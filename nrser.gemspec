@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.authors       = ["nrser"]
   spec.email         = ["neil@neilsouza.com"]
   spec.summary       = %q{basic ruby utils i use in a lot of stuff.}
-  spec.homepage      = ""
+  spec.homepage      = "https://github.com/nrser/nrser-ruby"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files -z`.split("\x0")
