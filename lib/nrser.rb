@@ -26,6 +26,14 @@ module NRSER
     end
   end
 
+  refine Exception do
+    def format
+      NRSER.format_exception self
+    end
+  end
+
+  using NRSER
+
   def self.unblock str
     parts = str.split(/\n\s+/)
     if m = parts[0].match(/^\s+/)
@@ -80,5 +88,13 @@ module NRSER
     require 'erb'
     filter_repeated_blank_lines ERB.new(dedent(str)).result(bnd)
   end # template
+
+  def self.format_exception e
+    msg = "#{ e.message } (#{ e.class }):\n  #{ e.backtrace.join("\n  ") }"
+    File.open('./tmp/out.txt', 'w') do |f|
+      f.puts msg
+    end
+    msg
+  end
 
 end
