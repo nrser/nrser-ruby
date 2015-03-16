@@ -94,11 +94,7 @@ module NRSER
   end # template
 
   def self.format_exception e
-    msg = "#{ e.message } (#{ e.class }):\n  #{ e.backtrace.join("\n  ") }"
-    File.open('./tmp/out.txt', 'w') do |f|
-      f.puts msg
-    end
-    msg
+    "#{ e.message } (#{ e.class }):\n  #{ e.backtrace.join("\n  ") }"
   end
 
   # adapted from acrive_support 4.2.0
