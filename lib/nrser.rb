@@ -24,7 +24,11 @@ module NRSER
     def dedent
       NRSER.dedent self
     end
-  end
+
+    def indent
+      NRSER.indent self
+    end
+  end # refine String
 
   refine Exception do
     def format
@@ -95,6 +99,16 @@ module NRSER
       f.puts msg
     end
     msg
+  end
+
+  # adapted from acrive_support 4.2.0
+  # 
+  # <https://github.com/rails/rails/blob/7847a19f476fb9bee287681586d872ea43785e53/activesupport/lib/active_support/core_ext/string/indent.rb>
+  #
+  def self.indent str, amount = 2, indent_string=nil, indent_empty_lines=false
+    indent_string = indent_string || str[/^[ \t]/] || ' '
+    re = indent_empty_lines ? /^/ : /^(?!$)/
+    str.gsub(re, indent_string * amount)
   end
 
 end
