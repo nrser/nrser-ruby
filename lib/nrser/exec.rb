@@ -1,5 +1,6 @@
+require 'nrser'
 
-module NRSER; end
+using NRSER
 
 module NRSER::Exec
   # substitute stuff into a shell command after escaping with 
