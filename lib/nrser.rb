@@ -25,8 +25,8 @@ module NRSER
       NRSER.dedent self
     end
 
-    def indent
-      NRSER.indent self
+    def indent *args
+      NRSER.indent self, *args
     end
 
     def truncate *args
