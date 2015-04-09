@@ -3,6 +3,27 @@ require 'nrser'
 using NRSER
 
 module NRSER::Exec
+  class Result
+    attr_reader :cmd, :exitstatus, :output
+
+    def initialize cmd, exitstatus, output
+      @cmd = cmd
+      @exitstatus = exitstatus
+      @output = output
+    end
+
+    def raise_error
+      raise SystemCallError.new <<-BLOCK.unblock, @exitstatus
+        cmd `#{ @cmd }` failed with status #{ @exitstatus }
+        and output #{ @output.inspect }
+      BLOCK
+    end
+
+    def success?
+      @exitstatus == 0
+    end
+  end
+
   # substitute stuff into a shell command after escaping with 
   # `Shellwords.escape`.
   #
@@ -49,5 +70,11 @@ module NRSER::Exec
         and output #{ output.inspect }
       BLOCK
     end
-  end # ::exec
+  end # ::run
+
+  def self.result cmd, subs = nil
+    cmd = sub(cmd, subs) unless subs.nil?
+    output = `#{ cmd } 2>&1`
+    Result.new cmd, $?.exitstatus, output
+  end # ::result
 end
