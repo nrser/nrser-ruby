@@ -19,8 +19,16 @@ module NRSER::Exec
       BLOCK
     end
 
+    def check_error
+      raise_error unless success?
+    end
+
     def success?
       @exitstatus == 0
+    end
+
+    def failure?
+      ! success?
     end
   end
 
