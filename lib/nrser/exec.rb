@@ -1,3 +1,5 @@
+require 'shellwords'
+
 require 'nrser'
 
 using NRSER
