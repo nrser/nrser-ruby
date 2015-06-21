@@ -1,47 +1,6 @@
 require "nrser/version"
 
 module NRSER
-  module KernelRefinements
-    def tpl *args
-      NRSER::template *args
-    end
-  end
-
-  refine Object do
-    include KernelRefinements
-
-    def pipe
-      yield self
-    end
-
-  end
-
-  refine String do
-    def unblock
-      NRSER.unblock self
-    end
-
-    def dedent
-      NRSER.dedent self
-    end
-
-    def indent *args
-      NRSER.indent self, *args
-    end
-
-    def truncate *args
-      NRSER.truncate self, *args
-    end
-  end # refine String
-
-  refine Exception do
-    def format
-      NRSER.format_exception self
-    end
-  end
-
-  using NRSER
-
   def self.unblock str
     parts = str.split(/\n\s+/)
     if m = parts[0].match(/^\s+/)
@@ -96,6 +55,11 @@ module NRSER
     require 'erb'
     filter_repeated_blank_lines ERB.new(dedent(str)).result(bnd)
   end # template
+
+  # alias
+  def self.tpl bnd, str
+    template bnd, str
+  end # tpl
 
   def self.format_exception e
     "#{ e.message } (#{ e.class }):\n  #{ e.backtrace.join("\n  ") }"

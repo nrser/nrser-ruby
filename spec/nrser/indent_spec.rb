@@ -1,7 +1,5 @@
 require 'spec_helper'
 
-using NRSER
-
 describe "NRSER.indent" do
   it "indents a block" do
     expect(
@@ -21,31 +19,4 @@ BLOCK
     expect( NRSER.indent "blah" ).to eq "  blah"
   end
 
-  it "refines String to add indent" do
-    expect(
-      <<-BLOCK.indent
-def f x
-  x * x
-end
-      BLOCK
-    ).to eq <<-BLOCK
-  def f x
-    x * x
-  end
-BLOCK
-  end
-
-  it "accepts arguments to the refinement of String" do
-    expect(
-      <<-BLOCK.indent(4)
-def f x
-  x * x
-end
-      BLOCK
-    ).to eq <<-BLOCK
-    def f x
-      x * x
-    end
-BLOCK
-  end
 end # indent

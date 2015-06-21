@@ -1,32 +1,20 @@
 require 'spec_helper'
 
-using NRSER
-
 describe 'NRSER.template' do
-  it "refines tpl in object like it was defined in Kernel" do
-    expect(
-      tpl binding, <<-BLOCK
-        hey
-      BLOCK
-    ).to eq <<-BLOCK.dedent
-        hey
-      BLOCK
-  end
-
   it "processes a simple template" do
     x = 1
 
     expect(
-      tpl binding, <<-BLOCK
+      NRSER.template binding, <<-BLOCK
         x is <%= x %>
       BLOCK
-    ).to eq <<-BLOCK.dedent
+    ).to eq NRSER.dedent <<-BLOCK
       x is 1
     BLOCK
   end
 
   it "handles edge cases" do
-    expect( tpl binding, ''     ).to eq ''
-    expect( tpl binding, 'blah' ).to eq 'blah'
+    expect( NRSER.template binding, ''     ).to eq ''
+    expect( NRSER.template binding, 'blah' ).to eq 'blah'
   end
 end # template
