@@ -52,12 +52,12 @@ module NRSER
       out.join
     end # filter_repeated_blank_lines
 
-    def template bnd, str
+    def erb bnd, str
       require 'erb'
       filter_repeated_blank_lines ERB.new(dedent(str)).result(bnd)
-    end # template
+    end # erb
 
-    alias_method :tpl, :template
+    alias_method :template, :erb
 
     def format_exception e
       "#{ e.message } (#{ e.class }):\n  #{ e.backtrace.join("\n  ") }"

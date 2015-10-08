@@ -3,10 +3,10 @@ require 'nrser/refinements'
 
 using NRSER
 
-describe 'NRSER.template' do
-  it "refines tpl in object like it was defined in Kernel" do
+describe 'Binding#erb' do
+  it "refines NRSER.erb into Binding" do
     expect(
-      tpl binding, <<-BLOCK
+      binding.erb <<-BLOCK
         hey
       BLOCK
     ).to eq <<-BLOCK.dedent
@@ -18,7 +18,7 @@ describe 'NRSER.template' do
     x = 1
 
     expect(
-      tpl binding, <<-BLOCK
+      binding.erb <<-BLOCK
         x is <%= x %>
       BLOCK
     ).to eq <<-BLOCK.dedent
@@ -27,7 +27,7 @@ describe 'NRSER.template' do
   end
 
   it "handles edge cases" do
-    expect( tpl binding, ''     ).to eq ''
-    expect( tpl binding, 'blah' ).to eq 'blah'
+    expect( binding.erb '' ).to eq ''
+    expect( binding.erb 'blah' ).to eq 'blah'
   end
-end # template
+end # Binding#erb

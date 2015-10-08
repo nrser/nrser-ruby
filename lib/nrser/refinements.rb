@@ -1,20 +1,15 @@
 module NRSER
-  module KernelRefinements
-    def tpl *args
-      NRSER::template *args
-    end
-  end
-
   refine Object do
-    include KernelRefinements
-
     def pipe
       yield self
     end
-
   end
 
   refine String do
+    def squish
+      NRSER.squish self
+    end
+    
     def unblock
       NRSER.unblock self
     end
@@ -35,6 +30,12 @@ module NRSER
   refine Exception do
     def format
       NRSER.format_exception self
+    end
+  end
+  
+  refine Binding do
+    def erb str
+      NRSER.template self, str
     end
   end
 end # NRSER
