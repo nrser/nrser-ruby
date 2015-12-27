@@ -188,11 +188,14 @@ module NRSER
     # *pure*
     # 
     # creates methods closed around a `NRSER::Logger` instance to be attached
-    # to objects to access the logger and do logging.
+    # to objects to access the logger and do logging and 'installs' them on
+    # the target.
+    # 
+    # @param target [Object] object to install methods on.
     # 
     # @param logger [NRSER::Logger] the logger to bind the methods to.
     # 
-    # @return [Hash<Symbol, Proc>] methods closed around the logger by name.
+    # @return nil
     # 
     def self.install_methods! target, logger
       methods = {
@@ -223,6 +226,8 @@ module NRSER
           target.send :define_method, sym, &body
         end
       end
+      
+      nil
     end
     
     
