@@ -3,13 +3,13 @@
 #   [:global, 'main']
 # end
 
-class Logger
+class Logger_
   
   def self.create obj
     puts "creating for #{ obj }"
     
     name = obj.respond_to?(:name) ? obj.name : obj.to_s
-    logger = Logger.new(name)
+    logger = Logger_.new(name)
     obj.instance_variable_set :@logger, logger
     
     body = ->(msg) {
@@ -64,12 +64,12 @@ class Logger
   end
   
   def log msg
-    puts "logging from Logger #{ @name }: #{ msg }"
+    puts "logging from Logger_ #{ @name }: #{ msg }"
     @name
   end
 end
 
-Logger.create self
+Logger_.create self
 
 module M1
   def self.f msg
@@ -78,7 +78,7 @@ module M1
 end
 
 module M2
-  Logger.create self
+  Logger_.create self
   
   def self.f msg
     log msg
@@ -86,7 +86,7 @@ module M2
 end
 
 class C1
-  Logger.create self
+  Logger_.create self
   
   def self.f msg
     log msg
@@ -108,10 +108,10 @@ class C2 < C1
 end
 
 module M3
-  Logger.create self
+  Logger_.create self
   
   module M4
-    Logger.reference self, M3
+    Logger_.reference self, M3
     
     def self.f msg
       log msg
