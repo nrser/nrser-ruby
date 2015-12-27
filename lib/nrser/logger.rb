@@ -1,4 +1,7 @@
 require 'logger'
+require 'yaml'
+require 'pp'
+require 'json'
 
 require 'nrser'
 require 'nrser/refinements'
@@ -42,75 +45,6 @@ module NRSER
       false
     end
 
-    module Include
-      module ClassMethods
-
-        def logger
-          class_variable_get(:@@__logger)
-        end
-
-        def debug *args
-          send_log :debug, *args
-        end
-
-        def info *args
-          send_log :info, *args
-        end
-
-        def warn *args
-          send_log :warn, *args
-        end
-
-        def error *args
-          send_log :error, *args
-        end
-
-        def fatal *args
-          send_log :fatal, *args
-        end
-
-        def send_log method_name, *args
-          return unless configured?
-          logger.send method_name, *args
-        end
-
-        def configured?
-          class_variable_defined?(:@@__logger)
-        end
-
-        def configure_logger options = {}
-          options[:name] ||= self.name
-          instance = Plistener::Logger.new(options)
-          class_variable_set :@@__logger, instance
-          instance
-        end
-      end # ClassMethods
-
-      def debug *args
-        self.class.debug *args
-      end
-
-      def info *args
-        self.class.info *args
-      end
-
-      def warn *args
-        self.class.warn *args
-      end
-
-      def error *args
-        self.class.error *args
-      end
-
-      def fatal *args
-        self.class.fatal *args
-      end
-
-      def self.included base
-        base.extend ClassMethods
-      end
-    end # Include
-
     # class functions
     # ==============
 
@@ -119,13 +53,41 @@ module NRSER
     #
     # format a debug message with optional key / values to print
     #
+    # @param name [String] logger name.
+    # @param level [String, Symbol, Fixnum] the level in string, symbol or 
+    #     integer form.
     # @param msg [String] message to print.
-    # @param dump [Hash] optional hash of keys and vaues to dump.
-    def self.format msg, dump = {}
-      unless dump.empty?
-        msg += "\n" + dump.map {|k, v| "  #{ k }: #{ v.inspect }" }.join("\n")
+    # @param dump [Hash] optional hash of keys and vaues to dump.    
+    def self.format name, level, msg, dump = {}
+      data = {
+        'logger' => name,
+        'time' => Time.now,
+      }
+      
+      data['msg'] = msg unless msg.empty?
+      data['values'] = dump_value(dump) unless dump.empty?
+      
+      YAML.dump level_name(level) => data
+    end
+    # prev:
+    # def self.format msg, dump = {}
+    #   unless dump.empty?
+    #     msg += "\n" + dump.map {|k, v| "  #{ k }: #{ v.inspect }" }.join("\n")
+    #   end
+    #   msg
+    # end
+    
+    def self.dump_value value      
+      case value
+      when String, Fixnum, Float, TrueClass, FalseClass
+        value
+      when Array
+        value.map {|v| dump_value v}
+      when Hash
+        value.map {|k, v| [k.to_s, dump_value(v)]}.to_h
+      else
+        value.pretty_inspect
       end
-      msg
     end
 
     # @api util
@@ -221,12 +183,96 @@ module NRSER
         level.downcase.to_sym
       end
     end
+    
+    # @api util
+    # *pure*
+    # 
+    # creates methods closed around a `NRSER::Logger` instance to be attached
+    # to objects to access the logger and do logging.
+    # 
+    # @param logger [NRSER::Logger] the logger to bind the methods to.
+    # 
+    # @return [Hash<Symbol, Proc>] methods closed around the logger by name.
+    # 
+    def self.install_methods! target, logger
+      methods = {
+        logger: ->() {
+          logger
+        },
+      }
+      
+      LEVEL_SYMS.each do |sym|
+        methods[sym] = ->(*args, &block) {
+          logger.send sym, *args, &block
+        }
+      end
+      
+      if target.is_a? Class
+        methods.each do |sym, body|
+          target.define_singleton_method sym, &body
+          target.send :define_method, sym, &body
+        end
+        
+      elsif target.is_a? Module
+        methods.each do |sym, body|
+          target.define_singleton_method sym, &body
+        end
+        
+      else
+        methods.each do |sym, body|
+          target.send :define_method, sym, &body
+        end
+      end
+    end
+    
+    
+    # creates a new `NRSER::Logger` and 'installs' a logger on target, adding
+    # singleton (class) and instance methods as appropriate
+    #
+    # @param target [Object] the object to install a new logger on, which can
+    #     be a Module, a Class, or just any plain-old instance that you want
+    #     to have it's own logger client.
+    # 
+    # @param options [Hash] options used when creating the `NRSER::Logger`.
+    # @see NRSER::Logger#initialize
+    # 
+    # @return [NRSER::Logger] the new `NRSER::Logger` instance.
+    # 
+    def self.install target, options = {}
+      options[:on] ||= false
+      options[:name] ||= if target.respond_to?(:name) && !target.name.nil?
+        target.name
+      else
+        target.to_s
+      end
+      
+      logger = self.new options
+      install_methods! target, logger
+      
+      logger
+    end # .install
+    
+    
+    # singleton (class) and instance methods as appropriate
+    #
+    # 
+    # @param source [Object] source instance with a logger installed to use
+    #     for the target.
+    # 
+    # @param target [Object] the object to use the source's logger.
+    # 
+    # @return [NRSER::Logger] the new `NRSER::Logger` instance.
+    # 
+    def self.use source, target
+      install_methods! target, source.logger
+    end # .use
+    
 
-    attr_reader :name, :dest, :level
+    attr_reader :name, :dest, :level, :ruby_logger
 
     def initialize options = {}
       options = {
-        dest: $stdout,
+        dest: $stderr,
         level: :info,
         say_hi: true,
         on: true,
@@ -235,31 +281,18 @@ module NRSER
       @name = options[:name]
       @on = options[:on]
       @dest = options[:dest]
-      @level = options[:level]
+      @level = self.class.level_int options[:level]
 
-      @logger = ::Logger.new @dest
-      @logger.level = self.class.level_int @level
+      @ruby_logger = ::Logger.new @dest
+      @ruby_logger.level = @level
 
-      @logger.formatter = proc do |severity, datetime, progname, msg|
-        prefix = "[#{ progname } #{ severity } #{ datetime.strftime('%Y.%m.%d-%H.%M.%s.%L') }]"
-        padding = " " * (prefix.length + 1)
-
-        if SEVERITY_COLORS[severity]
-          prefix = @@pastel.method(SEVERITY_COLORS[severity]).call prefix
-        end
-
-        prefix = prefix + " "
-
-        lines = msg.split "\n"
-        new_lines = [prefix + lines.first]
-        lines[1..-1].each do |line|
-          new_lines << (padding + line)
-        end
-        new_lines.join("\n") + "\n"
+      @ruby_logger.formatter = proc do |severity, datetime, progname, msg|
+        # just pass through
+        msg
       end
 
       if @on && options[:say_hi]
-        info NRSER.squish <<-END
+        info <<-END.squish
           started to logging to #{ @dest } at level
           #{ self.class.level_name @level }...
         END
@@ -297,7 +330,7 @@ module NRSER
     end
 
     def level= level
-      @logger.level = @level = level
+      @ruby_logger.level = @level = self.class.level_int(level)
     end
 
     def debug *args
@@ -321,9 +354,9 @@ module NRSER
     end
 
     private
-      def send_log level_name, args
-        return unless @on
-
+      def send_log level_sym, args
+        return unless @on && @level <= self.class.level_int(level_sym)
+        
         msg = ''
         dump = {}
         case args.length
@@ -342,11 +375,11 @@ module NRSER
           raise "must provide one or two arguments, not #{ args.length }"
         end
 
-        @logger.send(level_name, @name) {
-          Plistener::Logger.format(msg, dump)
+        @ruby_logger.send(level_sym, @name) {
+          NRSER::Logger.format(@name, level_sym, msg, dump)
         }
       end
     # end private
 
   end # Logger
-end # Plistener
+end # NRSER
