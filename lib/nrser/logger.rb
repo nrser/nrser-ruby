@@ -337,34 +337,50 @@ module NRSER
     def level= level
       @ruby_logger.level = @level = self.class.level_int(level)
     end
-
-    def debug *args
-      send_log :debug, args
+    
+    def with_level level, &block
+      prev_level = self.level
+      self.level = level
+      block.call
+      self.level = prev_level
     end
 
-    def info *args
-      send_log :info, args
+    def debug *args, &block
+      send_log :debug, args, block
     end
 
-    def warn *args
-      send_log :warn, args
+    def info *args, &block
+      send_log :info, args, block
     end
 
-    def error *args
-      send_log :error, args
+    def warn *args, &block
+      send_log :warn, args, block
     end
 
-    def fatal *args
-      send_log :fatal, args
+    def error *args, &block
+      send_log :error, args, block
+    end
+
+    def fatal *args, &block
+      send_log :fatal, args, block
     end
 
     private
-      def send_log level_sym, args
+      def send_log level_sym, args, block
         return unless @on && @level <= self.class.level_int(level_sym)
         
         msg = ''
         dump = {}
         case args.length
+        when 0
+          # if there is no block, just no-op
+          # @todo is this the right way to go?
+          return if block.nil?
+          
+          result = block.call
+          result = [result] unless result.is_a? Array
+          
+          send_log level_sym, result, nil
         when 1
           case args[0]
           when Hash
