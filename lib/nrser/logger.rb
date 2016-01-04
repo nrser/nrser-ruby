@@ -89,7 +89,7 @@ module NRSER
       when Array
         value.map {|v| dump_value v}
       when Hash
-        value.map {|k, v| [k.to_s, dump_value(v)]}.to_h
+        Hash[value.map {|k, v| [k.to_s, dump_value(v)]}]
       else
         value.pretty_inspect
       end
