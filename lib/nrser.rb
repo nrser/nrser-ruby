@@ -1,4 +1,5 @@
 require "nrser/version"
+require "nrser/collection"
 
 module NRSER
   class << self

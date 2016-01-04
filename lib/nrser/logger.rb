@@ -36,14 +36,19 @@ module NRSER
     # class variables
     # ===============
     
-    # if pastel is present, this will be an instance of `Pastel`
-    # otherwise, it will be false
+    # [Pastel, false] if pastel is present, this will be an instance of
+    # `Pastel` otherwise, it will be false
     @@pastel = begin
       require 'pastel'
       Pastel.new
     rescue LoadError => e
       false
     end
+    
+    # [Hash<IO, ::Logger>] map of IO instances (files, STDOUT, STDERR, etc.)
+    # to Ruby stdlib `Logger` instances that handle the actual writing to
+    # that destination.
+    @ruby_loggers = {}
 
     # class functions
     # ==============
@@ -271,7 +276,6 @@ module NRSER
     def self.use source, target
       install_methods! target, source.logger
     end # .use
-    
 
     attr_reader :name, :dest, :level, :ruby_logger
 
@@ -285,16 +289,8 @@ module NRSER
 
       @name = options[:name]
       @on = options[:on]
-      @dest = options[:dest]
       @level = self.class.level_int options[:level]
-
-      @ruby_logger = ::Logger.new @dest
-      @ruby_logger.level = @level
-
-      @ruby_logger.formatter = proc do |severity, datetime, progname, msg|
-        # just pass through
-        msg
-      end
+      self.dest = options[:dest]
 
       if @on && options[:say_hi]
         info <<-END.squish
@@ -335,7 +331,11 @@ module NRSER
     end
 
     def level= level
-      @ruby_logger.level = @level = self.class.level_int(level)
+      @level = self.class.level_int(level)
+      @ruby_loggers.each do |dest, ruby_logger|
+        ruby_logger.level = @level
+      end
+      @level
     end
     
     def with_level level, &block
@@ -344,23 +344,45 @@ module NRSER
       block.call
       self.level = prev_level
     end
-
+    
+    def dest= dest
+      @ruby_loggers = {}
+      NRSER.each dest do |dest|
+        @ruby_loggers[dest] = ::Logger.new(dest).tap do |ruby_logger|
+          ruby_logger.level = @level
+          ruby_logger.formatter = proc do |severity, datetime, progname, msg|
+            # just pass through
+            msg
+          end
+        end
+      end
+      @dest = dest
+    end
+    
+    # logging api
+    # ===========
+    
+    # @api logging
     def debug *args, &block
       send_log :debug, args, block
     end
-
+    
+    # @api logging
     def info *args, &block
       send_log :info, args, block
     end
-
+    
+    # @api logging
     def warn *args, &block
       send_log :warn, args, block
     end
 
+    # @api logging
     def error *args, &block
       send_log :error, args, block
     end
 
+    # @api logging
     def fatal *args, &block
       send_log :fatal, args, block
     end
@@ -396,10 +418,13 @@ module NRSER
           raise "must provide one or two arguments, not #{ args.length }"
         end
 
-        @ruby_logger.send(level_sym, @name) {
-          NRSER::Logger.format(@name, level_sym, msg, dump)
-        }
+        @ruby_loggers.each do |dest, ruby_logger|
+          ruby_logger.send(level_sym, @name) do
+            NRSER::Logger.format(@name, level_sym, msg, dump)
+          end
+        end
       end
+      
     # end private
 
   end # Logger
