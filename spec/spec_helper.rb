@@ -1,3 +1,5 @@
+require 'cmds'
+
 $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 require 'nrser'
 require 'nrser/logger'

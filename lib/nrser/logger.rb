@@ -24,6 +24,8 @@ module NRSER
       :fatal,
       :unknown,
     ]
+    
+    LOGGING_METHODS = LEVEL_SYMS - [:unknown] + [:die]
 
     SEVERITY_COLORS = {
       'DEBUG' => :bright_black,
@@ -209,7 +211,7 @@ module NRSER
         },
       }
       
-      LEVEL_SYMS.each do |sym|
+      LOGGING_METHODS.each do |sym|
         methods[sym] = ->(*args, &block) {
           logger.send sym, *args, &block
         }
