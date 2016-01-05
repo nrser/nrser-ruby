@@ -386,23 +386,35 @@ module NRSER
     def fatal *args, &block
       send_log :fatal, args, block
     end
+    
+    # @api logging
+    def die *args, &block
+      if @on
+        send_log :fatal, args, block
+        abort
+      else
+        abort self.class.format(
+          @name,
+          :fatal,
+          *extract_msg_and_dump(args, block)
+        )
+      end
+    end
 
     private
-      def send_log level_sym, args, block
-        return unless @on && @level <= self.class.level_int(level_sym)
-        
+      def extract_msg_and_dump args, block
         msg = ''
         dump = {}
         case args.length
         when 0
           # if there is no block, just no-op
           # @todo is this the right way to go?
-          return if block.nil?
-          
-          result = block.call
-          result = [result] unless result.is_a? Array
-          
-          send_log level_sym, result, nil
+          if block
+            result = block.call
+            result = [result] unless result.is_a? Array
+            
+            return extract_msg_and_dump result, nil
+          end
         when 1
           case args[0]
           when Hash
@@ -417,10 +429,18 @@ module NRSER
         else
           raise "must provide one or two arguments, not #{ args.length }"
         end
+        
+        [msg, dump]
+      end
+    
+      def send_log level_sym, args, block
+        return unless @on && @level <= self.class.level_int(level_sym)
+        
+        msg, dump = extract_msg_and_dump args, block
 
         @ruby_loggers.each do |dest, ruby_logger|
           ruby_logger.send(level_sym, @name) do
-            NRSER::Logger.format(@name, level_sym, msg, dump)
+            self.class.format(@name, level_sym, msg, dump)
           end
         end
       end
