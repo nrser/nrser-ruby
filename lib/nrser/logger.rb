@@ -206,31 +206,36 @@ module NRSER
     # 
     def self.install_methods! target, logger
       methods = {
-        logger: ->() {
-          logger
+        logger: {
+          private: false,
+          body: ->() { logger },
         },
       }
       
       LOGGING_METHODS.each do |sym|
-        methods[sym] = ->(*args, &block) {
-          logger.send sym, *args, &block
+        methods[sym] = {
+          private: true,
+          body: ->(*args, &block) { logger.send sym, *args, &block },
         }
       end
       
       if target.is_a? Class
-        methods.each do |sym, body|
-          target.define_singleton_method sym, &body
-          target.send :define_method, sym, &body
+        methods.each do |sym, stuff|
+          target.define_singleton_method sym, &stuff[:body]
+          target.send :define_method, sym, &stuff[:body]
+          target.send :private, sym if stuff[:private]
         end
         
       elsif target.is_a? Module
-        methods.each do |sym, body|
-          target.define_singleton_method sym, &body
+        methods.each do |sym, stuff|
+          target.define_singleton_method sym, &stuff[:body]
+          target.private_class_method sym if stuff[:private]
         end
         
       else
-        methods.each do |sym, body|
-          target.send :define_method, sym, &body
+        methods.each do |sym, stuff|
+          target.send :define_method, sym, &stuff[:body]
+          target.send :private, sym if stuff[:private]
         end
       end
       

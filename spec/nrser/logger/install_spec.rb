@@ -57,11 +57,11 @@ describe 'NRSER::Logger.install' do
     expect(mod.logger).to_not be MAIN.logger
     expect(mod.logger.name).to match /\#\<Module/
     
-    expect_to_not_log { mod.info "hey" }
+    expect_to_not_log { mod.send :info, "hey" }
     
     mod.logger.on
     
-    expect_to_log { mod.info "hey" }
+    expect_to_log { mod.send :info, "hey" }
   end
   
   it "installs in classes" do
@@ -77,22 +77,22 @@ describe 'NRSER::Logger.install' do
     expect(c.logger).to be cls.logger
     expect(c.logger.name).to match /\#\<Class/
     
-    expect_to_not_log { cls.info "hey" }
-    expect_to_not_log { c.info "hey" }
+    expect_to_not_log { cls.send :info, "hey" }
+    expect_to_not_log { c.send :info, "hey" }
     
     cls.logger.on
     
-    expect_to_log { cls.info "hey" }
-    expect_to_log { c.info "hey" }
+    expect_to_log { cls.send :info, "hey" }
+    expect_to_log { c.send :info, "hey" }
     
-    expect_to_not_log { cls.debug "hey" }
+    expect_to_not_log { cls.send :debug, "hey" }
     
     # @todo hmmm... this switches the log level for the entire class, not
     #     the instance...
     c.logger.level = :debug
     
-    expect_to_log { cls.debug "hey" }
-    expect_to_log { c.debug "hey" }
+    expect_to_log { cls.send :debug, "hey" }
+    expect_to_log { c.send :debug, "hey" }
   end
   
 end

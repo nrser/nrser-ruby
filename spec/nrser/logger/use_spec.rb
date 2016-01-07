@@ -10,7 +10,7 @@ describe 'NRSER::Logger.use' do
       end
     end
     
-    expect_to_log { Source::Target.info "here" }
+    expect_to_log { Source::Target.send :info, "here" }
     expect(Source::Target.logger).to be Source.logger
   end
 end
