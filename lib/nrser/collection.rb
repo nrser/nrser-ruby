@@ -1,3 +1,5 @@
+require 'set'
+
 module NRSER
   # include this module in any custom classes to have them treated as
   # collections instead of individual objects by the methods in this file
