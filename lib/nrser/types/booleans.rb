@@ -40,4 +40,8 @@ module NRSER::Types
     BOOL
   end
   
+  def self.boolean
+    bool
+  end
+  
 end # NRSER::Types

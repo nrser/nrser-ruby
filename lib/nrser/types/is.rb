@@ -17,7 +17,11 @@ module NRSER::Types
     end
     
     def test value
-      @value === value
+      @value.equal? value
+    end
+    
+    def == other
+      equal?(other) || @value === other.value
     end
   end # Is
   

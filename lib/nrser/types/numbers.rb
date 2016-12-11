@@ -40,6 +40,10 @@ module NRSER::Types
     INT
   end
   
+  def self.integer
+    int
+  end
+  
   # bounded integers
   # ================
   # 

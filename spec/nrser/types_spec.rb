@@ -122,6 +122,23 @@ describe NRSER::Types do
         fail: ['hey'],
       },
       
+      t.array => {
+        pass: [[], [1, 2, 3]],
+        fail: [nil, {}, '1,2,3'],
+        from_s: {
+          pass: ['1,2,3', '', '[1,2,3]', 'a, b, c'],
+        }
+      },
+      
+      t.array(t.int) => {
+        pass: [[], [1, 2, 3]],
+        fail: [['1']],
+        from_s: {
+          pass: ['1,2,3', '', '[1,2,3]'],
+          fail: ['a,b,c'],
+        }
+      },
+      
     }.each do |type, tests|
       if tests[:pass]
         tests[:pass].each do |value|
@@ -156,4 +173,21 @@ describe NRSER::Types do
       end # from_s
     end # each
   end # basic types #test and #check
+  
+  describe ".from_repr" do
+    {
+      t.str => ['string', 'str', 'String', 'STRING', 'STR'],
+      t.int => ['int', 'integer', 'Integer', 'INT'],
+      t.bool => ['bool', 'boolean', 'Boolean', 'BOOL'],
+      t.array => ['array', 'list', 'Array'],
+      # t.union('a', 'b', 'c') => 
+    }.each do |type, inputs|
+      inputs.each do |input|
+        it "converts #{ input.inspect } to #{ type }" do
+          expect(NRSER::Types.from_repr input).to eq type
+        end
+      end
+    end
+  end # #from_repr
+  
 end # QB::Types

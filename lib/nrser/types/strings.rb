@@ -23,6 +23,10 @@ module NRSER::Types
     end
   end # string
   
+  def self.string
+    str
+  end
+  
   EMPTY_STR = Is.new ''
   
   NON_EMPTY_STR = str length: {min: 1}, name: "NonEmptyStr"

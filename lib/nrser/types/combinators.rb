@@ -44,6 +44,12 @@ module NRSER::Types
       raise TypeError,
         "none of union types could convert #{ string.inspect }"
     end
+    
+    def == other
+      equal?(other) || (
+        other.class == self.class && other.types == @types
+      )
+    end
   end
   
   class Union < Combinator        
