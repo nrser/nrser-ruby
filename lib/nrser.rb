@@ -114,3 +114,5 @@ module NRSER
 
   end # class << self
 end
+
+require "nrser/types"
