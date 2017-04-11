@@ -180,11 +180,11 @@ describe NRSER::Types do
       t.int => ['int', 'integer', 'Integer', 'INT'],
       t.bool => ['bool', 'boolean', 'Boolean', 'BOOL'],
       t.array => ['array', 'list', 'Array'],
-      t.union('a', 'b', 'c') => [
-        {
-          'one_of': ['a', 'b', 'c'],
-        }
-      ]
+      # t.union('a', 'b', 'c') => [
+      #   {
+      #     'one_of': ['a', 'b', 'c'],
+      #   }
+      # ]
     }.each do |type, inputs|
       inputs.each do |input|
         it "converts #{ input.inspect } to #{ type }" do
