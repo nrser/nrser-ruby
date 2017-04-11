@@ -21,3 +21,14 @@ tmp
 *.a
 mkmf.log
 tmp/
+##############################################################################
+# BEGIN Qb.gitingore
+#
+# generated qb playbooks
+.qb-playbook.yml
+
+# ansible retry files
+.qb-playbook.retry
+#
+# END Qb.gitingore
+##############################################################################
