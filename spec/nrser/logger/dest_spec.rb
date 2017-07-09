@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'tempfile'
 
 describe 'NRSER::Logger.dest=' do
   it "writes to multiple destinations" do
