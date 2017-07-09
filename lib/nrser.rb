@@ -1,5 +1,6 @@
-require "nrser/version"
-require "nrser/collection"
+require_relative './nrser/version'
+require_relative './nrser/collection'
+require_relative './nrser/truthy'
 
 module NRSER
   class << self
@@ -115,4 +116,4 @@ module NRSER
   end # class << self
 end
 
-require "nrser/types"
+require_relative "./nrser/types"
