@@ -14,5 +14,9 @@ module NRSER
     end
     
     alias_method :omit, :except
+    
+    def leaves
+      NRSER.leaves self
+    end # #leaves
   end # Hash
 end # NRSER
