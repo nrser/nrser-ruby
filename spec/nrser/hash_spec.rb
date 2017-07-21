@@ -1,5 +1,7 @@
 require 'spec_helper'
 
+using NRSER
+
 describe NRSER.method(:truncate) do
   it do
     expect(NRSER.leaves({a: 1, b: 2})).to eq ({[:a] => 1, [:b] => 2})
@@ -19,4 +21,4 @@ describe NRSER.method(:truncate) do
       [:b] => 'bee',
     })
   end
-end # indent
+end # truncate

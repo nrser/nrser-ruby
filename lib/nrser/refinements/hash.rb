@@ -1,5 +1,5 @@
 module NRSER
-  refine Hash do
+  refine ::Hash do
     # lifted from ActiveSupport
     def except! *keys
       keys.each { |key| delete(key) }
@@ -18,5 +18,13 @@ module NRSER
     def leaves
       NRSER.leaves self
     end # #leaves
+    
+    def map_values &block
+      result = {}
+      
+      self.each { |key, value| result[key] = block.call key, value }
+      
+      result
+    end
   end # Hash
 end # NRSER
