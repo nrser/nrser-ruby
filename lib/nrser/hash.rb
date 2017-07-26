@@ -31,8 +31,7 @@ module NRSER
   # option hash.
   # 
   # @example
-  # 
-  # 
+  #   Say you have a 
   # 
   def self.as_hash value, key
     return value if value.is_a? Hash
@@ -45,7 +44,7 @@ module NRSER
     end
     
     {key => value}
-  end
+  end # .as_hash
   
   
 end # module NRSER
