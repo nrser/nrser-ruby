@@ -117,4 +117,5 @@ module NRSER
 end
 
 require_relative './nrser/hash'
+require_relative './nrser/array'
 require_relative "./nrser/types"

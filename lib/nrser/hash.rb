@@ -1,6 +1,5 @@
 module NRSER
   
-  
   def self.leaves hash, path: [], results: {}
     hash.each { |key, value|
       new_path = [*path, key]
@@ -21,9 +20,14 @@ module NRSER
   # hash and can't be converted to one:
   # 
   # 1.  If the value is a `Hash`, return it.
-  # 2.  If the value responds to `#to_h` and `#to_h` succeeds, return the
+  #     
+  # 2.  If `value` is `nil`, return `{}`.
+  #     
+  # 3.  If the value responds to `#to_h` and `#to_h` succeeds, return the
   #     resulting hash.
-  # 3.  Otherwise, return a new hash where `key` points to the value.
+  #     
+  # 4.  Otherwise, return a new hash where `key` points to the value.
+  #     **`key` MUST be provided in this case.**
   # 
   # Useful in method overloading and similar situations where you expect a 
   # hash that may specify a host of options, but want to allow the method
@@ -78,14 +82,20 @@ module NRSER
   # @param [Object] value
   #   The value that we want to be a hash.
   # 
-  # @param [Object] key
+  # @param [Object] key [default nil]
   #   The key that `value` will be stored under in the result if `value` is 
-  #   not a hash or can't be turned into one via `#to_h`.
+  #   not a hash or can't be turned into one via `#to_h`. If this happens
+  #   this value can **NOT** be `nil` or an `ArgumentError` is raised.
   # 
   # @return [Hash]
   # 
-  def self.as_hash value, key
+  # @raise [ArgumentError]
+  #   If it comes to constructing a new Hash with `value` as a value and no
+  #   argument was provided 
+  # 
+  def self.as_hash value, key = nil
     return value if value.is_a? Hash
+    return {} if value.nil?
     
     if value.respond_to? :to_h
       begin
@@ -94,8 +104,14 @@ module NRSER
       end
     end
     
+    # at this point we need a key argument
+    if key.nil?
+      raise ArgumentError,
+            "Need key to construct hash with value #{ value.inspect }, " +
+            "found nil."
+    end
+    
     {key => value}
   end # .as_hash
-  
   
 end # module NRSER
