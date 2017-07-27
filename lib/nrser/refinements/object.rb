@@ -17,5 +17,10 @@ module NRSER
     def as_hash key = nil
       NRSER.as_hash self, key
     end
+    
+    # Calls {NRSER.as_array} in `self`.
+    def as_array
+      NRSER.as_array self
+    end
   end
 end # NRSER

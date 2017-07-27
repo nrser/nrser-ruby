@@ -48,4 +48,14 @@ describe "Refinements for Object" do
   end # #as_hash
   
   
+  describe '#as_array' do
+    context "self is nil" do
+      it "returns {}" do
+        expect(nil.as_array).to eq([])
+      end # returns {}
+    end # self is nil
+    
+  end # #as_array
+  
+  
 end # Refinements for Object

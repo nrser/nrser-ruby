@@ -14,10 +14,5 @@ module NRSER
       self.each { |key| result[key] = block.call key }
       result
     end
-    
-    # Calls {NRSER.as_array} in `self`.
-    def as_array
-      NRSER.as_array self
-    end
   end # Array
 end # NRSER
