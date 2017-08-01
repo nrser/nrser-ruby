@@ -15,16 +15,14 @@ module NRSER
     
     alias_method :omit, :except
     
+    # See {NRSER.leaves}.
     def leaves
       NRSER.leaves self
     end # #leaves
     
+    # See {NRSER.map_hash_values}.
     def map_values &block
-      result = {}
-      
-      self.each { |key, value| result[key] = block.call key, value }
-      
-      result
+      NRSER.map_hash_values self, &block
     end
   end # Hash
 end # NRSER

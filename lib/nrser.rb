@@ -116,6 +116,7 @@ module NRSER
   end # class << self
 end
 
+require_relative './nrser/enumerable'
 require_relative './nrser/hash'
 require_relative './nrser/array'
 require_relative "./nrser/types"
