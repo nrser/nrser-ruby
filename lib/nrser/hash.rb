@@ -130,4 +130,144 @@ module NRSER
     result
   end # #map_hash_values
   
+  
+  
+  # Lifted from ActiveSupport
+  # =====================================================================
+  # 
+  # Not sure *why* I didn't want to depend on ActiveSupport in the first place,
+  # but I'm guessing it's many other things depending on it and the potential
+  # for dependency hell, but anyways, I didn't, and I'm going to keep it that
+  # way for the moment.
+  # 
+  # However, I do want some of that functionality, and I think it makes sense
+  # to keep the names and behaviors the same since ActiveSupport is so wide
+  # spread.
+  # 
+  # The methods are modified to operate functionally since we use refinements
+  # instead of global monkey-patching, and Ruby versions before 2.1 (I think)
+  # don't support refinements, so these are useful in environments where you
+  # don't want to mess with the global built-ins and you don't have 
+  # refinements available.
+  # 
+  
+  # Removes the given keys from hash and returns it.
+  # 
+  # Lifted from ActiveSupport.
+  # 
+  # @see http://www.rubydoc.info/gems/activesupport/5.1.3/Hash:except!
+  # 
+  # @param [Hash] hash
+  #   Hash to mutate.
+  # 
+  # @return [Hash]
+  # 
+  def self.except_keys! hash, *keys
+    keys.each { |key| hash.delete(key) }
+    hash
+  end
+  
+  singleton_class.send :alias_method, :omit_keys!, :except_keys!
+  
+  
+  # Returns a new hash without `keys`.
+  # 
+  # Lifted from ActiveSupport.
+  # 
+  # @see http://www.rubydoc.info/gems/activesupport/5.1.3/Hash:except
+  # 
+  # @param [Hash] hash
+  #   Source hash.
+  # 
+  # @return [Hash]
+  # 
+  def self.except_keys hash, *keys
+    except_keys! hash.dup, *keys
+  end
+  
+  singleton_class.send :alias_method, :omit_keys, :except_keys
+  
+  
+  # Lifted from ActiveSupport.
+  # 
+  # @see http://www.rubydoc.info/gems/activesupport/5.1.3/Hash:transform_keys!
+  # 
+  # @param [Hash] hash
+  #   Hash to mutate keys.
+  # 
+  # @return [Hash]
+  #   The mutated hash.
+  # 
+  def self.transform_keys! hash
+    # File 'lib/active_support/core_ext/hash/keys.rb', line 23
+    hash.keys.each do |key|
+      hash[yield(key)] = hash.delete(key)
+    end
+    hash
+  end
+  
+  
+  # Returns a new hash with each key transformed by the provided block.
+  # 
+  # Lifted from ActiveSupport.
+  # 
+  # @see http://www.rubydoc.info/gems/activesupport/5.1.3/Hash:transform_keys
+  # 
+  # @param [Hash] hash
+  # 
+  # @return [Hash]
+  #   New hash with transformed keys.
+  # 
+  def self.transform_keys hash, &block
+    # File 'lib/active_support/core_ext/hash/keys.rb', line 12
+    result = {}
+    hash.each_key do |key|
+      result[yield(key)] = hash[key]
+    end
+    result
+  end
+  
+  # My-style name
+  singleton_class.send :alias_method, :map_hash_keys, :transform_keys
+  
+  
+  # Mutates `hash` by converting all keys that respond to `#to_sym` to symbols.
+  # 
+  # Lifted from ActiveSupport.
+  # 
+  # @see http://www.rubydoc.info/gems/activesupport/5.1.3/Hash:symbolize_keys!
+  # 
+  # @param [Hash] hash
+  #   Hash to mutate.
+  # 
+  # @return [return_type]
+  #   @todo Document return value.
+  # 
+  def self.symbolize_keys! hash
+    transform_keys!(hash) { |key| key.to_sym rescue key }
+  end # .symbolize_keys!
+  
+  
+  
+  def self.symbolize_keys hash
+    # File 'lib/active_support/core_ext/hash/keys.rb', line 54
+    transform_keys(hash) { |key| key.to_sym rescue key }
+  end
+  
+  # Lifted from ActiveSupport.
+  # 
+  # @see http://www.rubydoc.info/gems/activesupport/5.1.3/Hash:slice
+  # 
+  # 
+  def self.slice_keys hash, *keys
+    # We're not using this, but, whatever, leave it in...
+    if hash.respond_to?(:convert_key, true)
+      keys.map! { |key| hash.convert_key(key) }
+    end
+    
+    keys.each_with_object(hash.class.new) { |k, new_hash|
+      new_hash[k] = hash[k] if hash.has_key?(k)
+    }
+  end
+  
 end # module NRSER
