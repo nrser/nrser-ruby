@@ -13,14 +13,14 @@ module NRSER
     # next step, it's going to probably be *the* most common argument type,
     # and there's no reason to do the tests and set up the exception 
     # handler if we already know what's up with it.
-    return NRSER.map_hash_values(enumerable) if enumerable.is_a? Hash
+    return NRSER.map_hash_values(enumerable, &block) if enumerable.is_a? Hash
     
     if enumerable.respond_to? :to_h
       begin
         hash = enumerable.to_h
       rescue TypeError => e
       else
-        return NRSER.map_hash_values hash
+        return NRSER.map_hash_values hash, &block
       end
     end
     

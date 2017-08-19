@@ -55,7 +55,7 @@ module NRSER::Types
     Array.new *args
   end
   
-  def self.list
-    array
+  def self.list *args
+    array *args
   end
 end # NRSER::Types
