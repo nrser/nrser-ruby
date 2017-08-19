@@ -25,7 +25,7 @@ module Meta
 # 
 module ClassAttrs 
   
-  # Class methods to extend the receiver with when {NRSER::ClassAttrs}
+  # Class methods to extend the receiver with when {NRSER::Meta::ClassAttrs}
   # is included.
   module ClassMethods
     def instance_variable_lookup name
@@ -65,8 +65,7 @@ module ClassAttrs
     end
   end # module ClassMethods
   
-  # Extend the including class with
-  # {QB::Util::ClassInstanceMethods::ClassMethods}
+  # Extend the including class with {NRSER::Meta::ClassAttrs::ClassMethods}
   def self.included base
     base.extend ClassMethods
   end
