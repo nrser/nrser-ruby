@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe NRSER::ClassAttrs do
+describe NRSER::Meta::ClassAttrs do
   # I'm writing this as I'm developing the module, so I'm going to walk through
   # some of the motivation, features and differences from other approaches
   # as notes to self/others...
@@ -19,7 +19,7 @@ describe NRSER::ClassAttrs do
   
   let (:base) {
     Class.new do
-      include NRSER::ClassAttrs
+      include NRSER::Meta::ClassAttrs
       
       # To compare, I'll also work with standard '@@' class variables and 
       # an standard attr_accessors added to the classes themselves.
