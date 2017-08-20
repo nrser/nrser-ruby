@@ -1,189 +1,27 @@
+require 'nrser/refinements'
+require 'nrser/refinements/types'
+
+using NRSER
+using NRSER::Types
+
 module NRSER 
-module Meta 
+module Meta
 
-T = NRSER::Types
 
-# 
 module Props
+  CLASS_KEY = :'__class__';
   PROPS_VARIABLE_NAME = :@__NRSER_props
   PROP_VALUES_VARIABLE_NAME = :@__NRSER_prop_values
   
-  class Prop
-    attr_accessor :defined_in,
-                  :name,
-                  :type,
-                  :source
-    
-    
-    def initialize  defined_in,
-                    name,
-                    type: T.any,
-                    default: NRSER::NO_ARG,
-                    source: nil
-      
-      @defined_in = defined_in
-      @name = name
-      @type = NRSER::Types.make type
-      @source = source
-      @default = default
-      
-      if @source.nil?
-        @instance_variable_source = false
-      else
-        source_str = source.to_s
-        @instance_variable_source = source_str[0] == '@'
-      end
-    end
-    
-    
-    # @todo Document default? method.
-    # 
-    # @param [type] arg_name
-    #   @todo Add name param description.
-    # 
-    # @return [return_type]
-    #   @todo Document return value.
-    # 
-    def default?
-      @default != NRSER::NO_ARG
-    end # #default?
-    
-    
-    def default
-      if default?
-        @default
-      else
-        raise NameError.new NRSER.squish <<-END
-          Prop #{ self } has no default value.
-        END
-      end
-    end
-    
-    
-    # @todo Document source? method.
-    # 
-    # @param [type] arg_name
-    #   @todo Add name param description.
-    # 
-    # @return [return_type]
-    #   @todo Document return value.
-    # 
-    def source?
-      !@source.nil?
-    end # #source?
-    
-    
-    # @todo Document instance_variable_source? method.
-    # 
-    # @param [type] arg_name
-    #   @todo Add name param description.
-    # 
-    # @return [return_type]
-    #   @todo Document return value.
-    # 
-    def instance_variable_source?
-      @instance_variable_source
-    end # #instance_variable_source?
-    
-    
-    # @todo Document primary? method.
-    # 
-    # @param [type] arg_name
-    #   @todo Add name param description.
-    # 
-    # @return [return_type]
-    #   @todo Document return value.
-    # 
-    def primary?
-      !source?
-    end # #primary?
-    
-    
-    # @todo Document get method.
-    # 
-    # @param [type] arg_name
-    #   @todo Add name param description.
-    # 
-    # @return [return_type]
-    #   @todo Document return value.
-    # 
-    def get instance
-      if source?
-        if instance_variable_source?
-          instance.instance_variable_get source
-        else
-          instance.send source
-        end
-      else
-        values(instance)[name]
-      end
-    end # #get
-    
-    
-    # @todo Document set method.
-    # 
-    # @param [type] arg_name
-    #   @todo Add name param description.
-    # 
-    # @return [return_type]
-    #   @todo Document return value.
-    # 
-    def set instance, value
-      unless type.test value
-        raise TypeError.new NRSER.squish <<-END
-          #{ defined_in }##{ name } must be of type #{ type };
-          found #{ value.inspect }
-        END
-      end
-      
-      values(instance)[name] = value
-    end # #set
-    
-    
-    
-    # @todo Document set_from_hash method.
-    # 
-    # @param [type] arg_name
-    #   @todo Add name param description.
-    # 
-    # @return [return_type]
-    #   @todo Document return value.
-    # 
-    def set_from_values_hash instance, **values
-      if values.key? name
-        set instance, values[name]
-      else
-        if default?
-          set instance, default.dup
-        else
-          raise TypeError.new NRSER.squish <<-END
-            Prop #{ name } has no default value and no value was provided in
-            values #{ values.inspect }.
-          END
-        end
-      end
-    end # #set_from_hash
-    
-    
-    private
-      
-      # @todo Document values method.
-      # 
-      # @param [type] arg_name
-      #   @todo Add name param description.
-      # 
-      # @return [return_type]
-      #   @todo Document return value.
-      # 
-      def values instance
-        unless instance.instance_variable_defined? PROP_VALUES_VARIABLE_NAME
-          instance.instance_variable_set PROP_VALUES_VARIABLE_NAME, {}
-        end
-        
-        instance.instance_variable_get PROP_VALUES_VARIABLE_NAME
-      end # #value
-    
-  end # class Prop
+  
+  # Module Methods (Utilities)
+  # =====================================================================
+  # 
+  # These are *NOT* mixed in to including classes, and must be accessed 
+  # via `NRSER::Meta::Props.<method_name>`.
+  # 
+  # They're utilities that should only really need to be used internally.
+  # 
   
   
   # @todo Document get_props_ref method.
@@ -203,8 +41,18 @@ module Props
   end # .get_props_ref
   
   
+  # Hook to extend the including class with {NRSER::Meta::Props:ClassMethods}
+  def self.included base
+    base.extend ClassMethods
+  end
+  
+  
+  # Mixed-In Class Methods
+  # ===================================================================== 
+  
+  # Methods added to the including *class* via `extend`.
+  # 
   module ClassMethods
-    
     
     # @todo Document props method.
     # 
@@ -248,7 +96,7 @@ module Props
     def prop name, **opts
       ref = NRSER::Meta::Props.get_props_ref self
       
-      T.sym.check name
+      t.sym.check name
       
       if ref.key? name
         raise ArgumentError.new NRSER.squish <<-END
@@ -274,38 +122,11 @@ module Props
       end
     end # #prop
     
-    
-    
-    # @todo Document from_h method.
-    # 
-    # @param [type] arg_name
-    #   @todo Add name param description.
-    # 
-    # @return [return_type]
-    #   @todo Document return value.
-    # 
-    def from_h hash
-      self.new(
-        NRSER.slice_keys(
-          NRSER.symbolize_keys(hash),
-          *self.props(primary: true).keys
-        )
-      )
-    end # #from_h
-    
-      
   end # module ClassMethods
   
   
-  # Extend the including class with {NRSER::Meta::Props:ClassMethods}
-  def self.included base
-    base.extend ClassMethods
-  end
-  
-  
-  # Instance Methods
+  # Mixed-In Instance Methods
   # =====================================================================
-  
   
   # @todo Document initialize_props method.
   # 
@@ -330,10 +151,12 @@ module Props
   # @return [return_type]
   #   @todo Document return value.
   # 
-  def to_h primary: false, own: false
+  def to_h primary: false, own: false, add_class: true
     NRSER.map_values(
       self.class.props own: own, primary: primary
-    ) { |name, prop| prop.get self }
+    ) { |name, prop| prop.get self }.tap { |hash|
+      hash[CLASS_KEY] = self.class.name if add_class
+    }
   end # #to_h
   
   
@@ -360,4 +183,5 @@ end # module Props
 end # module Meta
 end # module NRSER
 
+require_relative './props/prop'
 require_relative './props/base'

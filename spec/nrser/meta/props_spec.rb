@@ -47,20 +47,20 @@ describe NRSER::Meta::Props do
     expect(p.x).to be 1
     expect(p.y).to be 2
     
-    expect(p.to_h).to eq({x: 1, y: 2, blah: "blah!"})
-    expect(p.to_h(primary: true)).to eq({x: 1, y: 2})
+    expect(p.to_h add_class: false).to eq({x: 1, y: 2, blah: "blah!"})
+    expect(p.to_h(primary: true, add_class: false)).to eq({x: 1, y: 2})
     
     expect { point.new x: 1, y: 'why?' }.to raise_error TypeError
     expect { p.x = 3 }.to raise_error NoMethodError
     
     p_hash = p.to_h
     
-    p2 = point.from_h p_hash
+    p2 = point.new p_hash
     
     expect(p2.x).to be 1
     expect(p2.y).to be 2
     
-    expect(p2.to_h).to eq({x: 1, y: 2, blah: "blah!"})
+    expect(p2.to_h add_class: false).to eq({x: 1, y: 2, blah: "blah!"})
   end
   
 end # NRSER::Meta::Props
