@@ -62,16 +62,16 @@ module Props
     # @return [return_type]
     #   @todo Document return value.
     # 
-    def props own: false, primary: false
-      result = if !own && superclass.respond_to?(:props)
-        superclass.props own: own, primary: primary
+    def props only_own: false, only_primary: false
+      result = if !only_own && superclass.respond_to?(:props)
+        superclass.props only_own: only_own, only_primary: only_primary
       else
         {}
       end
       
       own_props = NRSER::Meta::Props.get_props_ref self
       
-      if primary
+      if only_primary
         own_props.each {|name, prop|
           if prop.primary?
             result[name] = prop
@@ -137,7 +137,7 @@ module Props
   #   @todo Document return value.
   # 
   def initialize_props values
-    self.class.props(primary: true).each { |name, prop|
+    self.class.props(only_primary: true).each { |name, prop|
       prop.set_from_values_hash self, values
     }
   end # #initialize_props
@@ -148,16 +148,42 @@ module Props
   # @param [type] arg_name
   #   @todo Add name param description.
   # 
-  # @return [return_type]
+  # @return [Hash<Symbol, Object>]
   #   @todo Document return value.
   # 
-  def to_h primary: false, own: false, add_class: true
+  def to_h only_own: false, only_primary: false
     NRSER.map_values(
-      self.class.props own: own, primary: primary
-    ) { |name, prop| prop.get self }.tap { |hash|
-      hash[CLASS_KEY] = self.class.name if add_class
-    }
+      self.class.props only_own: only_own, only_primary: only_primary
+    ) { |name, prop| prop.get self }
   end # #to_h
+  
+  # Create a "data" representation suitable for transport, storage, etc.
+  # 
+  # The result is meant to consist of only basic data types and structures -
+  # strings, numbers, arrays, hashes, datetimes, etc... though it depends on 
+  # any custom objects it encounters correctly responding to `#to_data` for 
+  # this to happen (as is implemented from classes that mix in Props here).
+  # 
+  # Prop names are converted to strings (from symbols) since though YAML
+  # supports symbol values, they have poor portability across languages,
+  # and they mean the same thing in this situation. 
+  # 
+  # @param [type] arg_name
+  #   @todo Add name param description.
+  # 
+  # @return [Hash<String, Object>]
+  #   @todo Document return value.
+  # 
+  def to_data only_own: false, only_primary: false, add_class: true
+    self.class.props(only_own: false, only_primary: false).
+      map { |name, prop|
+        [name.to_s, prop.to_data(self)]
+      }.
+      to_h.
+      tap { |hash|
+        hash[CLASS_KEY] = self.class.name if add_class
+      }
+  end # #to_data
   
   
   # @todo Document to_json method.

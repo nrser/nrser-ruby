@@ -38,7 +38,7 @@ describe NRSER::Meta::Props do
     expect(props[:blah].source?).to be true
     expect(props[:blah].primary?).to be false
     
-    primary_props = point.props primary: true
+    primary_props = point.props only_primary: true
     
     expect(primary_props.key? :blah).to be false
     
@@ -47,8 +47,8 @@ describe NRSER::Meta::Props do
     expect(p.x).to be 1
     expect(p.y).to be 2
     
-    expect(p.to_h add_class: false).to eq({x: 1, y: 2, blah: "blah!"})
-    expect(p.to_h(primary: true, add_class: false)).to eq({x: 1, y: 2})
+    expect(p.to_h).to eq({x: 1, y: 2, blah: "blah!"})
+    expect(p.to_h(only_primary: true)).to eq({x: 1, y: 2})
     
     expect { point.new x: 1, y: 'why?' }.to raise_error TypeError
     expect { p.x = 3 }.to raise_error NoMethodError
@@ -60,7 +60,7 @@ describe NRSER::Meta::Props do
     expect(p2.x).to be 1
     expect(p2.y).to be 2
     
-    expect(p2.to_h add_class: false).to eq({x: 1, y: 2, blah: "blah!"})
+    expect(p2.to_h).to eq({x: 1, y: 2, blah: "blah!"})
   end
   
 end # NRSER::Meta::Props

@@ -166,6 +166,27 @@ class Prop
   end # #set_from_hash
   
   
+  
+  # @todo Document to_data method.
+  # 
+  # @param [type] arg_name
+  #   @todo Add name param description.
+  # 
+  # @return [return_type]
+  #   @todo Document return value.
+  # 
+  def to_data instance
+    value = get instance
+    
+    if value.respond_to? :to_data
+      value.to_data
+    else
+      value
+    end
+  end # #to_data
+  
+  
+  
   private
     
     # @todo Document values method.
