@@ -2,7 +2,7 @@ module NRSER
   # Maps an enumerable object to a *new* hash with the same keys and values 
   # obtained by calling `block` with the current key and value.
   # 
-  # If `enumerable` *does not* sucessfully respond to `#to_h` then it's 
+  # If `enumerable` *does not* successfully respond to `#to_h` then it's 
   # treated as a hash where it's elements are the keys and all the values
   # are `nil`.
   # 

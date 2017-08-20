@@ -63,10 +63,7 @@ module NRSER::Types
     NRSER::Types::Union.new *types, **options
   end
   
-  # match any of the types
-  def self.one_of *types, **options
-    union *types, **options
-  end
+  singleton_class.send :alias_method, :one_of, :union
   
   class Intersection < Combinator      
     def test value
@@ -79,8 +76,6 @@ module NRSER::Types
     Intersection.new *types, **options
   end
   
-  # match all of the types
-  def self.all_of *types, **options
-    intersection *types, **options
-  end
+  singleton_class.send :alias_method, :all_of, :intersection
+  
 end # NRSER::Types

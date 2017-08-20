@@ -10,13 +10,13 @@ module NRSER::Types
     
     attr_reader :item_type
     
-    def initialize item_type = NRSER::Types.any, **options
+    def initialize item_type = NRSER::Types::ANY, **options
       super ::Array, **options
       @item_type = NRSER::Types.make item_type
     end
     
     def test value
-      super(value) && if @item_type == NRSER::Types.any
+      super(value) && if @item_type == NRSER::Types::ANY
         true
       else
         value.all? {|v| @item_type.test v}
@@ -55,7 +55,6 @@ module NRSER::Types
     Array.new *args
   end
   
-  def self.list *args
-    array *args
-  end
+  singleton_class.send :alias_method, :list, :array
+  
 end # NRSER::Types

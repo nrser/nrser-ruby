@@ -5,11 +5,41 @@ using NRSER
   
 module NRSER::Types
 
-  class Hash < NRSER::Types::Type
-    attr_reader :keys, :values, :including, :exactly, :min, :max
+  class HashType < IsA
+    attr_reader :keys, :values #, :including, :exactly, :min, :max
     
-    def initialize options = {}
+    def initialize  keys: NRSER::Types::ANY,
+                    values: NRSER::Types::ANY,
+                    **options
+      super ::Hash, **options
+      
+      @keys = NRSER::Types.make keys
+      @values = NRSER::Types.make keys
       
     end
-  end # Hash
+    
+    def test value
+      return false unless super(value)
+      
+      if keys == NRSER::Types::ALL && values == NRSER::Types::ALL
+        return true
+      end
+      
+      value.all? { |k, v|
+        keys.test(k) && values.test(v)
+      }
+    end
+  end # HashType
+  
+  HASH = HashType.new.freeze
+  
+  def self.hash_ *args
+    if args.empty?
+      HASH
+    else
+      HashType.new *args
+    end
+  end
+  
+  singleton_class.send :alias_method, :dict, :hash_
 end

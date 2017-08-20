@@ -23,7 +23,7 @@ module Props
       
       @defined_in = defined_in
       @name = name
-      @type = type
+      @type = NRSER::Types.make type
       @source = source
       @default = default
       
@@ -129,7 +129,13 @@ module Props
     #   @todo Document return value.
     # 
     def set instance, value
-      type.check value
+      unless type.test value
+        raise TypeError.new NRSER.squish <<-END
+          #{ defined_in }##{ name } must be of type #{ type };
+          found #{ value.inspect }
+        END
+      end
+      
       values(instance)[name] = value
     end # #set
     
