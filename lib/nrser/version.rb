@@ -1,3 +1,3 @@
 module NRSER
-  VERSION = "0.0.20.dev"
+  VERSION = "0.0.20"
 end
