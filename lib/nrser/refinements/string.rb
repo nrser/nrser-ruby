@@ -19,5 +19,13 @@ module NRSER
     def truncate *args
       NRSER.truncate self, *args
     end
+    
+    # See {NRSER.constantize}
+    def constantize
+      NRSER.constantize self
+    end
+    
+    alias_method :to_const, :constantize
+    
   end # refine String
 end # NRSER

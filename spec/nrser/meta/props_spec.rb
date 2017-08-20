@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-T = NRSER::Types
+using NRSER::Types
 
 describe NRSER::Meta::Props do
   
@@ -11,9 +11,9 @@ describe NRSER::Meta::Props do
     Class.new(NRSER::Meta::Props::Base) do
       # include NRSER::Meta::Props
       
-      prop :x, type: T.int
-      prop :y, type: T.int
-      prop :blah, type: T.str, source: :blah
+      prop :x, type: t.int
+      prop :y, type: t.int
+      prop :blah, type: t.str, source: :blah
       
       def blah
         "blah!"

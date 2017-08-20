@@ -1,3 +1,5 @@
+require 'pp'
+
 require 'nrser/refinements'
 require 'nrser/refinements/types'
 
@@ -7,9 +9,8 @@ using NRSER::Types
 module NRSER 
 module Meta
 
-
 module Props
-  CLASS_KEY = :'__class__';
+  CLASS_KEY = '__class__';
   PROPS_VARIABLE_NAME = :@__NRSER_props
   PROP_VALUES_VARIABLE_NAME = :@__NRSER_prop_values
   
@@ -39,6 +40,38 @@ module Props
     
     klass.instance_variable_get PROPS_VARIABLE_NAME
   end # .get_props_ref
+  
+  
+  # Instantiate a class from a data hash. The hash must contain the
+  # `__class__` key and the target class must be loaded already.
+  # 
+  # **WARNING**
+  # 
+  # I'm sure this is all-sorts of unsafe. Please don't ever think this is 
+  # reasonable to use on untrusted data.
+  # 
+  # @param [Hash<String, Object>] data
+  # 
+  # @return [Object]
+  #   @todo Document return value.
+  # 
+  # 
+  # 
+  def self.from_data data
+    t.hash_.check data
+    
+    unless data.key?(CLASS_KEY)
+      raise ArgumentError.new <<-END.dedent
+        Data is missing #{ CLASS_KEY } key - no idea what class to instantiate.
+        
+        #{ data.pretty_inspect }
+      END
+    end
+    
+    class_name = t.str.check data[CLASS_KEY]
+    klass = class_name.to_const
+    klass.from_data data
+  end # .from_data
   
   
   # Hook to extend the including class with {NRSER::Meta::Props:ClassMethods}
@@ -122,6 +155,22 @@ module Props
       end
     end # #prop
     
+    
+    # Instantiate from a data hash.
+    # 
+    # @todo
+    #   This needs to be extended to handle prop'd classes nested in
+    #   arrays and hashes... but for the moment, it is what it is.
+    # 
+    # @param [Hash<String, Object>] data
+    # 
+    # @return [self]
+    # 
+    def from_data data
+      self.new data.symbolize_keys
+    end # #from_data
+    
+    
   end # module ClassMethods
   
   
@@ -143,6 +192,13 @@ module Props
   end # #initialize_props
   
   
+  def merge overrides = {}
+    self.class.new(
+      self.to_h(only_primary: true).merge(overrides.symbolize_keys)
+    )
+  end
+  
+  
   # @todo Document to_h method.
   # 
   # @param [type] arg_name
@@ -152,9 +208,8 @@ module Props
   #   @todo Document return value.
   # 
   def to_h only_own: false, only_primary: false
-    NRSER.map_values(
-      self.class.props only_own: only_own, only_primary: only_primary
-    ) { |name, prop| prop.get self }
+    self.class.props(only_own: only_own, only_primary: only_primary).
+      map_values { |name, prop| prop.get self }
   end # #to_h
   
   # Create a "data" representation suitable for transport, storage, etc.
@@ -195,12 +250,12 @@ module Props
   #   @todo Document return value.
   # 
   def to_json *args
-    to_h.to_json *args
+    to_data.to_json *args
   end # #to_json
   
   
   def to_yaml *args
-    to_h.to_yaml *args
+    to_data.to_yaml *args
   end
   
   

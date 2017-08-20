@@ -21,7 +21,7 @@ module NRSER::Types
     def test value
       return false unless super(value)
       
-      if keys == NRSER::Types::ALL && values == NRSER::Types::ALL
+      if keys == NRSER::Types::ANY && values == NRSER::Types::ANY
         return true
       end
       
