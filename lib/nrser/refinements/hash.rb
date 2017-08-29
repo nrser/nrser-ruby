@@ -28,9 +28,9 @@ module NRSER
     end # #leaves
     
     
-    # See {NRSER.map_hash_values}.
+    # See {NRSER.map_values}.
     def map_values &block
-      NRSER.map_hash_values self, &block
+      NRSER.map_values self, &block
     end
     
     # See {NRSER.transform_keys!}

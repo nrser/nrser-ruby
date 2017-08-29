@@ -116,22 +116,6 @@ module NRSER
   
   
   
-  # @todo Document map_hash_values method.
-  # 
-  # @param [Hash] hash
-  #   @todo Add name param description.
-  # 
-  # @return [return_type]
-  #   @todo Document return value.
-  # 
-  def self.map_hash_values hash, &block
-    result = {}
-    hash.each { |key, value| result[key] = block.call key, value }
-    result
-  end # #map_hash_values
-  
-  
-  
   # Lifted from ActiveSupport
   # =====================================================================
   # 
