@@ -14,38 +14,46 @@ module NRSER
     # @raise [TypeError]
     #   If `hash` is not a {Hash}.
     # 
-    def to_open_struct hash
+    def to_open_struct hash, freeze: false
       unless hash.is_a? Hash
         raise TypeError,
               "Argument must be hash (found #{ hash.inspect })"
       end
       
-      _to_open_struct hash
+      _to_open_struct hash, freeze: freeze
     end # #to_open_struct
+    
     
     private
     
-    def _to_open_struct value
-      case value
-      when OpenStruct
-        # Just assume it's already taken care of if it's already an OpenStruct
-        value
+      def _to_open_struct value, freeze:
+        result = case value
+        when OpenStruct
+          # Just assume it's already taken care of if it's already an OpenStruct
+          value
+          
+        when Hash
+          OpenStruct.new(
+            map_values(value) { |k, v| _to_open_struct v, freeze: freeze }
+          )
+          
+        when Array
+          value.map { |v| _to_open_struct v, freeze: freeze }
+          
+        when Set
+          Set.new value.map { |v| _to_open_struct v, freeze: freeze }
         
-      when Hash
-        OpenStruct.new(
-          map_values(value) { |k, v| _to_open_struct v }
-        )
+        else
+          value
+        end
         
-      when Array
-        value.map { |v| _to_open_struct v }
+        if freeze
+          result.freeze
+        end
         
-      when Set
-        Set.new value.map { |v| _to_open_struct v }
-      
-      else
-        value
-      end
-    end
+        result
+      end # ._to_open_struct
+    # end private
     
   end # class < self (Eigenclass)
   
