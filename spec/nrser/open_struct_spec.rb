@@ -1,8 +1,6 @@
 require 'spec_helper'
 
 describe NRSER.method(:to_open_struct) do
-  # Need this re-def until can figure out how to refine parent subject scope
-  let(:method) { NRSER.method :to_open_struct }
   
   context "shallow Hash" do
     let(:hash) { {a: 1, b: 2} }
@@ -15,8 +13,7 @@ describe NRSER.method(:to_open_struct) do
     end # converts to an OpenStruct
     
     context "freeze: true" do
-      
-      subject { method.call hash, freeze: true }
+      subject { super().call hash, freeze: true }
       
       it "is converted to an OpenStruct" do
         expect(subject).to be_a OpenStruct
@@ -60,7 +57,7 @@ describe NRSER.method(:to_open_struct) do
     
     context "freeze: true" do
       
-      subject { method.call hash, freeze: true }
+      subject { super().call hash, freeze: true }
       
       it "is deeply converted into OpenStruct instances" do
         expect(subject).to be_a OpenStruct
