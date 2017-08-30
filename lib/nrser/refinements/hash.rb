@@ -72,7 +72,7 @@ module NRSER
     
     # See {NRSER.map_hash_keys}
     def map_keys &block
-      NRSER.map_hash_keys self, &block
+      NRSER.map_keys self, &block
     end
   end # Hash
 end # NRSER

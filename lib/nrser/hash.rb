@@ -212,7 +212,7 @@ module NRSER
   end
   
   # My-style name
-  singleton_class.send :alias_method, :map_hash_keys, :transform_keys
+  singleton_class.send :alias_method, :map_keys, :transform_keys
   
   
   # Mutates `hash` by converting all keys that respond to `#to_sym` to symbols.
