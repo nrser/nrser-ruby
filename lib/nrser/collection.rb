@@ -1,4 +1,5 @@
 require 'set'
+require 'ostruct'
 
 module NRSER
   # include this module in any custom classes to have them treated as
@@ -10,9 +11,13 @@ module NRSER
       Array,
       Hash,
       Set,
+      OpenStruct,
     ]
   end
   
+  # Eigenclass (Singleton Class)
+  # ========================================================================
+  # 
   class << self
     
     # test if an object is considered a collection.
@@ -24,40 +29,60 @@ module NRSER
       Collection::STDLIB.any? {|cls| obj.is_a? cls} || obj.is_a?(Collection)
     end
     
-    # yield on each element of a collection or on the object itself if it's
+    
+    # Yield on each element of a collection or on the object itself if it's
     # not a collection. avoids having to normalize to an array to iterate over
     # something that may be an object OR a collection of objects.
     # 
-    # @param obj [Object] target object.
+    # **NOTE**  Implemented for our idea of a collection instead of testing
+    #           for response to `#each` (or similar) to avoid catching things
+    #           like {IO} instances, which include {Enumerable} but are 
+    #           probably not what is desired when using {NRSER.each}
+    #           (more likely that you mean "I expect one or more files" than
+    #           "I expect one or more strings which may be represented by
+    #           lines in an open {File}").
     # 
-    # @yield each element of a collection or the target object itself.
+    # @param [Object] object
+    #   Target object.
     # 
-    # @return [Object] obj param.
+    # @yield
+    #   Each element of a collection or the target object itself.
     # 
-    def each obj, &block
-      if collection? obj
-        obj.each &block
+    # @return [Object]
+    #   `object` param.
+    # 
+    def each object, &block
+      if collection? object
+        object.each &block
       else
-        block.call obj
-        obj
+        block.call object
       end
+      object
     end
     
-    # if `obj` is a collection, calls `#map` with the block. otherwise,
+    
+    # If `object` is a collection, calls `#map` with the block. Otherwise,
     # applies block to the object and returns the result.
     # 
-    # @param obj [Object] target object.
+    # See note in {NRSER.each} for discussion of why this tests for a
+    # collection instead of duck-typing `#map`.
     # 
-    # @yield each element of a collection or the target object itself.
+    # @param [Object] object
+    #   Target object.
     # 
-    # @return [Object] the result of mapping or applying the block.
+    # @yield
+    #   Each element of a collection or the target object itself.
     # 
-    def map obj, &block
-      if collection? obj
-        obj.map &block
+    # @return [Object]
+    #   The result of mapping or applying the block.
+    # 
+    def map object, &block
+      if collection? object
+        object.map &block
       else
-        block.call obj
+        block.call object
       end
-    end
-  end
-end
+    end # #map
+    
+  end # class << self
+end # module NRSER
