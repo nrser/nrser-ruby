@@ -1,3 +1,5 @@
+require 'pathname'
+
 module NRSER
   refine String do
     def squish
@@ -26,6 +28,13 @@ module NRSER
     end
     
     alias_method :to_const, :constantize
+    
+    # @return [Pathname]
+    #   Convert self into a {Pathname}
+    # 
+    def to_pn
+      Pathname.new self
+    end
     
   end # refine String
 end # NRSER
