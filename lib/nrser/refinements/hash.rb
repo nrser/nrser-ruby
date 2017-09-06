@@ -74,5 +74,18 @@ module NRSER
     def map_keys &block
       NRSER.map_keys self, &block
     end
-  end # Hash
+    
+    
+    # See {NRSER.find_bounded}
+    def find_bounded bounds, &block
+      NRSER.find_bounded self, bounds, &block
+    end
+    
+    
+    # See {NRSER.find_only}
+    def find_only &block
+      NRSER.find_only self, &block
+    end
+    
+  end # refine ::Hash
 end # NRSER

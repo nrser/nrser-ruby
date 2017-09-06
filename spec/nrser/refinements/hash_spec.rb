@@ -11,3 +11,33 @@ describe 'Refinement Hash#map_values' do
     )
   end
 end # 'Hash#map_values'
+
+
+describe 'Refinement Hash#find_bounded' do
+  subject { {a: 1, b: 2, c: 3} }
+  
+  it do
+    expect(
+      subject.find_bounded(length: 2) { |k, v| v >= 2 }
+    ).to eq [[:b, 2], [:c, 3]]
+    
+    expect {
+      subject.find_bounded(length: 2) { |k, v| v == 2 }
+    }.to raise_error TypeError
+  end
+end # Refinement Hash#map_values
+
+
+describe 'Refinement Hash#find_only' do
+  subject { {a: 1, b: 2, c: 3} }
+  
+  it do
+    expect(
+      subject.find_only { |k, i| i == 2 }
+    ).to eq [:b, 2]
+    
+    expect {
+      subject.find_only { |k, i| i >= 2 }
+    }.to raise_error TypeError
+  end
+end # Refinement Hash#map_values
