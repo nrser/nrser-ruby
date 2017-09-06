@@ -13,11 +13,11 @@ module NRSER::Types
       @types = types.map {|type| NRSER::Types.make type}
     end
     
-    def name
+    def default_name
       @name || (
-        "#{ self.class.short_name }(" + 
+        "#{ self.class.short_name }<" + 
         @types.map {|type| type.name }.join(',') + 
-        ")"
+        ">"
       )
     end
     
@@ -68,6 +68,10 @@ module NRSER::Types
   class Intersection < Combinator      
     def test value
       @types.all? {|type| type.test value}
+    end
+    
+    def default_name
+      "( #{ @types.map { |t| t.name }.join ' | ' } )"
     end
   end
   

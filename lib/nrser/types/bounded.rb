@@ -5,9 +5,26 @@ using NRSER
   
 module NRSER::Types  
   class Bounded < NRSER::Types::Type
-    def initialize **options
-      @min = options[:min]
-      @max = options[:max]
+    
+    # @!attribute [r] min
+    #   @return [Number]
+    #     Minimum value.
+    attr_reader :min
+    
+    
+    # @!attribute [r] max
+    #   @return [Number]
+    #     Minimum value.
+    attr_reader :max
+    
+    
+    def initialize  min: nil,
+                    max: nil,
+                    **options
+      super **options
+      
+      @min = min
+      @max = max
     end
     
     def test value
@@ -25,7 +42,7 @@ module NRSER::Types
         "#{ name }=#{ value }"
       }.join(', ')
       
-      "#{ self.class.short_name }(#{ attrs_str })"
+      "#{ self.class.short_name } #{ attrs_str }"
     end
   end # Bounded
   

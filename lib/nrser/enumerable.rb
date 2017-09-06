@@ -53,5 +53,34 @@ module NRSER
       result
     end # #map_values
     
+    
+    
+    # @todo Document find_bounded method.
+    # 
+    # @param [type] arg_name
+    #   @todo Add name param description.
+    # 
+    # @return [return_type]
+    #   @todo Document return value.
+    # 
+    def find_bounded enum, bounds, &block
+      NRSER::Types.length(bounds).check(enum.find_all &block)
+    end # #find_bounded
+    
+    
+    
+    # @todo Document find_only method.
+    # 
+    # @param [type] arg_name
+    #   @todo Add name param description.
+    # 
+    # @return [return_type]
+    #   @todo Document return value.
+    # 
+    def find_only arg_name
+      # method body...
+    end # #find_only
+    
+    
   end # class << self (Eigenclass)
 end # module NRSER

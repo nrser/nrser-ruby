@@ -16,7 +16,7 @@ module NRSER::Types
         "#{ name }=#{ type.name }"
       }.join(', ')
       
-      "#{ self.class.short_name }(#{ attrs_str })"
+      "#{ self.class.short_name } #{ attrs_str }"
     end
     
     def test value
@@ -41,11 +41,15 @@ module NRSER::Types
         bounds[:min] = bounds[:max] = non_neg_int.check(args[0])
         
       when ::Hash
-        options = args[0].reject {|k, v|
-          if k == :min || k == :max
-            bounds[k] = non_neg_int.check(v)
-          end
-        }
+        options = NRSER.symbolize_keys args[0]
+        
+        bounds[:min] = options.delete :min
+        bounds[:max] = options.delete :max
+        
+        if length = options.delete(:length)
+          bounds[:min] = length
+          bounds[:max] = length
+        end
         
       else        
         raise ArgumentError, <<-END.squish
@@ -64,6 +68,18 @@ module NRSER::Types
       END
     end
     
-    attrs({length: intersection(non_neg_int, bounded(bounds))}, options)
+    bounded_type = bounded bounds
+    
+    length_type = if !bounded_type.min.nil? && bounded_type.min >= 0
+      # We don't need the non-neg check
+      bounded_type
+    else
+      # We do need the non-neg check
+      intersection(non_neg_int, bounded_type)
+    end
+    
+    options[:name] ||= "Length<#{ bounded_type.name }>"
+    
+    attrs({ length: length_type }, options)
   end
 end # NRSER::Types

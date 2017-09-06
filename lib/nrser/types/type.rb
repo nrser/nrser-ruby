@@ -27,7 +27,7 @@ module NRSER::Types
     def check value
       unless test value
         raise TypeError.new NRSER.squish <<-END
-          value #{ value.inspect } failed check #{ self.inspect }
+          value #{ value.inspect } failed check #{ self.to_s }
         END
       end
       
@@ -55,7 +55,7 @@ module NRSER::Types
     end
     
     def to_s
-      "<Type:#{ name }>"
+      "`Type: #{ name }`"
     end
   end # Type
 end # NRSER::Types
