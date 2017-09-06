@@ -64,7 +64,18 @@ module NRSER
     #   @todo Document return value.
     # 
     def find_bounded enum, bounds, &block
-      NRSER::Types.length(bounds).check(enum.find_all &block)
+      NRSER::Types.
+        length(bounds).
+        check(enum.find_all &block) { |type:, value:|
+          NRSER.dedent <<-END
+            
+            Length of found elements (#{ value.length }) FAILED to satisfy #{ type.to_s }
+            
+            Found:
+              #{ NRSER.indent value.pretty_inspect }
+            
+          END
+        }
     end # #find_bounded
     
     
@@ -77,8 +88,8 @@ module NRSER
     # @return [return_type]
     #   @todo Document return value.
     # 
-    def find_only arg_name
-      # method body...
+    def find_only enum, &block
+      find_bounded(enum, 1, &block).first
     end # #find_only
     
     

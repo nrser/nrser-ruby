@@ -24,14 +24,19 @@ module NRSER::Types
       raise NotImplementedError
     end
     
-    def check value
-      unless test value
-        raise TypeError.new NRSER.squish <<-END
+    def check value, &on_fail
+      # success case
+      return value if test value
+      
+      msg = if on_fail
+        on_fail.call type: self, value: value
+      else
+        NRSER.squish <<-END
           value #{ value.inspect } failed check #{ self.to_s }
         END
       end
       
-      value
+      raise TypeError.new msg
     end
     
     def respond_to? name, include_all = false
