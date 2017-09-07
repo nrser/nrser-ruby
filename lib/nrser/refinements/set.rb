@@ -20,5 +20,11 @@ module NRSER
       NRSER.find_only self, &block
     end
     
+    
+    # See {NRSER.to_h_by}
+    def to_h_by &block
+      NRSER.to_h_by self, &block
+    end
+    
   end # refine ::Set
 end # NRSER

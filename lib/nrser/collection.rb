@@ -53,7 +53,20 @@ module NRSER
     # 
     def each object, &block
       if collection? object
-        object.each &block
+        # We need to test for response because {OpenStruct} *will* respond to
+        # #each because *it will respond to anything* (which sucks), but it 
+        # will return `false` for `respond_to? :each` and the like, and this
+        # behavior could be shared by other collection objects, so it seems 
+        # like a decent idea.
+        if object.respond_to? :each_pair
+          object.each_pair &block
+        elsif object.respond_to? :each
+          object.each &block
+        else
+          raise TypeError.squished <<-END
+            Object #{ obj.inpsect } does not respond to #each or #each_pair
+          END
+        end
       else
         block.call object
       end

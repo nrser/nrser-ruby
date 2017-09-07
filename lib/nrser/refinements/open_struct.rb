@@ -11,6 +11,12 @@ module NRSER
       self.class.new NRSER.map_values(self, &block)
     end # #map_values
     
+    
+    # See {NRSER.to_h_by}
+    def to_h_by &block
+      NRSER.to_h_by self, &block
+    end
+    
   end
   
   refine OpenStruct.singleton_class do

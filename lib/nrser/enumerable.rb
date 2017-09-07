@@ -1,3 +1,7 @@
+require 'pp'
+
+require_relative './errors'
+
 module NRSER
   
   # Eigenclass (Singleton Class)
@@ -74,6 +78,9 @@ module NRSER
             Found:
               #{ NRSER.indent value.pretty_inspect }
             
+            Enumerable:
+              #{ NRSER.indent enum.pretty_inspect }
+            
           END
         }
     end # #find_bounded
@@ -91,6 +98,34 @@ module NRSER
     def find_only enum, &block
       find_bounded(enum, 1, &block).first
     end # #find_only
+    
+    
+    
+    # @todo Document to_h_by method.
+    # 
+    # @param [type] arg_name
+    #   @todo Add name param description.
+    # 
+    # @return [return_type]
+    #   @todo Document return value.
+    # 
+    def to_h_by enum, &block
+      {}.tap { |result|
+        enum.each { |element|
+          key = block.call element
+          
+          if result.key? key
+            raise NRSER::ConflictError.dedented <<-END
+              Key #{ key.inspect } is already in results with value:
+              
+              #{ result[key].pretty_inspect }
+            END
+          end
+          
+          result[key] = element
+        }
+      }
+    end # #to_h_by
     
     
   end # class << self (Eigenclass)
