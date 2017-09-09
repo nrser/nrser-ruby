@@ -12,7 +12,7 @@ module NRSER::Types
       @value = value
     end
     
-    def name
+    def default_name
       "Is(#{ @value.inspect })"
     end
     

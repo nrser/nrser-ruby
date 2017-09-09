@@ -11,11 +11,10 @@ module NRSER
     end # .gem_version
     
     
-    # The [Gem::Version][] [release][Gem::Version#release] for {NRSER::VERSION}
-    # - everything before any `-<alpha-numeric>` prerelease part (like `-dev`).
+    # The `Gem::Version` "release" for {NRSER::VERSION} - everything before 
+    # any `-<alpha-numeric>` prerelease part (like `-dev`).
     # 
-    # [Gem::Version]: https://ruby-doc.org/stdlib-2.4.1/libdoc/rubygems/rdoc/Gem/Version.html
-    # [Gem::Version#release]: https://ruby-doc.org/stdlib-2.4.1/libdoc/rubygems/rdoc/Gem/Version.html#method-i-release
+    # @see https://ruby-doc.org/stdlib-2.4.1/libdoc/rubygems/rdoc/Gem/Version.html#method-i-release
     # 
     # @example
     # 
@@ -30,6 +29,24 @@ module NRSER
     def self.release
       gem_version.release
     end # .release
+    
+    
+    # Get a URL to a place in the current version's docs on ruby-docs.org.
+    # 
+    # @param [String] rel_path
+    #   Relative path.
+    # 
+    # @return [String]
+    #   The RubyDocs URL.
+    # 
+    def self.doc_url rel_path
+      File.join(
+        "http://www.rubydoc.info/gems/nrser",
+        NRSER::Version.release.to_s,
+        rel_path
+      )
+    end # .doc_url
+    
     
   end
 end

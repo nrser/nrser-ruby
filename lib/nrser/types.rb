@@ -8,6 +8,7 @@ require 'nrser/types/where'
 require 'nrser/types/combinators'
 require 'nrser/types/maybe'
 require 'nrser/types/attrs'
+require 'nrser/types/responds'
 
 using NRSER
   
@@ -32,21 +33,55 @@ module NRSER::Types
     make(type).test value
   end
   
-  def self.match value, type_map
-    type_map.each {|type, block|
+  def self.match value, *clauses
+    if clauses.empty?
+      raise ArgumentError.new NRSER.dedent <<-END
+        Must supply either a single {type => expression} hash argument or a
+        even amount of arguments representing (type, expression) pairs after
+        `value`.
+        
+        #{ NRSER::Version.doc_url 'NRSER/Types#match-class_method' }
+      END
+    end
+    
+    enum = if clauses.length == 1 && clauses.first.respond_to?(:each_pair)
+      clauses.first.each_pair
+    else
+      unless clauses.length % 2 == 0
+        raise TypeError.new NRSER.dedent <<-END
+          When passing a list of clauses, it must be an even length
+          representing (type, expression) pairs.
+          
+          Found an argument list with length #{ clauses.length }:
+          
+          #{ clauses }
+        END
+      end
+      
+      clauses.each_slice(2)
+    end
+    
+    enum.each { |type, expression|
       if test value, type
-        return block.call value
+        # OK, we matched! Is the corresponding expression callable?
+        if expression.respond_to? :call
+          # It is; invoke and return result.
+          return expression.call value
+        else
+          # It's not; assume it's a value and return it.
+          return expression
+        end
       end
     }
     
     raise TypeError, <<-END.dedent
-      could not match value
+      Could not match value
       
-        #{ value.inspect }
+          #{ value.inspect }
       
       to any of types
       
-          #{ type_map.keys.map {|type| "\n    #{ type.inspect }"} }
+          #{ enum.map {|type, expression| "\n    #{ type.inspect }"} }
       
     END
   end

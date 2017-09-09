@@ -128,5 +128,34 @@ module NRSER
     end # #to_h_by
     
     
+    # Create an {Enumerator} that iterates over the "values" of an 
+    # {Enumerable} `enum`. If `enum` responds to `#each_value` than we return
+    # that. Otherwise, we return `#each_entry`.
+    # 
+    # @param [Enumerable] enum
+    # 
+    # @return [Enumerator]
+    # 
+    # @raise [TypeError]
+    #   If `enum` doesn't respond to `#each_value` or `#each_entry`.
+    # 
+    def enumerate_as_values enum
+      # NRSER.match enum,
+      #   t.respond_to(:each_value), :each_value.to_proc,
+      #   t.respond_to(:each_entry), :each_entry.to_proc
+      # 
+      if enum.respond_to? :each_value
+        enum.each_value
+      elsif enum.respond_to? :each_entry
+        enum.each_entry
+      else
+        raise TypeError.squished <<-END
+          Expected `enum` arg to respond to :each_value or :each_entry,
+          found #{ enum.inspect }
+        END
+      end
+    end # #enumerate_as_values
+    
+    
   end # class << self (Eigenclass)
 end # module NRSER

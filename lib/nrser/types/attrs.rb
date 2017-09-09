@@ -8,11 +8,13 @@ module NRSER::Types
   class Attrs < NRSER::Types::Type
     def initialize attrs, **options
       super **options
-      @attrs = attrs
+      @attrs = NRSER.map_values(attrs) { |name, type|
+        NRSER::Types.make type
+      }
     end
     
     def default_name
-      attrs_str = @attrs.map {|name, type|
+      attrs_str = @attrs.map { |name, type|
         "#{ name }=#{ type.name }"
       }.join(', ')
       
@@ -20,66 +22,75 @@ module NRSER::Types
     end
     
     def test value
-      @attrs.all? {|name, type|
+      @attrs.all? { |name, type|
         value.respond_to?(name) && type.test(value.method(name).call)
       }
     end
   end # Attrs
   
-  def self.attrs attrs, options = {}
-    Attrs.new attrs, **options
-  end
   
-  def self.length *args
-    bounds = {}
-    options = {}
-    
-    case args.length
-    when 1
-      case args[0]
-      when ::Integer
-        bounds[:min] = bounds[:max] = non_neg_int.check(args[0])
-        
-      when ::Hash
-        options = NRSER.symbolize_keys args[0]
-        
-        bounds[:min] = options.delete :min
-        bounds[:max] = options.delete :max
-        
-        if length = options.delete(:length)
-          bounds[:min] = length
-          bounds[:max] = length
+  # Eigenclass (Singleton Class)
+  # ========================================================================
+  # 
+  class << self
+    def attrs attrs, options = {}
+      Attrs.new attrs, **options
+    end
+
+    def length *args
+      bounds = {}
+      options = {}
+      
+      case args.length
+      when 1
+        case args[0]
+        when ::Integer
+          bounds[:min] = bounds[:max] = non_neg_int.check(args[0])
+          
+        when ::Hash
+          options = NRSER.symbolize_keys args[0]
+          
+          bounds[:min] = options.delete :min
+          bounds[:max] = options.delete :max
+          
+          if length = options.delete(:length)
+            bounds[:min] = length
+            bounds[:max] = length
+          end
+          
+        else        
+          raise ArgumentError, <<-END.squish
+            arg must be positive integer or option hash, found:
+            #{ args[0].inspect } of type #{ args[0].class }
+          END
         end
         
-      else        
+      when 2
+        bounds[:min] = bounds[:max] = non_neg_int.check(args[0])
+        options = args[1]
+        
+      else
         raise ArgumentError, <<-END.squish
-          arg must be positive integer or option hash, found:
-          #{ args[0].inspect } of type #{ args[0].class }
+          must provided 1 or 2 args.
         END
       end
       
-    when 2
-      bounds[:min] = bounds[:max] = non_neg_int.check(args[0])
-      options = args[1]
+      bounded_type = bounded bounds
       
-    else
-      raise ArgumentError, <<-END.squish
-        must provided 1 or 2 args.
-      END
-    end
+      length_type = if !bounded_type.min.nil? && bounded_type.min >= 0
+        # We don't need the non-neg check
+        bounded_type
+      else
+        # We do need the non-neg check
+        intersection(non_neg_int, bounded_type)
+      end
+      
+      options[:name] ||= "Length<#{ bounded_type.name }>"
+      
+      attrs({ length: length_type }, options)
+    end # #length
     
-    bounded_type = bounded bounds
     
-    length_type = if !bounded_type.min.nil? && bounded_type.min >= 0
-      # We don't need the non-neg check
-      bounded_type
-    else
-      # We do need the non-neg check
-      intersection(non_neg_int, bounded_type)
-    end
-    
-    options[:name] ||= "Length<#{ bounded_type.name }>"
-    
-    attrs({ length: length_type }, options)
-  end
+  end # class << self (Eigenclass)
+  
 end # NRSER::Types

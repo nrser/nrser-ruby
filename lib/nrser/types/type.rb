@@ -24,12 +24,12 @@ module NRSER::Types
       raise NotImplementedError
     end
     
-    def check value, &on_fail
+    def check value, &make_fail_message
       # success case
       return value if test value
       
-      msg = if on_fail
-        on_fail.call type: self, value: value
+      msg = if make_fail_message
+        make_fail_message.call type: self, value: value
       else
         NRSER.squish <<-END
           value #{ value.inspect } failed check #{ self.to_s }

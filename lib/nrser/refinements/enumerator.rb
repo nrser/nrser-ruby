@@ -1,9 +1,7 @@
-require 'set'
-
 require_relative './enumerable'
 
 module NRSER
-  refine ::Set do
+  refine ::Enumerator do
     include NRSER::Refinements::Enumerable
-  end # refine ::Set
+  end # refine ::Enumerator
 end # NRSER

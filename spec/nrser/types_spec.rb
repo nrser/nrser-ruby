@@ -1,8 +1,13 @@
 require 'spec_helper'
 
+require 'nrser/refinements'
+using NRSER
+
+require 'nrser/refinements/types'
+using NRSER::Types
+
+
 describe NRSER::Types do
-  t = NRSER::Types
-  
   describe 'basic types #test and #check' do
     {
       t.any => {
@@ -139,10 +144,15 @@ describe NRSER::Types do
         }
       },
       
+      t.respond_to(:each_value) => {
+        pass: [ {} ],
+        fail: [ [] ],
+      },
+      
     }.each do |type, tests|
       if tests[:pass]
         tests[:pass].each do |value|
-          it "ACCEPS #{ value.inspect } as #{ type }" do
+          it "ACCEPTS #{ value.inspect } as #{ type }" do
             expect(type.test value).to be true
             expect {type.check value}.not_to raise_error
           end

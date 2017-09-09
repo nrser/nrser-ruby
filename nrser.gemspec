@@ -30,4 +30,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "github-markup"
   
   spec.add_development_dependency "cmds"
+  
+  # Better CLI
+  spec.add_development_dependency "pry"
 end
