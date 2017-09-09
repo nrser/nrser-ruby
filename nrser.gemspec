@@ -20,6 +20,14 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "bundler", "~> 1.5"
   spec.add_development_dependency "rake"
   spec.add_development_dependency "rspec"
+  
+  # Doc gen with `yard`
   spec.add_development_dependency "yard"
+  # `yard` will use RDoc's built-in Markdown support, which is pretty GFM-like,
+  # but we'll explicitly include `redcarpet` and `github-markup` to make sure
+  # we get the functionality we want.
+  spec.add_development_dependency "redcarpet"
+  spec.add_development_dependency "github-markup"
+  
   spec.add_development_dependency "cmds"
 end
