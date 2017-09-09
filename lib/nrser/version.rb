@@ -16,7 +16,7 @@ module NRSER
     # 
     # [Gem::Version]: https://ruby-doc.org/stdlib-2.4.1/libdoc/rubygems/rdoc/Gem/Version.html
     # [Gem::Version#release]: https://ruby-doc.org/stdlib-2.4.1/libdoc/rubygems/rdoc/Gem/Version.html#method-i-release
-    #
+    # 
     # @example
     # 
     #   NRSER::VERSION
