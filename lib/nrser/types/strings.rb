@@ -31,4 +31,10 @@ module NRSER::Types
   
   NON_EMPTY_STR = str length: {min: 1}, name: "NonEmptyStr"
   
+  
+  def self.non_empty_str
+    NON_EMPTY_STR
+  end # .non_empty_str
+  
+  
 end # NRSER::Types

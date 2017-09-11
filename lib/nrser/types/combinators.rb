@@ -42,7 +42,7 @@ module NRSER::Types
       }
       
       raise TypeError,
-        "none of union types could convert #{ string.inspect }"
+        "none of combinator #{ self.to_s } types could convert #{ s.inspect }"
     end
     
     def == other
