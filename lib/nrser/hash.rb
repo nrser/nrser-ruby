@@ -283,7 +283,7 @@ module NRSER
   def self.slice_keys hash, *keys
     # We're not using this, but, whatever, leave it in...
     if hash.respond_to?(:convert_key, true)
-      keys.map! { |key| hash.convert_key(key) }
+      keys.map! { |key| hash.send :convert_key, key }
     end
     
     keys.each_with_object(hash.class.new) { |k, new_hash|
