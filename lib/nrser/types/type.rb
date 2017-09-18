@@ -7,10 +7,29 @@ module NRSER::Types
       name.split('::').last
     end
     
-    def initialize **options
-      @name = options[:name]
-      @from_s = options[:from_s]
-    end
+    
+    # Constructor
+    # =====================================================================
+    
+    # Instantiate a new `NRSER::Types::Type`.
+    # 
+    # @param [nil | String] name:
+    #   Name that will be used when displaying the type, or `nil` to use a
+    #   default generated name.
+    # 
+    # @param [nil | #call] from_s:
+    #   Callable that will be passed a {String} and should return an object 
+    #   that satisfies the type if it possible to create one.
+    #   
+    #   The returned value *will* be checked against the type, so returning a 
+    #   value that doesn't satisfy will result in a {TypeError} being raised
+    #   by {#from_s}.
+    # 
+    def initialize name: nil, from_s: nil
+      @name = name
+      @from_s = from_s
+    end # #initialize
+    
     
     def name
       @name || default_name
@@ -52,7 +71,7 @@ module NRSER::Types
         raise NoMethodError, "#from_s not defined"
       end
       
-      check @from_s.(s)
+      check @from_s.call( s )
     end
     
     def has_from_s?

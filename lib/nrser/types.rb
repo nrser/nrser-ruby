@@ -1,19 +1,68 @@
+# Requirements
+# =======================================================================
+
+# Stdlib
+# ---------------------------------------------------------------------
+
+# TODO Not sure if this needs to be here... can't find any usage of it in 
+#       quick searches, but I don't want to remove it now.
 require 'pp'
 
-require 'nrser/refinements'
-require 'nrser/types/type'
-require 'nrser/types/is'
-require 'nrser/types/is_a'
-require 'nrser/types/where'
-require 'nrser/types/combinators'
-require 'nrser/types/maybe'
-require 'nrser/types/attrs'
-require 'nrser/types/responds'
+# Deps
+# ---------------------------------------------------------------------
 
+# Package
+# ---------------------------------------------------------------------
+
+# Abstract infrastructure for type creation - stuff that doesn't define any
+# concrete type instances.
+# 
+# Files that define concrete type instances on load (usually as module 
+# constants, which I'm still questioning a bit as a design because of the
+# uncontrollable mutability of Ruby and the importance of type checks)
+# need to be required in the "Post-Processing" section at the bottom.
+# 
+require_relative './types/type'
+require_relative './types/is'
+require_relative './types/is_a'
+require_relative './types/where'
+require_relative './types/combinators'
+require_relative './types/maybe'
+require_relative './types/attrs'
+require_relative './types/responds'
+
+
+# Refinements
+# =======================================================================
+
+require 'nrser/refinements'
 using NRSER
-  
+
+
+# Stuff to help you define, test, check and match types in Ruby.
+# 
 module NRSER::Types
-  # make a type.
+  
+  # Make a {NRSER::Types::Type} from a value.
+  # 
+  # If the `value` argument is...
+  # 
+  # -   a {NRSER::Types::Type}, it is returned.
+  #     
+  # -   a {Class}, a new {NRSER::Types::IsA} matching that class is returned.
+  #     
+  #     This allows things like
+  #     
+  #         NRSER::Types.check 's', String
+  #         NRSER::Types.match 's', String, ->(s) { ... }
+  # 
+  # -   anything else, a new {NRSER::Types::Is} matching that value is
+  #     returned.
+  # 
+  # @param [Object] value
+  # 
+  # @return [NRSER::Types::Type]
+  # 
   def self.make value
     if value.is_a? NRSER::Types::Type
       value
@@ -24,14 +73,17 @@ module NRSER::Types
     end
   end
   
+  
   # raise an error if value doesn't match type.
   def self.check value, type
     make(type).check value
   end
   
+  
   def self.test value, type
     make(type).test value
   end
+  
   
   def self.match value, *clauses
     if clauses.empty?
@@ -84,7 +136,8 @@ module NRSER::Types
           #{ enum.map {|type, expression| "\n    #{ type.inspect }"} }
       
     END
-  end
+  end # .match
+  
   
   # make a type instance from a object representation that can come from 
   # a YAML or JSON declaration.
@@ -98,15 +151,22 @@ module NRSER::Types
         
       },
     }
-  end
+  end # .from_repr
+  
 end # NRSER::Types
 
-# things that define values, which may need to call the functions defined
-# above
-require 'nrser/types/any'
-require 'nrser/types/booleans'
-require 'nrser/types/numbers'
-require 'nrser/types/strings'
-require 'nrser/types/symbol'
-require 'nrser/types/array'
-require 'nrser/types/hash'
+
+# Post-Processing
+# =======================================================================
+# 
+# Files that define constants that need the proceeding infrastructure.
+# 
+
+require_relative './types/any'
+require_relative './types/booleans'
+require_relative './types/numbers'
+require_relative './types/strings'
+require_relative './types/symbol'
+require_relative './types/array'
+require_relative './types/hash'
+require_relative './types/paths'

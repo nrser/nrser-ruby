@@ -149,6 +149,28 @@ describe NRSER::Types do
         fail: [ [] ],
       },
       
+      t.path => {
+        pass: [
+          '.',
+          Pathname.getwd,
+        ],
+        
+        fail: [
+          '',
+          123,
+        ],
+        
+        from_s: {
+          pass: [
+            '.',
+          ],
+          
+          fail: [
+            '',
+          ],
+        },
+      }, # t.path
+      
     }.each do |type, tests|
       if tests[:pass]
         tests[:pass].each do |value|

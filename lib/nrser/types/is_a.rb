@@ -21,7 +21,7 @@ module NRSER::Types
   end # IsA
   
   # class membership
-  def self.is_a klass
-    IsA.new klass
+  def self.is_a klass, **options
+    IsA.new klass, **options
   end
 end # NRSER::Types
