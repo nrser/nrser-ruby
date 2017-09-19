@@ -13,5 +13,33 @@ module NRSER
       NRSER.rest self
     end # #rest
     
+    
+    # Returns a lambda that calls accepts a single arg and calls `#dig` on it
+    # with the elements of *this* array as arguments.
+    # 
+    # @example
+    #   list = [{id: 1, name: "Neil"}, {id: 2, name: "Mica"}]
+    #   list.to_h_by &[:id].digger
+    #   # =>  {
+    #   #       1 => {id: 1, name: "Neil"},
+    #   #       2 => {id: 2, name: "Mica"},
+    #   #     }
+    # 
+    # @todo
+    #   I wanted to use `#to_proc` so that you could use `&[:id]`, but unary
+    #   `&` doesn't invoke refinements, and I don't really want to monkey-patch
+    #   anything, especially something as core as `#to_proc` and `Array`.
+    # 
+    # @return [Proc]
+    #   Lambda proc that accepts a single argument and calls `#dig` with this 
+    #   array's contents as the `#dig` arguments.
+    # 
+    def digger
+      ->(digable) {
+        digable.dig *self
+      }
+    end # #digable
+    
+    
   end # refine ::Array
 end # NRSER
