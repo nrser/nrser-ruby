@@ -115,7 +115,7 @@ module NRSER
           key = block.call element
           
           if result.key? key
-            raise NRSER::ConflictError.dedented <<-END
+            raise NRSER::ConflictError.new NRSER.dedent <<-END
               Key #{ key.inspect } is already in results with value:
               
               #{ result[key].pretty_inspect }

@@ -93,5 +93,19 @@ describe "NRSER Enumerable Methods" do
   end # NRSER.method(:find_only)
   
   
+  describe NRSER.method(:to_h_by) do
+    
+    context "Duplicate keys" do
+      it "raises NRSER::ConflictError" do
+        expect {
+          NRSER.to_h_by([1, 2, 3]) { |i| i % 2 }
+        }.to raise_error NRSER::ConflictError
+      end
+    end # Duplicate keys
+    
+    
+  end # NRSER.to_h_by
+  
+  
 end # NRSER Enumerable Methods
 
