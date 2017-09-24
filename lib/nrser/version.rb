@@ -1,5 +1,5 @@
 module NRSER
-  VERSION = "0.0.24"
+  VERSION = "0.0.25.dev"
   
   module Version
     
