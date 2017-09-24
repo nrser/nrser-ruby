@@ -45,7 +45,7 @@ module NRSER::Types
     name: 'NonEmptyPathnameType'
   
   
-  PATH = union non_empty_str, NON_EMPTY_PATHNAME
+  PATH = union non_empty_str, NON_EMPTY_PATHNAME, name: 'Path'
   
   
   # Eigenclass (Singleton Class)
@@ -53,10 +53,21 @@ module NRSER::Types
   # 
   class << self
     
-    # @todo Document path method.
+    def pathname **options
+      if options.empty?
+        PATHNAME
+      else
+        is_a \
+          Pathname,
+          name: 'PathnameType',
+          from_s: ->(string) { Pathname.new string },
+          **options
+      end
+    end
+    
     # 
-    # @return [return_type]
-    #   @todo Document return value.
+    # 
+    # @return [NRSER::Types::Type]
     # 
     def path **options
       if options.empty?
