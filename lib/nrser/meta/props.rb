@@ -87,13 +87,16 @@ module Props
   # 
   module ClassMethods
     
-    # @todo Document props method.
+    # Get a map of property names to property instances.
     # 
-    # @param [type] arg_name
-    #   @todo Add name param description.
+    # @param [Boolean] only_own:
+    #   Don't include super-class properties.
     # 
-    # @return [return_type]
-    #   @todo Document return value.
+    # @param [Boolean] only_primary:
+    #   Don't include properties that have a {NRSER::Meta::Props::Prop#source}.
+    # 
+    # @return [Hash{ Symbol => NRSER::Meta::Props::Prop }]
+    #   Hash mapping property name to property instance.
     # 
     def props only_own: false, only_primary: false
       result = if !only_own && superclass.respond_to?(:props)
@@ -118,13 +121,17 @@ module Props
     end # #own_props
     
     
-    # @todo Document prop method.
+    # Define a property.
     # 
-    # @param [type] arg_name
-    #   @todo Add name param description.
+    # @param [Symbol] name
+    #   The name of the property.
     # 
-    # @return [return_type]
-    #   @todo Document return value.
+    # @param [Hash{ Symbol => Object }] **opts
+    #   Constructor options for {NRSER::Meta::Props::Prop}.
+    # 
+    # @return [NRSER::Meta::Props::Prop]
+    #   The newly created prop, thought you probably don't need it (it's 
+    #   already all bound up on the class at this point), but why not?
     # 
     def prop name, **opts
       ref = NRSER::Meta::Props.get_props_ref self
@@ -153,6 +160,8 @@ module Props
           #   end
         end
       end
+      
+      prop
     end # #prop
     
     
@@ -241,19 +250,30 @@ module Props
   end # #to_data
   
   
-  # @todo Document to_json method.
+  
+  # Language Inter-Op
+  # ---------------------------------------------------------------------
+  
+  # Get a JSON {String} encoding the instance's data.
   # 
-  # @param [type] arg_name
-  #   @todo Add name param description.
+  # @param [Array] *args
+  #   I really don't know. `#to_json` takes at last one argument, but I've
+  #   had trouble finding a spec for it :/
   # 
-  # @return [return_type]
-  #   @todo Document return value.
+  # @return [String]
   # 
   def to_json *args
     to_data.to_json *args
   end # #to_json
   
   
+  # Get a YAML {String} encoding the instance's data.
+  # 
+  # @param [Array] *args
+  #   I really don't know... whatever {YAML.dump} sends to it i guess.
+  # 
+  # @return [String]
+  #   
   def to_yaml *args
     to_data.to_yaml *args
   end
