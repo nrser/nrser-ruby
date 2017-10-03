@@ -58,6 +58,6 @@ shared_examples "Type maker method" do |  args: [],
       end
     }
   end
-end # example name
+end # Type maker method
 
 
