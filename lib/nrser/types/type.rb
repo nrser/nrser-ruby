@@ -1,5 +1,12 @@
+# Refinements
+# =======================================================================
+
 require 'nrser/refinements'
 using NRSER
+
+
+# Definitions
+# =======================================================================
 
 module NRSER::Types
   class Type

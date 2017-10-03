@@ -99,16 +99,6 @@ describe NRSER::Types do
         pass: [''],
       },
       
-      t.length(min: 0, max: 0) => {
-        pass: ['', [], {}],
-        fail: ['x', [1], {x: 1}],
-      },
-      
-      t.length(0) => {
-        pass: ['', [], {}],
-        fail: ['x', [1], {x: 1}],
-      },
-      
       t.bounded(min: 0, max: 0) => {
         pass: [0],
       },

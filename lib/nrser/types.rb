@@ -41,6 +41,8 @@ using NRSER
 
 # Stuff to help you define, test, check and match types in Ruby.
 # 
+# {include:file:lib/nrser/types/README.md}
+# 
 module NRSER::Types
   
   # Make a {NRSER::Types::Type} from a value.

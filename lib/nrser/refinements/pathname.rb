@@ -33,5 +33,16 @@ module NRSER
         super pattern, replacement
       end
     end
+    
+    
+    # Just returns `self`. Implemented to match the {String#to_pn} API so it
+    # can be called on an argument that may be either one.
+    # 
+    # @return [Pathname]
+    # 
+    def to_pn
+      Pathname.new self
+    end
+    
   end # Pathname
 end # NRSER

@@ -59,13 +59,20 @@ module NRSER
     
     
     
-    # @todo Document find_bounded method.
+    # Find all entries in an {Enumerable} for which `&block` returns a truthy
+    # value, then check the amount of results found against the
+    # {NRSER::Types.length} created from `bounds`, raising a {TypeError} if 
+    # the results' length doesn't satisfy the bounds type.
     # 
-    # @param [type] arg_name
-    #   @todo Add name param description.
+    # @param [Enumerable] enum
+    #   The entries to search and check.
+    # 
+    # @param []
     # 
     # @return [return_type]
     #   @todo Document return value.
+    # 
+    # @raise 
     # 
     def find_bounded enum, bounds, &block
       NRSER::Types.
@@ -73,7 +80,8 @@ module NRSER
         check(enum.find_all &block) { |type:, value:|
           NRSER.dedent <<-END
             
-            Length of found elements (#{ value.length }) FAILED to satisfy #{ type.to_s }
+            Length of found elements (#{ value.length }) FAILED to 
+            satisfy #{ type.to_s }
             
             Found:
               #{ NRSER.indent value.pretty_inspect }
@@ -84,7 +92,6 @@ module NRSER
           END
         }
     end # #find_bounded
-    
     
     
     # @todo Document find_only method.
@@ -98,7 +105,6 @@ module NRSER
     def find_only enum, &block
       find_bounded(enum, 1, &block).first
     end # #find_only
-    
     
     
     # @todo Document to_h_by method.
