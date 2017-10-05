@@ -76,5 +76,18 @@ module NRSER
       NRSER.map_keys self, &block
     end
     
+    
+    # See {NRSER.bury!}
+    def bury! key_path,
+              value,
+              parsed_key_type: :guess,
+              clobber: false
+      NRSER.bury! self,
+                  key_path,
+                  value,
+                  parsed_key_type: parsed_key_type,
+                  clobber: clobber
+    end
+    
   end # refine ::Hash
 end # NRSER
