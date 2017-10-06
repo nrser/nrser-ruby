@@ -221,6 +221,7 @@ module Props
       map_values { |name, prop| prop.get self }
   end # #to_h
   
+  
   # Create a "data" representation suitable for transport, storage, etc.
   # 
   # The result is meant to consist of only basic data types and structures -
