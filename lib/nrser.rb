@@ -1,4 +1,8 @@
-module NRSER; end
+require 'pathname'
+
+module NRSER
+  ROOT = ( Pathname.new(__FILE__).dirname / '..' ).expand_path
+end
 
 require_relative './nrser/version'
 require_relative './nrser/no_arg'
