@@ -32,9 +32,25 @@ module NRSER::Types
     #   value that doesn't satisfy will result in a {TypeError} being raised
     #   by {#from_s}.
     # 
-    def initialize name: nil, from_s: nil
+    # @param [nil | #call | #to_proc] to_data:
+    #   
+    # 
+    def initialize name: nil, from_s: nil, to_data: nil
       @name = name
       @from_s = from_s
+      
+      @to_data = if to_data.nil?
+        nil
+      elsif to_data.respond_to?( :call )
+        to_data
+      elsif to_data.respond_to?( :to_proc )
+        to_data.to_proc
+      else
+        raise TypeError.squished <<-END
+          `to_data:` keyword arg must be `nil`, respond to `:call` or respond
+          to `:to_proc`; found #{ to_data.inspect }
+        END
+      end
     end # #initialize
     
     
@@ -49,6 +65,7 @@ module NRSER::Types
     def test value
       raise NotImplementedError
     end
+    
     
     def check value, &make_fail_message
       # success case
@@ -65,14 +82,67 @@ module NRSER::Types
       raise TypeError.new msg
     end
     
+    
+    # Overridden to customize behavior for the {#from_s} and {#to_data} 
+    # methods - those methods are always defined, but we have {#respond_to?}
+    # return `false` if they lack the underlying instance variables needed
+    # to execute.
+    # 
+    # @example
+    #   t1 = t.where { |value| true }
+    #   t1.respond_to? :from_s
+    #   # => false
+    #   
+    #   t2 = t.where( from_s: ->(s){ s.split ',' } ) { |value| true }
+    #   t2.respond_to? :from_s
+    #   # => true
+    # 
+    # @param [Symbol | String] name
+    #   Method name to ask about.
+    # 
+    # @param [Boolean] include_all
+    #   IDK, part of Ruby API that is passed up to `super`.
+    # 
+    # @return [Boolean]
+    # 
     def respond_to? name, include_all = false
       if name == :from_s || name == 'from_s'
         has_from_s?
+      elsif name == :to_data || name == 'to_data'
+        has_to_data?
       else
         super name, include_all
       end
-    end
+    end # #respond_to?
     
+    
+    # Load a value of this type from a string representation by passing `s`
+    # to the {@from_s} {Proc}.
+    # 
+    # Checks the value {@from_s} returns with {#check} before returning it, so
+    # you know it satisfies this type.
+    # 
+    # @param [String] s
+    #   String representation.
+    # 
+    # @return [Object]
+    #   Value that has passed {#check}.
+    # 
+    # @raise [NoMethodError]
+    #   If this type doesn't know how to load values from strings.
+    #   
+    #   In basic types this happens when {NRSER::Types::Type#initialize} was 
+    #   not provided a `from_s:` {Proc} argument.
+    #   
+    #   {NRSER::Types::Type} subclasses may override {#from_s} entirely,
+    #   divorcing it from the `from_s:` constructor argument and internal
+    #   {@from_s} instance variable (which is why {@from_s} is not publicly
+    #   exposed - it should not be assumed to dictate {#from_s} behavior 
+    #   in general).
+    # 
+    # @raise [TypeError]
+    #   If the value loaded does not pass {#check}.
+    # 
     def from_s s
       if @from_s.nil?
         raise NoMethodError, "#from_s not defined"
@@ -81,12 +151,55 @@ module NRSER::Types
       check @from_s.call( s )
     end
     
+    
+    # Test if the type knows how to load values from strings.
+    # 
+    # If this method returns `true`, then we expect {#from_s} to succeed.
+    # 
+    # @return [Boolean]
+    # 
     def has_from_s?
       ! @from_s.nil?
     end
     
+    
+    # Test if the type has custom information about how to convert it's values
+    # into "data" - structures and values suitable for transportation and 
+    # storage (JSON, etc.).
+    # 
+    # If this method returns `true` then {#to_data} should succeed.
+    # 
+    # @return [Boolean]
+    # 
+    def has_to_data?
+      ! @to_data.nil?
+    end # #has_to_data?
+    
+    
+    # Dumps a value of this type to "data" - structures and values suitable
+    # for transport and storage, such as dumping to JSON or YAML, etc.
+    # 
+    # @param [Object] value
+    #   Value of this type (though it is *not* checked).
+    # 
+    # @return [Object]
+    #   The data representation of the value.
+    # 
+    def to_data value
+      if @from_s.nil?
+        raise NoMethodError, "#to_data not defined"
+      end
+      
+      @to_data.call value
+    end # #to_data
+    
+    
+    # @return [String]
+    #   a brief string description of the type.
+    # 
     def to_s
       "`Type: #{ name }`"
     end
+    
   end # Type
 end # NRSER::Types

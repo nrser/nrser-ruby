@@ -8,18 +8,19 @@ module NRSER::Types
   class Combinator < NRSER::Types::Type
     attr_reader :types
     
+    
     def initialize *types, **options
       super **options
       @types = types.map {|type| NRSER::Types.make type}
     end
     
+    
     def default_name
-      @name || (
-        "#{ self.class.short_name }<" + 
-        @types.map {|type| type.name }.join(',') + 
-        ">"
-      )
+      "#{ self.class.short_name }<" + 
+      @types.map {|type| type.name }.join(',') + 
+      ">"
     end
+    
     
     # a combinator may attempt to parse from a string if any of it's types
     # can do so
@@ -27,11 +28,12 @@ module NRSER::Types
       @types.any? {|type| type.has_from_s?}
     end
     
+    
     # a combinator iterates through each of it's types, trying the
     # conversion and seeing if the result satisfies the combinator type
     # itself. the first such value found is returned.
     def from_s s
-      @types.each {|type|
+      @types.each { |type|
         if type.respond_to? :from_s
           begin
             return check type.from_s(s)
@@ -44,6 +46,52 @@ module NRSER::Types
       raise TypeError,
         "none of combinator #{ self.to_s } types could convert #{ s.inspect }"
     end
+    
+    
+    # Overridden to delegate functionality to the combined types:
+    # 
+    # A combinator may attempt to parse from a string if any of it's types
+    # can do so.
+    # 
+    # @return [Boolean]
+    # 
+    def has_from_s?
+      @types.any? {|type| type.has_from_s?}
+    end # has_from_s
+    
+    
+    # Overridden to delegate functionality to the combined types:
+    # 
+    # A combinator can convert a value to data if *any* of it's types can.
+    # 
+    # @return [Boolean]
+    # 
+    def has_to_data?
+      @types.any? { |type| type.has_to_data? }
+    end # #has_to_data
+    
+    
+    # Overridden to delegate functionality to the combined types:
+    # 
+    # The first of the combined types that responds to `#to_data` is used to
+    # dump the value.
+    # 
+    # @param [Object] value
+    #   Value of this type (though it is *not* checked).
+    # 
+    # @return [Object]
+    #   The data representation of the value.
+    # 
+    def to_data value
+      @types.each { |type|
+        if type.respond_to? :to_data
+          return type.to_data value
+        end
+      }
+      
+      raise NoMethodError, "#to_data not defined"
+    end # #to_data
+    
     
     def == other
       equal?(other) || (

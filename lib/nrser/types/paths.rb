@@ -34,7 +34,8 @@ module NRSER::Types
   PATHNAME = is_a \
     Pathname,
     name: 'PathnameType',
-    from_s: ->(string) { Pathname.new string }
+    from_s: ->(string) { Pathname.new string },
+    to_data: :to_s
   
   
   # A type satisfied by a {Pathname} instance that's not empty (meaning it's
@@ -53,7 +54,7 @@ module NRSER::Types
   # 
   class << self
     
-    def pathname **options
+    def pathname to_data: :to_s, **options
       if options.empty?
         PATHNAME
       else
@@ -61,11 +62,14 @@ module NRSER::Types
           Pathname,
           name: 'PathnameType',
           from_s: ->(string) { Pathname.new string },
+          to_data: to_data,
           **options
       end
     end
     
+    # A path is a non-empty {String} or {Pathname}.
     # 
+    # @param **options see NRSER::Types::Type#initialize
     # 
     # @return [NRSER::Types::Type]
     # 
@@ -76,6 +80,62 @@ module NRSER::Types
         union non_empty_str, NON_EMPTY_PATHNAME, **options
       end
     end # #path
+    
+    
+    # An absolute {#path}.
+    # 
+    # @param **options see NRSER::Types::Type#initialize
+    # 
+    def abs_path name: 'AbsPath', **options
+      intersection \
+        path,
+        where { |path| File.absolute? path },
+        name: name,
+        **options
+    end
+    
+    
+    # A {NRSER::Types.path} that is a directory.
+    # 
+    # @param [Hash] **options
+    #   Construction options passed to {NRSER::Types::Type#initialize}.
+    # 
+    # @return [NRSER::Types::Type]
+    # 
+    def dir_path name: 'DirPath', **options
+      intersection \
+        path,
+        where { |path| File.directory? path },
+        name: name,
+        **options
+    end # #dir_path
+    
+    
+    # Absolute {.path} to a directory (both an {.abs_path} and an {.dir_path}).
+    # 
+    # @param [type] name:
+    #   @todo Add name param description.
+    # 
+    # @return [return_type]
+    #   @todo Document return value.
+    # 
+    def abs_dir_path name: 'AbsDirPath', **options
+      intersection \
+        abs_path,
+        dir_path,
+        name: name,
+        **options
+    end # #abs_dir_path
+    
+    
+    
+    def file_path name: 'FilePath', **options
+      intersection \
+        path,
+        where { |path| File.file? path },
+        name: name,
+        **options
+    end
     
   end # class << self (Eigenclass)
   

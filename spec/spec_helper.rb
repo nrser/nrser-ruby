@@ -31,6 +31,7 @@ end
 shared_examples "Type maker method" do |  args: [],
                                           accepts: [],
                                           rejects: [],
+                                          to_data: {},
                                           **expectations |
   context "#call( #{ args.map(&:inspect).join ', ' } )" do
     # Load the type into the subject by applying the parent scope subject,
@@ -55,6 +56,13 @@ shared_examples "Type maker method" do |  args: [],
     rejects.each { |value|
       it "rejects #{ value.inspect }" do
         expect( subject.test value ).to be false
+      end
+    }
+    
+    # {NRSER::Types::Type#to_data} tests
+    to_data.each { |value, data|
+      it "dumps value #{ value.inspect } to data #{ data.inspect }" do
+        expect( subject.to_data value ).to eq data
       end
     }
   end

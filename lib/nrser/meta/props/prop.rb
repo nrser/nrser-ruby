@@ -230,6 +230,8 @@ class Prop
     when nil
       if value.respond_to? :to_data
         value.to_data
+      elsif type.respond_to? :to_data
+        type.to_data value
       else
         value
       end
