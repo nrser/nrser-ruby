@@ -7,91 +7,125 @@ require 'nrser/types/bounded'
 using NRSER
   
 module NRSER::Types
+  # Parse a string into a number.
+  # 
+  # @return [Integer]
+  #   If the string represents a whole integer.
+  # 
+  # @return [Float]
+  #   If the string represents a decimal number.
+  # 
   def self.parse_number s
-    float = s.to_f
+    float = Float s
     int = float.to_i
     if float == int then int else float end
   end
   
-  # zero
-  # ====
   
-  ZERO = is 0, name: 'zero', from_s: method(:parse_number)
+  # Zero
+  # =====================================================================
+  
+  ZERO = is(
+    0,
+    name: 'ZeroType',
+    from_s: method( :parse_number )
+  ).freeze
   
   def self.zero
     ZERO
   end
   
-  # number (Numeric)
-  # ================
   
-  NUM = IsA.new Numeric, name: 'Num', from_s: method(:parse_number)
+  # Number ({Numeric})
+  # =====================================================================
+  
+  NUM = IsA.new(
+    Numeric,
+    name: 'NumType',
+    from_s: method( :parse_number )
+  ).freeze
   
   def self.num
     NUM
   end
   
-  # integers
-  # ========
+  singleton_class.send :alias_method, :number, :num
   
-  INT = IsA.new Integer, name: 'Int', from_s: method(:parse_number)
+  
+  # Integers
+  # =====================================================================
+  
+  INT = IsA.new(
+    Integer,
+    name: 'IntType',
+    from_s: method( :parse_number )
+  ).freeze
   
   def self.int
     INT
   end
   
-  def self.integer
-    int
-  end
+  singleton_class.send :alias_method, :integer, :int
   
-  # bounded integers
-  # ================
-  # 
   
-  # positive integer
+  # Bounded Integers
+  # ---------------------------------------------------------------------
+  
+  # Positive Integer
   # ----------------
   # 
-  # integer greater than zero.
+  # Integer greater than zero.
   # 
   
-  POS_INT = intersection INT, bounded(min: 1), name: 'PosInt'
+  POS_INT = intersection(
+    INT,
+    bounded(min: 1),
+    name: 'PosIntType'
+  ).freeze
   
   def self.pos_int
     POS_INT
   end
   
-  # negative integer
+  
+  # Negative Integer
   # ----------------
   # 
-  # integer less than zero
+  # Integer less than zero.
   # 
   
-  NEG_INT = intersection INT, bounded(max: -1), name: 'NegInt'
+  NEG_INT = intersection(
+    INT,
+    bounded(max: -1),
+    name: 'NegIntType'
+  ).freeze
   
   def self.neg_int
     NEG_INT
   end
   
-  # non-negative integer
+  
+  # Non-Negative Integer
   # --------------------
   # 
-  # positive integers and zero... but it seems more efficient to define these
+  # Positive integers and zero... but it seems more efficient to define these
   # as bounded instead of a union. 
   # 
   
-  NON_NEG_INT = intersection INT, bounded(min: 0), name: 'NonNegInt'
+  NON_NEG_INT = intersection INT, bounded(min: 0), name: 'NonNegIntType'
   
   def self.non_neg_int
     NON_NEG_INT
   end
   
-  # non-positive integer
+  
+  # Non-Positive Integer
   # --------------------
   # 
   # negative integers and zero.
   # 
   
-  NON_POS_INT = intersection INT, bounded(max: 0), name: 'NonPosInt'
+  NON_POS_INT = intersection INT, bounded(max: 0), name: 'NonPosIntType'
   
   def self.non_pos_int
     NON_POS_INT

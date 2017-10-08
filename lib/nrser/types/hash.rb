@@ -31,8 +31,6 @@ module NRSER::Types
     end
   end # HashType
   
-  HASH = HashType.new.freeze
-  
   
   # Eigenclass (Singleton Class)
   # ========================================================================
@@ -60,6 +58,41 @@ module NRSER::Types
     
     alias_method :dict, :hash_
     
+    
+    # Type for a {Hash} that consists of only a single key and value pair.
+    # 
+    # @param [String] name:
+    #   Name to give the new type.
+    # 
+    # @param [Hash] **options
+    #   Other options to pass to 
+    # 
+    # @return [NRSER::Types::Type]
+    # 
+    def hash_pair **options
+      if options.empty?
+        HASH_PAIR
+      else
+        intersection is_a( Hash ), length( 1 ), **options
+      end
+    end # #pair
+    
   end # class << self (Eigenclass)
+  
+  
+  # Post-Processing
+  # =======================================================================
+  # 
+  # Need to define the default constant types here 'cause they use the methods
+  # defined above.
+  # 
+  # NOTE   All these should be **frozen**... I mean we still can't guarantee
+  #       that users can't mutate them (which would break loose all sorts of
+  #       hell), but it's better than nothing.
+  # 
+  
+  HASH = HashType.new.freeze
+  
+  HASH_PAIR = hash_pair( name: 'HashPairType' ).freeze
   
 end

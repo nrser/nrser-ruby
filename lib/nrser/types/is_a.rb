@@ -11,8 +11,8 @@ module NRSER::Types
       @klass = klass
     end
     
-    def name
-      @name || "#{ self.class.short_name }(#{ @klass })"
+    def default_name
+      "#{ self.class.short_name }(#{ @klass })"
     end
     
     def test value

@@ -32,8 +32,9 @@ shared_examples "Type maker method" do |  args: [],
                                           accepts: [],
                                           rejects: [],
                                           to_data: {},
+                                          from_s: nil,
                                           **expectations |
-  context "#call( #{ args.map(&:inspect).join ', ' } )" do
+  context "#call #{ args.map(&:inspect).join ', ' }" do
     # Load the type into the subject by applying the parent scope subject,
     # which should be the Type maker method that we want to test, to the
     # args we received.
@@ -45,19 +46,21 @@ shared_examples "Type maker method" do |  args: [],
       { to: { be_a: NRSER::Types::Type } },
       *expectations.values
     
-    # Make sure it accepts the accepts
-    accepts.each { |value|
-      it "accepts #{ value.inspect }" do
-        expect( subject.test value ).to be true
-      end
-    }
-    
-    # And that it rejects the rejects
-    rejects.each { |value|
-      it "rejects #{ value.inspect }" do
-        expect( subject.test value ).to be false
-      end
-    }
+    describe "#test" do
+      # Make sure it accepts the accepts
+      accepts.each { |value|
+        it "accepts #{ value.inspect }" do
+          expect( subject.test value ).to be true
+        end
+      }
+      
+      # And that it rejects the rejects
+      rejects.each { |value|
+        it "rejects #{ value.inspect }" do
+          expect( subject.test value ).to be false
+        end
+      }
+    end # #test
     
     # {NRSER::Types::Type#to_data} tests
     to_data.each { |value, data|
@@ -65,7 +68,41 @@ shared_examples "Type maker method" do |  args: [],
         expect( subject.to_data value ).to eq data
       end
     }
-  end
+    
+    # {NRSER::Types::Type.from_s} test
+    unless from_s.nil?
+      describe '#from_s' do
+        
+        if from_s.key? :accepts
+          context "accepts" do
+            from_s[:accepts].each { |s, expected|
+              describe s.inspect do
+                subject { super().from_s s }
+                
+                it { is_expected.to eq expected }
+              end
+            } # each
+          end # accepts
+        end
+        
+        if from_s.key? :rejects
+          context "rejects" do
+            from_s[:rejects].each { |s, error|
+              describe s.inspect do
+                it "raises an error" do
+                  expect {
+                    subject.from_s s
+                  }.to raise_error *NRSER.as_array( error )
+                end # raises an error
+              end # 
+            }
+          end # rejects
+        end
+        
+      end # #from_s
+    end # unless from_s.nil?
+    
+  end # #call( ... )
 end # Type maker method
 
 

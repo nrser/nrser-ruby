@@ -198,7 +198,7 @@ module NRSER::Types
     #   a brief string description of the type.
     # 
     def to_s
-      "`Type: #{ name }`"
+      name
     end
     
   end # Type
