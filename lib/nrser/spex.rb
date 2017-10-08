@@ -66,3 +66,26 @@ shared_examples "expect subject" do |*expectations|
   }
 end # is expected
 
+
+# Shared example for a functional method that compares input and output pairs.
+# 
+shared_examples "function" do |success: {}, error: {}|
+  success.each { |args, expected|
+    args = NRSER.as_array args
+    
+    context "called with #{ args.map( &:inspect ).join ', ' }" do
+      subject { super().call *args }
+      
+      it {
+        matcher = if expected.respond_to?( :matches? )
+          expected
+        else
+          eq expected
+        end
+        
+        is_expected.to matcher
+      }
+    end
+  }
+end # function
+

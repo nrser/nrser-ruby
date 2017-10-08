@@ -1,3 +1,5 @@
+require_relative './string/looks_like'
+
 module NRSER
   class << self
     # Functions the operate on strings.
@@ -155,5 +157,6 @@ module NRSER
     end # constantize
     
     alias_method :to_const, :constantize
+    
   end # class << self
 end # module NRSER
