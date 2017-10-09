@@ -292,25 +292,29 @@ module NRSER
   end
   
   
+  # Meant to be a drop-in replacement for the ActiveSupport version, though
+  # I've changed the implementation a bit... because honestly I didn't 
+  # understand why they were doing it the way they do :/
+  # 
+  # @see http://www.rubydoc.info/gems/activesupport/5.1.3/Hash:slice!
+  # 
+  # 
+  def self.slice_keys! hash, *keys
+    # We're not using this, but, whatever, leave it in...
+    if hash.respond_to?(:convert_key, true)
+      keys.map! { |key| hash.send :convert_key, key }
+    end
+    
+    slice_keys( hash, *keys ).tap { |slice|
+      except_keys! hash, *keys
+    }
+  end
+  
+  
   # Eigenclass (Singleton Class)
   # ========================================================================
   # 
   class << self
-    
-    
-    
-    # @todo Document select_map method.
-    # 
-    # @param [type] arg_name
-    #   @todo Add name param description.
-    # 
-    # @return [return_type]
-    #   @todo Document return value.
-    # 
-    def select_map arg_name
-      # method body...
-    end # #select_map
-    
     
     # Guess which type of "name" key - strings or symbols - a hash (or other 
     # object that responds to `#keys` and `#empty`) uses.
