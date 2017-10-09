@@ -76,6 +76,30 @@ module NRSER::Types
       }
     end # #test
     
+    
+    # @return [Boolean]
+    #   `true` if this type can load values from a string, which is true if
+    #   *all* it's types can load values from strings.
+    # 
+    def has_from_s?
+      @types.all? &:has_from_s?
+    end # #has_from_s?
+    
+    
+    # Load each value in an array of strings split out by
+    # {NRSER::Types::ArrayType#from_s} by passing each value to `#from_s` in
+    # the type of the corresponding index.
+    # 
+    # @param [Array<String>] strings
+    # 
+    # @return [Array]
+    # 
+    def items_from_strings strings
+      @types.each_with_index.map { |type, index|
+        type.from_s strings[index]
+      }
+    end
+    
   end # class TupleType
   
 
