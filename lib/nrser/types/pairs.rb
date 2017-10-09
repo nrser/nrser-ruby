@@ -94,7 +94,7 @@ module NRSER::Types
     if options.empty?
       PAIR
     else
-      type_options = NRSER.slice_keys options, :key, :value
+      type_options = NRSER.slice_keys! options, :key, :value
       
       union \
         array_pair( **type_options ),
