@@ -41,5 +41,23 @@ module NRSER
     end # #digable
     
     
+    # Checks that length is 2 and returns `self`.
+    # 
+    # @return [Array]
+    #   Array of length 2.
+    # 
+    # @raise [TypeError]
+    #   If length is not 2.
+    # 
+    def to_pair
+      unless length == 2
+        raise TypeError,
+              "Array is not of length 2: #{ self.inspect }"
+      end
+      
+      self
+    end # #to_pair
+    
+    
   end # refine ::Array
 end # NRSER

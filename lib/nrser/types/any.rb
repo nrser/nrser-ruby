@@ -4,7 +4,7 @@ require 'nrser/types/where'
 using NRSER
   
 module NRSER::Types
-  ANY = where(name: 'Any', from_s: ->(s) { s }) { true }.freeze
+  ANY = where(name: 'AnyType', from_s: ->(s) { s }) { true }.freeze
   
   # anything
   def self.any

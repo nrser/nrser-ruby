@@ -9,11 +9,13 @@
 
 # Project / Package
 # -----------------------------------------------------------------------
-require_relative './combinators'
 
 
 # Refinements
 # =======================================================================
+
+require 'nrser/refinements'
+using NRSER
 
 
 # Declarations
@@ -27,25 +29,21 @@ module NRSER; end
 
 module NRSER::Types
   
-
-  # @todo Document pair method.
+  # A label is a non-empty {String} or {Symbol}.
   # 
-  # @param [type] arg_name
-  #   @todo Add name param description.
+  # @param [Hash] **options
+  #   Options to pass to {NRSER::Types::Type#initialize}.
   # 
-  # @return [return_type]
-  #   @todo Document return value.
+  # @return [NRSER::Types::Type]
   # 
-  def self.pair **options
+  def self.label **options
     if options.empty?
-      PAIR
+      LABEL
     else
-      union HASH_PAIR, 
+      union non_empty_str, non_empty_sym, **options
     end
-  end # #pair
+  end # .label
+  
+  LABEL = label( name: 'LabelType' ).freeze
   
 end # module NRSER::Types
-
-
-# Post-Processing
-# =======================================================================

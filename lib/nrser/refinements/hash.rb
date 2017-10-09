@@ -89,5 +89,24 @@ module NRSER
                   clobber: clobber
     end
     
+    
+    # Checks that `self` contains a single key/value pair (`#length` of 1)
+    # and returns it as an array of length 2.
+    # 
+    # @return [Array]
+    #   Array of length 2.
+    # 
+    # @raise [TypeError]
+    #   If `self` has more than one key/value pair.
+    # 
+    def to_pair
+      unless length == 1
+        raise TypeError,
+              "Hash has more than one pair: #{ self.inspect }"
+      end
+      
+      first
+    end
+    
   end # refine ::Hash
 end # NRSER

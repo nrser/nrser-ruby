@@ -201,5 +201,11 @@ module NRSER::Types
       name
     end
     
+    alias_method :really_inspect, :inspect
+    
+    def inspect
+      to_s
+    end
+    
   end # Type
 end # NRSER::Types

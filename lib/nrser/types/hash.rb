@@ -14,8 +14,7 @@ module NRSER::Types
       super ::Hash, **options
       
       @keys = NRSER::Types.make keys
-      @values = NRSER::Types.make keys
-      
+      @values = NRSER::Types.make values
     end
     
     def test value
@@ -32,67 +31,29 @@ module NRSER::Types
   end # HashType
   
   
-  # Eigenclass (Singleton Class)
-  # ========================================================================
+
+  # Type satisfied by {Hash} instances.
   # 
-  class << self
-    
-    # Type satisfied by {Hash} instances.
-    # 
-    # @param [Array] *args
-    #   Passed to {NRSER::Types::HashType#initialize} unless empty.
-    # 
-    # @return [NRSER::Types::HASH]
-    #   If `args` are empty.
-    # 
-    # @return [NRSER::Types::Type]
-    #   Newly constructed hash type from `args`.
-    # 
-    def hash_ *args
-      if args.empty?
-        HASH
-      else
-        HashType.new *args
-      end
+  # @param [Array] *args
+  #   Passed to {NRSER::Types::HashType#initialize} unless empty.
+  # 
+  # @return [NRSER::Types::HASH]
+  #   If `args` are empty.
+  # 
+  # @return [NRSER::Types::Type]
+  #   Newly constructed hash type from `args`.
+  # 
+  def self.hash_type *args
+    if args.empty?
+      HASH
+    else
+      HashType.new *args
     end
-    
-    alias_method :dict, :hash_
-    
-    
-    # Type for a {Hash} that consists of only a single key and value pair.
-    # 
-    # @param [String] name:
-    #   Name to give the new type.
-    # 
-    # @param [Hash] **options
-    #   Other options to pass to 
-    # 
-    # @return [NRSER::Types::Type]
-    # 
-    def hash_pair **options
-      if options.empty?
-        HASH_PAIR
-      else
-        intersection is_a( Hash ), length( 1 ), **options
-      end
-    end # #pair
-    
-  end # class << self (Eigenclass)
+  end
   
-  
-  # Post-Processing
-  # =======================================================================
-  # 
-  # Need to define the default constant types here 'cause they use the methods
-  # defined above.
-  # 
-  # NOTE   All these should be **frozen**... I mean we still can't guarantee
-  #       that users can't mutate them (which would break loose all sorts of
-  #       hell), but it's better than nothing.
-  # 
+  singleton_class.send :alias_method, :dict, :hash_type
+  singleton_class.send :alias_method, :hash_, :hash_type
   
   HASH = HashType.new.freeze
-  
-  HASH_PAIR = hash_pair( name: 'HashPairType' ).freeze
   
 end
