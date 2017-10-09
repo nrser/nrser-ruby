@@ -1,0 +1,32 @@
+.source.ruby:
+  $namespace:
+    title: NRSER RSpec
+  
+  Describe type maker method:
+    prefix: describe-type-maker-method
+    body: |
+      
+      # NRSER::Types.${1:method_name}
+      # ========================================================================
+      # 
+      describe "NRSER::Types.${1:method_name}" do
+        subject { NRSER::Types.method :${1:method_name} }
+        
+        it_behaves_like 'Type maker method',
+          args: [],
+          accepts: [  ],
+          rejects: [  ],
+          from_s: {
+            accepts: {
+              
+            },
+            rejects: {
+              
+            }
+          }
+        
+      end # NRSER::Types.${1:method_name}
+      
+      # ************************************************************************
+      
+      
