@@ -30,6 +30,7 @@ require_relative './types/combinators'
 require_relative './types/maybe'
 require_relative './types/attrs'
 require_relative './types/responds'
+require_relative './types/in'
 
 
 # Refinements
@@ -135,7 +136,7 @@ module NRSER::Types
       
       to any of types
       
-          #{ enum.map {|type, expression| "\n    #{ type.inspect }"} }
+          #{ enum.map {|type, expression| "\n    #{ type.inspect }"}.join '' }
       
     END
   end # .match
