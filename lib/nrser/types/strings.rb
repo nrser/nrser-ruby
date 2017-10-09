@@ -8,29 +8,29 @@ using NRSER
 module NRSER::Types
   STR = IsA.new String, name: 'Str', from_s: ->(s) { s }
   
-  def self.str **options
-    if options.empty?
+  def self.str length: nil, **options
+    if length.nil? && options.empty?
       # if there are no options can point to the constant for efficiency
       STR
     else
-      types = []
-      
-      if options[:length]
-        types << length(options[:length])
+      if length.nil?
+        IsA.new String, from_s: ->(s) { s }, **options
+      else
+        intersection \
+          IsA.new( String, from_s: ->(s) { s } ),
+          NRSER::Types.length( length ),
+          **options
       end
-      
-      intersection STR, *types
     end
   end # string
   
-  def self.string
-    str
-  end
+  singleton_class.send :alias_method, :string, :str
   
-  EMPTY_STR = Is.new ''
+  STR = str( name: 'StrType' ).freeze
   
-  NON_EMPTY_STR = str length: {min: 1}, name: "NonEmptyStr"
+  EMPTY_STR = Is.new( '' ).freeze
   
+  NON_EMPTY_STR = str( length: {min: 1}, name: "NonEmptyStr" ).freeze
   
   def self.non_empty_str
     NON_EMPTY_STR

@@ -87,14 +87,6 @@ describe NRSER::Types do
         },
       },
       
-      t.str => {
-        pass: ['hey', ''],
-        fail: [1, {}, nil],
-        from_s: {
-          pass: ['hey', ''],
-        }
-      },
-      
       t.attrs(to_s: t.str) => {
         pass: [''],
       },
@@ -109,11 +101,6 @@ describe NRSER::Types do
       
       t.attrs(length: t.bounded(min: 0, max: 0)) => {
         pass: ['', []],
-        fail: ['hey'],
-      },
-      
-      t.str(length: 0) => {
-        pass: [''],
         fail: ['hey'],
       },
       
