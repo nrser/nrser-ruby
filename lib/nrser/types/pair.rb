@@ -27,28 +27,22 @@ module NRSER; end
 
 module NRSER::Types
   
-  # Eigenclass (Singleton Class)
-  # ========================================================================
+
+  # @todo Document pair method.
   # 
-  class << self
-    
-    # @todo Document pair method.
-    # 
-    # @param [type] arg_name
-    #   @todo Add name param description.
-    # 
-    # @return [return_type]
-    #   @todo Document return value.
-    # 
-    def pair **options
-      if options.empty?
-        PAIR
-      else
-        union HASH_PAIR, 
-      end
-    end # #pair
-    
-  end # class << self (Eigenclass)
+  # @param [type] arg_name
+  #   @todo Add name param description.
+  # 
+  # @return [return_type]
+  #   @todo Document return value.
+  # 
+  def self.pair **options
+    if options.empty?
+      PAIR
+    else
+      union HASH_PAIR, 
+    end
+  end # #pair
   
 end # module NRSER::Types
 
