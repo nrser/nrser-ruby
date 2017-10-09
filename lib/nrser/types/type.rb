@@ -194,18 +194,36 @@ module NRSER::Types
     end # #to_data
     
     
+    # Language Inter-Op
+    # =====================================================================
+    
+    
     # @return [String]
-    #   a brief string description of the type.
+    #   a brief string description of the type - just it's {#name} surrounded
+    #   by some back-ticks to make it easy to see where it starts and stops.
     # 
     def to_s
-      name
+      "`#{ name }`"
     end
     
-    alias_method :really_inspect, :inspect
     
-    def inspect
-      to_s
-    end
+    # Inspecting
+    # ---------------------------------------------------------------------
+    # 
+    # Due to their combinatoric nature, types can quickly become large data
+    # hierarchies, and the built-in {#inspect} will produce a massive dump
+    # that's distracting and hard to decipher.
+    # 
+    # {#inspect} is readily used in tools like `pry` and `rspec`, significantly
+    # impacting their usefulness when working with types.
+    # 
+    # As a solution, we alias the built-in `#inspect` as {#builtin_inspect},
+    # so it's available in situations where you really want all those gory
+    # details, and point {#inspect} to {#to_s}.
+    # 
+    
+    alias_method :builtin_inspect, :inspect
+    alias_method :inspect, :to_s
     
   end # Type
 end # NRSER::Types
