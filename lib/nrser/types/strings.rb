@@ -6,8 +6,6 @@ require 'nrser/types/attrs'
 using NRSER
   
 module NRSER::Types
-  STR = IsA.new String, name: 'Str', from_s: ->(s) { s }
-  
   def self.str length: nil, **options
     if length.nil? && options.empty?
       # if there are no options can point to the constant for efficiency
