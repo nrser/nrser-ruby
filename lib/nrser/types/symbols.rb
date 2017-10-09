@@ -2,22 +2,27 @@ require 'nrser/refinements'
 require 'nrser/types/is'
 require 'nrser/types/is_a'
 
+require 'nrser/refinements'
 using NRSER
   
 module NRSER::Types
-  SYM = IsA.new Symbol, name: 'Sym', from_s: ->(s) { s.to_sym }
-  
+
   def self.sym **options
     if options.empty?
       # if there are no options can point to the constant for efficiency
       SYM
     else
-      raise "Not Implemented"
+      IsA.new(
+        Symbol,
+        from_s: :to_sym.to_proc,
+        **options
+      )
     end
-  end # string
+  end # sym
   
-  def self.symbol *args
-    sym *args
-  end
+  singleton_class.send :alias_method, :symbol, :sym
+  
+  
+  SYM = sym name: 'SymType'
   
 end # NRSER::Types
