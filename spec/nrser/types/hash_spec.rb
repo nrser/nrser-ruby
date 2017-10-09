@@ -7,7 +7,7 @@ require 'spec_helper'
 describe "NRSER::Types.hash_pair" do
   subject { NRSER::Types.method :hash_pair }
   
-  it_behaves_like 'Type maker method',
+  include_examples 'make type',
     accepts: [
       {x: 1},
     ],

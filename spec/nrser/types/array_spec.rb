@@ -13,7 +13,9 @@ using NRSER::Types
 describe "NRSER::Types.array" do
   subject { NRSER::Types.method :array }
   
-  it_behaves_like 'Type maker method',
+  it_behaves_like 'type maker method'
+  
+  include_examples 'make type',
     accepts: [
       [],
       [1, 2, 3],
@@ -52,7 +54,7 @@ describe "NRSER::Types.array" do
       }
     }
   
-  it_behaves_like 'Type maker method',
+  include_examples 'make type',
     args: [t.int],
     
     accepts: [

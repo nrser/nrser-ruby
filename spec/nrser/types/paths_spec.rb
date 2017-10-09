@@ -3,7 +3,7 @@ require 'spec_helper'
 describe "NRSER::Types.dir_path" do
   subject { NRSER::Types.method :dir_path }
   
-  it_behaves_like 'Type maker method',
+  include_examples 'make type',
     accepts: [
       '.',
       '/',
@@ -23,7 +23,7 @@ end # NRSER::Types.dir_path
 describe "NRSER::Types.file_path" do
   subject { NRSER::Types.method :file_path }
   
-  it_behaves_like 'Type maker method',
+  include_examples 'make type',
     accepts: [
       ( NRSER::ROOT / 'README.md' ),
     ],
@@ -43,7 +43,7 @@ describe "NRSER::Types.file_path" do
     }
   
   context "custom name" do
-    it_behaves_like 'Type maker method',
+    include_examples 'make type',
       args: [ name: 'CustomType' ],
       
       accepts: [

@@ -22,7 +22,18 @@ module NRSER::Types
   
   singleton_class.send :alias_method, :symbol, :sym
   
+  SYM = sym( name: 'SymType' ).freeze
   
-  SYM = sym name: 'SymType'
+  
+  def self.non_empty_sym **options
+    return NON_EMPTY_SYM if options.empty?
+    
+    intersection \
+      SYM,
+      attrs( {to_s: non_empty_str} ),
+      **options
+  end
+  
+  NON_EMPTY_SYM = non_empty_sym( name: 'NonEmptySym' ).freeze
   
 end # NRSER::Types

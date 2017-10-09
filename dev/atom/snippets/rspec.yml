@@ -12,7 +12,9 @@
       describe "NRSER::Types.${1:method_name}" do
         subject { NRSER::Types.method :${1:method_name} }
         
-        it_behaves_like 'Type maker method',
+        it_behaves_like 'type maker method'
+        
+        include_examples 'make type',
           args: [],
           accepts: [  ],
           rejects: [  ],

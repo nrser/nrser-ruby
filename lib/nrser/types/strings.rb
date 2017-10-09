@@ -30,11 +30,12 @@ module NRSER::Types
   
   EMPTY_STR = Is.new( '' ).freeze
   
-  NON_EMPTY_STR = str( length: {min: 1}, name: "NonEmptyStr" ).freeze
-  
-  def self.non_empty_str
-    NON_EMPTY_STR
+  def self.non_empty_str **options
+    return NON_EMPTY_STR if options.empty?
+    
+    str( length: {min: 1}, **options )
   end # .non_empty_str
   
+  NON_EMPTY_STR = non_empty_str( name: 'NonEmptyStr' ).freeze
   
 end # NRSER::Types

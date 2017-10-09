@@ -10,13 +10,13 @@ describe "NRSER::Types.length" do
     }
     
     # Three ways to cut it:
-    it_behaves_like 'Type maker method', args: [ length: 0 ], **kwds
-    it_behaves_like 'Type maker method', args: [ 0 ], **kwds
-    it_behaves_like 'Type maker method', args: [ min: 0, max: 0], **kwds
+    include_examples 'make type', args: [ length: 0 ], **kwds
+    include_examples 'make type', args: [ 0 ], **kwds
+    include_examples 'make type', args: [ min: 0, max: 0], **kwds
       
   end # zero length
   
-  it_behaves_like 'Type maker method',
+  include_examples 'make type',
     args:     [ {min: 3, max: 5}, name: '3to5Type' ],
     
     accepts: [

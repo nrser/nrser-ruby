@@ -28,17 +28,29 @@ def expect_to_not_log &block
 end
 
 
-shared_examples "Type maker method" do |  args: [],
-                                          accepts: [],
-                                          rejects: [],
-                                          to_data: {},
-                                          from_s: nil,
-                                          **expectations |
+shared_examples "type maker method" do |param_1|
+  context "provided `name:` option" do
+    let( :name ) { 'CustomTypeName' }
+    subject { super().call name: name }
+    
+    it { is_expected.to be_a NRSER::Types::Type }
+    it { is_expected.to have_attributes name: name }
+  end # provided `name:` option
+  
+end # type maker method
+
+
+shared_examples "make type" do |  args: [],
+                                  accepts: [],
+                                  rejects: [],
+                                  to_data: {},
+                                  from_s: nil,
+                                  **expectations |
   context "#call #{ args.map(&:inspect).join ', ' }" do
     # Load the type into the subject by applying the parent scope subject,
     # which should be the Type maker method that we want to test, to the
     # args we received.
-    refine_subject :call, *args
+    subject{ super().call *args }
     
     # Expect that it's a {NRSER::Types::Type} and any other expectations that
     # may have been passed in.
