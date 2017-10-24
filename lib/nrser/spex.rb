@@ -33,25 +33,6 @@ def merge_expectations *expectations
 end
 
 
-# Refine the subject of the parent scope by `#send`ing it a message and setting
-# the result as the new subject.
-# 
-# @param [Symbol | String] method_name
-#   Name of the method to send to.
-# 
-# @param [Array] args*
-#   Arguments to send to the method.
-# 
-# @return [void]
-#   Seems to be what RSpec's `subject` method returns.
-# 
-def refine_subject method_name, *args
-  subject {
-    super().send method_name, *args
-  }
-end # #refine_subject
-
-
 # Shared Examples
 # =====================================================================
 
