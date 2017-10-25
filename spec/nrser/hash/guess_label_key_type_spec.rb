@@ -1,7 +1,7 @@
 require 'spec_helper'
 
-describe "NRSER.guess_name_type" do
-  subject { NRSER.method :guess_name_type }
+describe "NRSER.guess_label_key_type" do
+  subject { NRSER.method :guess_label_key_type }
   
   it "can't guess about an empty hash" do
     expect( subject.call( {} ) ).to be nil
@@ -44,4 +44,4 @@ describe "NRSER.guess_name_type" do
     ).to be nil
   end
   
-end # NRSER.guess_name_type
+end # NRSER.guess_label_key_type

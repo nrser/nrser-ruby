@@ -107,6 +107,27 @@ module NRSER
     end # #find_only
     
     
+    
+    # @todo Document only method.
+    # 
+    # @param [type] arg_name
+    #   @todo Add name param description.
+    # 
+    # @return [return_type]
+    #   @todo Document return value.
+    # 
+    def only! enum
+      unless enum.length == 1
+        raise TypeError.new squish <<-END
+          Expected enumerable #{ enum.inspect } to have exactly one entry.
+        END
+      end
+      
+      enum.first
+    end # #only
+    
+    
+    
     # @todo Document to_h_by method.
     # 
     # @param [type] arg_name

@@ -37,5 +37,10 @@ module NRSER::Refinements::Enumerable
     NRSER.enumerate_as_values self
   end
   
+  # See {NRSER.only!}
+  def only!
+    NRSER.only! self
+  end
+  
 end # module NRSER::Refinements::Enumerable
 

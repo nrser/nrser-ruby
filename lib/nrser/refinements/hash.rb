@@ -108,5 +108,17 @@ module NRSER
       first
     end
     
+    
+    # See {NRSER.deep_merge}
+    def deep_merge other_hash, &block
+      NRSER.deep_merge self, other_hash, &block
+    end
+    
+    
+    # See {NRSER.deep_merge!}
+    def deep_merge! other_hash, &block
+      NRSER.deep_merge! self, other_hash, &block
+    end
+    
   end # refine ::Hash
 end # NRSER
