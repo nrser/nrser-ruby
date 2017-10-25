@@ -32,6 +32,47 @@ def merge_expectations *expectations
   }
 end
 
+class Msg
+  
+  # Name of method the message is for.
+  # 
+  # @return [Symbol | String]
+  #     
+  attr_reader :symbol
+  
+  
+  # Arguments 
+  # 
+  # @return [Array]
+  #     
+  attr_reader :args
+  
+  
+  # TODO document `block` attribute.
+  # 
+  # @return [#call]
+  #     
+  attr_reader :block
+  
+  
+  def initialize symbol, *args, &block
+    @symbol = symbol
+    @args = args
+    @block = block
+  end
+  
+  
+  def to_a
+    [symbol, *args]
+  end
+  
+  
+  def to_proc
+    block
+  end
+  
+end
+
 
 # Shared Examples
 # =====================================================================
@@ -50,8 +91,8 @@ end # is expected
 
 # Shared example for a functional method that compares input and output pairs.
 # 
-shared_examples "function" do |success: {}, error: {}|
-  success.each { |args, expected|
+shared_examples "function" do |mapping: {}, raising: {}|
+  mapping.each { |args, expected|
     args = NRSER.as_array args
     
     context "called with #{ args.map( &:inspect ).join ', ' }" do
@@ -60,12 +101,23 @@ shared_examples "function" do |success: {}, error: {}|
       it {
         matcher = if expected.respond_to?( :matches? )
           expected
+        elsif expected.is_a? Msg
+          self.send *expected #, &expected
         else
           eq expected
         end
         
         is_expected.to matcher
       }
+    end
+  }
+  
+  raising.each { |args, error|
+    args = NRSER.as_array args
+    
+    context "called with #{ args.map( &:inspect ).join ', ' }" do
+    # it "rejects #{ args.map( &:inspect ).join ', ' }" do
+      it { expect { subject.call *args }.to raise_error( *error ) }
     end
   }
 end # function

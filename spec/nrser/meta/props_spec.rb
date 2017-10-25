@@ -101,42 +101,60 @@ describe NRSER::Meta::Props do
       it { is_expected.to have_attributes x: 1, y: 2, blah: "blah!" }
       
       describe "#to_h" do
-      # ========================================================================
-        
         subject { super().to_h }
-        
-        it { is_expected.to be_a Hash }
-        
-      end # #to_h
+        it { is_expected.to eq x: 1, y: 2, blah: 'blah!' }
+      end
+      
+      describe "#to_h only_primary: true" do
+        subject { super().to_h only_primary: true }
+        it { is_expected.to eq x: 1, y: 2 }
+      end
       
       # ************************************************************************
-      
       
     end # Point instance where x=1 and y=2 (default blah)
     
     # ************************************************************************
     
+    
+    describe "bad constructor args" do
+    # ========================================================================
+      
+      it "rejects string `y: 'why?'` value" do
+        expect { point_class.new x: 1, y: 'why?' }.to raise_error TypeError
+      end
+      
+    end # bad constructor args
+    
+    
+    describe ".new" do
+      subject { point_class.method :new }
+      
+      it_behaves_like "function",
+        mapping: {
+          [{x: 1, y: 2}] => Msg.new(
+            :have_attributes, x: 1, y: 2, blah: 'blah!'
+          ),
+        },
+        raising: {
+          [{x: 1, y: 'why?'}] => [TypeError, /must be of type `IntType`/],
+        }
+    end # .new
+    
+    
+    describe "dump / load cycle" do
+      context "Point with x=1, y=2" do
+        let( :point ) { point_class.new x: 1, y: 2 }
+        let( :point_hash ) { point.to_h }
         
+        describe "new Point from old point's #to_h" do
+          subject { point_class.new point_hash }
+          it { is_expected.to have_attributes x: 1, y: 2, blah: 'blah!' }
+        end # new Point from old point's #to_h
+      end
+    end # dump / load cycle
+    
   end # simple Point class
-  
-  
-  # it "has the props" do
-  #   
-  #   expect(p.to_h).to eq({x: 1, y: 2, blah: "blah!"})
-  #   expect(p.to_h(only_primary: true)).to eq({x: 1, y: 2})
-  #   
-  #   expect { point.new x: 1, y: 'why?' }.to raise_error TypeError
-  #   expect { p.x = 3 }.to raise_error NoMethodError
-  #   
-  #   p_hash = p.to_h
-  #   
-  #   p2 = point.new p_hash
-  #   
-  #   expect(p2.x).to be 1
-  #   expect(p2.y).to be 2
-  #   
-  #   expect(p2.to_h).to eq({x: 1, y: 2, blah: "blah!"})
-  # end
   
 end # NRSER::Meta::Props
 
