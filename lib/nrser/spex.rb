@@ -69,4 +69,3 @@ shared_examples "function" do |success: {}, error: {}|
     end
   }
 end # function
-

@@ -4,7 +4,6 @@
 # Project / Package
 # -----------------------------------------------------------------------
 require_relative './hash/leaves'
-require_relative './hash/as_hash'
 require_relative './hash/except_keys'
 require_relative './hash/transform_keys'
 require_relative './hash/symbolize_keys'

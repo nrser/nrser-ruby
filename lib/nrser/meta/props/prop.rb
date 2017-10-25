@@ -154,7 +154,6 @@ class Prop
   end # #set
   
   
-  
   # @todo Document set_from_hash method.
   # 
   # @param [type] arg_name
@@ -168,7 +167,11 @@ class Prop
       set instance, values[name]
     else
       if default?
-        set instance, default.dup
+        set instance, if !default.nil? && default.respond_to?( :dup )
+          default.dup
+        else
+          default
+        end
       else
         raise TypeError.new NRSER.squish <<-END
           Prop #{ name } has no default value and no value was provided in

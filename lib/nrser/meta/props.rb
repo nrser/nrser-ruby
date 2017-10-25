@@ -217,7 +217,8 @@ module Props
   #   @todo Document return value.
   # 
   def to_h only_own: false, only_primary: false
-    self.class.props(only_own: only_own, only_primary: only_primary).
+    self.class.
+      props(only_own: only_own, only_primary: only_primary).
       map_values { |name, prop| prop.get self }
   end # #to_h
   

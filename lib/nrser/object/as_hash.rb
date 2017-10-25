@@ -1,8 +1,4 @@
-# Definitions
-# =======================================================================
-
 module NRSER
-  
   
   # Treat the value as the value for `key` in a hash if it's not already a
   # hash and can't be converted to one:
@@ -82,7 +78,7 @@ module NRSER
   #   argument was provided 
   # 
   def self.as_hash value, key = nil
-    return value if value.is_a? ::Hash
+    return value if value.is_a? Hash
     return {} if value.nil?
     
     if value.respond_to? :to_h

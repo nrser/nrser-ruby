@@ -1,5 +1,3 @@
-require 'nrser'
-
 require_relative './refinements/object'
 require_relative './refinements/string'
 require_relative './refinements/array'

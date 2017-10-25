@@ -7,7 +7,7 @@ end
 require_relative './nrser/version'
 require_relative './nrser/no_arg'
 require_relative './nrser/collection'
-require_relative './nrser/truthy'
+require_relative './nrser/object'
 require_relative './nrser/string'
 require_relative './nrser/binding'
 require_relative './nrser/exception'
