@@ -4,7 +4,7 @@ describe "NRSER.leaves" do
   subject { NRSER.method :leaves }
   
   it_behaves_like "function",
-    success: {
+    mapping: {
       [{a: 1, b: 2}] => {[:a] => 1, [:b] => 2},
       
       [{
