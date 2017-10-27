@@ -1,5 +1,5 @@
 ##############################################################################
-# RSpec helpers, shared examples, and other goodies.
+# RSpec helpers, shared examples, extensions, and other goodies.
 # 
 # This file is *not* required by default when `nrser` is since it **defines
 # global methods** and is not needed unless you're in [Rspec][].
@@ -74,6 +74,43 @@ class Msg
 end
 
 
+# Extensions
+# =====================================================================
+
+module NRSER; end
+
+module NRSER::RSpex
+  
+  # Instance methods to extend example groups with.
+  # 
+  module ExampleGroup
+    
+    # Call the current subject with `args` to produce a new subject for
+    # `block`.
+    # 
+    # @param [Array] *args
+    #   Arguments to call `subject` with to produce the new subject.
+    # 
+    # @param [#call] &block
+    #   Block to execute in the context of the example group after refining
+    #   the subject.
+    # 
+    def called_with *args, &block
+      context "called with #{ args.map( &:inspect ).join( ', ' ) }" do
+        subject { super().call *args }
+        instance_exec &block
+      end
+    end # #called_with
+    
+  end # module ExampleGroup
+  
+end # module NRSER:RSpex
+
+RSpec.configure do |config|
+  config.extend NRSER::RSpex::ExampleGroup
+end
+
+
 # Shared Examples
 # =====================================================================
 
@@ -121,3 +158,4 @@ shared_examples "function" do |mapping: {}, raising: {}|
     end
   }
 end # function
+
