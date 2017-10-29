@@ -5,8 +5,17 @@ describe "NRSER.leaves" do
   
   it_behaves_like "function",
     mapping: {
+      # flat hash
       [{a: 1, b: 2}] => {[:a] => 1, [:b] => 2},
       
+      # flat array
+      [ [:a, :b, :c] ] => {
+        [0] => :a,
+        [1] => :b,
+        [2] => :c,
+      },
+      
+      # Nested, all hashes
       [{
         a: {
           x: 'ex',
