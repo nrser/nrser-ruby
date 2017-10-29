@@ -1,8 +1,19 @@
+# Requirements
+# =======================================================================
+
+# Project / Package
+# -----------------------------------------------------------------------
 require_relative './enumerable'
+require_relative './tree'
+
+
+# Definitions
+# =======================================================================
 
 module NRSER
   refine ::Array do
     include NRSER::Refinements::Enumerable
+    include NRSER::Refinements::Tree
     
     
     # @return [Array]

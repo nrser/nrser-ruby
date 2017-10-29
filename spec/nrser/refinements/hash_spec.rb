@@ -74,4 +74,4 @@ describe "Refinement Hash#each_branch" do
     it { is_expected.to eq(a: 1, b: 4, c: 9) }
   end # called with a block
   
-end # Refinement Hash#leaves
+end # Refinement Hash#each_branch
