@@ -1,9 +1,20 @@
+# Requirements
+# =======================================================================
+
+# Project / Package
+# -----------------------------------------------------------------------
 require_relative './enumerable'
+require_relative './tree'
+
+
+# Definitions
+# =======================================================================
 
 module NRSER
   
   refine ::Hash do
     include NRSER::Refinements::Enumerable
+    include NRSER::Refinements::Tree
     
     # See {NRSER.except_keys!}.
     def except! *keys
@@ -25,12 +36,6 @@ module NRSER
     def slice *keys
       NRSER.slice_keys self, *keys
     end
-    
-    
-    # See {NRSER.leaves}.
-    def leaves
-      NRSER.leaves self
-    end # #leaves
     
     
     # See {NRSER.transform_keys!}
