@@ -102,6 +102,8 @@ module NRSER::RSpex
       end
     end # #called_with
     
+    alias_method :when_called_with, :called_with
+    
   end # module ExampleGroup
   
 end # module NRSER:RSpex
