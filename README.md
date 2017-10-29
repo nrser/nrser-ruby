@@ -1,18 +1,22 @@
-# NRSER Ruby lib
+NRSER Ruby lib
+========================================================================
 
-basic ruby utils i use in a lot of stuff.
+Basic Ruby utilities I use in a lot of stuff.
 
-these tools are hastily written or copied from other sources. 
+These tools are hastily written or copied from other sources. 
 
-they are not fast.
+They are not fast.
 
-they are not optimized.
+They are not optimized.
 
-they are largely untested.
+They are largely untested. Though this *is* slowly getting better.
 
-proceed with caution.
+Proceed with caution.
 
-## Installation
+
+------------------------------------------------------------------------
+Installation
+------------------------------------------------------------------------
 
 Add this line to your application's Gemfile:
 
@@ -27,6 +31,24 @@ Or install it yourself as:
     $ gem install nrser
 
 
-## Design
+------------------------------------------------------------------------
+Design
+------------------------------------------------------------------------
 
-
+1.  No monkey-patching (`core_ext` kinda stuff).
+    
+    All language extension is done with refinements.
+    
+    Refinements are funky in a few ways, but they make me feel better.
+    
+2.  As a corollary, (pretty-much) all refinement methods are implemented functionally so they can be used in older Rubies (2.0 and before I think?).
+    
+    This is pretty much only an issue with the current system Ruby version on macOS, which is `2.0.0`.
+    
+    I don't run into it much, but it's nice to have it when you need it, and has panned-out to be a decent design philosophy.
+    
+3.  Basically all these methods are defined directly on the `NRSER` module for the sake of brevity and connivence, though their definitions are split up across many files and directories by subject.
+    
+    I like this because I like small files. They make it easier to see what's changing in commits at a glance, and I find them easier to work with in the GUI editors that I use.
+    
+    The fact that Ruby does not tie source file location to API path is one of my favorite parts of the language.
