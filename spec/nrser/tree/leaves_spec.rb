@@ -40,6 +40,17 @@ describe "NRSER.leaves" do
         [2, :likes, 0]  => 'cats',
         [2, :likes, 1]  => 'cookies',
       },
+      
+      # Sets should be considered leaves
+      [{
+        neil: {
+          name: 'Neil',
+          likes: Set['tacos', 'cats'],
+        },
+      }] => {
+        [:neil, :name]  => 'Neil',
+        [:neil, :likes] => Set['tacos', 'cats'],
+      },
     } # mapping
   
 end # NRSER.bury
