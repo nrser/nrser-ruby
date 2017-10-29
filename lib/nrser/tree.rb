@@ -4,28 +4,13 @@
 # Project / Package
 # -----------------------------------------------------------------------
 require_relative './tree/leaves'
+require_relative './tree/map_leaves'
 
 
 # Definitions
 # =======================================================================
 
 module NRSER
-  
-  # Test if an object is a "tree" - a hash-like or array-like structure.
-  # 
-  # @param [type] arg_name
-  #   @todo Add name param description.
-  # 
-  # @return [Boolean]
-  #   `true` if `object` quacks like a tree.
-  # 
-  def self.tree? object
-    object.respond_to?( :each_pair ) || (
-      object.respond_to?( :each_index ) &&
-      object.respond_to?( :each_with_index )
-    )
-  end # .tree?
-  
   
   # Enumerate over the immediate "branches" of a structure that can be used
   # to compose our idea of a *tree*: nested hash-like and array-like structures

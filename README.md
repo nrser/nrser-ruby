@@ -51,6 +51,8 @@ Design
     
     Which sucks, but I can live with it, because the times that I need some Ruby when I've only got the macOS system installation available I really wants it.
     
+    -   The exception is the types system, which uses the refinements, and will thus be unavailable in old-ass rubies.
+    
 4.  Basically all these methods are defined directly on the `NRSER` module for the sake of brevity and connivence, though their definitions are split up across many files and directories by subject.
     
     I like this because I like small files. They make it easier to see what's changing in commits at a glance, and I find them easier to work with in the GUI editors that I use.

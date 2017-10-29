@@ -18,15 +18,13 @@ require 'nrser/refinements'
 using NRSER
 
 
-# Declarations
-# =======================================================================
-
-
 # Definitions
 # =======================================================================
 
 module NRSER::Types
   
+  # Tuple type - array of fixed length and types (though those could be
+  # {NRSER::Types::ANY}).
   # 
   class TupleType < NRSER::Types::ArrayType
     
@@ -116,7 +114,3 @@ module NRSER::Types
   end # .tuple
   
 end # module NRSER::Types
-
-
-# Post-Processing
-# =======================================================================

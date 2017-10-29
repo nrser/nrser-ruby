@@ -1,6 +1,5 @@
 module NRSER
   
-  
   # Eigenclass (Singleton Class)
   # ========================================================================
   # 
@@ -46,7 +45,8 @@ module NRSER
     #   # }
     #   
     # @param [#each_pair | (#each_index & #each_with_index)] tree
-    #   
+    # 
+    # @return [Hash<Array, Object>]
     # 
     def leaves tree
       {}.tap { |results|
@@ -58,19 +58,24 @@ module NRSER
     private
     # ========================================================================
       
-      # @todo Document _internal_leaves method.
+      # Internal recursive implementation for {NRSER.leaves}.
       # 
-      # @param [type] arg_name
-      #   @todo Add name param description.
+      # @param [#each_pair | (#each_index & #each_with_index)] tree
+      #   Tree to walk.
       # 
-      # @return [return_type]
-      #   @todo Document return value.
+      # @param [Array] path
+      #   Key path down to `tree`.
+      # 
+      # @param [Hash<Array, Object>] results
+      #   New hash to stick results in.
+      # 
+      # @return [nil]
       # 
       def _internal_leaves tree, path:, results:
         NRSER.each_branch( tree ) { |key, value|
           new_path = [*path, key]
           
-          if tree? value
+          if NRSER::Types.tree.test value
             _internal_leaves value, path: new_path, results: results
           else
             results[new_path] = value

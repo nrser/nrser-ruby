@@ -1,8 +1,8 @@
 
-# @todo document NRSER::Types module.
 module NRSER::Types
   
-  # @todo document Responds class.
+  # Type that encodes messages mapped to result types that member values must
+  # satisfy.
   class Responds < NRSER::Types::Type
     
     # Constants
@@ -85,7 +85,6 @@ module NRSER::Types
     def responds *args
       Responds.new *args
     end # #responds
-    
     
     
     # @todo Document respond_to Responds.

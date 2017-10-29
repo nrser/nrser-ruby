@@ -49,7 +49,8 @@ module NRSER
               key_path,
               value,
               parsed_key_type: :guess,
-              clobber: false
+              clobber: false,
+              create_arrays_for_unsigned_keys: false
       
       # Parse the key if it's not an array
       unless key_path.is_a?( Array )
@@ -66,7 +67,8 @@ module NRSER
         key_path,
         value,
         guess_key_type: ( parsed_key_type == :guess ),
-        clobber: clobber
+        clobber: clobber,
+        create_arrays_for_unsigned_keys: create_arrays_for_unsigned_keys
     end # #bury
     
     
@@ -82,43 +84,57 @@ module NRSER
       # @return [return_type]
       #   @todo Document return value.
       # 
-      def _internal_bury! hash,
+      def _internal_bury! tree,
                           key_path,
                           value,
                           guess_key_type:,
-                          clobber:
+                          clobber:,
+                          create_arrays_for_unsigned_keys:
                           
         # Split the key path into the current key and the rest of the keys
         key, *rest = key_path
         
-        # If we are guessing the key type and the hash uses some {Symbol}
-        # (and no {String}) keys then convert the key to a symbol.
-        if guess_key_type && guess_label_key_type( hash ) == Symbol
+        # If we are
+        # 
+        # -   Guessing the key type
+        # -   The tree is keyed
+        # -   The tree uses some {Symbol} (and no {String}) keys
+        # 
+        # then convert the key to a symbol.
+        # 
+        if  guess_key_type && 
+            tree.respond_to?( :keys ) &&
+            guess_label_key_type( tree ) == Symbol
           key = key.to_sym
         end
         
         # Terminating case: we're at the last segment
         if rest.empty?
           # Set the value
-          hash[key] = value
+          tree[key] = value
           
         else
           # Go deeper...
           
           # See if there is a hash in place
-          unless hash[key].is_a?( Hash )
+          unless NRSER::Types.tree.test tree[key]
             # There is not... so we need to do some figurin'
             
             # If we're clobbering or the hash has no value, we're good:
             # assign a new hash to set in
-            if clobber || ! hash.key?( key )
-              hash[key] = {}
+            if clobber || tree[key].nil?
+              if  create_arrays_for_unsigned_keys &&
+                  NRSER::Types.unsigned.test( key )
+                tree[key] = []
+              else
+                tree[key] = {}
+              end
               
             else
               # We've got an intractable state conflict; raise
               raise NRSER::ConflictError.new squish <<-END
                 can not set key #{ key.inspect } due to conflicting value
-                #{ hash[key].inspect } in hash #{ hash.inspect } (:clobber
+                #{ tree[key].inspect } in tree #{ tree.inspect } (:clobber
                 option not set)
               END
               
@@ -126,7 +142,7 @@ module NRSER
           end # unless hash[key].is_a?( Hash )
           
           # Dive in...
-          bury! hash[key], rest, value
+          bury! tree[key], rest, value
           
         end # if rest.empty? / else
       end # #_internal_bury!

@@ -62,4 +62,51 @@ describe "NRSER.leaves" do
       },
     } # mapping
   
-end # NRSER.bury
+end # NRSER.leaves
+
+describe "NRSER.map_leaves" do
+  let( :source ) {
+    {
+      1 => {
+        name: 'Neil',
+        likes: ['tacos', 'cats'],
+      },
+      
+      2 => {
+        name: 'Mica',
+        likes: ['cats', 'cookies'],
+      },
+    }
+  }
+  
+  subject {
+    NRSER.map_leaves( source ) { |key_path, value|
+      case value
+      when 'tacos'
+        'tamales'
+      when 'cats'
+        'bats'
+      when 'cookies'
+        'wookies'
+      else
+        value
+      end
+    }    
+  }
+  
+  it {
+    is_expected.to eq({
+      1 => {
+        name: 'Neil',
+        likes: ['tamales', 'bats'],
+      },
+      
+      2 => {
+        name: 'Mica',
+        likes: ['bats', 'wookies'],
+      },
+    })
+  }
+  
+end # NRSER.map_leaves
+

@@ -118,6 +118,8 @@ module NRSER::Types
     NON_NEG_INT
   end
   
+  singleton_class.send :alias_method, :unsigned, :non_neg_int
+  
   
   # Non-Positive Integer
   # --------------------
