@@ -1,22 +1,9 @@
 # Requirements
 # =======================================================================
 
-# Stdlib
-# -----------------------------------------------------------------------
-
-# Deps
-# -----------------------------------------------------------------------
-
 # Project / Package
 # -----------------------------------------------------------------------
 require_relative './tree/leaves'
-
-# Refinements
-# =======================================================================
-
-
-# Declarations
-# =======================================================================
 
 
 # Definitions
@@ -24,13 +11,13 @@ require_relative './tree/leaves'
 
 module NRSER
   
-  # @todo Document tree? method.
+  # Test if an object is a "tree" - a hash-like or array-like structure.
   # 
   # @param [type] arg_name
   #   @todo Add name param description.
   # 
-  # @return [return_type]
-  #   @todo Document return value.
+  # @return [Boolean]
+  #   `true` if `object` quacks like a tree.
   # 
   def self.tree? object
     object.respond_to?( :each_pair ) || (
@@ -111,5 +98,3 @@ module NRSER
   end # .each_branch
   
 end # module NRSER
-
-
