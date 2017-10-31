@@ -46,6 +46,40 @@ def merge_expectations *expectations
   }
 end
 
+class Wrapper
+  def initialize description: nil, &block
+    @description = description
+    @block = block
+  end
+  
+  def unwrap context: nil
+    if context
+      context.instance_exec &@block
+    else
+      @block.call
+    end
+  end
+  
+  def to_s
+    if @description
+      @description.to_s
+    else
+      "#<Wrapper ?>"
+    end
+  end
+end
+
+def wrap description, &block
+  Wrapper.new description: description, &block
+end
+
+def unwrap obj, context: nil
+  if obj.is_a? Wrapper
+    obj.unwrap context: context
+  else
+    obj
+  end
+end
 
 # Extensions
 # =====================================================================
@@ -111,7 +145,7 @@ module NRSER::RSpex
       end
       
       context "sent to #{ receiver } (#{ mode })" do
-        subject { super().send_to receiver  }
+        subject { super().send_to unwrap( receiver, context: self ) }
         instance_exec &block
       end
     end # #when_sent_to
