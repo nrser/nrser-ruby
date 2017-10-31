@@ -132,7 +132,7 @@ describe NRSER::Meta::Props do
       
       it_behaves_like "function",
         mapping: {
-          [{x: 1, y: 2}] => Msg.new(
+          [{x: 1, y: 2}] => NRSER::Message.new(
             :have_attributes, x: 1, y: 2, blah: 'blah!'
           ),
         },

@@ -9,6 +9,20 @@
 ##############################################################################
 
 
+# Requirements
+# =======================================================================
+
+# Stdlib
+# -----------------------------------------------------------------------
+
+# Deps
+# -----------------------------------------------------------------------
+
+# Project / Package
+# -----------------------------------------------------------------------
+require_relative './message'
+
+
 # Helpers
 # =====================================================================
 
@@ -30,47 +44,6 @@ def merge_expectations *expectations
       }
     }
   }
-end
-
-class Msg
-  
-  # Name of method the message is for.
-  # 
-  # @return [Symbol | String]
-  #     
-  attr_reader :symbol
-  
-  
-  # Arguments 
-  # 
-  # @return [Array]
-  #     
-  attr_reader :args
-  
-  
-  # TODO document `block` attribute.
-  # 
-  # @return [#call]
-  #     
-  attr_reader :block
-  
-  
-  def initialize symbol, *args, &block
-    @symbol = symbol
-    @args = args
-    @block = block
-  end
-  
-  
-  def to_a
-    [symbol, *args]
-  end
-  
-  
-  def to_proc
-    block
-  end
-  
 end
 
 
@@ -95,14 +68,53 @@ module NRSER::RSpex
     #   Block to execute in the context of the example group after refining
     #   the subject.
     # 
-    def called_with *args, &block
+    def when_called_with *args, &block
       context "called with #{ args.map( &:inspect ).join( ', ' ) }" do
         subject { super().call *args }
         instance_exec &block
       end
     end # #called_with
     
-    alias_method :when_called_with, :called_with
+    alias_method :called_with, :when_called_with
+    
+    
+    def describe_message symbol, *args, &body
+      description = \
+        "message #{ [symbol, *args].map( &:inspect ).join( ', ' ) }"
+      
+      describe description, type: :message do
+        subject { NRSER::Message.new symbol, *args }
+        instance_exec &body
+      end
+    end
+    
+    
+    # For use when `subject` is a {NRSER::Message}. Create a new context for
+    # the `receiver` where the subject is the result of sending that message
+    # to the receiver.
+    # 
+    # @param [Object] receiver
+    #   Object that will receive the message to create the new subject.
+    # 
+    # @param [Boolean] publicly:
+    #   Send message publicly via {Object#public_send} (default) or privately  
+    #   via {Object.send}.
+    # 
+    # @return
+    #   Whatever the `context` call returns.
+    # 
+    def when_sent_to receiver, publicly: true, &block
+      mode = if publicly
+        "publicly"
+      else
+        "privately"
+      end
+      
+      context "sent to #{ receiver } (#{ mode })" do
+        subject { super().send_to receiver  }
+        instance_exec &block
+      end
+    end # #when_sent_to
     
   end # module ExampleGroup
   
@@ -140,7 +152,7 @@ shared_examples "function" do |mapping: {}, raising: {}|
       it {
         matcher = if expected.respond_to?( :matches? )
           expected
-        elsif expected.is_a? Msg
+        elsif expected.is_a? NRSER::Message
           self.send *expected #, &expected
         else
           eq expected
