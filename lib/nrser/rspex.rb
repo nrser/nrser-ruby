@@ -174,6 +174,21 @@ module NRSER::RSpex
     alias_method :when_sent_to, :describe_sent_to
     
     
+    # @todo Document describe_topic method.
+    # 
+    # @param [type] arg_name
+    #   @todo Add name param description.
+    # 
+    # @return [return_type]
+    #   @todo Document return value.
+    # 
+    def describe_topic name, **options, &block
+      describe "[ TOPIC #{ name } ]", type: :topic, **options do
+        instance_exec &block
+      end
+    end # #describe_topic
+    
+    
   end # module ExampleGroup
   
 end # module NRSER:RSpex
