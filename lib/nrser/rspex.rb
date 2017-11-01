@@ -92,8 +92,17 @@ module NRSER::RSpex
   # 
   module ExampleGroup
     
-    # Call the current subject with `args` to produce a new subject for
-    # `block`.
+    # Create a new {RSpec.describe} section where the subject is set by
+    # calling the parent subject with `args` and evaluate `block` in it.
+    # 
+    # @example
+    #   describe "hi sayer" do
+    #     subject{ ->( name ) { "Hi #{ name }!" } }
+    #     
+    #     describe_called_with 'Mom' do
+    #       it { is_expected.to eq 'Hi Mom!' }
+    #     end
+    #   end
     # 
     # @param [Array] *args
     #   Arguments to call `subject` with to produce the new subject.
@@ -102,14 +111,20 @@ module NRSER::RSpex
     #   Block to execute in the context of the example group after refining
     #   the subject.
     # 
-    def called_with *args, &block
-      context "called with #{ args.map( &:inspect ).join( ', ' ) }" do
+    def describe_called_with *args, &block
+      describe "called with #{ args.map( &:inspect ).join( ', ' ) }" do
         subject { super().call *args }
         instance_exec &block
       end
-    end # #called_with
+    end # #describe_called_with
     
-    alias_method :when_called_with, :called_with
+    # Aliases to other names I was using at first... not preferring their use
+    # at the moment.
+    # 
+    # The `when_` one sucks because Atom de-dents the line, and `describe_` 
+    # is just clearer what the block is doing for people reading it.
+    alias_method :called_with, :describe_called_with
+    alias_method :when_called_with, :describe_called_with
     
     
     def describe_message symbol, *args, &body
@@ -137,20 +152,26 @@ module NRSER::RSpex
     # @return
     #   Whatever the `context` call returns.
     # 
-    def sent_to receiver, publicly: true, &block
+    def describe_sent_to receiver, publicly: true, &block
       mode = if publicly
         "publicly"
       else
         "privately"
       end
       
-      context "sent to #{ receiver } (#{ mode })" do
+      describe "sent to #{ receiver } (#{ mode })" do
         subject { super().send_to unwrap( receiver, context: self ) }
         instance_exec &block
       end
-    end # #sent_to
+    end # #describe_sent_to
     
-    alias_method :when_sent_to, :sent_to
+    # Aliases to other names I was using at first... not preferring their use
+    # at the moment.
+    # 
+    # The `when_` one sucks because Atom de-dents the line, and `describe_` 
+    # is just clearer what the block is doing for people reading it.
+    alias_method :sent_to, :describe_sent_to
+    alias_method :when_sent_to, :describe_sent_to
     
     
   end # module ExampleGroup
