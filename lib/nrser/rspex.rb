@@ -102,14 +102,14 @@ module NRSER::RSpex
     #   Block to execute in the context of the example group after refining
     #   the subject.
     # 
-    def when_called_with *args, &block
+    def called_with *args, &block
       context "called with #{ args.map( &:inspect ).join( ', ' ) }" do
         subject { super().call *args }
         instance_exec &block
       end
     end # #called_with
     
-    alias_method :called_with, :when_called_with
+    alias_method :when_called_with, :called_with
     
     
     def describe_message symbol, *args, &body
@@ -137,7 +137,7 @@ module NRSER::RSpex
     # @return
     #   Whatever the `context` call returns.
     # 
-    def when_sent_to receiver, publicly: true, &block
+    def sent_to receiver, publicly: true, &block
       mode = if publicly
         "publicly"
       else
@@ -148,7 +148,10 @@ module NRSER::RSpex
         subject { super().send_to unwrap( receiver, context: self ) }
         instance_exec &block
       end
-    end # #when_sent_to
+    end # #sent_to
+    
+    alias_method :when_sent_to, :sent_to
+    
     
   end # module ExampleGroup
   
