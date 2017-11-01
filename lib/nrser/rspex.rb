@@ -69,7 +69,7 @@ class Wrapper
   end
 end
 
-def wrap description, &block
+def wrap description = nil, &block
   Wrapper.new description: description, &block
 end
 
@@ -208,10 +208,12 @@ shared_examples "function" do |mapping: {}, raising: {}|
       subject { super().call *args }
       
       it {
+        expected = unwrap expected, context: self
+        
         matcher = if expected.respond_to?( :matches? )
           expected
         elsif expected.is_a? NRSER::Message
-          self.send *expected #, &expected
+          expected.send_to self
         else
           eq expected
         end
