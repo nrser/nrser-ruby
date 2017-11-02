@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 ##############################################################################
 # RSpec helpers, shared examples, extensions, and other goodies.
 # 
@@ -20,7 +22,7 @@
 
 # Project / Package
 # -----------------------------------------------------------------------
-require_relative './message'
+require_relative './op/message'
 
 
 # Helpers
@@ -183,10 +185,36 @@ module NRSER::RSpex
     #   @todo Document return value.
     # 
     def describe_topic name, **options, &block
-      describe "[ TOPIC #{ name } ]", type: :topic, **options do
+      describe "§ #{ name }", type: :topic, **options do
         instance_exec &block
       end
     end # #describe_topic
+    
+    
+    # Define a `context` block with `let` bindings and evaluate the `body`
+    # block in it.
+    # 
+    # @param [Hash<Symbol, Object>] **bindings
+    #   Map of symbol names to value to bind using `let`.
+    # 
+    # @param [#call] &body
+    #   Body block to evaluate in the context.
+    # 
+    # @return
+    #   Whatever `context` returns.
+    # 
+    def context_where **bindings, &body
+      description = bindings.map { |name, value|
+        "let #{ name } = #{ value }"
+      }.join( ',  ' )
+      
+      context "| #{ description } |", type: :where do
+        bindings.each { |name, value|
+          let( name ) { value }
+          instance_exec &body
+        }
+      end
+    end
     
     
   end # module ExampleGroup

@@ -8,11 +8,11 @@ module NRSER
   # 
   # Encapsulates the method symbol as well as any arguments and block to send.
   # 
-  # Implements `#to_a` and `#to_proc` so it can be used like
+  # Implements `#to_proc` so it can be used like
   # 
-  #     obj.send *msg, &msg
+  #     enum.map &message
   # 
-  # You can also invert control via {NRSER::Message#send_to}:
+  # You can invoke the message on a receiver object like
   # 
   #     msg.send_to obj
   # 
@@ -59,30 +59,28 @@ module NRSER
     end
     
     
-    # Returns the {#symbol} followed by any {#args}, allowing the instance to
-    # be "splatted" into {Object.send}.
+    # Creates a {Proc} that accepts a single `receiver` argument and calls
+    # {#sent_to} on it, allowing messages to be used via the `&` operator
+    # in `map`, etc.
     # 
-    # @example Send with splat
+    # @example Map each entry as the message receiver using `&`
     #   
-    #   obj.send *msg, &msg
-    # 
-    # @return [Array]
-    # 
-    def to_a
-      [symbol, *args]
-    end
-    
-    
-    # Returns {#block}, allowing the instance to be `&`'d into {Object.send}.
-    # 
-    # @example Send with &
+    #   enum = [ [], [1], [1, 2] ]
     #   
-    #   obj.send *msg, &msg
+    #   length_message = NRSER::Message.new :length
+    #   first_message = NRSER::Message.new :first
+    #   
+    #   enum.map &length_message
+    #   # => [0, 1, 2]
+    #   
+    #   enum.map &first_message
+    #   # => [nil, 1, 1]
     # 
     # @return [Proc]
     # 
     def to_proc
-      block
+      # block
+      ->( receiver ) { send_to receiver }
     end
 
     
@@ -113,10 +111,13 @@ module NRSER
       end
     end
     
+    # @return [String]
+    #   Brief description of the message.
+    # 
     def to_s
       "#<NRSER::Message symbol=#{ symbol } args=#{ args } block=#{ block }>"
     end
-  end
+  end # class Message
   
 end # module NRSER
 
