@@ -66,24 +66,40 @@ module NRSER
     alias_method :to_m, :to_message
     
     
-    # Create a unary {Proc} that accepts a `receiver` and provides this array's
+    # Create a {Proc} that accepts a single `receiver` and provides this array's
     # entries as the arguments to `#public_send` (or `#send` if the `publicly`
     # option is `false`).
     # 
+    # Equivalent to
+    # 
+    #   to_message.to_proc publicly: boolean
+    # 
     # @example
     #   
-    #   sender = [:fetch, :x].to_sender
-    #   sender.call x: 'ex'
+    #   [:fetch, :x].sender.call x: 'ex'
     #   # => 'ex'
     # 
     # @param [Boolean] publicly:
-    #   See {NRSER::Message#sent_to}.
+    #   When `true`, uses `#public_send` in liu of `#send`.
     # 
     # @return [Proc]
     # 
     def to_sender publicly: true
       to_message.to_proc publicly: publicly
     end
+    
+    alias_method :sender, :to_sender
+    alias_method :sndr, :to_sender
+    
+    
+    # See {NRSER.chainer}.
+    #
+    def to_chainer publicly: true
+      NRSER.chainer self, publicly: publicly
+    end # #to_chainer
+    
+    alias_method :chainer, :to_chainer
+    alias_method :chnr, :to_chainer
     
     
     # Returns a lambda that calls accepts a single arg and calls `#dig` on it
@@ -110,8 +126,8 @@ module NRSER
       NRSER::Message.new( :dig, *self ).to_proc
     end # #to_digger
     
-    # Old (or alternate?) name
     alias_method :digger, :to_digger
+    alias_method :dggr, :to_digger
     
     
   end # refine ::Array

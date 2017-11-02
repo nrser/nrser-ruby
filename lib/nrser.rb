@@ -6,7 +6,8 @@ end
 
 require_relative './nrser/version'
 require_relative './nrser/no_arg'
-require_relative './nrser/op/message'
+require_relative './nrser/message'
+require_relative './nrser/proc'
 require_relative './nrser/collection'
 require_relative './nrser/object'
 require_relative './nrser/string'

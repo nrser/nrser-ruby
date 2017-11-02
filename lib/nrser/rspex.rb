@@ -22,7 +22,7 @@
 
 # Project / Package
 # -----------------------------------------------------------------------
-require_relative './op/message'
+require_relative './message'
 
 
 # Helpers
