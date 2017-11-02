@@ -11,7 +11,7 @@ using NRSER::Types
 # ========================================================================
 # 
 describe "NRSER::Types.array" do
-  subject { NRSER::Types.method :array }
+  subject { t.method :array }
   
   it_behaves_like 'type maker method'
   
@@ -48,7 +48,7 @@ describe "NRSER::Types.array" do
     and_is_expected: {
       to: {
         have_attributes: {
-          class: NRSER::Types::ArrayType,
+          class: t::ArrayType,
           name: 'ArrayType',
         }
       }
