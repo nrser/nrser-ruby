@@ -78,10 +78,12 @@ module NRSER
     # 
     # @return [Proc]
     # 
-    def to_proc
+    def to_proc publicly: true
       # block
-      ->( receiver ) { send_to receiver }
+      ->( receiver ) { send_to receiver, publicly: publicly }
     end
+    
+    alias_method :to_sender, :to_proc
 
     
     # Send this instance to a receiver object.
