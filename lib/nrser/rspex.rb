@@ -176,16 +176,28 @@ module NRSER::RSpex
     alias_method :when_sent_to, :describe_sent_to
     
     
-    # @todo Document describe_topic method.
+    # Describe a "section". Just like {RSpec.describe} except it:
     # 
-    # @param [type] arg_name
-    #   @todo Add name param description.
+    # 1.  Expects a string title.
+    #     
+    # 2.  Prepends a little section squiggle `§` to the title so sections are 
+    #     easier to pick out visually.
+    #     
+    # 3.  Adds `type: :section` metadata.
     # 
-    # @return [return_type]
-    #   @todo Document return value.
+    # @param [String] title
+    #   String title for the section.
     # 
-    def describe_section name, **options, &block
-      describe "§ #{ name }", type: :topic, **options do
+    # @param [Hash<Symbol, Object>] **metadata
+    #   Additional [RSpec metadata][] for the example group.
+    #   
+    #   [RSpec metadata]: https://relishapp.com/rspec/rspec-core/docs/metadata/user-defined-metadata
+    # 
+    # @return
+    #   Whatever {RSpec.describe} returns.
+    # 
+    def describe_section title, **metadata, &block
+      describe "§ #{ title }", type: :section, **metadata do
         instance_exec &block
       end
     end # #describe_section
