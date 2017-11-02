@@ -10,7 +10,7 @@ describe NRSER::Message, type: :class do
   
   describe "#to_proc" do
         
-    describe_topic "mapping an Enumerable using &message" do
+    describe_section "mapping an Enumerable using &message" do
       subject { ->( message ) { enum.map &message } }
       
       context_where enum: [ [], [1], [1, 2] ] do

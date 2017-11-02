@@ -184,11 +184,14 @@ module NRSER::RSpex
     # @return [return_type]
     #   @todo Document return value.
     # 
-    def describe_topic name, **options, &block
+    def describe_section name, **options, &block
       describe "§ #{ name }", type: :topic, **options do
         instance_exec &block
       end
-    end # #describe_topic
+    end # #describe_section
+    
+    # Old name
+    alias_method :describe_topic, :describe_section
     
     
     # Define a `context` block with `let` bindings and evaluate the `body`
