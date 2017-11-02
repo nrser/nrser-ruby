@@ -70,5 +70,22 @@ module NRSER
     end # #to_pair
     
     
+    # Creates a new {NRSER::Message} from the array.
+    # 
+    # @example
+    #   
+    #   message = [:fetch, :x].to_message
+    #   message.send_to x: 'ex', y: 'why?'
+    #   # => 'ex'
+    # 
+    # @return [NRSER::Message]
+    # 
+    def to_message
+      NRSER::Message.new *self
+    end # #to_message
+    
+    alias_method :to_m, :to_message
+    
+    
   end # refine ::Array
 end # NRSER
