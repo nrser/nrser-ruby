@@ -224,7 +224,10 @@ module NRSER::RSpex
       }.join( ',  ' )
       
       context "| #{ description } |", type: :where do
-        bindings.each { |name, value| let( name ) { value } }
+        bindings.each { |name, value|
+          let( name ) { unwrap value, context: self }
+        }
+        
         instance_exec &body
       end
     end
