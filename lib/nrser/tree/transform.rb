@@ -27,5 +27,4 @@ module NRSER
     }.to_h
   end # .transform
   
-    
 end # module NRSER
