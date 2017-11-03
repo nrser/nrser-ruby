@@ -89,6 +89,12 @@ end
 module NRSER; end
 
 module NRSER::RSpex
+  PREFIXES = {
+    # module: "𝓜 𝓸𝓭𝓾𝓵𝓮",
+    module: "𝞛",
+    section: '§',
+    method: '𝞴',
+  }
   
   # Instance methods to extend example groups with.
   # 
@@ -197,13 +203,39 @@ module NRSER::RSpex
     #   Whatever {RSpec.describe} returns.
     # 
     def describe_section title, **metadata, &block
-      describe "§ #{ title }", type: :section, **metadata do
+      describe(
+        "#{ NRSER::RSpex::PREFIXES[:section] } #{ title }",
+        type: :section,
+        **metadata
+      ) do
         instance_exec &block
       end
     end # #describe_section
     
     # Old name
     alias_method :describe_topic, :describe_section
+    
+    
+    def describe_module mod, **metadata, &block
+      describe(
+        "#{ NRSER::RSpex::PREFIXES[:module] } #{ mod.name }",
+        type: :module,
+        **metadata
+      ) do
+        instance_exec &block
+      end
+    end # #describe_module
+    
+    
+    def describe_method name, **metadata, &block
+      describe(
+        "#{ NRSER::RSpex::PREFIXES[:method] } #{ name }",
+        type: :method,
+        **metadata
+      ) do
+        instance_exec &block
+      end
+    end # #describe_section
     
     
     # Define a `context` block with `let` bindings and evaluate the `body`
@@ -240,6 +272,9 @@ end # module NRSER:RSpex
 RSpec.configure do |config|
   config.extend NRSER::RSpex::ExampleGroup
 end
+
+
+include NRSER::RSpex::ExampleGroup
 
 
 # Shared Examples
