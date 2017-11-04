@@ -31,8 +31,12 @@ module NRSER
   # 
   # @return [NRSER::Message]
   # 
-  def self.message symbol, *args, &block
-    NRSER::Message.new symbol, *args, &block
+  def self.message *args, &block
+    if args.length == 1 && args[0].is_a?( Message )
+      args[0]
+    else
+      Message.new *args, &block
+    end
   end # #message
   
   singleton_class.send :alias_method, :msg, :message
@@ -102,7 +106,7 @@ module NRSER
   # @return [Proc]
   # 
   def self.chainer mappable, publicly: true
-    messages = mappable.map { |value| NRSER::Message.new *value }
+    messages = mappable.map { |value| message *value }
     
     ->( receiver ) {
       messages.reduce( receiver ) { |receiver, message|
