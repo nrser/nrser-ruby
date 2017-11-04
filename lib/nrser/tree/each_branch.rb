@@ -55,12 +55,12 @@ module NRSER
         
         Enumerator.new( index_enumerator.size ) { |yielder|
           index_enumerator.each { |value, index|
-            yielder.yield index, value
+            yielder.yield [index, value]
           }
         }
       else
         tree.each_with_index.map { |value, index|
-          block.call index, value
+          block.call [index, value]
         }
       end
       
