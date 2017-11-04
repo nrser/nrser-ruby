@@ -89,12 +89,25 @@ end
 module NRSER; end
 
 module NRSER::RSpex
-  PREFIXES = {
-    # module: "𝓜 𝓸𝓭𝓾𝓵𝓮",
-    module: "𝞛",
+  PREFIXES_BASE = {
     section: '§',
-    method: '𝞴',
+    group: '•',
   }
+  
+  PREFIXES_MATH_ITALIC = PREFIXES_BASE.merge(
+    module: '𝑀',
+    method: '𝑚',
+    class:  '𝐶',
+  )
+  
+  PREFIXES_MATH_GREEK = PREFIXES_BASE.merge(
+    # module: "𝓜 𝓸𝓭𝓾𝓵𝓮",
+    module: "𝛭",
+    method: '𝜆',
+    class: '𝛤',
+  )
+  
+  PREFIXES = PREFIXES_MATH_ITALIC
   
   # Instance methods to extend example groups with.
   # 
@@ -227,6 +240,28 @@ module NRSER::RSpex
     end # #describe_module
     
     
+    def describe_class klass, **metadata, &block
+      describe(
+        "#{ NRSER::RSpex::PREFIXES[:class] } #{ klass.name }",
+        type: :class,
+        **metadata
+      ) do
+        instance_exec &block
+      end
+    end # #describe_class
+    
+    
+    def describe_group title, **metadata, &block
+      describe(
+        "#{ NRSER::RSpex::PREFIXES[:group] } #{ title }",
+        type: :group,
+        **metadata
+      ) do
+        instance_exec &block
+      end
+    end # #describe_class
+    
+    
     def describe_method name, **metadata, &block
       describe(
         "#{ NRSER::RSpex::PREFIXES[:method] } #{ name }",
@@ -235,7 +270,7 @@ module NRSER::RSpex
       ) do
         instance_exec &block
       end
-    end # #describe_section
+    end # #describe_method
     
     
     # Define a `context` block with `let` bindings and evaluate the `body`
