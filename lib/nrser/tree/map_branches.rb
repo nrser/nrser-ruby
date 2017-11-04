@@ -5,6 +5,8 @@
 # -----------------------------------------------------------------------
 require 'nrser/types/trees'
 
+require_relative './each_branch'
+
 
 # Definitions
 # =======================================================================
@@ -72,14 +74,14 @@ module NRSER
       raise ArgumentError, "Must provide block"
     end
     
-    pairs = NRSER.each_branch( tree ).map &block
+    pairs = each_branch( tree ).map &block
     
-    NRSER::Types.match tree,
-      NRSER::Types.hash_like, ->( _ ) {
+    Types.match tree,
+      Types.hash_like, ->( _ ) {
         pairs.to_h
       },
       
-      NRSER::Types.array_like, ->( _ ) {
+      Types.array_like, ->( _ ) {
         pairs.each_with_object( [] ) { |(index, value), array|
           array[index] = value
         }
