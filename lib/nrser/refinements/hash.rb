@@ -58,11 +58,15 @@ module NRSER
       NRSER.symbolize_keys! self
     end
     
+    alias_method :sym_keys!, :symbolize_keys!
+    
     
     # See {NRSER.symbolize_keys}
     def symbolize_keys
       NRSER.symbolize_keys self
     end
+    
+    alias_method :sym_keys, :symbolize_keys
     
     
     # See {NRSER.stringify_keys!}
@@ -70,11 +74,15 @@ module NRSER
       NRSER.stringify_keys! self
     end
     
+    alias_method :str_keys!, :stringify_keys!
+    
     
     # See {NRSER.stringify_keys}
     def stringify_keys
       NRSER.stringify_keys self
     end
+    
+    alias_method :str_keys, :stringify_keys
     
     
     # See {NRSER.map_hash_keys}
