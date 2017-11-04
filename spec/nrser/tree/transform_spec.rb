@@ -64,31 +64,31 @@ describe "NRSER.transform" do
     #       something that converts the map result into a Hash only if the
     #       tree was hash-like.
     # 
-    # describe "arrays in tree" do
-    #   let :tree do
-    #     {
-    #       list: [
-    #         { name: :name.rtvr },
-    #         { age: :age.rtvr },
-    #       ]
-    #     }
-    #   end
-    #   
-    #   let :source do
-    #     {
-    #       name: 'Mr. Cat',
-    #       age: 2,
-    #     }
-    #   end
-    #   
-    #   it do
-    #     is_expected.to eq \
-    #       list: [
-    #         { name: 'Mr. Cat' },
-    #         { age: 2 },
-    #       ]
-    #   end
-    # end # arrays in tree
+    describe "arrays in tree" do
+      let :tree do
+        {
+          list: [
+            { name: :name.rtvr },
+            { age: :age.rtvr },
+          ]
+        }
+      end
+      
+      let :source do
+        {
+          name: 'Mr. Cat',
+          age: 2,
+        }
+      end
+      
+      it do
+        is_expected.to eq \
+          list: [
+            { name: 'Mr. Cat' },
+            { age: 2 },
+          ]
+      end
+    end # arrays in tree
     
     
   end # section simple examples

@@ -12,7 +12,7 @@ module NRSER
   #   @todo Document return value.
   # 
   def self.transform tree, source
-    each_branch( tree ).map { |pair|
+    map_branches( tree ) { |pair|
       pair.map { |value|
         if NRSER::Types.tree.test value
           transform value, source
@@ -24,7 +24,7 @@ module NRSER
           end
         end
       }
-    }.to_h
+    }
   end # .transform
   
 end # module NRSER
