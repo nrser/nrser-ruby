@@ -60,10 +60,7 @@ describe "NRSER.transform" do
       
     end # transform in key
     
-    # TODO  doesn't work yet... prob wants a general {NRSER#map_branches} or
-    #       something that converts the map result into a Hash only if the
-    #       tree was hash-like.
-    # 
+    
     describe "arrays in tree" do
       let :tree do
         {

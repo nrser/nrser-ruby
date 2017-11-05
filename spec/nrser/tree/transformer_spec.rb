@@ -1,10 +1,113 @@
-require 'spec_helper'
+# Refinements
+# =======================================================================
 
 require 'nrser/refinements'
 using NRSER
 
-describe "NRSER.transformer" do
-  # subject { NRSER.method :transformer }
+
+# Examples
+# =====================================================================
+
+describe_method "NRSER.transformer" do
+# ========================================================================
+# 
+# Basically the same {NRSER.transform} tests but using {NRSER.transformer}
+# to build the trees instead of {#sender}, {#chainer}, etc.
+# 
+  
+  describe_section "Simple Examples" do
+  # ========================================================================
+  
+    subject { NRSER.transform tree, source }
+    
+    describe "value swap in {x: 'ex', y: 'why?'}" do
+      
+      let( :tree ) {
+        NRSER.transformer do |h|
+          {
+            x: h[:y],
+            y: h[:x],
+          }
+        end
+      } # let :tree
+      
+      let( :source ) {
+        {
+          x: 'ex',
+          y: 'why?'
+        }
+      } # let :source
+      
+      it { is_expected.to eq x: 'why?', y: 'ex' }
+      
+    end # value swap in {x: 'ex', y: 'why?'}
+    
+    
+    describe "transform in key" do
+      
+      let :tree do
+        NRSER.transformer do |contact|
+          {
+            users: {
+              { id: contact[:id] } => {
+                name: contact[:name],
+              }
+            }
+          }
+        end
+      end
+      
+      let :source do
+        {
+          id: 123,
+          name: "Mr. Cat",
+        }
+      end
+      
+      it do
+        is_expected.to eq \
+          users: {
+            { id: 123 } => {
+              name: "Mr. Cat",
+            }
+          }
+      end
+      
+    end # transform in key
+    
+    
+    describe "arrays in tree" do
+      let :tree do
+        NRSER.transformer do |h|
+          {
+            list: [
+              { name: h[:name] },
+              { age: h[:age] },
+            ]
+          }
+        end
+      end
+      
+      let :source do
+        {
+          name: 'Mr. Cat',
+          age: 2,
+        }
+      end
+      
+      it do
+        is_expected.to eq \
+          list: [
+            { name: 'Mr. Cat' },
+            { age: 2 },
+          ]
+      end
+    end # arrays in tree
+    
+    
+  end # section simple examples
+  # ************************************************************************
+  
   
   describe_section "Real-World Examples" do
   # ========================================================================
@@ -24,10 +127,6 @@ describe "NRSER.transformer" do
           city:       "北京市",
           state:      "北京",
           zip:        "100010"
-      end
-      
-      let :source do
-        address
       end
       
       let :tree do
