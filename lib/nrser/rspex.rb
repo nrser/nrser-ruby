@@ -95,9 +95,10 @@ module NRSER::RSpex
   }
   
   PREFIXES_MATH_ITALIC = PREFIXES_BASE.merge(
-    module: '𝑀',
-    method: '𝑚',
-    class:  '𝐶',
+    module:       '𝑀',
+    method:       '𝑚',
+    class:        '𝐶',
+    attribute:    '𝑎',
   )
   
   PREFIXES_MATH_GREEK = PREFIXES_BASE.merge(
@@ -105,6 +106,7 @@ module NRSER::RSpex
     module: "𝛭",
     method: '𝜆',
     class: '𝛤',
+    attribute:    '𝛼',
   )
   
   PREFIXES = PREFIXES_MATH_ITALIC
@@ -271,6 +273,21 @@ module NRSER::RSpex
         instance_exec &block
       end
     end # #describe_method
+    
+    
+    def describe_attribute symbol, **metadata, &block
+      describe(
+        "#{ NRSER::RSpex::PREFIXES[:attribute] } ##{ symbol }",
+        type: :attribute,
+        **metadata
+      ) do
+        subject { super().public_send symbol }
+        instance_exec &block
+      end
+    end # #describe_attribute
+    
+    # Shorter name
+    alias_method :describe_attr, :describe_attribute
     
     
     # Define a `context` block with `let` bindings and evaluate the `body`
