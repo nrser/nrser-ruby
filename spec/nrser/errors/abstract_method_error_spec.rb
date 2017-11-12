@@ -1,6 +1,4 @@
 
-
-# @todo document NRSER::TestFixtures:: module.
 module NRSER::TestFixtures::AbstractMethodError
   
   class Base
@@ -46,4 +44,3 @@ describe_class NRSER::AbstractMethodError do
   
   
 end # Class NRSER::AbstractMethodError Description
-

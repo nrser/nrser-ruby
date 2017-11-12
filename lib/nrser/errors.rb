@@ -1,11 +1,29 @@
 module NRSER
+  
   # Indicates some piece of application state is in conflict with the attempted
   # operation.
   class ConflictError < StandardError; end
   
   
-  # Extension of 
+  # Extension of Ruby's {NotImplementedError} to provide a useful message 
+  # and convenient constructor for abstract methods.
+  # 
+  # @example
+  #   
+  #   def f
+  #     raise NRSER::AbstractMethodError.new( self, __method__ )
+  # 
+  # 
   class AbstractMethodError < NotImplementedError
+    
+    # Construct a new `AbstractMethodError`.
+    # 
+    # @param [Object] instance
+    #   Instance that invoked the abstract method.
+    # 
+    # @param [Symbol | String] method_name
+    #   Name of abstract method.
+    # 
     def initialize instance, method_name
       @instance = instance
       @method_name = method_name
@@ -34,8 +52,8 @@ module NRSER
       end
       
       super message
-    end
-  end
+    end # #initialize
+    
+  end # class AbstractMethodError
 
-end
-
+end # module NRSER
