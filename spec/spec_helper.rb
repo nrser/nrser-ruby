@@ -6,6 +6,16 @@ require 'nrser'
 require 'nrser/logger'
 require 'nrser/rspex'
 
+
+# Dumping ground for classes and modules that we need to create for tests.
+# 
+module NRSER::TestFixtures
+  
+  # module definition...
+  
+end # module NRSER::TestFixtures
+
+
 MAIN = self
 
 LOG_LEVELS = {
