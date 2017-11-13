@@ -19,7 +19,7 @@ module NRSER
   #   @todo Document return value.
   # 
   def self.transform tree, source
-    map_tree( tree ) { |value|
+    map_tree( tree, prune: true ) { |value|
       if value.is_a? Proc
         value.call source
       else

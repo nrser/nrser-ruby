@@ -32,14 +32,18 @@ module NRSER
   # 
   # See the specs for examples. Used in {NRSER.transformer}.
   # 
-  # @param tree see NRSER.each_branch
+  # @param tree (see NRSER.each_branch)
+  # 
+  # @param [Boolean] prune:
+  #   When `true`, prunes out values whose labels end with `?` and values are
+  #   `nil`.
   # 
   # @yieldparam [Object] element
   #   Anything reached from the root that is not structural (hash-like or
   #   array-like), including / inside hash keys (though array 
   #   indexes are **not** passed).
   # 
-  def self.map_tree tree, &block
+  def self.map_tree tree, prune: false, &block
     # TODO type check tree?
     
     mapped = tree.map { |element|
@@ -50,7 +54,7 @@ module NRSER
       # trees, as well as into hash values and array entries.
       # 
       if Types.tree.test element
-        map_tree element, &block
+        map_tree element, prune: prune, &block
       else
         # When we've run out of trees, finally pipe through the block:
         block.call element
@@ -60,7 +64,15 @@ module NRSER
     # If `tree` is hash-like, we want to convert the array of pair arrays 
     # back into a hash.
     if Types.hash_like.test tree
-      mapped.to_h
+      if prune
+        mapped.reject { |key, value|
+          Types.label.test( key ) &&
+          key.to_s.end_with?( '?' ) &&
+          value.nil?
+        }.to_h
+      else
+        mapped.to_h
+      end
     else
       # Getting here means it was array-like, so it's already fine
       mapped
