@@ -32,9 +32,31 @@ module NRSER::Refinements::Tree
   end # #leaves
   
   
+  # Calls {NRSER.map_leaves} on `self` with `&block`.
+  # 
+  def map_leaves &block
+    NRSER.map_leaves self, &block
+  end
+  
+  
   # Sends `self` and the optional `block` to {NRSER.each_branch}.
+  # 
   def each_branch &block
     NRSER.each_branch self, &block
+  end
+  
+  
+  # Calls {NRSER.map_branches} on `self` with `&block`.
+  # 
+  def map_branches &block
+    NRSER.map_branches self, &block
+  end # #map_branches
+  
+  
+  # Calls {NRSER.map_tree} on `self` with `&block`.
+  # 
+  def map_tree **options, &block
+    NRSER.map_tree self, **options, &block
   end
   
 end # module NRSER::Refinements::Tree
