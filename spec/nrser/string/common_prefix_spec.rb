@@ -27,4 +27,13 @@ describe "NRSER.common_prefix" do
       BLOCK
     ).to eq "        "
   end
+  
+  it "finds indents in %-quoted strings" do
+    str = %|
+      hey
+      there
+    |.lines.reject( &NRSER.method( :whitespace? ) ).join
+    
+    expect( NRSER.common_prefix str.lines ).to eq '      '
+  end
 end # common_prefix

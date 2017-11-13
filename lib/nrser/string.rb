@@ -1,7 +1,18 @@
 require_relative './string/looks_like'
 
 module NRSER
+  # @!group String Functions
+  
+  WHITESPACE_RE = /\A[[:space:]]*\z/
+  
+  
+  def self.whitespace? string
+    string =~ WHITESPACE_RE
+  end
+  
+  
   class << self
+    
     # Functions the operate on strings.
     
     # turn a multi-line string into a single line, collapsing whitespace
@@ -17,28 +28,18 @@ module NRSER
     
     def common_prefix strings
       raise ArgumentError.new("argument can't be empty") if strings.empty?
-      sorted = strings.sort.reject {|line| line == "\n"}
+      
+      sorted = strings.sort
+      
       i = 0
+      
       while sorted.first[i] == sorted.last[i] &&
             i < [sorted.first.length, sorted.last.length].min
         i = i + 1
       end
-      strings.first[0...i]
+      
+      sorted.first[0...i]
     end # common_prefix
-    
-    
-    def dedent str
-      return str if str.empty?
-      lines = str.lines
-      indent = common_prefix(lines).match(/^\s*/)[0]
-      return str if indent.empty?
-      lines.map {|line|
-        line = line[indent.length..line.length] if line.start_with? indent
-      }.join
-    end # dedent
-    
-    # I like dedent better, but other libs seems to call it deindent
-    alias_method :deindent, :dedent
     
     
     def filter_repeated_blank_lines str
@@ -60,16 +61,7 @@ module NRSER
     end # filter_repeated_blank_lines
     
     
-    # adapted from acrive_support 4.2.0
-    # 
-    # <https://github.com/rails/rails/blob/7847a19f476fb9bee287681586d872ea43785e53/activesupport/lib/active_support/core_ext/string/indent.rb>
-    #
-    def indent str, amount = 2, indent_string=nil, indent_empty_lines=false
-      indent_string = indent_string || str[/^[ \t]/] || ' '
-      re = indent_empty_lines ? /^/ : /^(?!$)/
-      str.gsub(re, indent_string * amount)
-    end
-    
+
     # Truncates a given +text+ after a given <tt>length</tt> if +text+ is longer than <tt>length</tt>:
     #
     #   'Once upon a time in a world far far away'.truncate(27)
