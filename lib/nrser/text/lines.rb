@@ -2,16 +2,8 @@
 module NRSER
   # @!group Text
   
-  
-  # Constants
-  # =====================================================================
-  
-  INDENT_RE = /\A[\ \t]*/
-  
-  
   # Classes
   # =====================================================================
-  
   
   # @todo document Lines class.
   class Lines < Array
@@ -40,9 +32,7 @@ module NRSER
     # Instance Methods
     # ======================================================================
     
-    
   end # class Lines
-  
   
   
   # Functions
