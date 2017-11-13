@@ -39,10 +39,27 @@ module NRSER
   # 
   # <https://github.com/rails/rails/blob/7847a19f476fb9bee287681586d872ea43785e53/activesupport/lib/active_support/core_ext/string/indent.rb>
   #
-  def self.indent str, amount = 2, indent_string = nil, indent_empty_lines = false
-    indent_string = indent_string || str[/^[ \t]/] || ' '
-    re = indent_empty_lines ? /^/ : /^(?!$)/
-    str.gsub(re, indent_string * amount)
+  def self.indent text,
+                  amount = 2,
+                  indent_string: nil,
+                  indent_empty_lines: false,
+                  skip_first_line: false
+    if skip_first_line
+      lines = self.lines text
+      
+      lines.first + indent(
+        rest( lines ).join,
+        amount,
+        indent_string: indent_string,
+        skip_first_line: false
+      )
+      
+    else
+      indent_string = indent_string || text[/^[ \t]/] || ' '
+      re = indent_empty_lines ? /^/ : /^(?!$)/
+      text.gsub re, indent_string * amount
+      
+    end
   end
   
   
