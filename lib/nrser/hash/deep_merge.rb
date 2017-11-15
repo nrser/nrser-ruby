@@ -42,7 +42,7 @@ module NRSER
                                   other_value.is_a?(Hash)
         deep_merge this_value, other_value, &block
       else
-        if block_given? && key?(current_key)
+        if block_given? && base_hash.key?( current_key )
           block.call(current_key, this_value, other_value)
         else
           other_value
