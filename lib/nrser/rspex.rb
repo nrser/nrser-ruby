@@ -302,10 +302,13 @@ module NRSER::RSpex
     # @return
     #   Whatever `context` returns.
     # 
-    def context_where **bindings, &body
-      description = bindings.map { |name, value|
-        "let #{ name } = #{ value }"
-      }.join( ',  ' )
+    def context_where description = nil, **bindings, &body
+      
+      if description.nil?
+        description = "let " + bindings.map { |name, value|
+          "#{ name } = #{ value }"
+        }.join( ', ' )
+      end
       
       context "| #{ description } |", type: :where do
         bindings.each { |name, value|
