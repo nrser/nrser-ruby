@@ -30,6 +30,7 @@ module NRSER; end
 # =======================================================================
   
 module NRSER::Types
+  
   class ArrayType < IsA
     # Default value to split strings with in {#from_s} if the string provided
     # does is not recognized as an encoding format (as of writing, JSON is
@@ -48,6 +49,11 @@ module NRSER::Types
     
     def default_name
       self.class.short_name
+    end
+    
+    
+    def item_type
+      NRSER::Types.any
     end
     
     
@@ -179,12 +185,17 @@ module NRSER::Types
   # 
   class << self
     
-    # array
+    # @!group Type Factory Functions
+    
+    # {NRSER::Types::ArrayType} / {NRSER::Types::ArrayOfType} factory function.
+    # 
+    # @param [Type | Object] item_type
+    #   Optional type of items.
     # 
     # @return [NRSER::Types::Type]
     # 
-    def array item_type = NRSER::NO_ARG, **options
-      if item_type == NRSER::NO_ARG
+    def array item_type = any, **options
+      if item_type == any
         if options.empty?
           ARRAY
         else
@@ -198,5 +209,6 @@ module NRSER::Types
     alias_method :list, :array
     
   end # class << self (Eigenclass)
+  
   
 end # NRSER::Types

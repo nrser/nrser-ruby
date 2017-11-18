@@ -53,6 +53,7 @@ module NRSER::Types
   # ========================================================================
   # 
   class << self
+    # @!group Type Factory Functions
     
     def pathname to_data: :to_s, **options
       if options.empty?
