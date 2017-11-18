@@ -12,4 +12,19 @@ module NRSER
     array[1..-1]
   end # .rest
   
+  
+  # A destructive partition.
+  def self.extract_from_array! array, &block
+    extracted = []
+    array.reject! { |entry|
+      test = block.call entry
+      if test
+        extracted << entry
+      end
+      test
+    }
+    extracted
+  end
+  
+  
 end # module NRSER

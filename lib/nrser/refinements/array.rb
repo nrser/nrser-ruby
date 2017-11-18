@@ -25,6 +25,11 @@ module NRSER
     end # #rest
     
     
+    def extract! &block
+      NRSER.extract_from_array! self, &block
+    end
+    
+    
     # `to_*` Converters
     # =====================================================================
     
