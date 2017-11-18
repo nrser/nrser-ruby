@@ -65,11 +65,26 @@ module NRSER
     # back into a hash.
     if Types.hash_like.test tree
       if prune
-        mapped.reject { |key, value|
-          Types.label.test( key ) &&
-          key.to_s.end_with?( '?' ) &&
-          value.nil?
-        }.to_h
+        pruned = {}
+        
+        mapped.each { |key, value|
+          if  Types.label.test( key ) &&
+              key.to_s.end_with?( '?' )
+            unless value.nil?
+              new_key = key.to_s[0..-2]
+              
+              if key.is_a?( Symbol )
+                new_key = new_key.to_sym
+              end
+              
+              pruned[new_key] = value
+            end
+          else
+            pruned[key] = value
+          end
+        }
+        
+        pruned
       else
         mapped.to_h
       end

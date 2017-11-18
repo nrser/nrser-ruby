@@ -79,7 +79,7 @@ describe_method "NRSER.map_tree" do
       
       2 => {
         name: 'Ms. Mica',
-        fav_color: 'red',
+        fav_color?: 'red',
         age: 32,
         likes: [:cats, :cookies],
       },
