@@ -24,9 +24,13 @@ module NRSER::Types
   
   singleton_class.send :alias_method, :string, :str
   
-  STR = str( name: 'StrType' ).freeze
+  STR = str( name: 'StringType' ).freeze
   
-  EMPTY_STR = Is.new( '' ).freeze
+  EMPTY_STR = str( name: 'EmptyStringType', length: 0 ).freeze
+  
+  def self.empty_str
+    EMPTY_STR
+  end
   
   def self.non_empty_str **options
     return NON_EMPTY_STR if options.empty?
