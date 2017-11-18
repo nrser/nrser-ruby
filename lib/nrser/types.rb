@@ -24,6 +24,7 @@ require 'pp'
 # 
 require_relative './types/type'
 require_relative './types/is'
+require_relative './types/nil'
 require_relative './types/is_a'
 require_relative './types/where'
 require_relative './types/combinators'
