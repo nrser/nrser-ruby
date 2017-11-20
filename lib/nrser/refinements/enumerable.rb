@@ -37,6 +37,11 @@ module NRSER::Refinements::Enumerable
     NRSER.enumerate_as_values self
   end
   
+  # Calls {NRSER.only} on `self`.
+  def only **options
+    NRSER.only self, **options
+  end
+  
   # See {NRSER.only!}
   def only!
     NRSER.only! self

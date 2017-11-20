@@ -107,6 +107,26 @@ module NRSER
     end # #find_only
     
     
+    # Return the only entry if the enumerable has `#count` one. Otherwise,
+    # return `default` (which defaults to `nil`).
+    # 
+    # @param [Enumerable] enum
+    #   Enumerable in question.
+    # 
+    # @param [Object] default:
+    #   Value to return if `enum` does not have only one entry.
+    # 
+    # @return [Object]
+    #   The only entry in `enum` if it has only one, else `default`.
+    # 
+    def only enum, default: nil
+      if enum.count == 1
+        enum.first
+      else
+        default
+      end
+    end
+    
     
     # @todo Document only method.
     # 
@@ -117,7 +137,7 @@ module NRSER
     #   @todo Document return value.
     # 
     def only! enum
-      unless enum.length == 1
+      unless enum.count == 1
         raise TypeError.new squish <<-END
           Expected enumerable #{ enum.inspect } to have exactly one entry.
         END
