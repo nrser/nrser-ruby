@@ -197,6 +197,16 @@ module NRSER::RSpex
     alias_method :when_sent_to, :describe_sent_to
     
     
+    def describe_return_value *args, &body
+      msg = NRSER::Message.from *args
+      
+      describe "return value from #{ msg }" do
+        subject { msg.send_to super() }
+        instance_exec &body
+      end # "return value from #{ msg }"
+    end
+    
+    
     # Describe a "section". Just like {RSpec.describe} except it:
     # 
     # 1.  Expects a string title.
