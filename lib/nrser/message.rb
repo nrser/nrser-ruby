@@ -20,6 +20,39 @@ module NRSER
   # sent to an object as a method call, especially in testing.
   # 
   class Message
+    # Class Methods
+    # =====================================================================
+    
+    # Instantiate a message from the arguments, unless they already are one.
+    # 
+    # @overload from symbol, *args, &block
+    #   Create a new instance from the arguments by passing them to 
+    #   {NRSER::Message.new}.
+    # 
+    #   @param [NRSER::Message] message
+    #     An already instantiated message, which is simple returned.
+    #   
+    #   @return [NRSER::Message]
+    #     Message created from the arguments.
+    # 
+    # @overload from message
+    #   Convenience method to return the message if it's the only argument.
+    #   
+    #   @param [NRSER::Message] message
+    #     An already instantiated message, which is simple returned.
+    #   
+    #   @return [NRSER::Message]
+    #     The `message` argument.
+    # 
+    def self.from *args, &block
+      if args.length == 1 && args[0].is_a?( Message )
+        args[0]
+      else
+        new *args, &block
+      end
+    end # .from
+    
+    
     # Name of method the message is for.
     # 
     # @return [Symbol | String]
