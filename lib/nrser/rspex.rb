@@ -88,7 +88,20 @@ end
 
 module NRSER; end
 
-module NRSER::RSpex
+module NRSER::RSpex  
+  
+  # Constants
+  # =====================================================================
+  
+  
+  # Symbols
+  # ---------------------------------------------------------------------
+  # 
+  # Sources:
+  # 
+  # -   https://en.wikipedia.org/wiki/Mathematical_operators_and_symbols_in_Unicode
+  # 
+  
   PREFIXES_BASE = {
     section: '§',
     group: '•',
@@ -99,15 +112,24 @@ module NRSER::RSpex
     method:       '𝑚',
     class:        '𝐶',
     attribute:    '𝑎',
+    file:         '𝐹',
   )
   
-  PREFIXES_MATH_GREEK = PREFIXES_BASE.merge(
-    # module: "𝓜 𝓸𝓭𝓾𝓵𝓮",
-    module: "𝛭",
-    method: '𝜆',
-    class: '𝛤',
-    attribute:    '𝛼',
+  PREFIXES_MATH_CURSIVE_WORDS = PREFIXES_BASE.merge(
+    module:       '𝓜 𝓸𝓭𝓾𝓵𝓮',
+    method:       '𝓶𝓮𝓽',
+    class:        '𝐶',
+    attribute:    '𝑎',
+    file:         '𝐹',
   )
+  
+  # PREFIXES_MATH_GREEK = PREFIXES_BASE.merge(
+  #   # module: "𝓜 𝓸𝓭𝓾𝓵𝓮",
+  #   module:       '𝛭',
+  #   method:       '𝜆',
+  #   class:        '𝛤',
+  #   attribute:    '𝛼',
+  # )
   
   PREFIXES = PREFIXES_MATH_ITALIC
   
@@ -239,6 +261,20 @@ module NRSER::RSpex
     
     # Old name
     alias_method :describe_topic, :describe_section
+    
+    
+    def describe_file path, **metadata, &body
+      title = path
+      
+      describe(
+        "#{ NRSER::RSpex::PREFIXES[:file] } #{ title }",
+        type: :file,
+        file: path,
+        **metadata
+      ) do
+        instance_exec &body
+      end
+    end
     
     
     def describe_module mod, **metadata, &block

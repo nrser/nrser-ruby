@@ -46,6 +46,10 @@ module NRSER::Types
     name: 'NonEmptyPathnameType'
   
   
+  POSIX_PATH_SEGMENT_RE = /\A[^\/\n]*\z/
+  
+  # POSIX_PATH_SEGMENT = non_empty_str not_include: '/'
+  
   PATH = union non_empty_str, NON_EMPTY_PATHNAME, name: 'Path'
   
   
@@ -56,7 +60,7 @@ module NRSER::Types
     # @!group Type Factory Functions
     
     def pathname to_data: :to_s, **options
-      if options.empty?
+      if options.empty? && to_data == :to_s
         PATHNAME
       else
         is_a \
