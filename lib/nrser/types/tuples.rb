@@ -50,6 +50,11 @@ module NRSER::Types
     end # #initialize
     
     
+    def default_name
+      '[' + @types.map( &:name ).join( ', ' ) + ']'
+    end
+    
+    
     # Instance Methods
     # ======================================================================
     
