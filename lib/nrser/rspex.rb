@@ -133,6 +133,24 @@ module NRSER::RSpex
   
   PREFIXES = PREFIXES_MATH_ITALIC
   
+  
+  # Module (Class) Functions
+  # =====================================================================
+  
+  
+  # @todo Document short_s method.
+  # 
+  # @param [type] arg_name
+  #   @todo Add name param description.
+  # 
+  # @return [return_type]
+  #   @todo Document return value.
+  # 
+  def self.short_s value
+    NRSER.smart_ellipsis value.inspect, 64
+  end # .short_s
+  
+  
   # Instance methods to extend example groups with.
   # 
   module ExampleGroup
@@ -157,7 +175,7 @@ module NRSER::RSpex
     #   the subject.
     # 
     def describe_called_with *args, &block
-      describe "called with #{ args.map( &:inspect ).join( ', ' ) }" do
+      describe "called with #{ args.map( &NRSER::RSpex.method( :short_s ) ).join( ', ' ) }" do
         subject { super().call *args }
         instance_exec &block
       end
@@ -174,7 +192,7 @@ module NRSER::RSpex
     
     def describe_message symbol, *args, &body
       description = \
-        "message #{ [symbol, *args].map( &:inspect ).join( ', ' ) }"
+        "message #{ [symbol, *args].map( &NRSER::RSpex.method( :short_s ) ).join( ', ' ) }"
       
       describe description, type: :message do
         subject { NRSER::Message.new symbol, *args }
@@ -351,12 +369,12 @@ module NRSER::RSpex
     def context_where description = nil, **bindings, &body
       
       if description.nil?
-        description = "let " + bindings.map { |name, value|
-          "#{ name } = #{ value }"
+        description = bindings.map { |name, value|
+          "#{ name } = #{ NRSER::RSpex.short_s value }"
         }.join( ', ' )
       end
       
-      context "| #{ description } |", type: :where do
+      context "△ #{ description }", type: :where do
         bindings.each { |name, value|
           let( name ) { unwrap value, context: self }
         }
@@ -399,7 +417,7 @@ shared_examples "function" do |mapping: {}, raising: {}|
   mapping.each { |args, expected|
     args = NRSER.as_array args
     
-    context "called with #{ args.map( &:inspect ).join ', ' }" do
+    context "called with #{ args.map( &NRSER::RSpex.method( :short_s ) ).join ', ' }" do
       subject { super().call *args }
       
       it {
@@ -421,7 +439,7 @@ shared_examples "function" do |mapping: {}, raising: {}|
   raising.each { |args, error|
     args = NRSER.as_array args
     
-    context "called with #{ args.map( &:inspect ).join ', ' }" do
+    context "called with #{ args.map( &NRSER::RSpex.method( :short_s ) ).join ', ' }" do
     # it "rejects #{ args.map( &:inspect ).join ', ' }" do
       it { expect { subject.call *args }.to raise_error( *error ) }
     end
