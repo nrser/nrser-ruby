@@ -70,22 +70,28 @@ describe_file 'types/paths.rb' do
   end # NRSER::Types.dir_path
   
   
-  describe 'NRSER::Types::POSIX_PATH_SEGMENT_RE' do
-    subject { NRSER::Types::POSIX_PATH_SEGMENT_RE }
+  describe 'NRSER::Types.path_seg' do
+    subject { NRSER::Types.method :path_seg }
     
-    describe_method 'match' do
-      subject { super().method :match }
+    include_examples 'make type',
+      accepts: [
+        'hey',
+        'ho_let\'s goooo!'
+      ],
       
-      it_behaves_like "function",
-        mapping: {
-          ["hey"] =>  wrap { be_a( MatchData ) },
-          ["h/ey"] => nil,
+      rejects: [
+        'hey/ho',
+      ],
+      
+      and_is_expected: {
+        to: {
+          have_attributes: {
+            name: 'POSIXPathSegment',
+          }
         }
-      
-    end # Method match Description
+      }    
     
-    
-  end # NRSER::Types::POSIX_PATH_SEGMENT_RE
+  end # NRSER::Types.path_seg
   
   
 end

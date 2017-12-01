@@ -45,11 +45,6 @@ module NRSER::Types
     where { |value| value.to_s.length > 0 },
     name: 'NonEmptyPathnameType'
   
-  
-  POSIX_PATH_SEGMENT_RE = /\A[^\/\n]*\z/
-  
-  # POSIX_PATH_SEGMENT = non_empty_str not_include: '/'
-  
   PATH = union non_empty_str, NON_EMPTY_PATHNAME, name: 'Path'
   
   
@@ -85,6 +80,19 @@ module NRSER::Types
         union non_empty_str, NON_EMPTY_PATHNAME, **options
       end
     end # #path
+    
+    
+    def path_segment **options
+      if options.empty?
+        POSIX_PATH_SEGMENT
+      else
+        intersection  non_empty_str,
+                      where { |string| ! string.include?( '/' ) },
+                      name: 'POSIXPathSegment'
+      end
+    end
+    
+    alias_method :path_seg, :path_segment
     
     
     # An absolute {#path}.
@@ -143,6 +151,8 @@ module NRSER::Types
     end
     
   end # class << self (Eigenclass)
+  
+  POSIX_PATH_SEGMENT = path_segment name: 'POSIXPathSegment'
   
 end # module NRSER::Types
 
