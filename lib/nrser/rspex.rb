@@ -83,6 +83,15 @@ def unwrap obj, context: nil
   end
 end
 
+
+def List *args
+  NRSER::RSpex::List.new args
+end
+
+def Args *args
+  NRSER::RSpex::Args.new args
+end
+
 # Extensions
 # =====================================================================
 
@@ -105,6 +114,7 @@ module NRSER::RSpex
   PREFIXES_BASE = {
     section: '§',
     group: '•',
+    invocation: '⟮⟯',
   }
   
   PREFIXES_MATH_ITALIC = PREFIXES_BASE.merge(
@@ -146,14 +156,135 @@ module NRSER::RSpex
   # @return [return_type]
   #   @todo Document return value.
   # 
-  def self.short_s value
-    NRSER.smart_ellipsis value.inspect, 64
+  def self.short_s value, max = 64
+    NRSER.smart_ellipsis value.inspect, max
   end # .short_s
+  
+  
+  
+  # @todo Document format_type method.
+  # 
+  # @param [type] arg_name
+  #   @todo Add name param description.
+  # 
+  # @return [return_type]
+  #   @todo Document return value.
+  # 
+  def self.format_type type, description
+    return description if type.nil? || !PREFIXES.key?( type )
+    
+    "#{ NRSER::RSpex::PREFIXES[type] } #{ description }"
+  end # .format_type
+  
+  
+  
+  # @todo Document format method.
+  # 
+  # @param [type] arg_name
+  #   @todo Add name param description.
+  # 
+  # @return [return_type]
+  #   @todo Document return value.
+  # 
+  def self.format *parts, type: nil
+    format_type \
+      type,
+      parts.
+        map { |part|
+          if part.respond_to? :to_desc
+            part.to_desc
+          elsif part.is_a? String
+            part
+          else
+            short_s part
+          end
+        }.
+        join( ' ' )
+  end # .format
+  
+  
+  class List < Array
+    def to_desc
+      map { |entry| NRSER::RSpex.short_s entry, 16 }.join ", "
+    end
+  end
+  
+  
+  class Opts < Hash
+    def to_desc
+      map { |key, value|
+        if key.is_a? Symbol
+          "#{ key }: #{ NRSER::RSpex.short_s value, 16 }"
+        else
+          "#{ NRSER::RSpex.short_s key, 16 } => #{ NRSER::RSpex.short_s value, 16 }"
+        end
+      }.join( ", " )
+    end
+  end
+  
+  
+  class Args < Array
+    def to_desc
+      if last.is_a?( Hash )
+        [
+          List.new( self[0..-2] ).to_desc,
+          Opts[ last ].to_desc,
+        ].reject( &:empty? ).join( ", " )
+      else
+        super
+      end
+    end
+  end
   
   
   # Instance methods to extend example groups with.
   # 
   module ExampleGroup
+    
+    
+    # @todo Document describe_x method.
+    # 
+    # @param [type] arg_name
+    #   @todo Add name param description.
+    # 
+    # @return [return_type]
+    #   @todo Document return value.
+    # 
+    def describe_x_type *description_parts,
+                        type:,
+                        metadata: {},
+                        subject_block: nil,
+                        &body
+      
+      description = NRSER::RSpex.format *description_parts, type: type
+      
+      describe description, **metadata, type: type do
+        subject( &subject_block ) if subject_block
+        instance_exec &body
+      end # description, 
+      
+    end # #describe_x
+    
+    
+    # @todo Document describe_instance method.
+    # 
+    # @param [type] arg_name
+    #   @todo Add name param description.
+    # 
+    # @return [return_type]
+    #   @todo Document return value.
+    # 
+    def describe_instance *constructor_args, &body
+      describe_x_type ".new(", Args(*constructor_args), ")",
+        type: :instance,
+        metadata: {
+          constructor_args: constructor_args,
+        },
+        # subject_block: -> { super().new *described_args },
+        subject_block: -> { super().new *described_constructor_args },
+        &body
+    end # #describe_instance
+    
     
     # Create a new {RSpec.describe} section where the subject is set by
     # calling the parent subject with `args` and evaluate `block` in it.
@@ -174,11 +305,11 @@ module NRSER::RSpex
     #   Block to execute in the context of the example group after refining
     #   the subject.
     # 
-    def describe_called_with *args, &block
-      describe "called with #{ args.map( &NRSER::RSpex.method( :short_s ) ).join( ', ' ) }" do
-        subject { super().call *args }
-        instance_exec &block
-      end
+    def describe_called_with *args, &body
+      describe_x_type  "called with", List(*args),
+        type: :invocation,
+        subject_block: -> { super().call *args },
+        &body
     end # #describe_called_with
     
     # Aliases to other names I was using at first... not preferring their use
@@ -306,15 +437,27 @@ module NRSER::RSpex
     end # #describe_module
     
     
-    def describe_class klass, **metadata, &block
+    def describe_class klass, bind_subject: true, **metadata, &block
+      description = "#{ NRSER::RSpex::PREFIXES[:class] } #{ klass.name }"
+      
       describe(
-        "#{ NRSER::RSpex::PREFIXES[:class] } #{ klass.name }",
+        description,
         type: :class,
+        class: klass,
         **metadata
       ) do
+        if bind_subject
+          subject { klass }
+        end
+        
         instance_exec &block
       end
     end # #describe_class
+    
+    
+    def described_class
+      metadata[:class] || super()
+    end
     
     
     def describe_group title, **metadata, &block
@@ -332,8 +475,13 @@ module NRSER::RSpex
       describe(
         "#{ NRSER::RSpex::PREFIXES[:method] } #{ name }",
         type: :method,
+        method_name: name,
         **metadata
       ) do
+        if name.is_a? Symbol
+          subject { super().method name }
+        end
+        
         instance_exec &block
       end
     end # #describe_method
@@ -370,8 +518,8 @@ module NRSER::RSpex
       
       if description.nil?
         description = bindings.map { |name, value|
-          "#{ name } = #{ NRSER::RSpex.short_s value }"
-        }.join( ', ' )
+          "#{ name }: #{ NRSER::RSpex.short_s value }"
+        }.join( ", " )
       end
       
       context "△ #{ description }", type: :where do
@@ -386,10 +534,26 @@ module NRSER::RSpex
     
   end # module ExampleGroup
   
+  
+  # Extensions available in examples themselves via RSpec's `config.include`.
+  # 
+  module Example
+    def described_class
+      self.class.metadata[:class] || super
+    end
+    
+    def described_constructor_args
+      self.class.metadata[:constructor_args]
+    end
+    
+  end
+  
 end # module NRSER:RSpex
+
 
 RSpec.configure do |config|
   config.extend NRSER::RSpex::ExampleGroup
+  config.include NRSER::RSpex::Example
 end
 
 
