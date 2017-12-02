@@ -5,7 +5,13 @@ module NRSER
 
     def erb bnd, str
       require 'erb'
-      filter_repeated_blank_lines ERB.new(dedent(str)).result(bnd)
+      
+      filter_repeated_blank_lines(
+        with_indent_tagged( dedent( str ) ) { |tagged_str|
+          ERB.new( tagged_str ).result( bnd )
+        },
+        remove_leading: true
+      )
     end # erb
 
     alias_method :template, :erb

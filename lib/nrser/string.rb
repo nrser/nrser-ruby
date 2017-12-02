@@ -44,10 +44,10 @@ module NRSER
     end # common_prefix
     
     
-    def filter_repeated_blank_lines str
+    def filter_repeated_blank_lines str, remove_leading: false
       out = []
       lines = str.lines
-      skipping = false
+      skipping = remove_leading
       str.lines.each do |line|
         if line =~ /^\s*$/
           unless skipping
