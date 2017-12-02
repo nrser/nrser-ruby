@@ -1,0 +1,29 @@
+---
+# Playbook to setup the dev env for this repo
+# 
+# From the project root run with:
+# 
+#     qb setup
+# 
+- name: dev setup for nrser/qb
+
+  hosts: localhost
+
+  # pre_tasks:
+  # - name: load dev_setup facts
+  #   tags:
+  #   - always
+  #   dev_setup_facts:
+
+  roles:
+  
+  - role: qb/dev/ref/repo/git
+    full_name: vmg/redcarpet
+    version: v3.4.0
+  
+  tasks:
+  
+  - name: >-
+      Install gems
+    bundler:
+      gem_path: ./.bundle
