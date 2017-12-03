@@ -10,7 +10,8 @@ module NRSER
 module Meta
 
 module Props
-  CLASS_KEY = '__class__';
+  DEFAULT_CLASS_KEY = '__class__';
+  
   PROPS_VARIABLE_NAME = :@__NRSER_props
   PROP_VALUES_VARIABLE_NAME = :@__NRSER_prop_values
   
@@ -51,30 +52,66 @@ module Props
   # reasonable to use on untrusted data.
   # 
   # @param [Hash<String, Object>] data
+  #   Data hash to load from.
   # 
-  # @return [Object]
-  #   @todo Document return value.
+  # @param 
   # 
+  # @return [NRSER::Meta::Props]
+  #   Instance of a propertied class.
   # 
-  # 
-  def self.UNSAFE_load_instance_from_data data
+  def self.UNSAFE_load_instance_from_data data, class_key: DEFAULT_CLASS_KEY
     t.hash_.check data
     
-    unless data.key?(CLASS_KEY)
+    unless data.key?( class_key )
       raise ArgumentError.new binding.erb <<-ERB
-        Data is missing <%= CLASS_KEY %> key - no idea what class to 
+        Data is missing <%= class_key %> key - no idea what class to 
         instantiate.
         
-        data:
+        Data:
         
             <%= data.pretty_inspect %>
         
       ERB
     end
     
-    class_name = t.non_empty_str.check data[CLASS_KEY]
+    # Get the class name from the data hash using the key, checking that it's
+    # a non-empty string.
+    class_name = t.non_empty_str.check data[class_key]
+    
+    # Resolve the constant at that name.
     klass = class_name.to_const
+    
+    # Make sure it's one of ours
+    unless klass.included_modules.include?( NRSER::Meta::Props )
+      raise ArgumentError.new binding.erb <<-ERB
+        Can not load instance from data - bad class name.
+        
+        Extracted class name
+        
+            <%= class_name.inspect %>
+        
+        from class key
+        
+            <%= class_key.inspect %>
+        
+        which resolved to constant
+        
+            <%= klass.inspect %>
+        
+        but that class does not include the NRSER::Meta::Props mixin, which we
+        check for to help protect against executing an unrelated `.from_data`
+        class method when attempting to load.
+        
+        Data:
+        
+            <%= data.pretty_inspect %>
+        
+      ERB
+    end
+    
+    # Kick off the restore and return the result
     klass.from_data data
+    
   end # .UNSAFE_load_instance_from_data
   
   
@@ -261,14 +298,18 @@ module Props
   # @return [Hash<String, Object>]
   #   @todo Document return value.
   # 
-  def to_data only_own: false, only_primary: false, add_class: true
+  def to_data only_own: false,
+              only_primary: false,
+              add_class: true,
+              class_key: NRSER::Meta::Props::DEFAULT_CLASS_KEY
+              
     self.class.props(only_own: false, only_primary: false).
       map { |name, prop|
         [name.to_s, prop.to_data(self)]
       }.
       to_h.
       tap { |hash|
-        hash[CLASS_KEY] = self.class.name if add_class
+        hash[class_key] = self.class.name if add_class
       }
   end # #to_data
   
