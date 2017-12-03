@@ -57,21 +57,25 @@ module Props
   # 
   # 
   # 
-  def self.from_data data
+  def self.UNSAFE_load_instance_from_data data
     t.hash_.check data
     
     unless data.key?(CLASS_KEY)
-      raise ArgumentError.new <<-END.dedent
-        Data is missing #{ CLASS_KEY } key - no idea what class to instantiate.
+      raise ArgumentError.new binding.erb <<-ERB
+        Data is missing <%= CLASS_KEY %> key - no idea what class to 
+        instantiate.
         
-        #{ data.pretty_inspect }
-      END
+        data:
+        
+            <%= data.pretty_inspect %>
+        
+      ERB
     end
     
-    class_name = t.str.check data[CLASS_KEY]
+    class_name = t.non_empty_str.check data[CLASS_KEY]
     klass = class_name.to_const
     klass.from_data data
-  end # .from_data
+  end # .UNSAFE_load_instance_from_data
   
   
   # Hook to extend the including class with {NRSER::Meta::Props:ClassMethods}
@@ -176,7 +180,24 @@ module Props
     # @return [self]
     # 
     def from_data data
-      self.new data.symbolize_keys
+      values = {}
+      props = self.props
+      
+      data.each { |data_key, data_value|
+        prop_key = case data_key
+        when Symbol
+          data_key
+        when String
+          data_key.to_sym
+        end
+        
+        if  prop_key &&
+            prop = props[prop_key]
+          values[prop_key] = prop.value_from_data data_value
+        end
+      }
+      
+      self.new values
     end # #from_data
     
     

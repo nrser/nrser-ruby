@@ -55,6 +55,8 @@ describe NRSER::Meta::Props do
         cat_prop = @owner_class.props[:cat]
         expect( cat_prop.type ).to be_a NRSER::Types::IsA
         expect( cat_prop.type.klass ).to be @cat_class
+        expect( @cat_class.respond_to? :from_data ).to be true
+        expect( cat_prop.type.has_from_data? ).to be true
       end
       
       it "dumps to and loads from data" do

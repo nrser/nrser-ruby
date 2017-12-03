@@ -309,8 +309,8 @@ class NRSER::Meta::Props::Prop
   def set instance, value
     type.check( value ) do
       binding.erb <<-END
-        Value of type <%= value.class.name %> for prop <%= self.full_name %> failed
-        type check.
+        Value of type <%= value.class.name %> for prop <%= self.full_name %> 
+        failed type check.
         
         Must satisfy type:
         
@@ -340,16 +340,20 @@ class NRSER::Meta::Props::Prop
       set instance, values[name]
     else
       if default?
-        set instance, if !default.nil? && default.respond_to?( :dup )
-          default.dup
-        else
-          default
-        end
+        # set instance, if !default.nil? && default.respond_to?( :dup )
+        #   default.dup
+        # else
+        #   default
+        # end
+        set instance, default
       else
-        raise TypeError.new NRSER.squish <<-END
-          Prop #{ self } has no default value and no value was provided in
-          values #{ values.inspect }.
-        END
+        raise TypeError.new binding.erb <<-ERB
+          Prop <#= full_name %> has no default value and no value was provided 
+          in values:
+          
+              <%= values.pretty_inspect %>
+          
+        ERB
       end
     end
   end # #set_from_hash
@@ -438,7 +442,11 @@ class NRSER::Meta::Props::Prop
       # This {Prop} does not have any custom `from_data` instructions, which
       # means we must rely on the {#type} to covert *data* to a *value*.
       # 
-      type.from_data data
+      if type.has_from_data?
+        type.from_data data
+      else
+        data
+      end
       
     when Symbol, String
       # The custom `from_data` configuration specifies a string or symbol name,

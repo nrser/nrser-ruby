@@ -16,7 +16,8 @@ describe NRSER::Meta::Props do
     
     let(:point_class) {
       Class.new(NRSER::Meta::Props::Base) do
-        # include NRSER::Meta::Props
+        # So that error messages look right
+        def self.name; 'Point'; end
         
         prop :x, type: t.int
         prop :y, type: t.int
@@ -137,7 +138,10 @@ describe NRSER::Meta::Props do
           ),
         },
         raising: {
-          [{x: 1, y: 'why?'}] => [TypeError, /must be of type `IntType`/],
+          [ {x: 1, y: 'why?'} ] => [
+            TypeError,
+            /Value of type String for prop Point\#y\s+failed type check/m
+          ],
         }
     end # .new
     

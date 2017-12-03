@@ -40,12 +40,22 @@ module NRSER::Types
     #   Instance of {#klass}.
     # 
     def from_data data
-      if @klass.respond_to? :from_data
-        check @klass.from_data( data )
+      if @from_data.nil?
+        if @klass.respond_to? :from_data
+          check @klass.from_data( data )
+        else
+          super data
+        end
       else
-        super data
+        @from_data.call data
       end
     end
+    
+    
+    def has_from_data?
+      @from_data || @klass.respond_to?( :from_data )
+    end
+    
   end # IsA
   
   

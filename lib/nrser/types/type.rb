@@ -180,7 +180,7 @@ module NRSER::Types
     
     
     def from_data data
-      if @from_s.nil?
+      if @from_data.nil?
         raise NoMethodError, "#from_data not defined"
       end
       
@@ -212,6 +212,11 @@ module NRSER::Types
     end # #has_to_data?
     
     
+    def has_from_data?
+      ! @from_data.nil?
+    end
+    
+    
     # Dumps a value of this type to "data" - structures and values suitable
     # for transport and storage, such as dumping to JSON or YAML, etc.
     # 
@@ -222,7 +227,7 @@ module NRSER::Types
     #   The data representation of the value.
     # 
     def to_data value
-      if @from_s.nil?
+      if @to_data.nil?
         raise NoMethodError, "#to_data not defined"
       end
       
