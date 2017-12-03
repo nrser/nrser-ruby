@@ -63,6 +63,25 @@ module NRSER
     end # filter_repeated_blank_lines
     
     
+    def lazy_filter_repeated_blank_lines source, remove_leading: false
+      skipping = remove_leading
+      
+      source = source.each_line if source.is_a? String
+      
+      Enumerator::Lazy.new source do |yielder, line|
+        if line =~ /^\s*$/
+          unless skipping
+            yielder << line
+          end
+          skipping = true
+        else
+          skipping = false
+          yielder << line
+        end
+      end
+      
+    end # filter_repeated_blank_lines
+    
 
     # Truncates a given +text+ after a given <tt>length</tt> if +text+ is longer than <tt>length</tt>:
     #
