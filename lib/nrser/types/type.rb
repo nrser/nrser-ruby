@@ -35,7 +35,7 @@ module NRSER::Types
     # @param [nil | #call | #to_proc] to_data:
     #   
     # 
-    def initialize name: nil, from_s: nil, to_data: nil
+    def initialize name: nil, from_s: nil, to_data: nil, from_data: nil
       @name = name
       @from_s = from_s
       
@@ -46,10 +46,37 @@ module NRSER::Types
       elsif to_data.respond_to?( :to_proc )
         to_data.to_proc
       else
-        raise TypeError.squished <<-END
-          `to_data:` keyword arg must be `nil`, respond to `:call` or respond
-          to `:to_proc`; found #{ to_data.inspect }
-        END
+        raise TypeError.new binding.erb <<-ERB
+          `to_data:` keyword arg must be `nil`, respond to `#call` or respond
+          to `#to_proc`.
+          
+          Found value:
+          
+              <%= to_data.pretty_inspect %>
+          
+          (type <%= to_data.class %>)
+          
+        ERB
+      end
+      
+      @from_data = if from_data.nil?
+        nil
+      elsif from_data.respond_to?( :call )
+        from_data
+      elsif from_data.respond_to?( :to_proc )
+        from_data.to_proc
+      else
+        raise TypeError.new binding.erb <<-ERB
+          `to_data:` keyword arg must be `nil`, respond to `#call` or respond
+          to `#to_proc`.
+          
+          Found value:
+          
+              <%= from_data.pretty_inspect %>
+          
+          (type <%= from_data.class %>)
+          
+        ERB
       end
     end # #initialize
     
@@ -149,6 +176,15 @@ module NRSER::Types
       end
       
       check @from_s.call( s )
+    end
+    
+    
+    def from_data data
+      if @from_s.nil?
+        raise NoMethodError, "#from_data not defined"
+      end
+      
+      check @from_data.call( data )
     end
     
     

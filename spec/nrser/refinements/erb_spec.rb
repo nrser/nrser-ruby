@@ -101,7 +101,7 @@ END
     
     expect( error.message ).
       to eq <<-END
-Expected `@from_data` to be Symbol, String or Proc,
+Expected `@from_data` to be Symbol, String or Proc;
 found Hash.
 
 Acceptable types:
