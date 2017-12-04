@@ -22,7 +22,8 @@
 
 # Project / Package
 # -----------------------------------------------------------------------
-require_relative './message'
+require 'nrser/message'
+require 'nrser/rspex/shared_examples'
 
 
 # Helpers
@@ -171,9 +172,11 @@ module NRSER::RSpex
   #   @todo Document return value.
   # 
   def self.format_type type, description
-    return description if type.nil? || !PREFIXES.key?( type )
+    prefixes = RSpec.configuration.x_type_prefixes
     
-    "#{ NRSER::RSpex::PREFIXES[type] } #{ description }"
+    return description if type.nil? || !prefixes.key?( type )
+    
+    "#{ prefixes[type] } #{ description }"
   end # .format_type
   
   
@@ -204,19 +207,22 @@ module NRSER::RSpex
   
   
   class List < Array
-    def to_desc
-      map { |entry| NRSER::RSpex.short_s entry, 16 }.join ", "
+    def to_desc max = nil
+      max = [16, 64 / self.length].max if max.nil?
+      map { |entry| NRSER::RSpex.short_s entry, max }.join ", "
     end
   end
   
   
   class Opts < Hash
-    def to_desc
+    def to_desc max = nil
+      max = [16, ( 64 / self.count )].max if max.nil?
+      
       map { |key, value|
         if key.is_a? Symbol
-          "#{ key }: #{ NRSER::RSpex.short_s value, 16 }"
+          "#{ key }: #{ NRSER::RSpex.short_s value, max }"
         else
-          "#{ NRSER::RSpex.short_s key, 16 } => #{ NRSER::RSpex.short_s value, 16 }"
+          "#{ NRSER::RSpex.short_s key, max } => #{ NRSER::RSpex.short_s value, max }"
         end
       }.join( ", " )
     end
@@ -224,7 +230,7 @@ module NRSER::RSpex
   
   
   class Args < Array
-    def to_desc
+    def to_desc max = nil
       if last.is_a?( Hash )
         [
           List.new( self[0..-2] ).to_desc,
@@ -554,59 +560,12 @@ end # module NRSER:RSpex
 RSpec.configure do |config|
   config.extend NRSER::RSpex::ExampleGroup
   config.include NRSER::RSpex::Example
+  
+  config.add_setting :x_type_prefixes
+  config.x_type_prefixes = \
+    NRSER::RSpex::PREFIXES_BASE.merge( NRSER::RSpex::PREFIXES_MATH_ITALIC )
 end
 
-
+# Make available at the top-level
 include NRSER::RSpex::ExampleGroup
-
-
-# Shared Examples
-# =====================================================================
-
-shared_examples "expect subject" do |*expectations|
-  merge_expectations( *expectations ).each { |state, specs|
-    specs.each { |verb, noun|
-      it {
-        # like: is_expected.to(include(noun))
-        is_expected.send state, self.send(verb, noun)
-      }
-    }
-  }
-end # is expected
-
-
-# Shared example for a functional method that compares input and output pairs.
-# 
-shared_examples "function" do |mapping: {}, raising: {}|
-  mapping.each { |args, expected|
-    args = NRSER.as_array args
-    
-    context "called with #{ args.map( &NRSER::RSpex.method( :short_s ) ).join ', ' }" do
-      subject { super().call *args }
-      
-      it {
-        expected = unwrap expected, context: self
-        
-        matcher = if expected.respond_to?( :matches? )
-          expected
-        elsif expected.is_a? NRSER::Message
-          expected.send_to self
-        else
-          eq expected
-        end
-        
-        is_expected.to matcher
-      }
-    end
-  }
-  
-  raising.each { |args, error|
-    args = NRSER.as_array args
-    
-    context "called with #{ args.map( &NRSER::RSpex.method( :short_s ) ).join ', ' }" do
-    # it "rejects #{ args.map( &:inspect ).join ', ' }" do
-      it { expect { subject.call *args }.to raise_error( *error ) }
-    end
-  }
-end # function
 
