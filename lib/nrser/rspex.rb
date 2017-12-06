@@ -208,6 +208,7 @@ module NRSER::RSpex
   
   class List < Array
     def to_desc max = nil
+      return '' if empty?
       max = [16, 64 / self.length].max if max.nil?
       map { |entry| NRSER::RSpex.short_s entry, max }.join ", "
     end
@@ -216,6 +217,8 @@ module NRSER::RSpex
   
   class Opts < Hash
     def to_desc max = nil
+      return '' if empty?
+      
       max = [16, ( 64 / self.count )].max if max.nil?
       
       map { |key, value|
