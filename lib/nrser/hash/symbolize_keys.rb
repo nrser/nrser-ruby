@@ -17,7 +17,7 @@ module NRSER
     transform_keys!(hash) { |key| key.to_sym rescue key }
   end # .symbolize_keys!
   
-  singleton_class.send :alias_method, :sym_keys!, :symbolize_keys!
+  singleton_class.send :alias_method, :to_sym_keys!, :symbolize_keys!
   
   
   # Returns a new hash with all keys that respond to `#to_sym` converted to
@@ -36,6 +36,6 @@ module NRSER
     transform_keys(hash) { |key| key.to_sym rescue key }
   end
   
-  singleton_class.send :alias_method, :sym_keys, :symbolize_keys
+  singleton_class.send :alias_method, :to_sym_keys, :symbolize_keys
 
 end # module NRSER

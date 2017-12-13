@@ -16,7 +16,7 @@ module NRSER
     transform_keys! hash, &:to_s
   end
   
-  singleton_class.send :alias_method, :str_keys!, :stringify_keys!
+  singleton_class.send :alias_method, :to_s_keys!, :stringify_keys!
   
   
   # Returns a new hash with all keys transformed to strings by calling `#to_s`
@@ -32,6 +32,6 @@ module NRSER
     transform_keys hash, &:to_s
   end
   
-  singleton_class.send :alias_method, :str_keys, :stringify_keys
+  singleton_class.send :alias_method, :to_s_keys, :stringify_keys
 
 end # module NRSER
