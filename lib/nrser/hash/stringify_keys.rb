@@ -33,5 +33,21 @@ module NRSER
   end
   
   singleton_class.send :alias_method, :to_s_keys, :stringify_keys
+  
+  
+  # @todo Document deep_stringify_keys method.
+  # 
+  # @param [type] arg_name
+  #   @todo Add name param description.
+  # 
+  # @return [return_type]
+  #   @todo Document return value.
+  # 
+  def self.deep_stringify_keys object
+    deep_transform_keys object, &:to_s
+  end # .deep_stringify_keys
+  
+  singleton_class.send :alias_method, :to_s_keys_r, :deep_stringify_keys
+  
 
 end # module NRSER

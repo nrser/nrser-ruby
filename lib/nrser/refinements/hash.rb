@@ -46,11 +46,35 @@ module NRSER
     end
     
     
+    # See {NRSER.deep_transform_keys!}
+    def deep_transform_keys! &block
+      return enum_for(:deep_transform_keys!) { size } unless block_given?
+      NRSER.deep_transform_keys! self, &block
+    end
+    
+    alias_method :deep_map_keys!, :deep_transform_keys!
+    alias_method :map_keys_r!,    :deep_transform_keys!
+    alias_method :deep_rekey!,    :deep_transform_keys!
+    alias_method :rekey_r!,       :deep_transform_keys!
+    
+    
     # See {NRSER.transform_keys}
     def transform_keys &block
-      return hash.enum_for(:transform_keys) { size } unless block_given?
+      return enum_for(:transform_keys) { size } unless block_given?
       NRSER.transform_keys self, &block
     end
+    
+    
+    # See {NRSER.deep_transform_keys}
+    def deep_transform_keys &block
+      return enum_for(:deep_transform_keys) { size } unless block_given?
+      NRSER.deep_transform_keys self, &block
+    end
+    
+    alias_method :deep_map_keys, :deep_transform_keys
+    alias_method :map_keys_r,    :deep_transform_keys
+    alias_method :deep_rekey,    :deep_transform_keys
+    alias_method :rekey_r,       :deep_transform_keys
     
     
     # See {NRSER.symbolize_keys!}
