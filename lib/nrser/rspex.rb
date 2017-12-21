@@ -269,7 +269,7 @@ module NRSER::RSpex
       
       describe description, **metadata, type: type do
         subject( &subject_block ) if subject_block
-        instance_exec &body
+        module_exec &body
       end # description, 
       
     end # #describe_x
@@ -336,7 +336,7 @@ module NRSER::RSpex
       
       describe description, type: :message do
         subject { NRSER::Message.new symbol, *args }
-        instance_exec &body
+        module_exec &body
       end
     end
     
@@ -364,7 +364,7 @@ module NRSER::RSpex
       
       describe "sent to #{ receiver } (#{ mode })" do
         subject { super().send_to unwrap( receiver, context: self ) }
-        instance_exec &block
+        module_exec &block
       end
     end # #describe_sent_to
     
@@ -382,7 +382,7 @@ module NRSER::RSpex
       
       describe "return value from #{ msg }" do
         subject { msg.send_to super() }
-        instance_exec &body
+        module_exec &body
       end # "return value from #{ msg }"
     end
     
@@ -413,7 +413,7 @@ module NRSER::RSpex
         type: :section,
         **metadata
       ) do
-        instance_exec &block
+        module_exec &block
       end
     end # #describe_section
     
@@ -430,7 +430,7 @@ module NRSER::RSpex
         file: path,
         **metadata
       ) do
-        instance_exec &body
+        module_exec &body
       end
     end
     
@@ -441,7 +441,7 @@ module NRSER::RSpex
         type: :module,
         **metadata
       ) do
-        instance_exec &block
+        module_exec &block
       end
     end # #describe_module
     
@@ -459,7 +459,7 @@ module NRSER::RSpex
           subject { klass }
         end
         
-        instance_exec &block
+        module_exec &block
       end
     end # #describe_class
     
@@ -475,7 +475,7 @@ module NRSER::RSpex
         type: :group,
         **metadata
       ) do
-        instance_exec &block
+        module_exec &block
       end
     end # #describe_class
     
@@ -491,7 +491,7 @@ module NRSER::RSpex
           subject { super().method name }
         end
         
-        instance_exec &block
+        module_exec &block
       end
     end # #describe_method
     
@@ -503,7 +503,7 @@ module NRSER::RSpex
         **metadata
       ) do
         subject { super().public_send symbol }
-        instance_exec &block
+        module_exec &block
       end
     end # #describe_attribute
     
@@ -536,7 +536,7 @@ module NRSER::RSpex
           let( name ) { unwrap value, context: self }
         }
         
-        instance_exec &body
+        module_exec &body
       end
     end
     
