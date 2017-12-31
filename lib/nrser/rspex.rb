@@ -272,7 +272,58 @@ module NRSER::RSpex
         module_exec &body
       end # description, 
       
-    end # #describe_x
+    end # #describe_x_type
+    
+    
+    # **EXPERIMENTAL**
+    # 
+    # Example group helper for use at the top level of each spec file to
+    # set a bunch of stuff up and build a helpful description.
+    # 
+    # @todo
+    #   This is totally just a one-off right now... would need to be 
+    #   generalized quite a bit...
+    #   
+    #   1.  Extraction of module, class, etc from metadata should be flexible
+    #       
+    #   2.  Built description would need to be conditional on what metadata
+    #       was found.
+    # 
+    # @param [String] description:
+    #   A description of the spec file to add to the RSpec description.
+    # 
+    # @param [String] spec_path:
+    #   The path to the spec file (just feed it `__FILE__`).
+    #   
+    #   Probably possible to extract this somehow without having to provide it?
+    # 
+    # @return [nil]
+    # 
+    def describe_spec_file  description:,
+                            spec_path:,
+                            bind_subject: true,
+                            **metadata,
+                            &body
+
+      meth = metadata[:module].method metadata[:method]
+      file, line = meth.source_location
+      path = Pathname.new file
+      loc = "./#{ path.relative_path_from Pathname.getwd }:#{ line }"
+      
+      spec_rel_path = "./#{ Pathname.new( spec_path ).relative_path_from Pathname.getwd }"
+      
+      desc = "#{ metadata[:module].name }.#{ metadata[:method] } (#{ loc }) #{ description } Spec (#{ spec_rel_path})"
+      
+      describe desc, **metadata do
+        if bind_subject
+          subject { meth }
+        end
+        
+        module_exec &body
+      end
+      
+      nil
+    end # #describe_spec_file
     
     
     # @todo Document describe_instance method.
@@ -435,12 +486,17 @@ module NRSER::RSpex
     end
     
     
-    def describe_module mod, **metadata, &block
+    def describe_module mod, bind_subject: true, **metadata, &block
       describe(
         "#{ NRSER::RSpex::PREFIXES[:module] } #{ mod.name }",
         type: :module,
+        module: mod,
         **metadata
       ) do
+        if bind_subject
+          subject { mod }
+        end
+        
         module_exec &block
       end
     end # #describe_module
@@ -567,6 +623,8 @@ RSpec.configure do |config|
   config.add_setting :x_type_prefixes
   config.x_type_prefixes = \
     NRSER::RSpex::PREFIXES_BASE.merge( NRSER::RSpex::PREFIXES_MATH_ITALIC )
+    
+  config.add_setting :x_type_prefixes
 end
 
 # Make available at the top-level
