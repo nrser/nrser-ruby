@@ -204,5 +204,85 @@ module NRSER
     end # #enumerate_as_values
     
     
+    # Count entries in an {Enumerable} by the value returned when they are 
+    # passed to the block.
+    # 
+    # @example Count array entries by class
+    #   
+    #   [1, 2, :three, 'four', 5, :six].count_by &:class
+    #   # => {Fixnum=>3, Symbol=>2, String=>1}
+    # 
+    # @param [Enumerable<E>] enum
+    #   {Enumerable} (or other object with compatible `#each_with_object` and 
+    #   `#to_enum` methods) you want to count.
+    # 
+    # @param [Proc<(E)=>C>] &block
+    #   Block mapping entries in `enum` to the group to count them in.
+    # 
+    # @return [Hash{C=>Integer}]
+    #   Hash mapping groups to positive integer counts.
+    # 
+    def count_by enum, &block
+      enum.each_with_object( Hash.new 0 ) do |entry, hash|
+        hash[block.call entry] += 1
+      end
+    end
+    
+    
+    # Like `Enumerable#find`, but wraps each call to `&block` in a
+    # `begin` / `rescue`, returning the result of the first call that doesn't
+    # raise an error.
+    # 
+    # If no calls succeed, raises a {NRSER::MultipleErrors} containing the 
+    # errors from the block calls.
+    # 
+    # @param [Enumerable<E>] enum
+    #   Values to call `&block` with.
+    # 
+    # @param [Proc<E=>V>] &block
+    #   Block to call, which is expected to raise an error if it fails.
+    # 
+    # @return [V]
+    #   Result of first call to `&block` that doesn't raise.
+    # 
+    # @raise [ArgumentError]
+    #   If `enum` was empty (`enum#each` never yielded).
+    # 
+    # @raise [NRSER::MultipleErrors]
+    #   If all calls to `&block` failed.
+    # 
+    def try_find enum, &block
+      errors = []
+      
+      enum.each do |*args|
+        begin
+          result = block.call *args
+        rescue Exception => error
+          errors << error
+        else
+          return result
+        end
+      end
+      
+      if errors.empty?
+        raise ArgumentError,
+          "Appears that enumerable was empty: #{ enum.inspect }"
+      else
+        raise NRSER::MultipleErrors.new errors
+      end
+    end
+    
+    
+    # TODO It would be nice for this to work...
+    # 
+    # def to_enum object, meth, *args
+    #   unless object.respond_to?( meth )
+    #     object = NRSER::Enumerable.new object
+    #   end
+    # 
+    #   object.to_enum meth, *args
+    # end
+    
+    
   end # class << self (Eigenclass)
 end # module NRSER

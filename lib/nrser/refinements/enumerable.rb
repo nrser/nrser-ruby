@@ -32,20 +32,34 @@ module NRSER::Refinements::Enumerable
     NRSER.to_h_by self, &block
   end
   
+  
   # See {NRSER.enumerate_as_values}
   def enumerate_as_values
     NRSER.enumerate_as_values self
   end
+  
   
   # Calls {NRSER.only} on `self`.
   def only **options
     NRSER.only self, **options
   end
   
+  
   # See {NRSER.only!}
   def only!
     NRSER.only! self
   end
   
+  
+  # See {NRSER.count_by}
+  def count_by &block
+    NRSER.count_by self, &block
+  end
+  
+  
+  # See {NRSER.try_find}
+  def try_find &block
+    NRSER.try_find self, &block
+  end
+  
 end # module NRSER::Refinements::Enumerable
-
