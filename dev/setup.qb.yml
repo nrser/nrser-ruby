@@ -5,21 +5,19 @@
 # 
 #     qb setup
 # 
-- name: dev setup for nrser/qb
+- name: Local dev setup for nrser/qb project
 
   hosts: localhost
-
-  # pre_tasks:
-  # - name: load dev_setup facts
-  #   tags:
-  #   - always
-  #   dev_setup_facts:
 
   roles:
   
   - role: qb/dev/ref/repo/git
     full_name: vmg/redcarpet
     version: v3.4.0
+  
+  - role: qb/dev/ref/repo/git
+    full_name: xijo/reverse_markdown
+    version: v1.0.4
   
   tasks:
   
