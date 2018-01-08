@@ -40,7 +40,7 @@ require 'nrser/rspex/shared_examples'
 def merge_expectations *expectations
   Hash.new { |result, state|
     result[state] = []
-  }.tap { |result| 
+  }.tap { |result|
     expectations.each { |ex|
       ex.each { |state, clauses|
         result[state] += clauses.to_a
@@ -98,7 +98,7 @@ end
 
 module NRSER; end
 
-module NRSER::RSpex  
+module NRSER::RSpex
   
   # Constants
   # =====================================================================
@@ -270,7 +270,7 @@ module NRSER::RSpex
       describe description, **metadata, type: type do
         subject( &subject_block ) if subject_block
         module_exec &body
-      end # description, 
+      end # description,
       
     end # #describe_x_type
     
@@ -281,7 +281,7 @@ module NRSER::RSpex
     # set a bunch of stuff up and build a helpful description.
     # 
     # @todo
-    #   This is totally just a one-off right now... would need to be 
+    #   This is totally just a one-off right now... would need to be
     #   generalized quite a bit...
     #   
     #   1.  Extraction of module, class, etc from metadata should be flexible
@@ -299,7 +299,7 @@ module NRSER::RSpex
     # 
     # @return [nil]
     # 
-    def describe_spec_file  description:,
+    def describe_spec_file  description: nil,
                             spec_path:,
                             bind_subject: true,
                             **metadata,
@@ -312,7 +312,12 @@ module NRSER::RSpex
       
       spec_rel_path = "./#{ Pathname.new( spec_path ).relative_path_from Pathname.getwd }"
       
-      desc = "#{ metadata[:module].name }.#{ metadata[:method] } (#{ loc }) #{ description } Spec (#{ spec_rel_path})"
+      desc = [
+        "#{ metadata[:module].name }.#{ metadata[:method] }",
+        "(#{ loc })",
+        description,
+        "Spec (#{ spec_rel_path})"
+      ].compact.join " "
       
       describe desc, **metadata do
         if bind_subject
@@ -375,7 +380,7 @@ module NRSER::RSpex
     # Aliases to other names I was using at first... not preferring their use
     # at the moment.
     # 
-    # The `when_` one sucks because Atom de-dents the line, and `describe_` 
+    # The `when_` one sucks because Atom de-dents the line, and `describe_`
     # is just clearer what the block is doing for people reading it.
     alias_method :called_with, :describe_called_with
     alias_method :when_called_with, :describe_called_with
@@ -400,7 +405,7 @@ module NRSER::RSpex
     #   Object that will receive the message to create the new subject.
     # 
     # @param [Boolean] publicly:
-    #   Send message publicly via {Object#public_send} (default) or privately  
+    #   Send message publicly via {Object#public_send} (default) or privately
     #   via {Object.send}.
     # 
     # @return
@@ -422,7 +427,7 @@ module NRSER::RSpex
     # Aliases to other names I was using at first... not preferring their use
     # at the moment.
     # 
-    # The `when_` one sucks because Atom de-dents the line, and `describe_` 
+    # The `when_` one sucks because Atom de-dents the line, and `describe_`
     # is just clearer what the block is doing for people reading it.
     alias_method :sent_to, :describe_sent_to
     alias_method :when_sent_to, :describe_sent_to
@@ -442,7 +447,7 @@ module NRSER::RSpex
     # 
     # 1.  Expects a string title.
     #     
-    # 2.  Prepends a little section squiggle `§` to the title so sections are 
+    # 2.  Prepends a little section squiggle `§` to the title so sections are
     #     easier to pick out visually.
     #     
     # 3.  Adds `type: :section` metadata.
@@ -629,4 +634,3 @@ end
 
 # Make available at the top-level
 include NRSER::RSpex::ExampleGroup
-
