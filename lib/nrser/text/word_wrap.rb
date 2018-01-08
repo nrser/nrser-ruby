@@ -1,6 +1,6 @@
 
 module NRSER
-  # @!group Text
+  # @!group Text Functions
   
   # Split text at whitespace to fit in line length. Lifted from Rails'
   # ActionView.

@@ -13,7 +13,7 @@ require_relative './lines'
 
 
 module NRSER
-  # @!group Text
+  # @!group Text Functions
   
   
   # Constants
@@ -109,7 +109,7 @@ module NRSER
   # `marker` and `separator` can be configured via keyword arguments, but they
   #  default to:
   # 
-  # -   `marker` - {NRSER::INDENT_TAG_MARKER}, the no-printable ASCII 
+  # -   `marker` - {NRSER::INDENT_TAG_MARKER}, the no-printable ASCII
   #     *record separator* (ASCII character 30, "\x1E" / "\u001E").
   #     
   # -   `separator` - {NRSER::INDENT_TAG_SEPARATOR}, the non-printable ASCII

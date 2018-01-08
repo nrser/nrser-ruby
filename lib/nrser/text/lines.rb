@@ -1,6 +1,6 @@
 
 module NRSER
-  # @!group Text
+  # @!group Text Functions
   
   # Classes
   # =====================================================================
