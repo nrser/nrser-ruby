@@ -1,15 +1,13 @@
 # Refinements
 # =======================================================================
 
-require 'nrser/refinements'
 using NRSER
 
 
-module NRSER
-module Meta
-module Props
+# Definitions
+# =======================================================================
 
-class Base
+class NRSER::Meta::Props::Base
   include NRSER::Meta::Props
   
   def initialize **values
@@ -30,8 +28,4 @@ class Base
       #<#{ self.class.name } #{ props_str }>
     END
   end # #to_s
-end # class Base
-
-end # module Props
-end # module Meta
-end # module NRSER
+end # class NRSER::Meta::Props::Base

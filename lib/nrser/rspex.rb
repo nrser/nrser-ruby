@@ -22,8 +22,7 @@
 
 # Project / Package
 # -----------------------------------------------------------------------
-require 'nrser/message'
-require 'nrser/rspex/shared_examples'
+require_relative './rspex/shared_examples'
 
 
 # Helpers

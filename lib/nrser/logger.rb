@@ -1,15 +1,11 @@
-require 'logger'
-require 'yaml'
-require 'pp'
-require 'json'
-
-
 # Refinements
 # =======================================================================
 
-require 'nrser/refinements'
 using NRSER
 
+
+# Definitions
+# =======================================================================
 
 module NRSER
   

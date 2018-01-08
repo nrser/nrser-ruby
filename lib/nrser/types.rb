@@ -1,19 +1,3 @@
-# Requirements
-# =======================================================================
-
-# Stdlib
-# ---------------------------------------------------------------------
-
-# TODO Not sure if this needs to be here... can't find any usage of it in
-#       quick searches, but I don't want to remove it now.
-require 'pp'
-
-# Deps
-# ---------------------------------------------------------------------
-
-# Package
-# ---------------------------------------------------------------------
-
 # Abstract infrastructure for type creation - stuff that doesn't define any
 # concrete type instances.
 # 
@@ -36,7 +20,6 @@ require_relative './types/in'
 # Refinements
 # =======================================================================
 
-require 'nrser/refinements'
 using NRSER
 
 

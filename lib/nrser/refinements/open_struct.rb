@@ -1,5 +1,3 @@
-require 'ostruct'
-
 module NRSER 
   refine OpenStruct do
     

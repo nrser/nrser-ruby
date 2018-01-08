@@ -1,4 +1,3 @@
-
 module NRSER
   # @!group Text Functions
   

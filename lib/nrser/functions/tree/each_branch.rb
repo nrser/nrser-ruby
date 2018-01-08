@@ -1,6 +1,3 @@
-# Definitions
-# =======================================================================
-
 module NRSER
   
   # @!group Tree Functions

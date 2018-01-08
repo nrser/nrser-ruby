@@ -1,6 +1,3 @@
-require 'set'
-require 'ostruct'
-
 module NRSER
   # include this module in any custom classes to have them treated as
   # collections instead of individual objects by the methods in this file
@@ -36,7 +33,7 @@ module NRSER
     # 
     # **NOTE**  Implemented for our idea of a collection instead of testing
     #           for response to `#each` (or similar) to avoid catching things
-    #           like {IO} instances, which include {Enumerable} but are 
+    #           like {IO} instances, which include {Enumerable} but are
     #           probably not what is desired when using {NRSER.each}
     #           (more likely that you mean "I expect one or more files" than
     #           "I expect one or more strings which may be represented by
@@ -54,9 +51,9 @@ module NRSER
     def each object, &block
       if collection? object
         # We need to test for response because {OpenStruct} *will* respond to
-        # #each because *it will respond to anything* (which sucks), but it 
+        # #each because *it will respond to anything* (which sucks), but it
         # will return `false` for `respond_to? :each` and the like, and this
-        # behavior could be shared by other collection objects, so it seems 
+        # behavior could be shared by other collection objects, so it seems
         # like a decent idea.
         if object.respond_to? :each_pair
           object.each_pair &block

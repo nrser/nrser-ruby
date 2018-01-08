@@ -1,4 +1,26 @@
+# Requirements
+# =======================================================================
+# 
+# I'm moving to "just require everything" after abandoning the idea of
+# supporting old rubies (2.3 is now min), so all the require expressions
+# should just go here, making life much simpler.
+# 
+
+# Stdlib
+# -----------------------------------------------------------------------
 require 'pathname'
+require 'set'
+require 'pp'
+require 'ostruct'
+require 'json'
+require 'yaml'
+require 'logger'
+require 'singleton'
+
+
+# Deps
+# -----------------------------------------------------------------------
+
 
 # Hi there!
 # 
@@ -34,8 +56,12 @@ module NRSER
   
 end
 
+require_relative './nrser/errors'
 require_relative './nrser/version'
 require_relative './nrser/no_arg'
 require_relative './nrser/message'
 require_relative './nrser/collection'
 require_relative './nrser/functions'
+require_relative './nrser/types'
+require_relative './nrser/refinements'
+require_relative './nrser/meta'

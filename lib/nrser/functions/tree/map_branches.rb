@@ -1,16 +1,3 @@
-# Requirements
-# =======================================================================
-
-# Project / Package
-# -----------------------------------------------------------------------
-
-require_relative '../enumerable'
-require_relative './each_branch'
-
-
-# Definitions
-# =======================================================================
-
 module NRSER
   
   # @!group Tree Functions

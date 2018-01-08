@@ -1,34 +1,14 @@
-# Requirements
-# =======================================================================
-
-# Stdlib
-# -----------------------------------------------------------------------
-require 'pp'
-
-# Deps
-# -----------------------------------------------------------------------
-
-# Project / Package
-# -----------------------------------------------------------------------
-
-
 # Refinements
 # =======================================================================
 
-require 'nrser/refinements'
 using NRSER
-
-require 'nrser/refinements/types'
 using NRSER::Types
 
 
 # Definitions
 # =======================================================================
 
-module NRSER
-module Meta
-
-module Props
+module NRSER::Meta::Props
   DEFAULT_CLASS_KEY = '__class__';
   
   PROPS_VARIABLE_NAME = :@__NRSER_props
@@ -363,8 +343,9 @@ module Props
   
 end # module Props
 
-end # module Meta
-end # module NRSER
+
+# Post-Processing
+# =======================================================================
 
 require_relative './props/prop'
 require_relative './props/base'

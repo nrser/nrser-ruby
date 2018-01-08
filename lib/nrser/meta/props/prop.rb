@@ -1,23 +1,7 @@
-# Requirements
-# =======================================================================
-
-# Stdlib
-# -----------------------------------------------------------------------
-
-# Deps
-# -----------------------------------------------------------------------
-
-# Project / Package
-# -----------------------------------------------------------------------
-
-
 # Refinements
 # =======================================================================
 
-require 'nrser/refinements'
 using NRSER
-
-require 'nrser/refinements/types'
 using NRSER::Types
 
 
@@ -65,7 +49,7 @@ class NRSER::Meta::Props::Prop
   # method (method that takes no arguments) that provides the property's
   # value.
   # 
-  # Props that have a source are considered *derived*, those that don't are 
+  # Props that have a source are considered *derived*, those that don't are
   # called *primary*.
   # 
   # @return [Symbol | String]
@@ -104,7 +88,7 @@ class NRSER::Meta::Props::Prop
     
     @source = source # TODO fix this: t.maybe( t.label ).check source
     
-    # Detect if the source 
+    # Detect if the source
     if source.nil?
       @instance_variable_source = false
     else
@@ -119,7 +103,7 @@ class NRSER::Meta::Props::Prop
     # Can't provide both default and default_from
     unless default.nil? || default_from.nil?
       raise NRSER::ConflictError.new binding.erb <<-ERB
-        Both `default:` and `default_from:` keyword args provided when 
+        Both `default:` and `default_from:` keyword args provided when
         constructing <%= self %>. At least one must be `nil`.
         
         default:
@@ -144,7 +128,7 @@ class NRSER::Meta::Props::Prop
         @has_default = if source.nil?
           @type.test default
         else
-          # NOTE  This is up for debate... does a derived property have a 
+          # NOTE  This is up for debate... does a derived property have a
           #       default? What does that even mean?
           true # false ?
         end
@@ -164,7 +148,7 @@ class NRSER::Meta::Props::Prop
         # If we passed the check we know the value is valid
         @has_default = true
         
-        # Set the default value to `default`, freezing it since it will be 
+        # Set the default value to `default`, freezing it since it will be
         # set on instances without any attempt at duplication, which seems like
         # it *might be ok* since a lot of prop'd classes are being used
         # immutably.
@@ -201,7 +185,7 @@ class NRSER::Meta::Props::Prop
   end # #full_name
   
   
-  # Test if this prop is configured to provide default values - 
+  # Test if this prop is configured to provide default values -
   # 
   # @param [type] arg_name
   #   @todo Add name param description.
@@ -309,7 +293,7 @@ class NRSER::Meta::Props::Prop
   def set instance, value
     type.check( value ) do
       binding.erb <<-END
-        Value of type <%= value.class.name %> for prop <%= self.full_name %> 
+        Value of type <%= value.class.name %> for prop <%= self.full_name %>
         failed type check.
         
         Must satisfy type:
@@ -348,7 +332,7 @@ class NRSER::Meta::Props::Prop
         set instance, default
       else
         raise TypeError.new binding.erb <<-ERB
-          Prop <#= full_name %> has no default value and no value was provided 
+          Prop <#= full_name %> has no default value and no value was provided
           in values:
           
               <%= values.pretty_inspect %>
@@ -367,14 +351,14 @@ class NRSER::Meta::Props::Prop
   # declaration:
   # 
   # 1.  {nil} *default*
-  #     -   If the property value responds to `#to_data`, the result of 
+  #     -   If the property value responds to `#to_data`, the result of
   #         invoking that method will be returned.
   #         
   #         **WARNING**
   #         
   #         This can cause infinite recursion if an instance has
   #         a property value that is also an instance of the same class (as
-  #         as other more complicated scenarios that boil down to the same 
+  #         as other more complicated scenarios that boil down to the same
   #         problem), but, really, what else would it do in this situation?
   #         
   #         This problem can be avoided by by providing a `to_data:` keyword
@@ -400,7 +384,7 @@ class NRSER::Meta::Props::Prop
   #   is returned if we don't have any better options, see above).
   # 
   # @raise [TypeError]
-  #   If {@to_data} (provided via the `to_data:` keyword at property 
+  #   If {@to_data} (provided via the `to_data:` keyword at property
   #   declaration) is anything other than {nil}, {String}, {Symbol} or {Proc}.
   # 
   def to_data instance
@@ -491,7 +475,7 @@ class NRSER::Meta::Props::Prop
   # 
   def to_s
     "#<#{ self.class.name } #{ full_name }:#{ type }>"
-  end # #to_s  
+  end # #to_s
   
   
   private

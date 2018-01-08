@@ -1,26 +1,29 @@
-
-
 module NRSER
-  
-  # Eigenclass (Singleton Class)
-  # ========================================================================
+
+  # Deep merge arrays of data hashes, matching hashes by computing a key with
+  # `&merge_key`.
   # 
-  class << self
-    
-    # @todo Document merge_by method.
-    # 
-    # @param [type] arg_name
-    #   @todo Add name param description.
-    # 
-    # @return [return_type]
-    #   @todo Document return value.
-    # 
-    def merge_by current, *updates, &getter
-      updates.reduce( to_h_by current, &getter ) { |result, update|
-        deep_merge! result, to_h_by(update, &getter)
-      }.values
-    end # #merge_by
-    
-  end # class << self (Eigenclass)
+  # Uses {NRSER.deep_merge!} to merge.
+  # 
+  # @param [Array<Hash>] current
+  #   Current (base) array of hashes to start with (lowest predominance).
+  # 
+  # @param [Array<Hash>] *updates
+  #   One or more arrays of update hashes to merge over `current` (last is
+  #   highest predominance).
+  # 
+  # @param [Proc<(Hash)=>Object>] &merge_key
+  #   Each hash is passed to `&merge_key` and the result is used to match
+  #   hashes for merge. Must not return equal values for two different hashes
+  #   in any of the arrays (`current` or any of `*updates`).
+  # 
+  # @return [Array<Hash>]
+  #   Final array of merged hashes. Don't depend on order.
+  # 
+  def self.merge_by current, *updates, &merge_key
+    updates.reduce( to_h_by current, &merge_key ) { |result, update|
+      deep_merge! result, to_h_by( update, &merge_key )
+    }.values
+  end # .merge_by
     
 end # module NRSER

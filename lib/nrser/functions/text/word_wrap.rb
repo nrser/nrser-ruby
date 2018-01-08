@@ -1,4 +1,3 @@
-
 module NRSER
   # @!group Text Functions
   
@@ -24,6 +23,5 @@ module NRSER
       line.length > line_width ? line.gsub(/(.{1,#{line_width}})(\s+|$)/, "\\1#{break_sequence}").strip : line
     end * break_sequence
   end # .word_wrap
-  
-  
+    
 end # module NRSER

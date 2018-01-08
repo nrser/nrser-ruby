@@ -1,10 +1,4 @@
-require 'set'
-require 'ostruct'
-
-require 'spec_helper'
-
 using NRSER
-
 
 describe NRSER.method(:map_values) do
   
@@ -45,4 +39,3 @@ describe NRSER.method(:map_values) do
   
   
 end # NRSER.map_values
-

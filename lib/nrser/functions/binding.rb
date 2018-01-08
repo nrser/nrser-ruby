@@ -1,5 +1,3 @@
-require_relative './string'
-
 module NRSER
   class << self
 

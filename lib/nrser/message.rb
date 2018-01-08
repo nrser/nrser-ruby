@@ -1,9 +1,6 @@
-# Definitions
-# =======================================================================
-
 module NRSER
   
-  # Container for a message (method call) to be sent to a receiver via 
+  # Container for a message (method call) to be sent to a receiver via
   # {Object#send} (or {Object#public_send}).
   # 
   # Encapsulates the method symbol as well as any arguments and block to send.
@@ -16,7 +13,7 @@ module NRSER
   # 
   #     msg.send_to obj
   # 
-  # Useful for clearly describing and recognizing data that is meant to be 
+  # Useful for clearly describing and recognizing data that is meant to be
   # sent to an object as a method call, especially in testing.
   # 
   class Message
@@ -26,7 +23,7 @@ module NRSER
     # Instantiate a message from the arguments, unless they already are one.
     # 
     # @overload from symbol, *args, &block
-    #   Create a new instance from the arguments by passing them to 
+    #   Create a new instance from the arguments by passing them to
     #   {NRSER::Message.new}.
     # 
     #   @param [NRSER::Message] message
@@ -155,4 +152,3 @@ module NRSER
   end # class Message
   
 end # module NRSER
-

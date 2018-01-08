@@ -4,10 +4,6 @@ $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 
 require 'nrser'
 
-# Namespaces that require refinements and so are not required by default
-require 'nrser/types'
-require 'nrser/meta'
-
 require 'nrser/logger'
 require 'nrser/rspex'
 

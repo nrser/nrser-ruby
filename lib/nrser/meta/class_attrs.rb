@@ -1,11 +1,8 @@
-module NRSER 
-module Meta
-  
 # Mixin to provide methods to define and access class attributes - variables
 # that act like instance variables with regards to inheritance but for the
 # class itself.
 # 
-# The motivation is to create a easy-to-use class instance variables that 
+# The motivation is to create a easy-to-use class instance variables that
 # resolve like regular instance variables by looking up the inheritance
 # hierarchy - meaning that:
 # 
@@ -23,7 +20,7 @@ module Meta
 # The tests in `spec/nrser/class_attrs_spec.rb` provide detailed walk-through
 # of usage and differences from other approaches.
 # 
-module ClassAttrs 
+module NRSER::Meta::ClassAttrs
   
   # Class methods to extend the receiver with when {NRSER::Meta::ClassAttrs}
   # is included.
@@ -120,7 +117,4 @@ module ClassAttrs
     base.extend ClassMethods
   end
   
-end # module ClassAttrs
-
-end # module Meta
-end # module NRSER
+end # module NRSER::Meta::ClassAttrs

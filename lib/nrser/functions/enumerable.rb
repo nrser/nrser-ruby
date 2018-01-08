@@ -1,8 +1,3 @@
-require 'pp'
-
-require 'nrser/errors'
-require_relative './binding'
-
 module NRSER
   
   # @!group Enumerable Functions
