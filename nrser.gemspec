@@ -19,20 +19,31 @@ Gem::Specification.new do |spec|
   spec.test_files    = Dir["spec/**/*.rb"]
   spec.require_paths = ["lib"]
 
-  spec.add_development_dependency "bundler", "~> 1.5"
-  spec.add_development_dependency "rake"
-  spec.add_development_dependency "rspec"
+
+  # Dependencies
+  # ============================================================================
   
-  # Doc gen with `yard`
-  spec.add_development_dependency "yard"
-  # `yard` will use RDoc's built-in Markdown support, which is pretty GFM-like,
-  # but we'll explicitly include `redcarpet` and `github-markup` to make sure
-  # we get the functionality we want.
-  spec.add_development_dependency "redcarpet"
-  spec.add_development_dependency "github-markup"
+  # Development Dependencies
+  # ----------------------------------------------------------------------------
+
+  spec.add_development_dependency "bundler",        '~> 1.16', '>= 1.16.1'
+  spec.add_development_dependency "rake",           '~> 12.3'
   
-  spec.add_development_dependency "cmds"
+  # Testing with `rspec`
+  spec.add_development_dependency "rspec",          '~> 3.7'
   
-  # Better CLI
-  spec.add_development_dependency "pry"
+  # Doc site generation with `yard`
+  spec.add_development_dependency "yard",           '~> 0.9.12'
+  
+  # These, along with `//.yardopts` config, are *supposed to* result in
+  # rendering markdown files and doc comments using
+  # GitHub-Flavored Markdown (GFM), though I'm not sure if it's totally working
+  spec.add_development_dependency "redcarpet",      '~> 3.4'
+  spec.add_development_dependency "github-markup",  '~> 1.6'
+  
+  # Nicer REPL experience
+  spec.add_development_dependency "pry",            '~> 0.10.4'
+  
+  # My system commands lib
+  spec.add_development_dependency "cmds",           '~> 0.0', '>= 0.2.4'
 end
