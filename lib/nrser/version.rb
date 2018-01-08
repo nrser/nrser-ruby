@@ -1,5 +1,5 @@
 module NRSER
-  VERSION = "0.0.31.dev"
+  VERSION = "0.1.0.dev"
   
   module Version
     
@@ -11,7 +11,7 @@ module NRSER
     end # .gem_version
     
     
-    # The `Gem::Version` "release" for {NRSER::VERSION} - everything before 
+    # The `Gem::Version` "release" for {NRSER::VERSION} - everything before
     # any `-<alpha-numeric>` prerelease part (like `-dev`).
     # 
     # @see https://ruby-doc.org/stdlib-2.4.1/libdoc/rubygems/rdoc/Gem/Version.html#method-i-release
@@ -46,7 +46,6 @@ module NRSER
         rel_path
       )
     end # .doc_url
-    
     
   end
 end

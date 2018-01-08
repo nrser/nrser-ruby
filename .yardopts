@@ -1,2 +1,4 @@
 --markup-provider=redcarpet
 --markup markdown
+--tag pure:"Pure Function"
+--tag status:"Status"

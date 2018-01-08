@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 describe NRSER::Meta::ClassAttrs do
   # I'm writing this as I'm developing the module, so I'm going to walk through
   # some of the motivation, features and differences from other approaches
@@ -13,7 +11,7 @@ describe NRSER::Meta::ClassAttrs do
   # Because any changes would global and RSpec seems to do things some-what
   # asynchronously we need to use dynamic class creation, which is sub-optimal
   # because it has subtle difference with normal definitions (@@ variable
-  # declaration being the major one I've hit do far), but it seems like the 
+  # declaration being the major one I've hit do far), but it seems like the
   # most reasonable way to go about it at the moment.
   # 
   
@@ -21,7 +19,7 @@ describe NRSER::Meta::ClassAttrs do
     Class.new do
       include NRSER::Meta::ClassAttrs
       
-      # To compare, I'll also work with standard '@@' class variables and 
+      # To compare, I'll also work with standard '@@' class variables and
       # an standard attr_accessors added to the classes themselves.
       
       # Normally this would be
@@ -43,7 +41,7 @@ describe NRSER::Meta::ClassAttrs do
       # I won't ever set this
       class_attr_accessor :never_set
       
-      # I'll define this here, but won't set it from base 
+      # I'll define this here, but won't set it from base
       class_attr_accessor :def_in_base
       
       # These will be set from here
@@ -88,7 +86,7 @@ describe NRSER::Meta::ClassAttrs do
     end
   }
   
-  let(:child_2) {  
+  let(:child_2) {
     Class.new(base) do
     end
   }
@@ -109,7 +107,7 @@ describe NRSER::Meta::ClassAttrs do
   # don't (PROBLEM! examples) for class (@@) variables.
   # 
   
-    it "can access @@ variables from base and any subclass (OK)" do    
+    it "can access @@ variables from base and any subclass (OK)" do
       [base, child_1, child_1_1, child_2, child_2_1].each do |klass|
         expect(
           klass.class_variable_get :@@base_class_var
@@ -125,7 +123,7 @@ describe NRSER::Meta::ClassAttrs do
         base.class_variable_set :@@base_class_var, new_value
       }
       
-      it "can access new value from base and any subclass (OK)" do    
+      it "can access new value from base and any subclass (OK)" do
         [base, child_1, child_1_1, child_2, child_2_1].each do |klass|
           expect(
             klass.class_variable_get :@@base_class_var
@@ -142,9 +140,9 @@ describe NRSER::Meta::ClassAttrs do
         child_1.class_variable_set :@@base_class_var, new_value
       }
       
-      # This is the problem: changes to the value anywhere in the hierarchy 
-      # are global to the hierarchy 
-      it "reads that value from all classes (PROBLEM!)" do    
+      # This is the problem: changes to the value anywhere in the hierarchy
+      # are global to the hierarchy
+      it "reads that value from all classes (PROBLEM!)" do
         [base, child_1, child_1_1, child_2, child_2_1].each do |klass|
           expect(
             klass.class_variable_get :@@base_class_var
@@ -204,7 +202,7 @@ describe NRSER::Meta::ClassAttrs do
         base.set_in_base_1 = new_value
       }
       
-      it "can access new value from base and any subclass" do    
+      it "can access new value from base and any subclass" do
         [base, child_1, child_1_1, child_2, child_2_1].each do |klass|
           expect(klass.set_in_base_1).to be new_value
         end
@@ -222,13 +220,13 @@ describe NRSER::Meta::ClassAttrs do
         child_1.set_in_base_1 = new_value
       }
       
-      it "reads the new value from that class and any subclasses" do    
+      it "reads the new value from that class and any subclasses" do
         [child_1, child_1_1].each do |klass|
           expect(klass.set_in_base_1).to be new_value
         end
       end
       
-      it "reads the old value from any other classes" do    
+      it "reads the old value from any other classes" do
         [base, child_2, child_2_1].each do |klass|
           expect(klass.set_in_base_1).to be :set_in_base_1_value
         end

@@ -4,7 +4,7 @@
 # Stdlib
 # ---------------------------------------------------------------------
 
-# TODO Not sure if this needs to be here... can't find any usage of it in 
+# TODO Not sure if this needs to be here... can't find any usage of it in
 #       quick searches, but I don't want to remove it now.
 require 'pp'
 
@@ -17,7 +17,7 @@ require 'pp'
 # Abstract infrastructure for type creation - stuff that doesn't define any
 # concrete type instances.
 # 
-# Files that define concrete type instances on load (usually as module 
+# Files that define concrete type instances on load (usually as module
 # constants, which I'm still questioning a bit as a design because of the
 # uncontrollable mutability of Ruby and the importance of type checks)
 # need to be required in the "Post-Processing" section at the bottom.
@@ -30,7 +30,6 @@ require_relative './types/where'
 require_relative './types/combinators'
 require_relative './types/maybe'
 require_relative './types/attrs'
-require_relative './types/responds'
 require_relative './types/in'
 
 
@@ -143,7 +142,7 @@ module NRSER::Types
   end # .match
   
   
-  # make a type instance from a object representation that can come from 
+  # make a type instance from a object representation that can come from
   # a YAML or JSON declaration.
   def self.from_repr repr
     match repr, {
@@ -168,6 +167,10 @@ end # NRSER::Types
 
 require_relative './types/any'
 require_relative './types/booleans'
+
+# Requires `booleans`
+require_relative './types/responds'
+
 require_relative './types/numbers'
 require_relative './types/strings'
 require_relative './types/symbols'

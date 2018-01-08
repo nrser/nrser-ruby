@@ -1,5 +1,7 @@
 module NRSER
   
+  # @!group Hash Functions
+  
   # Lifted from ActiveSupport.
   # 
   # @see http://www.rubydoc.info/gems/activesupport/5.1.3/Hash:transform_keys!
@@ -84,7 +86,7 @@ module NRSER
   #   Anything; see examples.
   # 
   # @param [Proc] &block
-  #   Proc that should accept each key as it's only argument and return the 
+  #   Proc that should accept each key as it's only argument and return the
   #   new key to replace it with.
   # 
   def self.deep_transform_keys object, &block

@@ -11,6 +11,7 @@
 # -----------------------------------------------------------------------
 require_relative './combinators'
 require_relative './responds'
+require_relative './is_a'
 
 
 # Refinements

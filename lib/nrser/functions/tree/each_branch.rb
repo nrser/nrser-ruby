@@ -3,6 +3,8 @@
 
 module NRSER
   
+  # @!group Tree Functions
+  
   # Enumerate over the immediate "branches" of a structure that can be used
   # to compose our idea of a *tree*: nested hash-like and array-like structures
   # like you would get from parsing a JSON document.
@@ -35,7 +37,7 @@ module NRSER
   #   `#each_with_index` call.
   # 
   # @raise [NoMethodError]
-  #   If `tree` does not respond to `#each_pair` or to `#each_index` and 
+  #   If `tree` does not respond to `#each_pair` or to `#each_index` and
   #   `#each_with_index`.
   # 
   def self.each_branch tree, &block
@@ -44,13 +46,13 @@ module NRSER
       tree.each_pair &block
       
     elsif tree.respond_to? :each_index
-      # Array-like... we test for `each_index` because - unintuitively - 
+      # Array-like... we test for `each_index` because - unintuitively -
       # `#each_with_index` is a method of {Enumerable}, meaning that {Set}
       # responds to it, though sets are unordered and the values can't be
-      # accessed via those indexes. Hence we look for `#each_index`, which 
+      # accessed via those indexes. Hence we look for `#each_index`, which
       # {Set} does not respond to.
       
-      if block.nil?        
+      if block.nil?
         index_enumerator = tree.each_with_index
         
         Enumerator.new( index_enumerator.size ) { |yielder|

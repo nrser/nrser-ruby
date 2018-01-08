@@ -1,12 +1,31 @@
+# Requirements
+# =======================================================================
+
+# Stdlib
+# -----------------------------------------------------------------------
 require 'pp'
 
-require 'nrser/refinements'
-require 'nrser/refinements/types'
+# Deps
+# -----------------------------------------------------------------------
 
+# Project / Package
+# -----------------------------------------------------------------------
+
+
+# Refinements
+# =======================================================================
+
+require 'nrser/refinements'
 using NRSER
+
+require 'nrser/refinements/types'
 using NRSER::Types
 
-module NRSER 
+
+# Definitions
+# =======================================================================
+
+module NRSER
 module Meta
 
 module Props
@@ -19,7 +38,7 @@ module Props
   # Module Methods (Utilities)
   # =====================================================================
   # 
-  # These are *NOT* mixed in to including classes, and must be accessed 
+  # These are *NOT* mixed in to including classes, and must be accessed
   # via `NRSER::Meta::Props.<method_name>`.
   # 
   # They're utilities that should only really need to be used internally.
@@ -48,13 +67,13 @@ module Props
   # 
   # **WARNING**
   # 
-  # I'm sure this is all-sorts of unsafe. Please don't ever think this is 
+  # I'm sure this is all-sorts of unsafe. Please don't ever think this is
   # reasonable to use on untrusted data.
   # 
   # @param [Hash<String, Object>] data
   #   Data hash to load from.
   # 
-  # @param 
+  # @param
   # 
   # @return [NRSER::Meta::Props]
   #   Instance of a propertied class.
@@ -64,7 +83,7 @@ module Props
     
     unless data.key?( class_key )
       raise ArgumentError.new binding.erb <<-ERB
-        Data is missing <%= class_key %> key - no idea what class to 
+        Data is missing <%= class_key %> key - no idea what class to
         instantiate.
         
         Data:
@@ -122,7 +141,7 @@ module Props
   
   
   # Mixed-In Class Methods
-  # ===================================================================== 
+  # =====================================================================
   
   # Methods added to the including *class* via `extend`.
   # 
@@ -171,7 +190,7 @@ module Props
     #   Constructor options for {NRSER::Meta::Props::Prop}.
     # 
     # @return [NRSER::Meta::Props::Prop]
-    #   The newly created prop, thought you probably don't need it (it's 
+    #   The newly created prop, thought you probably don't need it (it's
     #   already all bound up on the class at this point), but why not?
     # 
     def prop name, **opts
@@ -284,13 +303,13 @@ module Props
   # Create a "data" representation suitable for transport, storage, etc.
   # 
   # The result is meant to consist of only basic data types and structures -
-  # strings, numbers, arrays, hashes, datetimes, etc... though it depends on 
-  # any custom objects it encounters correctly responding to `#to_data` for 
+  # strings, numbers, arrays, hashes, datetimes, etc... though it depends on
+  # any custom objects it encounters correctly responding to `#to_data` for
   # this to happen (as is implemented from classes that mix in Props here).
   # 
   # Prop names are converted to strings (from symbols) since though YAML
   # supports symbol values, they have poor portability across languages,
-  # and they mean the same thing in this situation. 
+  # and they mean the same thing in this situation.
   # 
   # @param [type] arg_name
   #   @todo Add name param description.

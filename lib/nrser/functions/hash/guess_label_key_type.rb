@@ -2,8 +2,10 @@
 # =======================================================================
 
 module NRSER
+  
+  # @!group Hash Functions
 
-  # Guess which type of "label" key - strings or symbols - a hash (or other 
+  # Guess which type of "label" key - strings or symbols - a hash (or other
   # object that responds to `#keys` and `#empty`) uses.
   # 
   # @param [#keys & #empty] keyed

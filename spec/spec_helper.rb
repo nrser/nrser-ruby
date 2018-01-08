@@ -3,6 +3,11 @@ require 'cmds'
 $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 
 require 'nrser'
+
+# Namespaces that require refinements and so are not required by default
+require 'nrser/types'
+require 'nrser/meta'
+
 require 'nrser/logger'
 require 'nrser/rspex'
 
@@ -116,7 +121,7 @@ shared_examples "make type" do |  args: [],
                     subject.from_s s
                   }.to raise_error *NRSER.as_array( error )
                 end # raises an error
-              end # 
+              end #
             }
           end # rejects
         end
@@ -126,5 +131,3 @@ shared_examples "make type" do |  args: [],
     
   end # #call( ... )
 end # Type maker method
-
-

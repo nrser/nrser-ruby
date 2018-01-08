@@ -1,7 +1,7 @@
 require 'pathname'
 
-require 'nrser/string'
-require 'nrser/text'
+require_relative '../functions/string'
+require_relative '../functions/text'
 
 module NRSER
   refine String do

@@ -1,8 +1,9 @@
-
 # Definitions
 # =======================================================================
 
 module NRSER
+  
+  # @!group Hash Functions
   
   # Returns a new hash created by recursively merging `other_hash` on top of
   # `base_hash`.
@@ -12,7 +13,7 @@ module NRSER
   # @see https://github.com/rails/rails/blob/23c8f6918d4e6b9a823aa7a91377c6e3b5d60e13/activesupport/lib/active_support/core_ext/hash/deep_merge.rb
   # 
   # @param [Hash] base_hash
-  #   Base hash - it's values will be overwritten by any key paths shared with 
+  #   Base hash - it's values will be overwritten by any key paths shared with
   #   the other hash.
   # 
   # @param [Hash] other_hash
@@ -38,7 +39,7 @@ module NRSER
     other_hash.each_pair do |current_key, other_value|
       this_value = base_hash[current_key]
 
-      base_hash[current_key] = if this_value.is_a?(Hash) && 
+      base_hash[current_key] = if this_value.is_a?(Hash) &&
                                   other_value.is_a?(Hash)
         deep_merge this_value, other_value, &block
       else
@@ -52,6 +53,5 @@ module NRSER
 
     base_hash
   end
-  
-  
+    
 end # module NRSER

@@ -16,8 +16,8 @@ module NRSER::Types
     
     
     def default_name
-      "#{ self.class.short_name }<" + 
-      @types.map {|type| type.name }.join(',') + 
+      "#{ self.class.short_name }<" +
+      @types.map {|type| type.name }.join(',') +
       ">"
     end
     
@@ -100,7 +100,7 @@ module NRSER::Types
     end
   end
   
-  class Union < Combinator        
+  class Union < Combinator
     def test value
       @types.any? {|type| type.test value}
     end
@@ -113,7 +113,7 @@ module NRSER::Types
   
   singleton_class.send :alias_method, :one_of, :union
   
-  class Intersection < Combinator      
+  class Intersection < Combinator
     def test value
       @types.all? {|type| type.test value}
     end

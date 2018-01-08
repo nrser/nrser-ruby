@@ -6,8 +6,8 @@ using NRSER
 
 
 module NRSER
-module Meta 
-module Props 
+module Meta
+module Props
 
 class Base
   include NRSER::Meta::Props

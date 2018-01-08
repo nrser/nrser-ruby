@@ -3,10 +3,13 @@ require 'yaml'
 require 'pp'
 require 'json'
 
-require 'nrser'
-require 'nrser/refinements'
 
+# Refinements
+# =======================================================================
+
+require 'nrser/refinements'
 using NRSER
+
 
 module NRSER
   
@@ -61,10 +64,10 @@ module NRSER
     # format a debug message with optional key / values to print
     #
     # @param name [String] logger name.
-    # @param level [String, Symbol, Fixnum] the level in string, symbol or 
+    # @param level [String, Symbol, Fixnum] the level in string, symbol or
     #     integer form.
     # @param msg [String] message to print.
-    # @param dump [Hash] optional hash of keys and vaues to dump.    
+    # @param dump [Hash] optional hash of keys and vaues to dump.
     def self.format name, level, msg, dump = {}
       data = {
         'logger' => name,
@@ -84,7 +87,7 @@ module NRSER
     #   msg
     # end
     
-    def self.dump_value value      
+    def self.dump_value value
       case value
       when String, Fixnum, Float, TrueClass, FalseClass
         value

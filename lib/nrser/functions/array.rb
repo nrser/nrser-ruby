@@ -1,4 +1,4 @@
-module NRSER  
+module NRSER
   
   # Functional implementation of "rest" for arrays. Used when refining `#rest`
   # into {Array}.
@@ -25,6 +25,5 @@ module NRSER
     }
     extracted
   end
-  
   
 end # module NRSER

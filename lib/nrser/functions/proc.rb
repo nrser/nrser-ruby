@@ -13,7 +13,7 @@
 
 # Project / Package
 # -----------------------------------------------------------------------
-require_relative './message'
+require_relative '../message'
 
 
 # Definitions
@@ -95,7 +95,7 @@ module NRSER
   # 
   # @note
   #   `mappable`` entries are mapped into messages when {#to_chain} is called,
-  #   meaning subsequent changes to `mappable` **will not** affect the 
+  #   meaning subsequent changes to `mappable` **will not** affect the
   #   returned proc.
   # 
   # @example Equivalent of `Time.now.to_i`

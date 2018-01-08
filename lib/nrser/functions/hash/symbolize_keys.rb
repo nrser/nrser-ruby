@@ -3,6 +3,8 @@
 
 module NRSER
   
+  # @!group Hash Functions
+  
   # Mutates `hash` by converting all keys that respond to `#to_sym` to symbols.
   # 
   # Lifted from ActiveSupport.
@@ -36,7 +38,7 @@ module NRSER
     transform_keys(hash) { |key| key.to_sym rescue key }
   end
   
-  singleton_class.send :alias_method, :to_sym_keys, :symbolize_keys  
+  singleton_class.send :alias_method, :to_sym_keys, :symbolize_keys
   
   
   # @todo Document deep_symbolize_keys method.

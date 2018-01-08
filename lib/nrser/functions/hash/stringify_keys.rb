@@ -3,6 +3,8 @@
 
 module NRSER
   
+  # @!group Hash Functions
+  
   # Converts all keys into strings by calling `#to_s` on them. **Mutates the
   # hash.**
   # 

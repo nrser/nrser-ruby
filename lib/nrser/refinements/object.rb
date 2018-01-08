@@ -9,7 +9,7 @@
 
 # Project / Package
 # -----------------------------------------------------------------------
-require 'nrser/object'
+require 'nrser/functions/object'
 
 
 # Definitions

@@ -1,5 +1,7 @@
 module NRSER
   
+  # @!group Object Functions
+  
   # Return an array given any value in the way that makes most sense:
   # 
   # 1.  If `value` is an array, return it.

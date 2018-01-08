@@ -1,5 +1,7 @@
 module NRSER
   
+  # @!group Object Functions
+  
   # Treat the value as the value for `key` in a hash if it's not already a
   # hash and can't be converted to one:
   # 
@@ -13,7 +15,7 @@ module NRSER
   # 4.  Otherwise, return a new hash where `key` points to the value.
   #     **`key` MUST be provided in this case.**
   # 
-  # Useful in method overloading and similar situations where you expect a 
+  # Useful in method overloading and similar situations where you expect a
   # hash that may specify a host of options, but want to allow the method
   # to be called with a single value that corresponds to a default key in that
   # option hash.
@@ -54,9 +56,9 @@ module NRSER
   # ---------------------
   # 
   # Right now, {.as_hash} also tests if `value` responds to `#to_h`, and will
-  # try to call it, using the result if it doesn't raise. This lets it deal 
+  # try to call it, using the result if it doesn't raise. This lets it deal
   # with Ruby's "I used to be a Hash until someone mapped me" values like
-  # `[[:class, 'address']]`. I'm not sure if this is the best approach, but 
+  # `[[:class, 'address']]`. I'm not sure if this is the best approach, but
   # I'm going to try it for now and see how it pans out in actual usage.
   # 
   # @todo
@@ -67,7 +69,7 @@ module NRSER
   #   The value that we want to be a hash.
   # 
   # @param [Object] key [default nil]
-  #   The key that `value` will be stored under in the result if `value` is 
+  #   The key that `value` will be stored under in the result if `value` is
   #   not a hash or can't be turned into one via `#to_h`. If this happens
   #   this value can **NOT** be `nil` or an `ArgumentError` is raised.
   # 
@@ -75,7 +77,7 @@ module NRSER
   # 
   # @raise [ArgumentError]
   #   If it comes to constructing a new Hash with `value` as a value and no
-  #   argument was provided 
+  #   argument was provided
   # 
   def self.as_hash value, key = nil
     return value if value.is_a? Hash

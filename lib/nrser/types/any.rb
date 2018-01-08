@@ -1,7 +1,6 @@
 require 'nrser/refinements'
 require 'nrser/types/where'
 
-using NRSER
   
 module NRSER::Types
   ANY = where(name: 'AnyType', from_s: ->(s) { s }) { true }.freeze

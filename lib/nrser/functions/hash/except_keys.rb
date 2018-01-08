@@ -3,6 +3,8 @@
 
 module NRSER
   
+  # @!group Hash Functions
+  
   # Removes the given keys from hash and returns it.
   # 
   # Lifted from ActiveSupport.

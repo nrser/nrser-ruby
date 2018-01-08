@@ -2,6 +2,8 @@
 # =======================================================================
 
 module NRSER
+  
+  # @!group Hash Functions
 
   # Lifted from ActiveSupport.
   # 
@@ -21,7 +23,7 @@ module NRSER
   
   
   # Meant to be a drop-in replacement for the ActiveSupport version, though
-  # I've changed the implementation a bit... because honestly I didn't 
+  # I've changed the implementation a bit... because honestly I didn't
   # understand why they were doing it the way they do :/
   # 
   # @see http://www.rubydoc.info/gems/activesupport/5.1.3/Hash:slice!

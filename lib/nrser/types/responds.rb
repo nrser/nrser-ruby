@@ -1,3 +1,4 @@
+require_relative './booleans'
 
 module NRSER::Types
   

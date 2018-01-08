@@ -11,6 +11,8 @@ Gem::Specification.new do |spec|
   spec.summary       = %q{basic ruby utils i use in a lot of stuff.}
   spec.homepage      = "https://github.com/nrser/nrser-ruby"
   spec.license       = "MIT"
+  
+  spec.required_ruby_version = '>= 2.3.0'
 
   spec.files         = Dir["lib/**/*.rb"] + %w(LICENSE.txt README.md)
   spec.executables   = [] # spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
