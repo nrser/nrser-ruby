@@ -1,8 +1,8 @@
 module NRSER
   
   refine ::Hash do
-    include NRSER::Refinements::Enumerable
-    include NRSER::Refinements::Tree
+    include NRSER::Ext::Enumerable
+    include NRSER::Ext::Tree
     
     
     # See {NRSER.except_keys!}.

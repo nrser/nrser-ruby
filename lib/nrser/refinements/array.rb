@@ -1,23 +1,11 @@
-# Requirements
-# =======================================================================
-
-# Project / Package
-# -----------------------------------------------------------------------
-require_relative './enumerable'
-require_relative './tree'
-
-
-# Definitions
-# =======================================================================
-
 module NRSER
   refine ::Array do
-    include NRSER::Refinements::Enumerable
-    include NRSER::Refinements::Tree
+    include NRSER::Ext::Enumerable
+    include NRSER::Ext::Tree
     
     
     # @return [Array]
-    #   new array consisting of all elements after the first (which may be 
+    #   new array consisting of all elements after the first (which may be
     #   none, resulting in an empty array).
     # 
     def rest
@@ -124,7 +112,7 @@ module NRSER
     #   anything, especially something as core as `#to_proc` and `Array`.
     # 
     # @return [Proc]
-    #   Lambda proc that accepts a single argument and calls `#dig` with this 
+    #   Lambda proc that accepts a single argument and calls `#dig` with this
     #   array's contents as the `#dig` arguments.
     # 
     def to_digger

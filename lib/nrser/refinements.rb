@@ -2,8 +2,6 @@
 module NRSER::Refinements; end
 
 # Require all refinements
-require_relative './refinements/enumerable'
-require_relative './refinements/tree'
 require_relative './refinements/object'
 require_relative './refinements/string'
 require_relative './refinements/array'

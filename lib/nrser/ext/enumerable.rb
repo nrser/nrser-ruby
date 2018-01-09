@@ -1,10 +1,9 @@
-# Instance methods that are mixed in to the refinements of many classes that
-# include {Enumerable}, including {Array}, {Set}, {Hash} and {OpenStruct}.
+# Instance methods to extend {Enumerable} objects.
 # 
-# All of these just proxy to a {NRSER} module (static) method, so the
-# functionality can be used on older Rubies that can't refine.
+# Refined into many of them, including {Array}, {Set}, {Hash} and {OpenStruct},
+# and may be independently used as well.
 # 
-module NRSER::Refinements::Enumerable
+module NRSER::Ext::Enumerable
   
   # See {NRSER.map_values}
   def map_values &block
@@ -59,4 +58,4 @@ module NRSER::Refinements::Enumerable
     NRSER.try_find self, &block
   end
   
-end # module NRSER::Refinements::Enumerable
+end # module NRSER::Ext::Enumerable

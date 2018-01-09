@@ -1,7 +1,7 @@
 # Instance methods that are refined in to the Ruby built-ins that we consider
 # trees: {Array}, {Hash} and {OpenStruct}.
 # 
-module NRSER::Refinements::Tree
+module NRSER::Ext::Tree
   
   # Sends `self` to {NRSER.leaves}.
   def leaves
@@ -36,4 +36,4 @@ module NRSER::Refinements::Tree
     NRSER.map_tree self, **options, &block
   end
   
-end # module NRSER::Refinements::Tree
+end # module NRSER::Ext::Tree

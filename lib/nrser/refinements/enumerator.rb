@@ -1,5 +1,5 @@
 module NRSER
   refine ::Enumerator do
-    include NRSER::Refinements::Enumerable
+    include NRSER::Ext::Enumerable
   end # refine ::Enumerator
 end # NRSER
