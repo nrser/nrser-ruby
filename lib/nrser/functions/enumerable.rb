@@ -1,3 +1,6 @@
+require_relative './enumerable/find_map'
+require_relative './enumerable/find_all_map'
+
 module NRSER
   
   # @!group Enumerable Functions

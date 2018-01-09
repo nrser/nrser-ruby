@@ -58,4 +58,10 @@ module NRSER::Ext::Enumerable
     NRSER.try_find self, &block
   end
   
+  
+  # See {NRSER.find_map}
+  def find_map *args, &block
+    NRSER.find_map self, *args, &block
+  end
+  
 end # module NRSER::Ext::Enumerable

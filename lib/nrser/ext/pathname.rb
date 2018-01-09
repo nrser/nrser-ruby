@@ -46,8 +46,7 @@ module NRSER::Ext::Pathname
   end
   
   
-  
-  # @todo Document parent_containing method.
+  # @todo Document find_root method.
   # 
   # @param [type] arg_name
   #   @todo Add name param description.
@@ -55,9 +54,21 @@ module NRSER::Ext::Pathname
   # @return [return_type]
   #   @todo Document return value.
   # 
-  def parent_containing rel_path, glob: :guess
-    NRSER.parent_dir_containing rel_path, glob: glob
-  end # .parent_containing
+  def find_up rel_path, **kwds
+    NRSER.find_up rel_path, **kwds, from: self
+  end # #find_root
   
+  
+  # @todo Document find_root method.
+  # 
+  # @param [type] arg_name
+  #   @todo Add name param description.
+  # 
+  # @return [return_type]
+  #   @todo Document return value.
+  # 
+  def find_up! rel_path, **kwds
+    NRSER.find_up! rel_path, **kwds, from: self
+  end # #find_root
   
 end # module NRSER::Ext::Pathname
