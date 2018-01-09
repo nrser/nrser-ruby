@@ -1,26 +1,3 @@
-# Requirements
-# =======================================================================
-
-# Stdlib
-# -----------------------------------------------------------------------
-
-# Deps
-# -----------------------------------------------------------------------
-
-# Project / Package
-# -----------------------------------------------------------------------
-
-
-# Declarations
-# =======================================================================
-
-module NRSER; end
-module NRSER::Refinements; end
-
-
-# Definitions
-# =======================================================================
-
 # Instance methods that are refined in to the Ruby built-ins that we consider
 # trees: {Array}, {Hash} and {OpenStruct}.
 # 
@@ -60,4 +37,3 @@ module NRSER::Refinements::Tree
   end
   
 end # module NRSER::Refinements::Tree
-

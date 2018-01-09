@@ -1,12 +1,8 @@
 module NRSER
   # @!group Path Functions
   
-  GLOB_RE = /
-    (?:[^\\][\*\?]) |
-    (?:[^\\]\[)
-  /x
-  
-  
+  # @return [Pathname]
+  # 
   def self.pn_from path
     if path.is_a? Pathname
       path
@@ -14,7 +10,6 @@ module NRSER
       Pathname.new path
     end
   end
-  
   
   # @todo Document glob? method.
   # 
@@ -29,23 +24,8 @@ module NRSER
   end # .glob?
   
   
-  # @todo Document glob? method.
-  # 
-  # @param [type] arg_name
-  #   @todo Add name param description.
-  # 
-  # @return [return_type]
-  #   @todo Document return value.
-  # 
-  def self.glob? path
-    
-  end # .glob?
-  
-  
   def self.find_parent_dir from: Pathname.pwd, strict: false, &block
-    from = Pathname.new( from ) unless from.is_a?( Pathname )
-    
-    pn_from( from ).ascend.find
+    from = pn_from from
     
     unless strict
       result = block.call from
@@ -68,7 +48,7 @@ module NRSER
   )
     glob = looks_globish?( rel_path ) if glob == :guess
     
-    find_parent_dir from, strict: strict do |parent|
+    find_parent_dir from: from, strict: strict do |parent|
       path = parent / rel_path
       
       found = if glob

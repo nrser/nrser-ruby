@@ -1,5 +1,3 @@
-require_relative './enumerable'
-
 module NRSER
   refine ::Enumerator do
     include NRSER::Refinements::Enumerable

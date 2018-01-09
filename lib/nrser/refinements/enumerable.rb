@@ -1,10 +1,7 @@
-module NRSER; end
-module NRSER::Refinements; end
-
 # Instance methods that are mixed in to the refinements of many classes that
 # include {Enumerable}, including {Array}, {Set}, {Hash} and {OpenStruct}.
 # 
-# All of these just proxy to a {NRSER} module (static) method, so the 
+# All of these just proxy to a {NRSER} module (static) method, so the
 # functionality can be used on older Rubies that can't refine.
 # 
 module NRSER::Refinements::Enumerable

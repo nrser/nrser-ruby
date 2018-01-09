@@ -56,6 +56,7 @@ module NRSER
   
 end
 
+require_relative './nrser/ext'
 require_relative './nrser/errors'
 require_relative './nrser/version'
 require_relative './nrser/no_arg'
