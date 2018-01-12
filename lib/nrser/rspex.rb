@@ -134,7 +134,7 @@ module NRSER::RSpex
   PREFIXES_BASE = {
     section: '§',
     group: '•',
-    invocation: '⟮⟯',
+    invocation: '𝑓⟮𝑥⟯',
   }
   
   PREFIXES_MATH_ITALIC = PREFIXES_BASE.merge(
