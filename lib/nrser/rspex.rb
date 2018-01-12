@@ -50,8 +50,24 @@ end
 
 class Wrapper
   def initialize description: nil, &block
-    @description = description
-    @block = block
+    case description
+    when Symbol
+      @description = description.to_s
+      
+      if block
+        raise ArgumentError,
+          "Don't provide block with symbol"
+      end
+      
+      if @description.start_with? '@'
+        @block = Proc.new { instance_variable_get description }
+      else
+        @block = description.to_proc
+      end
+    else
+      @description = description
+      @block = block
+    end
   end
   
   def unwrap context: nil
@@ -68,6 +84,10 @@ class Wrapper
     else
       "#<Wrapper ?>"
     end
+  end
+  
+  def inspect
+    to_s
   end
 end
 
