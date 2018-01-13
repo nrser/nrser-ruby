@@ -22,7 +22,15 @@
 
 # Project / Package
 # -----------------------------------------------------------------------
+require 'nrser'
 require_relative './rspex/shared_examples'
+
+
+
+# Refinements
+# =======================================================================
+
+using NRSER
 
 
 # Helpers
@@ -121,7 +129,6 @@ module NRSER::RSpex
   
   # Constants
   # =====================================================================
-  
   
   # Symbols
   # ---------------------------------------------------------------------
@@ -225,6 +232,18 @@ module NRSER::RSpex
   end # .format
   
   
+  # Get the relative path from the working directory with the `./` in front.
+  # 
+  # @param [String | Pathname] dest
+  #   Destination file path.
+  # 
+  # @return [String]
+  # 
+  def self.dot_rel_path dest
+    File.join '.', dest.to_pn.relative_path_from( Pathname.getwd )
+  end # .dot_rel_path
+  
+  
   class List < Array
     def to_desc max = nil
       return '' if empty?
@@ -323,20 +342,73 @@ module NRSER::RSpex
                             bind_subject: true,
                             **metadata,
                             &body
-
-      meth = metadata[:module].method metadata[:method]
-      file, line = meth.source_location
-      path = Pathname.new file
-      loc = "./#{ path.relative_path_from Pathname.getwd }:#{ line }"
       
-      spec_rel_path = "./#{ Pathname.new( spec_path ).relative_path_from Pathname.getwd }"
+      if metadata[:module] && metadata[:method]
+        meth = metadata[:module].method metadata[:method]
+        file, line = meth.source_location
+        path = Pathname.new file
+        loc = "./#{ path.relative_path_from Pathname.getwd }:#{ line }"
+        
+        spec_rel_path = \
+          "./#{ Pathname.new( spec_path ).relative_path_from Pathname.getwd }"
+        
+        desc = [
+          "#{ metadata[:module].name }.#{ metadata[:method] }",
+          "(#{ loc })",
+          description,
+          "Spec (#{ spec_rel_path})"
+        ].compact.join " "
       
-      desc = [
-        "#{ metadata[:module].name }.#{ metadata[:method] }",
-        "(#{ loc })",
-        description,
-        "Spec (#{ spec_rel_path})"
-      ].compact.join " "
+      elsif metadata[:class]
+        klass = metadata[:class]
+        
+        # Get a reasonable file and line for the class
+        file, line = klass.
+          # Get an array of all instance methods, excluding inherited ones
+          # (the `false` arg)
+          instance_methods( false ).
+          # Add `#initialize` since it isn't in `#instance_methods` for some
+          # reason
+          <<( :initialize ).
+          # Map those to their {UnboundMethod} objects
+          map { |sym| klass.instance_method sym }.
+          # Toss any `nil` values
+          compact.
+          # Get the source locations
+          map( &:source_location ).
+          # Get the first line in the shortest path
+          min_by { |(path, line)| [path.length, line] }
+          
+          # Another approach I thought of... (untested)
+          # 
+          # Get the path
+          # # Get frequency of the paths
+          # count_by { |(path, line)| path }.
+          # # Get the one with the most occurrences
+          # max_by { |path, count| count }.
+          # # Get just the path (not the count)
+          # first
+        
+        location = if file
+          "(#{ NRSER::RSpex.dot_rel_path file }:#{ line })"
+        end
+        
+        desc = [
+          klass.name,
+          location,
+          description,
+          "Spec (#{ NRSER::RSpex.dot_rel_path spec_path })"
+        ].compact.join " "
+        
+      else
+        # TODO  Make this work!
+        raise ArgumentError.new binding.erb <<-END
+          Not yet able to handle metadata:
+          
+              <%= metadata.pretty_inspect %>
+          
+        END
+      end
       
       describe desc, **metadata do
         if bind_subject
