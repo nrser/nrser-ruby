@@ -54,42 +54,48 @@ module NRSER::RSpex::ExampleGroup
       klass = metadata[:class]
       
       if metadata[:instance_method]
+        instance_method = klass.instance_method metadata[:instance_method]
         
+        file, line = instance_method.source_location
+        
+        name = "#{ klass.name }##{ metadata[:instance_method] }"
+      else
+        name = klass.name
+        
+        # Get a reasonable file and line for the class
+        file, line = klass.
+          # Get an array of all instance methods, excluding inherited ones
+          # (the `false` arg)
+          instance_methods( false ).
+          # Add `#initialize` since it isn't in `#instance_methods` for some
+          # reason
+          <<( :initialize ).
+          # Map those to their {UnboundMethod} objects
+          map { |sym| klass.instance_method sym }.
+          # Toss any `nil` values
+          compact.
+          # Get the source locations
+          map( &:source_location ).
+          # Get the first line in the shortest path
+          min_by { |(path, line)| [path.length, line] }
+          
+          # Another approach I thought of... (untested)
+          # 
+          # Get the path
+          # # Get frequency of the paths
+          # count_by { |(path, line)| path }.
+          # # Get the one with the most occurrences
+          # max_by { |path, count| count }.
+          # # Get just the path (not the count)
+          # first
       end
-      
-      # Get a reasonable file and line for the class
-      file, line = klass.
-        # Get an array of all instance methods, excluding inherited ones
-        # (the `false` arg)
-        instance_methods( false ).
-        # Add `#initialize` since it isn't in `#instance_methods` for some
-        # reason
-        <<( :initialize ).
-        # Map those to their {UnboundMethod} objects
-        map { |sym| klass.instance_method sym }.
-        # Toss any `nil` values
-        compact.
-        # Get the source locations
-        map( &:source_location ).
-        # Get the first line in the shortest path
-        min_by { |(path, line)| [path.length, line] }
-        
-        # Another approach I thought of... (untested)
-        # 
-        # Get the path
-        # # Get frequency of the paths
-        # count_by { |(path, line)| path }.
-        # # Get the one with the most occurrences
-        # max_by { |path, count| count }.
-        # # Get just the path (not the count)
-        # first
       
       location = if file
         "(#{ NRSER::RSpex.dot_rel_path file }:#{ line })"
       end
       
       desc = [
-        klass.name,
+        name,
         location,
         description,
         "Spec (#{ NRSER::RSpex.dot_rel_path spec_path })"
