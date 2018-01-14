@@ -1,4 +1,5 @@
---markup-provider=redcarpet
---markup markdown
+--markup-provider commonmarker
+--markup commonmark
 --tag pure:"Pure Function"
 --tag status:"Status"
+--plugin yard-commonmarker

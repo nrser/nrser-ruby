@@ -23,27 +23,34 @@ Gem::Specification.new do |spec|
   # Dependencies
   # ============================================================================
   
+  # Runtime Dependencies
+  # ----------------------------------------------------------------------------
+  
+  # Persistent (immutable) collections
+  spec.add_dependency             'hamster',        '~> 3.0'
+  
   # Development Dependencies
   # ----------------------------------------------------------------------------
 
-  spec.add_development_dependency "bundler",        '~> 1.16', '>= 1.16.1'
-  spec.add_development_dependency "rake",           '~> 12.3'
+  spec.add_development_dependency "bundler",            '~> 1.16', '>= 1.16.1'
+  spec.add_development_dependency "rake",               '~> 12.3'
   
   # Testing with `rspec`
-  spec.add_development_dependency "rspec",          '~> 3.7'
+  spec.add_development_dependency "rspec",              '~> 3.7'
   
   # Doc site generation with `yard`
-  spec.add_development_dependency "yard",           '~> 0.9.12'
+  spec.add_development_dependency 'yard', '~> 0.9.12'
   
-  # These, along with `//.yardopts` config, are *supposed to* result in
-  # rendering markdown files and doc comments using
-  # GitHub-Flavored Markdown (GFM), though I'm not sure if it's totally working
-  spec.add_development_dependency "redcarpet",      '~> 3.4'
-  spec.add_development_dependency "github-markup",  '~> 1.6'
+  # GitHub-Flavored Markdown (GFM) for use with `yard`
+  spec.add_development_dependency 'github-markup', '~> 1.6'
+  
+  # Provider for `commonmarker`, the new GFM lib
+  spec.add_development_dependency 'yard-commonmarker', '~> 0.3.0'
   
   # Nicer REPL experience
   spec.add_development_dependency "pry",            '~> 0.10.4'
   
   # My system commands lib
   spec.add_development_dependency "cmds",           '~> 0.0', '>= 0.2.4'
+  
 end
