@@ -31,4 +31,28 @@
       
       # ************************************************************************
       
-      
+  
+  Example Group Method File:
+    prefix: file-example-group-method
+    body: |
+      # frozen_string_literal: true
+
+      module NRSER::RSpex::ExampleGroup
+        
+        # @todo Document ${1:describe_method} method.
+        # 
+        # @return [void]
+        # 
+        def ${1:describe_method} *args, **kwds, &body
+          # Do custom setup / prep...
+          
+          # Create the RSpec example group context
+          describe description, **metadata do
+            # Invoke let, subject, etc...
+            
+            # Exec the body in the example group context
+            module_exec &body
+          end
+        end # #${1:describe_method}
+        
+      end # module NRSER::RSpex::ExampleGroup
