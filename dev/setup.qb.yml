@@ -19,6 +19,14 @@
     full_name: xijo/reverse_markdown
     version: v1.0.4
   
+  - role: qb/dev/ref/repo/git
+    full_name: gjtorikian/commonmarker
+    version: v0.17.7.1
+  
+  - role: qb/dev/ref/repo/git
+    full_name: rocketjob/semantic_logger
+    version: v4.2.0
+  
   tasks:
   
   - name: >-
