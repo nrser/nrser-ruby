@@ -29,6 +29,21 @@ Gem::Specification.new do |spec|
   # Persistent (immutable) collections
   spec.add_dependency             'hamster',        '~> 3.0'
   
+  # Much better logging
+  spec.add_dependency 'semantic_logger',  '~> 4.2'
+
+  # With much more awesome printing!
+  spec.add_dependency 'awesome_print',    '~> 1.8'
+  
+  # Style strings for the terminal
+  spec.add_dependency 'pastel', '~> 0.7.2'
+  
+  # Commonmark (new standardized GFM) Ruby implementation that GH is suggesting
+  # 
+  # Using it to parse strings and style them for the terminal
+  # 
+  spec.add_dependency 'commonmarker', '~> 0.17.7'
+  
   # Development Dependencies
   # ----------------------------------------------------------------------------
 
