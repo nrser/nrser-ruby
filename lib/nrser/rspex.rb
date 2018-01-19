@@ -245,7 +245,7 @@ module NRSER::RSpex
   end
   
   
-  class Args < Array
+  class Args < List
     def to_desc max = nil
       if last.is_a?( Hash )
         [
