@@ -6,30 +6,6 @@
 # 
 module NRSER::RSpex::ExampleGroup
   
-  # @todo Document describe_x method.
-  # 
-  # @param [type] arg_name
-  #   @todo Add name param description.
-  # 
-  # @return [return_type]
-  #   @todo Document return value.
-  # 
-  def describe_x_type *description_parts,
-                      type:,
-                      metadata: {},
-                      subject_block: nil,
-                      &body
-    
-    description = NRSER::RSpex.format *description_parts, type: type
-    
-    describe description, **metadata, type: type do
-      subject( &subject_block ) if subject_block
-      module_exec &body
-    end # description,
-    
-  end # #describe_x_type
-  
-  
   # @todo Document describe_instance method.
   # 
   # @param [type] arg_name
@@ -303,4 +279,11 @@ module NRSER::RSpex::ExampleGroup
 end # module NRSER:RSpex::ExampleGroup
 
 
+# Post-Processing
+# =======================================================================
+
+require_relative './example_group/describe_x'
 require_relative './example_group/describe_spec_file'
+require_relative './example_group/describe_when'
+require_relative './example_group/describe_setup'
+require_relative './example_group/describe_use_case'

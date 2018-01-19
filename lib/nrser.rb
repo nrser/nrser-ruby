@@ -20,7 +20,7 @@ require 'singleton'
 
 # Deps
 # -----------------------------------------------------------------------
-
+require 'hamster'
 
 # Hi there!
 # 
@@ -61,8 +61,10 @@ require_relative './nrser/errors'
 require_relative './nrser/version'
 require_relative './nrser/no_arg'
 require_relative './nrser/message'
+require_relative './nrser/env'
 require_relative './nrser/collection'
 require_relative './nrser/functions'
 require_relative './nrser/types'
 require_relative './nrser/refinements'
 require_relative './nrser/meta'
+require_relative './nrser/mean_streak'

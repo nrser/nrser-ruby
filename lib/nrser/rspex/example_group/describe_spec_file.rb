@@ -95,10 +95,10 @@ module NRSER::RSpex::ExampleGroup
       end
       
       desc = [
+        "𝑆𝑃𝐸𝐶 𝐹𝐼𝐿𝐸 `#{ NRSER::RSpex.dot_rel_path spec_path }` 𝐹𝑂𝑅",
         name,
         location,
         description,
-        "Spec (#{ NRSER::RSpex.dot_rel_path spec_path })"
       ].compact.join " "
       
       subj = klass

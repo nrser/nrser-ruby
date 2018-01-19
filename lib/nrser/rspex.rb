@@ -19,12 +19,14 @@
 
 # Deps
 # -----------------------------------------------------------------------
+require 'rspec'
+require 'commonmarker'
 
 # Project / Package
 # -----------------------------------------------------------------------
 require 'nrser'
 require_relative './rspex/shared_examples'
-
+require_relative './rspex/format'
 
 
 # Refinements
@@ -170,6 +172,10 @@ module NRSER::RSpex
   
   PREFIXES = PREFIXES_MATH_ITALIC
   
+  # PREFIXES = PREFIXES_MATH_ITALIC.map_values { |k, v|
+  #   RSpec::Core::Formatters::ConsoleCodes.wrap( v, :cyan )
+  # }
+  
   
   # Module (Class) Functions
   # =====================================================================
@@ -188,25 +194,6 @@ module NRSER::RSpex
   end # .short_s
   
   
-  
-  # @todo Document format_type method.
-  # 
-  # @param [type] arg_name
-  #   @todo Add name param description.
-  # 
-  # @return [return_type]
-  #   @todo Document return value.
-  # 
-  def self.format_type type, description
-    prefixes = RSpec.configuration.x_type_prefixes
-    
-    return description if type.nil? || !prefixes.key?( type )
-    
-    "#{ prefixes[type] } #{ description }"
-  end # .format_type
-  
-  
-  
   # @todo Document format method.
   # 
   # @param [type] arg_name
@@ -215,20 +202,8 @@ module NRSER::RSpex
   # @return [return_type]
   #   @todo Document return value.
   # 
-  def self.format *parts, type: nil
-    format_type \
-      type,
-      parts.
-        map { |part|
-          if part.respond_to? :to_desc
-            part.to_desc
-          elsif part.is_a? String
-            part
-          else
-            short_s part
-          end
-        }.
-        join( ' ' )
+  def self.format *args
+    NRSER::RSpex::Format.description *args
   end # .format
   
   
@@ -307,9 +282,9 @@ RSpec.configure do |config|
   
   config.add_setting :x_type_prefixes
   config.x_type_prefixes = \
-    NRSER::RSpex::PREFIXES_BASE.merge( NRSER::RSpex::PREFIXES_MATH_ITALIC )
-    
-  config.add_setting :x_type_prefixes
+    NRSER::RSpex::PREFIXES
+  
+  config.add_setting :x_style, default: :unicode
 end
 
 # Make available at the top-level
