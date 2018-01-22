@@ -116,8 +116,10 @@ module NRSER
         Pathname.glob( path ).find { |match_path|
           match_path.public_send test
         }
+      elsif path.public_send( test )
+        path
       else
-        path.public_send test
+        nil
       end
       
       unless found_path.nil?
