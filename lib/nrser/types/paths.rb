@@ -30,7 +30,7 @@ module NRSER; end
 
 module NRSER::Types
   
-  # A {Pathname} type that provides a `from_s` 
+  # A {Pathname} type that provides a `from_s`
   PATHNAME = is_a \
     Pathname,
     name: 'PathnameType',
@@ -102,7 +102,7 @@ module NRSER::Types
     def abs_path name: 'AbsPath', **options
       intersection \
         path,
-        where { |path| File.absolute? path },
+        where { |path| path.to_pn.absolute? },
         name: name,
         **options
     end
@@ -155,4 +155,3 @@ module NRSER::Types
   POSIX_PATH_SEGMENT = path_segment name: 'POSIXPathSegment'
   
 end # module NRSER::Types
-
