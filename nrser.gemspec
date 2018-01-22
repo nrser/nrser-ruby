@@ -27,13 +27,13 @@ Gem::Specification.new do |spec|
   # ----------------------------------------------------------------------------
   
   # Persistent (immutable) collections
-  spec.add_dependency             'hamster',        '~> 3.0'
+  spec.add_dependency 'hamster', '~> 3.0'
   
   # Much better logging
-  spec.add_dependency 'semantic_logger',  '~> 4.2'
+  spec.add_dependency 'semantic_logger', '~> 4.2'
 
   # With much more awesome printing!
-  spec.add_dependency 'awesome_print',    '~> 1.8'
+  spec.add_dependency 'awesome_print', '~> 1.8'
   
   # Style strings for the terminal
   spec.add_dependency 'pastel', '~> 0.7.2'
@@ -47,11 +47,11 @@ Gem::Specification.new do |spec|
   # Development Dependencies
   # ----------------------------------------------------------------------------
 
-  spec.add_development_dependency "bundler",            '~> 1.16', '>= 1.16.1'
-  spec.add_development_dependency "rake",               '~> 12.3'
+  spec.add_development_dependency "bundler", '~> 1.16', '>= 1.16.1'
+  spec.add_development_dependency "rake", '~> 12.3'
   
   # Testing with `rspec`
-  spec.add_development_dependency "rspec",              '~> 3.7'
+  spec.add_development_dependency "rspec", '~> 3.7'
   
   # Doc site generation with `yard`
   spec.add_development_dependency 'yard', '~> 0.9.12'
@@ -63,9 +63,9 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'yard-commonmarker', '~> 0.3.0'
   
   # Nicer REPL experience
-  spec.add_development_dependency "pry",            '~> 0.10.4'
+  spec.add_development_dependency "pry", '~> 0.10.4'
   
   # My system commands lib
-  spec.add_development_dependency "cmds",           '~> 0.0', '>= 0.2.4'
+  spec.add_development_dependency "cmds", '~> 0.0', '>= 0.2.4'
   
 end

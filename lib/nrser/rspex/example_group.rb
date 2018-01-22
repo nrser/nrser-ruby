@@ -6,26 +6,6 @@
 # 
 module NRSER::RSpex::ExampleGroup
   
-  # @todo Document describe_instance method.
-  # 
-  # @param [type] arg_name
-  #   @todo Add name param description.
-  # 
-  # @return [return_type]
-  #   @todo Document return value.
-  # 
-  def describe_instance *constructor_args, &body
-    describe_x_type ".new(", Args(*constructor_args), ")",
-      type: :instance,
-      metadata: {
-        constructor_args: constructor_args,
-      },
-      # subject_block: -> { super().new *described_args },
-      subject_block: -> { super().new *described_constructor_args },
-      &body
-  end # #describe_instance
-  
-  
   # Create a new {RSpec.describe} section where the subject is set by
   # calling the parent subject with `args` and evaluate `block` in it.
   # 
@@ -287,3 +267,4 @@ require_relative './example_group/describe_spec_file'
 require_relative './example_group/describe_when'
 require_relative './example_group/describe_setup'
 require_relative './example_group/describe_use_case'
+require_relative './example_group/describe_instance'
