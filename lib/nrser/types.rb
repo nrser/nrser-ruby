@@ -104,7 +104,11 @@ module NRSER::Types
         # OK, we matched! Is the corresponding expression callable?
         if expression.respond_to? :call
           # It is; invoke and return result.
-          return expression.call value
+          if expression.arity == 0
+            return expression.call
+          else
+            return expression.call value
+          end
         else
           # It's not; assume it's a value and return it.
           return expression
