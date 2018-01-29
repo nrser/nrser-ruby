@@ -121,10 +121,18 @@ module NRSER
   end # .truncate
   
   
-  # Cut the middle out of a string and stick an ellipsis in there instead.
+  # Cut the middle out of a sliceable object with length and stick an ellipsis
+  # in there instead.
   # 
-  # @param [String] string
-  #   Source string.
+  # Categorized with {String} functions 'cause that's where it started, and
+  # that's probably how it will primarily continue to be used, but tested to
+  # work on {Array} and should for other classes that satisfy the same
+  # slice and  interface.
+  # 
+  # @param [V & #length & #slice & #<< & #+] source
+  #   Source object. In practice, {String} and {Array} work. In theory,
+  #   anything that responds to `#length`, `#slice`, `#<<` and `#+` with the
+  #   same semantics will work.
   # 
   # @param [Fixnum] max
   #   Max length to allow for the output string.
@@ -134,18 +142,27 @@ module NRSER
   #   removed. Defaults to the unicode ellipsis since I'm targeting the CLI
   #   at the moment and it saves precious characters.
   # 
-  # @return [String]
-  #   String of at most `max` length with the middle chopped out if needed
-  #   to do so.
-  def self.ellipsis string, max, omission: UNICODE_ELLIPSIS
-    return string unless string.length > max
+  # @return [V]
+  #   Object of the same type as `source` of at most `max` length with the
+  #   middle chopped out if needed to do so.\*
+  #   
+  #   \* Really, it has to do with how all the used methods are implemented,
+  #   but we hope that conforming classes will return instances of their own
+  #   class like {String} and {Array} do.
+  # 
+  def self.ellipsis source, max, omission: UNICODE_ELLIPSIS
+    return source unless source.length > max
     
     trim_to = max - omission.length
+    middle = trim_to / 2
+    remainder = trim_to % 2
     
-    start = string[0, (trim_to / 2) + (trim_to % 2)]
-    finish = string[-( (trim_to / 2) - (trim_to % 2) )..-1]
+    start = source.slice( 0, middle + remainder )
+    start << omission
     
-    start + omission + finish
+    finish = source.slice( -( middle - remainder )..-1 )
+    
+    start + finish
   end # .ellipsis
   
   
