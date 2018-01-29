@@ -193,8 +193,10 @@ module NRSER
   #   If `enum` does not have `#count == 1`.
   # 
   def self.only! enum
-    unless enum.count == 1
-      raise ArgumentError.new erb binding, <<-END
+    count = enum.count
+    
+    unless count == 1
+      message = erb binding, <<-END
         Expected enumerable to have #count == 1 but it has
         
         #count = <%= enum.count %>
@@ -204,6 +206,11 @@ module NRSER
             <%= enum.pretty_inspect %>
         
       END
+      
+      raise NRSER::CountError.new message,
+                                  subject: enum,
+                                  count: count,
+                                  expected: 1
     end
     
     enum.first
