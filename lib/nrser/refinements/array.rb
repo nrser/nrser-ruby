@@ -18,6 +18,12 @@ module NRSER
     end
     
     
+    # Calls {NRSER.ellipsis} on `self`.
+    def ellipsis *args
+      NRSER.ellipsis self, *args
+    end
+    
+    
     # `to_*` Converters
     # =====================================================================
     

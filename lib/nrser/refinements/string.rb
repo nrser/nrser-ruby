@@ -50,5 +50,11 @@ module NRSER
       NRSER.whitespace? self
     end
     
+    
+    # Calls {NRSER.ellipsis} on `self`.
+    def ellipsis *args
+      NRSER.ellipsis self, *args
+    end
+    
   end # refine String
 end # NRSER
