@@ -52,10 +52,16 @@ module NRSER
   end
   
   
-  def self.dedent text, ignore_whitespace_lines: true
+  def self.dedent text,
+                  ignore_whitespace_lines: true,
+                  return_lines: false
     return text if text.empty?
     
-    all_lines = text.lines
+    all_lines = if text.is_a?( Array )
+      text
+    else
+      text.lines
+    end
     
     indent_significant_lines = if ignore_whitespace_lines
       all_lines.reject { |line| whitespace? line }
@@ -67,7 +73,7 @@ module NRSER
     
     return text if indent.empty?
     
-    all_lines.map { |line|
+    dedented_lines = all_lines.map { |line|
       if line.start_with? indent
         line[indent.length..-1]
       elsif line.end_with? "\n"
@@ -75,7 +81,13 @@ module NRSER
       else
         ""
       end
-    }.join
+    }
+    
+    if return_lines
+      dedented_lines
+    else
+      dedented_lines.join
+    end
   end # .dedent
   
   # I like dedent better, but other libs seems to call it deindent
