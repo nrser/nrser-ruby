@@ -188,16 +188,19 @@ module NRSER::Meta::Props
       prop = Prop.new self, name, **opts
       ref[name] = prop
       
-      unless prop.source?
+      if prop.create_reader?
         class_eval do
-          define_method(name) do
+          define_method prop.name do
             prop.get self
           end
-          
-          # protected
-          #   define_method("#{ name }=") do |value|
-          #     prop.set self, value
-          #   end
+        end
+      end
+      
+      if prop.create_writer?
+        class_eval do
+          define_method "#{ prop.name }=" do |value|
+            prop.set self, value
+          end
         end
       end
       
@@ -255,6 +258,9 @@ module NRSER::Meta::Props
     self.class.props(only_primary: true).each { |name, prop|
       prop.set_from_values_hash self, values
     }
+    
+    # TODO  Now trigger all eager defaults (check prop getting trigger 
+    #       correctly)
   end # #initialize_props
   
   

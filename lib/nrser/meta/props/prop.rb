@@ -52,7 +52,18 @@ class NRSER::Meta::Props::Prop
   # Props that have a source are considered *derived*, those that don't are
   # called *primary*.
   # 
-  # @return [Symbol | String]
+  # @return [nil]
+  #   When this prop is a *primary* property and receives it's value at
+  #   initialization or from a {#default}.
+  # 
+  # @return [Symbol]
+  #   This prop is *derived* by returning an instance variable if the symbol
+  #   starts with `@` or otherwise by sending the symbol to the prop'd instance
+  #   (calling that method with no arguments).
+  # 
+  # @return [Proc]
+  #   This prop is *derived* by evaluating this {Proc} in the prop'd
+  #   instance.
   #     
   attr_reader :source
   
@@ -67,18 +78,34 @@ class NRSER::Meta::Props::Prop
   # `.prop` "macro" defined at {NRSER::Meta::Props::ClassMethods#prop}
   # that is extended in to classes including {NRSER::Meta::Props}.
   # 
+  # @param [nil | Proc | Object] default:
+  #   A default value or a {Proc} used to get default values for *primary*
+  #   props. *Dervied* props (those that have a {#source}) may not
+  # 
+  #   At least one of `default:` and `source:` must be `nil`.
+  # 
+  # @param [nil | Symbol | String | Proc] source:
+  #   Source that provides the prop's value. See details for how each type is
+  #   handled in {#source}. Strings are converted to symbols.
+  #   
+  #   At least one of `default:` and `source:` must be `nil`.
+  # 
+  # @raise [ArgumentError]
+  #   If `default:` is not `nil` *and* `source:` is not `nil`.
+  # 
+  # @raise
+  # 
   def initialize  defined_in,
                   name,
                   type: t.any,
                   default: nil,
-                  default_from: nil,
                   source: nil,
                   to_data: nil,
                   from_data: nil
     
     # Set these up first so {#to_s} works in case we need to raise errors.
     @defined_in = defined_in
-    @name = name
+    @name = t.sym.check name
     @type = t.make type
     
     @to_data = to_data
@@ -86,90 +113,146 @@ class NRSER::Meta::Props::Prop
     
     # Source
     
-    @source = source # TODO fix this: t.maybe( t.label ).check source
+    # normalize source to {nil}, {Symbol} or {Proc}
+    @source = t.match source,
+      nil,        nil,
+      String,     ->( string ) { string.to_sym },
+      Symbol,     source,
+      Proc,       source
     
-    # Detect if the source
-    if source.nil?
-      @instance_variable_source = false
-    else
-      # TODO Check that default and default_from are `nil`, make no sense here
-      
-      source_str = source.to_s
-      @instance_variable_source = source_str[0] == '@'
-    end
+    # Detect if the source points to an instance variable (`:'@name'`-formatted
+    # symbol).
+    @instance_variable_source = \
+      @source.is_a?( Symbol ) && @source.to_s[0] == '@'
     
-    # Defaults
+    init_default! default
     
-    # Can't provide both default and default_from
-    unless default.nil? || default_from.nil?
-      raise NRSER::ConflictError.new binding.erb <<-ERB
-        Both `default:` and `default_from:` keyword args provided when
-        constructing <%= self %>. At least one must be `nil`.
-        
-        default:
-            <%= default.pretty_inspect %>
-        
-        default_from:
-            <%= default_from.pretty_inspect %>
-        
-      ERB
-    end
+  end # #initialize
+  
+  
+  protected
+  # ========================================================================
     
-    if default_from.nil?
-      # We are going to use `default`
-          
-      # Validate `default` value
+    
+    def init_default! default
       if default.nil?
-        # If it's `nil` we still want to see if it's a valid value for the type
-        # so we can report if this prop has a default value or not.
-        # 
-        # However, we only need to do that if there is no `source`
-        # 
-        @has_default = if source.nil?
-          @type.test default
+        # If it's `nil`, we will use it as the default value *if* this
+        # is a primary prop *and* the type is satisfied by `nil`
+        @has_default = source? && @type.test( default )
+        return
+      end
+      
+      # Now the we know that the default isn't `nil`, we want to check that
+      # the prop doesn't have a source, because defaults don't make any sense
+      # for sourced props
+      if source?
+        raise ArgumentError.new binding.erb <<-END
+          Can not construct {<%= self.class.name %>} with `default` and `source`
+          
+          Props with {#source} always get their value from that source, so
+          defaults don't make any sense.
+          
+          Attempted to construct prop <%= name.inspect %> for class
+          {<%= defined_in.name %>} with:
+          
+          default:
+          
+              <%= default.pretty_inspect %>
+          
+          source:
+          
+              <%= source.pretty_inspect %>
+          
+        END
+      end
+      
+      when Proc
+        # When a {Proc} is provided, we have a default (we will call it for
+        # each instance of the prop'd class to get the value)
+        @has_default = true
+        @default = default
+        
+      else
+        
+      end
+      
+
+      if default_from.nil?
+        # We are going to use `default`
+            
+        # Validate `default` value
+        if default.nil?
+
+          
         else
-          # NOTE  This is up for debate... does a derived property have a
-          #       default? What does that even mean?
-          true # false ?
+          # Check that the default value is valid for the type, raising TypeError
+          # if it isn't.
+          @type.check( default ) { |type:, value:|
+            binding.erb <<-ERB
+              Default value is not valid for <%= self %>:
+              
+                  <%= value.pretty_inspect %>
+              
+            ERB
+          }
+          
+          # If we passed the check we know the value is valid
+          @has_default = true
+          
+          # Set the default value to `default`, freezing it since it will be
+          # set on instances without any attempt at duplication, which seems like
+          # it *might be ok* since a lot of prop'd classes are being used
+          # immutably.
+          @default_value = default.freeze
         end
         
       else
-        # Check that the default value is valid for the type, raising TypeError
-        # if it isn't.
-        @type.check( default ) { |type:, value:|
-          binding.erb <<-ERB
-            Default value is not valid for <%= self %>:
-            
-                <%= value.pretty_inspect %>
-            
-          ERB
-        }
+        # `default_from` is not `nil`, so we're going to use that.
         
-        # If we passed the check we know the value is valid
+        # This means we "have" a default since we believe we can use it to make
+        # one - the actual values will have to be validates at that point.
         @has_default = true
         
-        # Set the default value to `default`, freezing it since it will be
-        # set on instances without any attempt at duplication, which seems like
-        # it *might be ok* since a lot of prop'd classes are being used
-        # immutably.
-        @default_value = default.freeze
+        # And set it.
+        # 
+        # TODO validate it's something reasonable here?
+        # 
+        @default_from = default_from
       end
-      
-    else
-      # `default_from` is not `nil`, so we're going to use that.
-      
-      # This means we "have" a default since we believe we can use it to make
-      # one - the actual values will have to be validates at that point.
-      @has_default = true
-      
-      # And set it.
-      # 
-      # TODO validate it's something reasonable here?
-      # 
-      @default_from = default_from
     end
     
-  end # #initialize
+  # end protected
+  public
+  
+  
+  # Instance Methods
+  # ============================================================================
+  
+  # Used by the {NRSER::Meta::Props::ClassMethods.prop} "macro" method to
+  # determine if it should create a reader method on the propertied class.
+  # 
+  # @return [Boolean]
+  #   `true` if a reader method should be created for the prop value.
+  # 
+  def create_reader?
+    primary? ||
+    !source.is_a?( Symbol ) ||
+    source != name
+  end # #create_reader?
+  
+  
+  # Used by the {NRSER::Meta::Props::ClassMethods.prop} "macro" method to
+  # determine if it should create a writer method on the propertied class.
+  # 
+  # Right now, we don't create writers, but we will probably make them an
+  # option in the future, which is why this stub is here.
+  # 
+  # @return [Boolean]
+  #   Always `false` for the moment.
+  # 
+  def create_writer?
+    false
+  end # #create_writer?
   
   
   # Full name with class prop was defined in.
@@ -202,7 +285,7 @@ class NRSER::Meta::Props::Prop
   
   
   def default
-    if default?
+    if has_default?
       @default
     else
       raise NameError.new NRSER.squish <<-END
@@ -212,13 +295,9 @@ class NRSER::Meta::Props::Prop
   end
   
   
-  # @todo Document source? method.
+  # Does this property have a source method that it gets it's value from?
   # 
-  # @param [type] arg_name
-  #   @todo Add name param description.
-  # 
-  # @return [return_type]
-  #   @todo Document return value.
+  # @return [Boolean]
   # 
   def source?
     !@source.nil?
