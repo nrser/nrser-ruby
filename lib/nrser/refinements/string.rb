@@ -1,8 +1,3 @@
-require 'pathname'
-
-require_relative '../functions/string'
-require_relative '../functions/text'
-
 module NRSER
   refine String do
     def squish
