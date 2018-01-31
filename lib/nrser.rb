@@ -56,15 +56,26 @@ module NRSER
   
 end
 
+# 1.  Load up extension mixins first - they don't invoke anything, just define
+#     methods
 require_relative './nrser/ext'
-require_relative './nrser/errors'
+
+# 2.  Then load up the refinements, which either include the extension mixins
+#     or directly define proxies and methods (but don't execute them).
+#     
+#     This way everything else should be able to use them.
+#     
+require_relative './nrser/refinements'
+
+# 3.  Then everything else...
 require_relative './nrser/version'
+require_relative './nrser/char'
+require_relative './nrser/errors'
 require_relative './nrser/no_arg'
 require_relative './nrser/message'
 require_relative './nrser/env'
 require_relative './nrser/collection'
 require_relative './nrser/functions'
 require_relative './nrser/types'
-require_relative './nrser/refinements'
 require_relative './nrser/meta'
 require_relative './nrser/mean_streak'
