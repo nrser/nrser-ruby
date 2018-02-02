@@ -118,7 +118,7 @@ class NRSER::Meta::Props::Prop
       nil,        nil,
       String,     ->( string ) { string.to_sym },
       Symbol,     source,
-      Proc,       source
+      Proc,       ->(){ source }
     
     # Detect if the source points to an instance variable (`:'@name'`-formatted
     # symbol).
@@ -166,60 +166,27 @@ class NRSER::Meta::Props::Prop
         END
       end
       
-      when Proc
-        # When a {Proc} is provided, we have a default (we will call it for
-        # each instance of the prop'd class to get the value)
-        @has_default = true
-        @default = default
+      # It must be a {Proc} or be frozen
+      unless Proc === default || default.frozen?
+        raise ArgumentError.new binding.erb <<-END
+          Non-proc default values must be frozen
         
-      else
-        
+          Default values that are *not* a {Proc} are shared between *all*
+          instances of the prop'd class, and as such *must* be immutable
+          (`#frozen? == true`).
+          
+          Found `default`:
+          
+              <%= default.pretty_inspect %>
+          
+          when constructing prop <%= name.inspect %>
+          for class <%= defined_in.name %>
+        END
       end
-      
-
-      if default_from.nil?
-        # We are going to use `default`
-            
-        # Validate `default` value
-        if default.nil?
-
-          
-        else
-          # Check that the default value is valid for the type, raising TypeError
-          # if it isn't.
-          @type.check( default ) { |type:, value:|
-            binding.erb <<-ERB
-              Default value is not valid for <%= self %>:
-              
-                  <%= value.pretty_inspect %>
-              
-            ERB
-          }
-          
-          # If we passed the check we know the value is valid
-          @has_default = true
-          
-          # Set the default value to `default`, freezing it since it will be
-          # set on instances without any attempt at duplication, which seems like
-          # it *might be ok* since a lot of prop'd classes are being used
-          # immutably.
-          @default_value = default.freeze
-        end
         
-      else
-        # `default_from` is not `nil`, so we're going to use that.
-        
-        # This means we "have" a default since we believe we can use it to make
-        # one - the actual values will have to be validates at that point.
-        @has_default = true
-        
-        # And set it.
-        # 
-        # TODO validate it's something reasonable here?
-        # 
-        @default_from = default_from
-      end
-    end
+      @has_default = true
+      @default = default
+    end # #init_default!
     
   # end protected
   public
@@ -235,9 +202,17 @@ class NRSER::Meta::Props::Prop
   #   `true` if a reader method should be created for the prop value.
   # 
   def create_reader?
-    primary? ||
-    !source.is_a?( Symbol ) ||
-    source != name
+    # Always create readers for primary props
+    return true if primary?
+    
+    # Don't override methods
+    return false if defined_in.instance_methods.include?( name )
+    
+    # Create if {#source} is a {Proc} so it's accessible
+    return true if Proc === source
+    
+    # Source is a symbol; only create if it's not the same as the name
+    return source != name
   end # #create_reader?
   
   
@@ -286,7 +261,11 @@ class NRSER::Meta::Props::Prop
   
   def default
     if has_default?
-      @default
+      if Proc === @default
+        @default.call
+      else
+        @default
+      end
     else
       raise NameError.new NRSER.squish <<-END
         Prop #{ self } has no default value.
@@ -545,7 +524,7 @@ class NRSER::Meta::Props::Prop
         
       ERB
     end
-      
+    
   end # #value_from_data
   
   
