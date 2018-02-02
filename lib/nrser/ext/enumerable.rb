@@ -64,4 +64,10 @@ module NRSER::Ext::Enumerable
     NRSER.find_map self, *args, &block
   end
   
+  # See {NRSER.slice?}
+  def slice? *args, &block
+    NRSER.slice? self, *args, &block
+  end
+  
+  
 end # module NRSER::Ext::Enumerable
