@@ -11,7 +11,13 @@ module NRSER
   # 
   ROOT = ( Pathname.new( __FILE__ ).dirname / '..' / '..' ).expand_path
   
+  
+  # String version of the gem.
+  # 
+  # @return [String]
+  # 
   VERSION = "0.1.4.dev"
+  
   
   module Version
     
