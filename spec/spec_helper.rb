@@ -7,6 +7,12 @@ require 'nrser'
 require 'nrser/logger'
 require 'nrser/rspex'
 
+RSpec.configure do |config|
+  unless ENV['LABS']
+    config.filter_run_excluding labs: true
+  end
+end
+
 
 # Dumping ground for classes and modules that we need to create for tests.
 # 
@@ -29,6 +35,16 @@ LOG_LEVELS = {
 }
 
 BAD_LOG_LEVELS = [:blah, -1, 6, "BLAH"]
+
+
+if ENV['DEBUG']
+  SemanticLogger.default_level = :debug
+  SemanticLogger.add_appender(
+    io: $stderr,
+    formatter: { color: {ap: { multiline: true } }}
+  )
+end
+
 
 def expect_to_log &block
   expect(&block).to output.to_stderr_from_any_process
