@@ -59,6 +59,26 @@ module NRSER::RSpex::ExampleGroup
         file, line = instance_method.source_location
         
         name = "#{ klass.name }##{ metadata[:instance_method] }"
+        
+      elsif metadata[:method]
+        # Class method
+        meth = metadata[:class].method metadata[:method]
+        file, line = meth.source_location
+        path = Pathname.new file
+        loc = "./#{ path.relative_path_from Pathname.getwd }:#{ line }"
+
+        spec_rel_path = \
+          "./#{ Pathname.new( spec_path ).relative_path_from Pathname.getwd }"
+
+        desc = [
+          "#{ metadata[:class].name }.#{ metadata[:method] }",
+          "(#{ loc })",
+          description,
+          "Spec (#{ spec_rel_path})"
+        ].compact.join " "
+
+        subj = meth
+        
       else
         name = klass.name
         
