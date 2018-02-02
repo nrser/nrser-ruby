@@ -1,9 +1,7 @@
-
-
 # Definitions
 # =======================================================================
 
-module NRSER
+module NRSER::Labs
   
   # A class to hold info about how to find a record (besides by primary key).
   # 
@@ -16,7 +14,7 @@ module NRSER
   #   {NRSER::Types::Where}...
   #   
   #   Maybe this functionality has something to do with the types system?
-  #   It seems like the placeholder stuff would be hard to integrate with 
+  #   It seems like the placeholder stuff would be hard to integrate with
   #   that, but having a whole other very similar system sucks too.
   # 
   class Where

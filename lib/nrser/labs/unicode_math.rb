@@ -1,4 +1,4 @@
-module NRSER
+module NRSER::Labs
   module UnicodeMath
     SET_STARTS = {
       bold: {
