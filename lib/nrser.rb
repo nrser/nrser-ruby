@@ -17,10 +17,11 @@ require 'yaml'
 require 'logger'
 require 'singleton'
 
-
 # Deps
 # -----------------------------------------------------------------------
 require 'hamster'
+require 'semantic_logger'
+
 
 # Hi there!
 # 
@@ -47,28 +48,25 @@ require 'hamster'
 # Enjoy!
 # 
 module NRSER
-  
-  # Absolute, expanded path to the gem's root directory.
-  # 
-  # @return [Pathname]
-  # 
-  ROOT = ( Pathname.new(__FILE__).dirname / '..' ).expand_path
-  
+  include SemanticLogger::Loggable
 end
 
-# 1.  Load up extension mixins first - they don't invoke anything, just define
+# 1.  Load up version, which has {NRSER::ROOT} in it and depends on nothing
+#     else
+require_relative './nrser/version'
+
+# 2.  Load up extension mixins first - they don't invoke anything, just define
 #     methods
 require_relative './nrser/ext'
 
-# 2.  Then load up the refinements, which either include the extension mixins
+# 3.  Then load up the refinements, which either include the extension mixins
 #     or directly define proxies and methods (but don't execute them).
 #     
 #     This way everything else should be able to use them.
 #     
 require_relative './nrser/refinements'
 
-# 3.  Then everything else...
-require_relative './nrser/version'
+# 4.  Then everything else...
 require_relative './nrser/char'
 require_relative './nrser/errors'
 require_relative './nrser/no_arg'
