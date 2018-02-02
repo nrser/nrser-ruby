@@ -16,7 +16,7 @@ module NRSER
     # @return [Exception]
     # 
     def squished message
-      new message.squish
+      new NRSER.squish( message )
     end
     
     # Create a new instance from the dedented message.
@@ -28,7 +28,7 @@ module NRSER
     # @return [Exception]
     # 
     def dedented message
-      new message.dedent
+      new NRSER.dedent( message )
     end
     
   end # refine Exception.singleton_class
