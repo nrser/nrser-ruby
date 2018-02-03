@@ -1,3 +1,5 @@
+require 'pathname'
+
 module NRSER
   # Absolute, expanded path to the gem's root directory.
   # 
