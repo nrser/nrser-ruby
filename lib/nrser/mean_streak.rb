@@ -12,6 +12,8 @@ require 'commonmarker'
 
 # Project / Package
 # -----------------------------------------------------------------------
+require_relative './mean_streak/document'
+
 
 # Refinements
 # =======================================================================
@@ -61,8 +63,8 @@ class NRSER::MeanStreak
   # @return [CommonMarker::Node]
   #   The `document` node.
   # 
-  def self.parse text, options = :DEFAULT, extensions = []
-    
+  def self.parse source, options = :DEFAULT, extensions = []
+    default.parse source, cm_options: options, cm_extensions: extensions
   end
   
   
@@ -87,9 +89,3 @@ class NRSER::MeanStreak
   
   
 end # class NRSER::ShellDown
-
-
-# Post-Processing
-# =======================================================================
-
-require_relative './mean_streak/document'
