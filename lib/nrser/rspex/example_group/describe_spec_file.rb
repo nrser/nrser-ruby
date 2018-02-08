@@ -96,8 +96,10 @@ module NRSER::RSpex::ExampleGroup
           compact.
           # Get the source locations
           map( &:source_location ).
+          # Get rid of `[nil, nil]` results, which seems to come from C exts
+          reject { |(path, line)| path.nil? || line.nil? }.
           # Get the first line in the shortest path
-          min_by { |(path, line)| [path.length, line] }
+          min_by { |(path, line)| p [path, line]; [path.length, line] }
           
           # Another approach I thought of... (untested)
           # 
