@@ -30,7 +30,7 @@ describe "NRSER::Types.non_empty_sym" do
     and_is_expected: {
       to: {
         have_attributes: {
-          name: 'NonEmptySym'
+          name: 'NonEmptySymbol'
         }
       }
     }

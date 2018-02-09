@@ -23,6 +23,16 @@ module NRSER::Types
     def == other
       equal?(other) || @value === other.value
     end
+    
+    # @return [String]
+    #   a brief string description of the type - just it's {#name} surrounded
+    #   by some back-ticks to make it easy to see where it starts and stops.
+    # 
+    def to_s
+      "{ x ≡ #{ @value.inspect } }"
+    end
+    
+    alias_method :inspect, :to_s
   end # Is
   
   # an exact value (using ===)

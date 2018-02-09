@@ -1,11 +1,10 @@
-require 'nrser/refinements'
 require 'nrser/types/combinators'
 
-using NRSER
-  
 module NRSER::Types
+    
   # nil or the argument type
-  def self.maybe type
-    union nil, type, name: "Maybe(#{ type.name })"
+  def self.maybe type, **options
+    union self.nil, type, name: "#{ type.name }?", **options
   end
+  
 end # NRSER::Types

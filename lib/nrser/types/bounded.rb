@@ -3,7 +3,7 @@ require 'nrser/types/type'
 
 using NRSER
   
-module NRSER::Types  
+module NRSER::Types
   class Bounded < NRSER::Types::Type
     
     # @!attribute [r] min
@@ -44,6 +44,7 @@ module NRSER::Types
       
       "#{ self.class.short_name } #{ attrs_str }"
     end
+    
   end # Bounded
   
   def self.bounded **options

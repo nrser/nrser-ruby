@@ -29,6 +29,9 @@ using NRSER
 # 
 module NRSER::Types
   
+  L_PAREN = '(' # '❪'
+  R_PAREN = ')' # '❫'
+  
   # Make a {NRSER::Types::Type} from a value.
   # 
   # If the `value` argument is...
@@ -50,12 +53,12 @@ module NRSER::Types
   # @return [NRSER::Types::Type]
   # 
   def self.make value
-    if value.is_a? NRSER::Types::Type
+    if value.nil?
+      self.nil
+    elsif value.is_a? NRSER::Types::Type
       value
-    elsif value.is_a? ::Class
-      IsA.new value
     else
-      Is.new value
+      self.when value
     end
   end
   
@@ -152,6 +155,7 @@ end # NRSER::Types
 # Files that define constants that need the proceeding infrastructure.
 # 
 
+require_relative './types/when'
 require_relative './types/any'
 require_relative './types/booleans'
 
@@ -168,3 +172,4 @@ require_relative './types/paths'
 require_relative './types/tuples'
 require_relative './types/pairs'
 require_relative './types/trees'
+require_relative './types/shape'

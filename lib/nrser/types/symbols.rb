@@ -8,32 +8,27 @@ using NRSER
 module NRSER::Types
 
   def self.sym **options
-    if options.empty?
-      # if there are no options can point to the constant for efficiency
-      SYM
-    else
-      IsA.new(
-        Symbol,
-        from_s: :to_sym.to_proc,
-        **options
-      )
-    end
+    IsA.new(
+      Symbol,
+      from_s: :to_sym.to_proc,
+      **options
+    )
   end # sym
   
   singleton_class.send :alias_method, :symbol, :sym
   
-  SYM = sym( name: 'SymType' ).freeze
+  
+  def self.empty_sym **options
+    is :'', name: 'EmptySymbol', **options
+  end
   
   
   def self.non_empty_sym **options
-    return NON_EMPTY_SYM if options.empty?
-    
     intersection \
-      SYM,
-      attrs( {to_s: non_empty_str} ),
+      sym,
+      self.not( empty_sym ),
+      name: 'NonEmptySymbol',
       **options
   end
-  
-  NON_EMPTY_SYM = non_empty_sym( name: 'NonEmptySym' ).freeze
   
 end # NRSER::Types

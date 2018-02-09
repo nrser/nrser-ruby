@@ -28,6 +28,10 @@ module NRSER::Types
         keys.test(k) && values.test(v)
       }
     end
+    
+    def default_name
+      "Hash{#{ @keys.name }=>#{ @values.name }}"
+    end
   end # HashType
   
   

@@ -20,9 +20,11 @@ module NRSER::Types
       @klass = klass
     end
     
+    
     def default_name
-      "#{ self.class.short_name }(#{ @klass.name })"
+      @klass.name
     end
+    
     
     def test value
       value.is_a? @klass
@@ -54,6 +56,13 @@ module NRSER::Types
     
     def has_from_data?
       @from_data || @klass.respond_to?( :from_data )
+    end
+    
+    
+    def == other
+      equal?( other ) ||
+      ( self.class == other.class &&
+        self.klass == other.klass )
     end
     
   end # IsA

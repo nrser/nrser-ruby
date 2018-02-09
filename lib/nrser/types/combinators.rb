@@ -1,3 +1,6 @@
+# encoding: UTF-8
+# frozen_string_literal: true
+
 require 'nrser/refinements'
 require 'nrser/types/type'
 
@@ -16,9 +19,15 @@ module NRSER::Types
     
     
     def default_name
-      "#{ self.class.short_name }<" +
-      @types.map {|type| type.name }.join(',') +
-      ">"
+      if self.class::JOIN_SYMBOL
+        NRSER::Types::L_PAREN +
+        @types.map { |type| type.name }.join( self.class::JOIN_SYMBOL ) +
+        NRSER::Types::R_PAREN
+      else
+        "#{ self.class.short_name }<" +
+        @types.map {|type| type.name }.join(',') +
+        ">"
+      end
     end
     
     
@@ -101,6 +110,8 @@ module NRSER::Types
   end
   
   class Union < Combinator
+    JOIN_SYMBOL = ' ⋁ '
+    
     def test value
       @types.any? {|type| type.test value}
     end
@@ -112,14 +123,14 @@ module NRSER::Types
   end
   
   singleton_class.send :alias_method, :one_of, :union
+  singleton_class.send :alias_method, :or, :union
   
   class Intersection < Combinator
-    def test value
-      @types.all? {|type| type.test value}
-    end
+    # JOIN_SYMBOL = ', '
+    JOIN_SYMBOL = ' ⋀ '
     
-    def default_name
-      "( #{ @types.map { |t| t.name }.join ' | ' } )"
+    def test value
+      @types.all? { |type| type.test value}
     end
   end
   
@@ -129,5 +140,25 @@ module NRSER::Types
   end
   
   singleton_class.send :alias_method, :all_of, :intersection
+  singleton_class.send :alias_method, :and, :intersection
+  
+  
+  class XOR < Combinator
+    JOIN_SYMBOL = ' ⊕ '
+    
+    def test value
+      @types.count { |type| type === value } == 1
+    end
+    
+    # def default_name
+    #   '⊕'
+    #   "( #{ @types.map { |t| t.name }.join ' ⊕ ' } )"
+    # end
+  end
+  
+  
+  def self.xor *types, **options
+    XOR.new *types, **options
+  end
   
 end # NRSER::Types

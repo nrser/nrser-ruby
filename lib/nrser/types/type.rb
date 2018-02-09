@@ -25,10 +25,10 @@ module NRSER::Types
     #   default generated name.
     # 
     # @param [nil | #call] from_s:
-    #   Callable that will be passed a {String} and should return an object 
+    #   Callable that will be passed a {String} and should return an object
     #   that satisfies the type if it possible to create one.
     #   
-    #   The returned value *will* be checked against the type, so returning a 
+    #   The returned value *will* be checked against the type, so returning a
     #   value that doesn't satisfy will result in a {TypeError} being raised
     #   by {#from_s}.
     # 
@@ -89,6 +89,15 @@ module NRSER::Types
       self.class.short_name
     end
     
+    
+    # See if a value satisfies the type.
+    # 
+    # @param [Object] value
+    #   Value to test for type satisfaction.
+    # 
+    # @return [Boolean]
+    #   `true` if the `value` satisfies the type.
+    # 
     def test value
       raise NotImplementedError
     end
@@ -110,7 +119,7 @@ module NRSER::Types
     end
     
     
-    # Overridden to customize behavior for the {#from_s} and {#to_data} 
+    # Overridden to customize behavior for the {#from_s} and {#to_data}
     # methods - those methods are always defined, but we have {#respond_to?}
     # return `false` if they lack the underlying instance variables needed
     # to execute.
@@ -158,13 +167,13 @@ module NRSER::Types
     # @raise [NoMethodError]
     #   If this type doesn't know how to load values from strings.
     #   
-    #   In basic types this happens when {NRSER::Types::Type#initialize} was 
+    #   In basic types this happens when {NRSER::Types::Type#initialize} was
     #   not provided a `from_s:` {Proc} argument.
     #   
     #   {NRSER::Types::Type} subclasses may override {#from_s} entirely,
     #   divorcing it from the `from_s:` constructor argument and internal
     #   {@from_s} instance variable (which is why {@from_s} is not publicly
-    #   exposed - it should not be assumed to dictate {#from_s} behavior 
+    #   exposed - it should not be assumed to dictate {#from_s} behavior
     #   in general).
     # 
     # @raise [TypeError]
@@ -200,7 +209,7 @@ module NRSER::Types
     
     
     # Test if the type has custom information about how to convert it's values
-    # into "data" - structures and values suitable for transportation and 
+    # into "data" - structures and values suitable for transportation and
     # storage (JSON, etc.).
     # 
     # If this method returns `true` then {#to_data} should succeed.
@@ -244,7 +253,7 @@ module NRSER::Types
     #   by some back-ticks to make it easy to see where it starts and stops.
     # 
     def to_s
-      "`#{ name }`"
+      "{ x ∈ #{ name } }"
     end
     
     
@@ -265,6 +274,19 @@ module NRSER::Types
     
     alias_method :builtin_inspect, :inspect
     alias_method :inspect, :to_s
+    
+    
+    # Hook into Ruby's *case subsumption* operator to allow usage in `case`
+    # statements!
+    # 
+    # TODO  Want to switch {NRSER::Types.match} over to use `===`!
+    # 
+    # @param value (see #test)
+    # @return (see #test)
+    #   
+    def === value
+      test value
+    end
     
   end # Type
 end # NRSER::Types
