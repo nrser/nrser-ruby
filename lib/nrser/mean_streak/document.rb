@@ -209,20 +209,38 @@ class NRSER::MeanStreak::Document
   
   
   def source_before_first_child node
-    source_byteslice(
+    slice = source_byteslice(
       start_on: source_byte_indexes( node )[:first_byte][:index],
       end_before: source_byte_indexes( node.first )[:first_byte][:index],
     )
+    
+    # See comments in {#render_children}
+    if  mean_streak.type_renderers[:code] &&
+        node.first.type == :code &&
+        slice.start_with?( '`' )
+      slice = slice[1..-1]
+    end
+    
+    slice
   end
   
   
   def source_after_last_child node
     last_child = node.each.to_a.last
     
-    source_byteslice(
+    slice = source_byteslice(
       start_after: source_byte_indexes( last_child )[:last_byte][:index],
       end_on: source_byte_indexes( node )[:last_byte][:index]
     )
+    
+    # See comments in {#render_children}
+    if  mean_streak.type_renderers[:code] &&
+        last_child.type == :code &&
+        slice.end_with?( '`' )
+      slice = slice[0..-2]
+    end
+    
+    slice
   end
   
   

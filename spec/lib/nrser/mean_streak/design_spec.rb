@@ -45,7 +45,12 @@ describe_spec_file(
           
           # `:code`
           "Here `I` am" => "Here <C>I</C> am",
+          # At the start
+          "`Here I` am" => "<C>Here I</C> am",
+          # At the end
+          "Here `I am`" => "Here <C>I am</C>",
           
+          # Some big ol' bytes
           "北京东城东直门" => "北京东城东直门",
           "北京*东城*东直门" => "北京<I>东城</I>东直门",
         }
