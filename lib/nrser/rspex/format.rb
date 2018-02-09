@@ -86,6 +86,12 @@ module NRSER::RSpex::Format
   end
   
   
+  def self.md_code_quote string
+    quote = '`' * ((string.scan( /`+/ ).map( &:length ).max || 0) + 1)
+    "#{ quote }#{ string }#{ quote }"
+  end
+  
+  
   
   def self.fix_esc_seq commonmark
     commonmark.gsub( "\e\\[", "\e[" )
@@ -192,8 +198,7 @@ module NRSER::RSpex::Format
     parts.
       map { |part|
         if part.respond_to? :to_desc
-          # '`' + part.to_desc.gsub('`', '\`') + '`'
-          '`' + part.to_desc + '`'
+          md_code_quote part.to_desc
         elsif part.is_a? String
           part
         else
