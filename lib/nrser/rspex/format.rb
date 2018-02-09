@@ -192,6 +192,7 @@ module NRSER::RSpex::Format
     parts.
       map { |part|
         if part.respond_to? :to_desc
+          # '`' + part.to_desc.gsub('`', '\`') + '`'
           '`' + part.to_desc + '`'
         elsif part.is_a? String
           part

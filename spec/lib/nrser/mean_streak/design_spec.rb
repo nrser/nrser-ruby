@@ -53,6 +53,14 @@ describe_spec_file(
           # Some big ol' bytes
           "北京东城东直门" => "北京东城东直门",
           "北京*东城*东直门" => "北京<I>东城</I>东直门",
+          
+          # Nesty-messtys with `:code` blocks...
+          # 
+          # It turns out the way to include ` in inline code is to quote
+          # with more than the longest backtick run inside
+          # 
+          %{A string: ``"with `backticks` in it"``} =>
+            %{A string: <C>"with `backticks` in it"</C>}
         }
     end
   end

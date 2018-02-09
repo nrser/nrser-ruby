@@ -218,7 +218,7 @@ class NRSER::MeanStreak::Document
     if  mean_streak.type_renderers[:code] &&
         node.first.type == :code &&
         slice.start_with?( '`' )
-      slice = slice[1..-1]
+      slice = slice.sub /\A`+/, ''
     end
     
     slice
@@ -237,7 +237,7 @@ class NRSER::MeanStreak::Document
     if  mean_streak.type_renderers[:code] &&
         last_child.type == :code &&
         slice.end_with?( '`' )
-      slice = slice[0..-2]
+      slice = slice.sub /`+\z/, ''
     end
     
     slice
@@ -268,10 +268,11 @@ class NRSER::MeanStreak::Document
           # chomp off the starting and ending backticks
           if prev.type == :code
             # Previous node is `:code`, chomp off any leading backtick
-            between = between[1..-1] if between.start_with?( '`' )
+            # between = between[1..-1] if between.start_with?( '`' )
+            between = between.sub /\A`+/, ''
           elsif child.type == :code
             # Current node is `:code`, chomp off any leading backtick
-            between = between[0..-2] if between.end_with?( '`' )
+            between = between.sub /`+\z/, ''
           end
         end
         
