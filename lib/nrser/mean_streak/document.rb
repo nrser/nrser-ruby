@@ -296,15 +296,6 @@ class NRSER::MeanStreak::Document
   def render_node node
     if mean_streak.type_renderers[node.type]
       mean_streak.type_renderers[node.type].call self, node
-    # case node.type
-    # when :emph
-    #   # pastel.italic node.map( &method( __method__ ) ).join
-    #   pastel.italic render_children( node )
-    # when :strong
-    #   # pastel.bold node.map( &method( __method__ ) ).join
-    #   pastel.bold render_children( node )
-    # when :code
-    #   pastel.magenta node.string_content
     else
       if node.first
         # Has children
