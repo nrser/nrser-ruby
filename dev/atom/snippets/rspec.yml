@@ -35,6 +35,7 @@
   Example Group Method File:
     prefix: file-example-group-method
     body: |
+      # encoding: UTF-8
       # frozen_string_literal: true
 
       module NRSER::RSpex::ExampleGroup
