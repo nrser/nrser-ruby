@@ -1,17 +1,12 @@
+# encoding: UTF-8
 # frozen_string_literal: true
 
 # Requirements
 # =======================================================================
 
-# Stdlib
-# -----------------------------------------------------------------------
-
 # Deps
 # -----------------------------------------------------------------------
 require 'pastel'
-
-# Project / Package
-# -----------------------------------------------------------------------
 
 
 # Refinements
@@ -117,38 +112,6 @@ class NRSER::MeanStreak::Document
   def source_lines
     @source_lines ||= Hamster::List[*source.lines.map( &:freeze )]
   end
-
-
-  # Get the substring of the source that a node came from (via its
-  # `#sourcepos`).
-  # 
-  # @return [String]
-  # 
-  def source_for_node node
-    pos = node.sourcepos
-    
-    if pos[:start_line] == pos[:end_line]
-      source_lines[pos[:start_line] - 1].byteslice \
-        (pos[:start_column] - 1)...pos[:end_column]
-    else
-      lines = source_lines[(pos[:start_line] - 1)...pos[:end_line]]
-      
-      # Trim the start off the first line, unless the start column is 1
-      unless pos[:start_column] == 1
-        lines = lines.delete_at( 0 ).add \
-          lines[0].byteslice( (pos[:start_column] - 1)..-1 )
-      end
-      
-      # Trim the end off the first line, unless the end column is the last
-      # line's length
-      unless pos[:end_column] == lines[-1].length
-        lines = lines.delete_at( -1 ) << \
-          lines[-1].byteslice( 0...pos[:end_column] )
-      end
-      
-      lines.join
-    end
-  end
   
   
   def source_byte_indexes node
@@ -211,6 +174,24 @@ class NRSER::MeanStreak::Document
     # Take the slice... the `...` range seems kinda easier 'cause the resulting
     # byte size is the difference `next_byte - end_before`
     source.byteslice start_on...end_before
+  end
+  
+  
+  # Get the substring of the source that a node came from (via its
+  # `#sourcepos`).
+  # 
+  # @return [String]
+  # 
+  def source_for_node node
+    indexes = source_byte_indexes node
+    
+    # This one is *really* easy now!
+    source_byteslice(
+      # Start on the first byte
+      start_on: indexes[:first_byte][:index],
+      # End on the last
+      end_on: indexes[:last_byte][:index]
+    )
   end
   
   
