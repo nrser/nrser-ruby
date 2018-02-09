@@ -25,6 +25,8 @@ require 'commonmarker'
 # Project / Package
 # -----------------------------------------------------------------------
 require 'nrser'
+require_relative './rspex/example'
+require_relative './rspex/example_group'
 require_relative './rspex/shared_examples'
 require_relative './rspex/format'
 
@@ -122,10 +124,9 @@ def Args *args
   NRSER::RSpex::Args.new args
 end
 
+
 # Extensions
 # =====================================================================
-
-module NRSER; end
 
 module NRSER::RSpex
   
@@ -258,22 +259,7 @@ module NRSER::RSpex
     end
   end
   
-  # Extensions available in examples themselves via RSpec's `config.include`.
-  # 
-  module Example
-    def described_class
-      self.class.metadata[:class] || super
-    end
-    
-    def described_constructor_args
-      self.class.metadata[:constructor_args]
-    end
-    
-  end
-  
 end # module NRSER:RSpex
-
-require_relative './rspex/example_group'
 
 
 RSpec.configure do |config|
