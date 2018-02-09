@@ -92,81 +92,6 @@ module NRSER::RSpex::Format
   end
   
   
-  
-  def self.fix_esc_seq commonmark
-    commonmark.gsub( "\e\\[", "\e[" )
-  end
-  
-  
-  # @todo Document render_commonmark method.
-  # 
-  # @param [type] arg_name
-  #   @todo Add name param description.
-  # 
-  # @return [return_type]
-  #   @todo Document return value.
-  # 
-  def self.render_shelldown *render_doc_args
-    doc = CommonMarker.render_doc *render_doc_args
-    
-    transformed = transform_node( doc ).only!
-    commonmark = transformed.to_commonmark
-    ansi = fix_esc_seq commonmark
-    ansi
-  end # .render_commonmark
-  
-  
-  def self.text_node string_content
-    CommonMarker::Node.new( :text ).tap { |node|
-      node.string_content = string_content
-    }
-  end
-  
-  
-  def self.pastel_node name
-    text_node pastel.lookup( name )
-  end
-  
-  
-  def self.transform_node node
-    case node.type
-    when :emph
-      [
-        pastel_node( :italic ),
-        node.map { |child| transform_node child },
-        pastel_node( :clear ),
-      ].flatten
-    when :strong
-      [
-        pastel_node( :bold ),
-        node.map { |child| transform_node child},
-        pastel_node( :clear ),
-      ].flatten
-    when :text
-      [node]
-    when :code
-      [
-        pastel_node( :magenta ),
-        text_node( node.string_content ),
-        pastel_node( :clear ),
-      ]
-    else
-      new_node = CommonMarker::Node.new node.type
-      
-      # new_node.string_content = node.string_content
-      
-      node.
-        each { |child|
-          transform_node( child ).each { |new_child|
-            new_node.append_child new_child
-          }
-        }
-      
-      [new_node]
-    end
-  end
-  
-  
   # @todo Document format_type method.
   # 
   # @param [type] arg_name
@@ -208,7 +133,6 @@ module NRSER::RSpex::Format
       join( ' ' ).
       squish.
       thru { |description|
-        # render_shelldown prepend_type( type, description )
         mean_streak.render prepend_type( type, description )
       }
   end # .description
