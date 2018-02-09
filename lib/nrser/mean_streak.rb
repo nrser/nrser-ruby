@@ -68,8 +68,26 @@ class NRSER::MeanStreak
   end
   
   
+  # TODO document `type_renderers` attribute.
+  # 
+  # @return [Hash<Symbol, Proc>]
+  #     
+  attr_reader :type_renderers
+  
+  
+  
+  def initialize &block
+    @type_renderers = {}
+    block.call( self ) if block
+  end
+  
+  
   # Instance Methods
   # ============================================================================
+  
+  def render_type type, &renderer
+    @type_renderers[type] = renderer
+  end
   
   
   # @todo Document parse method.
@@ -86,6 +104,17 @@ class NRSER::MeanStreak
       **options,
       mean_streak: self
   end # #parse
+  
+  
+  def render doc_or_source
+    doc = if doc_or_source.is_a? NRSER::MeanStreak::Document
+      doc_or_source
+    else
+      parse doc_or_source
+    end
+    
+    doc.render
+  end
   
   
 end # class NRSER::ShellDown

@@ -10,7 +10,27 @@ using NRSER
 module NRSER::RSpex::Format
 
   
-  PASTEL = Pastel.new
+  def self.pastel
+    @pastel ||= Pastel.new
+  end
+  
+  
+  def self.mean_streak
+    @mean_streak ||= NRSER::MeanStreak.new do |ms|
+      ms.render_type :emph do |doc, node|
+        italic doc.render_children( node )
+      end
+      
+      ms.render_type :strong do |doc, node|
+        bold doc.render_children( node )
+      end
+      
+      ms.render_type :code do |doc, node|
+        code node.string_content
+      end
+    end
+  end
+  
   
   def self.transpose_A_z string, lower_a:, upper_a:
     string
@@ -37,7 +57,7 @@ module NRSER::RSpex::Format
   
   
   def self.esc_seq_italic string
-    PASTEL.italic string
+    pastel.italic string
   end
   
   
@@ -46,6 +66,25 @@ module NRSER::RSpex::Format
   end
   
   singleton_class.send :alias_method, :i, :italic
+  
+  
+  def self.esc_seq_bold string
+    pastel.bold string
+  end
+  
+  
+  def self.bold string
+    # FIXME   Should switch on config once {.unicode_bold} is written
+    esc_seq_bold string
+  end
+  
+  singleton_class.send :alias_method, :b, :bold
+  
+  
+  def self.code string
+    pastel.yellow string
+  end
+  
   
   
   def self.fix_esc_seq commonmark
@@ -79,7 +118,7 @@ module NRSER::RSpex::Format
   
   
   def self.pastel_node name
-    text_node PASTEL.lookup( name )
+    text_node pastel.lookup( name )
   end
   
   
@@ -136,7 +175,7 @@ module NRSER::RSpex::Format
     prefixes = RSpec.configuration.x_type_prefixes
     
     prefix = prefixes[type] ||
-              PASTEL.magenta( i( type.to_s.upcase.gsub('_', ' ') ) )
+              pastel.magenta( i( type.to_s.upcase.gsub('_', ' ') ) )
     
     "#{ prefix } #{ description }"
   end # .format_type
@@ -163,7 +202,8 @@ module NRSER::RSpex::Format
       join( ' ' ).
       squish.
       thru { |description|
-        render_shelldown prepend_type( type, description )
+        # render_shelldown prepend_type( type, description )
+        mean_streak.render prepend_type( type, description )
       }
   end # .description
   

@@ -18,6 +18,7 @@ require 'pastel'
 # =======================================================================
 
 using NRSER
+using NRSER::Types
 
 
 # Declarations
@@ -127,21 +128,22 @@ class NRSER::MeanStreak::Document
     pos = node.sourcepos
     
     if pos[:start_line] == pos[:end_line]
-      source_lines[pos[:start_line] - 1][
+      source_lines[pos[:start_line] - 1].byteslice \
         (pos[:start_column] - 1)...pos[:end_column]
-      ]
     else
       lines = source_lines[(pos[:start_line] - 1)...pos[:end_line]]
       
       # Trim the start off the first line, unless the start column is 1
       unless pos[:start_column] == 1
-        lines = lines.delete_at( 0 ).add lines[0][(pos[:start_column] - 1)..-1]
+        lines = lines.delete_at( 0 ).add \
+          lines[0].byteslice( (pos[:start_column] - 1)..-1 )
       end
       
       # Trim the end off the first line, unless the end column is the last
       # line's length
       unless pos[:end_column] == lines[-1].length
-        lines = lines.delete_at( -1 ) << lines[-1][0...pos[:end_column]]
+        lines = lines.delete_at( -1 ) << \
+          lines[-1].byteslice( 0...pos[:end_column] )
       end
       
       lines.join
@@ -149,117 +151,97 @@ class NRSER::MeanStreak::Document
   end
   
   
-  def source_indexes node
-    node.sourcepos.map_values { |k, n| n - 1 }
+  def source_byte_indexes node
+    pos = node.sourcepos
+    
+    indexes = {
+      first_byte: {
+        line: pos[:start_line] - 1,
+        column: pos[:start_column] - 1,
+      },
+      last_byte: {
+        line: pos[:end_line] - 1,
+        column: pos[:end_column] - 1,
+      },
+    }
+    
+    indexes.each do |key, byte_index_pos|
+      byte_index_pos[:index] = source_byte_index **byte_index_pos
+    end
+    
+    indexes
+  end
+  
+  
+  def source_byte_index line:, column:
+    # source_lines[0...line].map( &:bytesize ).reduce( column, :+ )
+    byte_index = column
+    if line > 0
+      source_lines[0..(line - 1)].each { |_| byte_index += _.bytesize }
+    end
+    byte_index
+  end
+  
+  
+  def source_byteslice **kwds
+    t.and(
+      # All the values must be `nil` or non-negative integer
+      t.hash_(keys: t.sym, values: t.non_neg_int?),
+      # Exactly one of `start_on` and `start_after` must be `nil`
+      t.xor(t.shape(start_on: nil), t.shape(start_after: nil)),
+      # Exactly one of `end_on` and `end_before` must be `nil`
+      t.xor(t.shape(end_on: nil), t.shape(end_before: nil))
+    ).check kwds
+    
+    # The first byte we're gonna slice is either the `start_on` keyword
+    # provided or the `start_after` bumped forward by 1 (which we can do
+    # because it must point to the last *byte* before the slice, *not the
+    # character*, so +1 gets us to the first slice byte)
+    start_on = kwds[:start_on] || (kwds[:start_after] + 1)
+    
+    # In the same way, we can figure out the last byte after the slice
+    end_before = kwds[:end_before] || (kwds[:end_on] + 1)
+    
+    # Sanity check
+    if start_on > end_before
+      # We done fucked up, which is not that unusual for me with this shit
+      raise "Shit... start_on: #{ start_on }, end_before: #{ end_before }"
+    end
+    
+    # Take the slice... the `...` range seems kinda easier 'cause the resulting
+    # byte size is the difference `next_byte - end_before`
+    source.byteslice start_on...end_before
+  end
+  
+  
+  def source_between start_node, end_node
+    # Ok, all we do is take a byte slice based on their byte indexes
+    source_byteslice(
+      # The index of the start node's last type is the byte just *before*
+      # the slice starts
+      start_after: source_byte_indexes( start_node )[:last_byte][:index],
+      # The index of the end node's first byte is the byte just *after* the
+      # slice ends
+      end_before: source_byte_indexes( end_node )[:first_byte][:index]
+    )
   end
   
   
   def source_before_first_child node
-    node_indexes = source_indexes node
-    child_indexes = source_indexes node.first
-    
-    # Easy case - there is no source before the first child
-    if  node_indexes[:start_line] == child_indexes[:start_line] &&
-        node_indexes[:start_column] == child_indexes[:start_column]
-      return ''
-    end
-    
-    # Ok, hard(er) case now...
-    if child_indexes[:start_column] == 0
-      # The child starts on the first column of a line, so we need to cut
-      # at the end of the previous line
-      end_line_index = child_indexes[:start_line] - 1
-      end_column_index = -1
-    else
-      # Child does not start on first column, so use the same line to end and
-      # bump the column back one
-      end_line_index = child_indexes[:start_line]
-      end_column_index = child_indexes[:start_column] - 1
-    end
-    
-    lines = source_lines[node_indexes[:start_line]..end_line_index]
-    
-    if lines.length == 1
-      lines[0][node_indexes[:start_column]..end_column_index]
-      
-    else
-      unless node_indexes[:start_column] == 0
-        lines = lines.delete_at( 0 ).add lines[0][node_indexes[:start_column]..-1]
-      end
-      
-      unless end_column_index == -1
-        lines = lines.delete_at( -1 ) << lines[-1][0..end_column_index]
-      end
-      
-      lines.join
-    end
+    source_byteslice(
+      start_on: source_byte_indexes( node )[:first_byte][:index],
+      end_before: source_byte_indexes( node.first )[:first_byte][:index],
+    )
   end
   
   
   def source_after_last_child node
-    node_indexes = source_indexes node
-    child_indexes = source_indexes node.each.to_a.last
+    last_child = node.each.to_a.last
     
-    # Easy case - there is no source after the last child
-    if  node_indexes[:end_line] == child_indexes[:end_line] &&
-        node_indexes[:end_column] == child_indexes[:end_column]
-      return ''
-    end
-    
-    # Ok, hard(er) case now...
-    if  child_indexes[:end_column] ==
-        source_lines[child_indexes[:end_line]].length - 1
-      # The last child ends on the last column of it's last line,
-      # so we need to start at the first column of the next line
-      start_line_index = child_indexes[:end_line] + 1
-      start_column_index = 0
-    else
-      # Child does not end on last column of line, so use the same line to
-      # start and bump the column forward one
-      start_line_index = child_indexes[:end_line]
-      start_column_index = child_indexes[:end_column] + 1
-    end
-    
-    lines = source_lines[start_line_index..node_indexes[:end_line]]
-    
-    unless start_column_index == 0
-      lines = lines.delete_at( 0 ).add lines[0][start_column_index]
-    end
-    
-    unless node_indexes[:end_column] == lines[-1].length - 1
-      lines = lines.delete_at( -1 ) << lines[-1][0..node_indexes[:end_column]]
-    end
-    
-    lines.join
-  end
-  
-  
-  def source_offset line:, column:
-    offset = column
-    if line > 0
-      source_lines[0..(line - 1)].each { |l| offset += l.length }
-    end
-    offset
-  end
-  
-  
-  def source_between node_a, node_b
-    a_indexes = source_indexes node_a
-    b_indexes = source_indexes node_b
-    
-    a_end_offset = source_offset \
-      line: a_indexes[:end_line],
-      column: a_indexes[:end_column]
-    
-    b_start_offset = source_offset \
-      line: b_indexes[:start_line],
-      column: b_indexes[:start_column]
-    
-    if a_end_offset + 1 == b_start_offset
-      ''
-    else
-      source[(a_end_offset + 1)..(b_start_offset - 1)]
-    end
+    source_byteslice(
+      start_after: source_byte_indexes( last_child )[:last_byte][:index],
+      end_on: source_byte_indexes( node )[:last_byte][:index]
+    )
   end
   
   
@@ -267,8 +249,34 @@ class NRSER::MeanStreak::Document
     prev = nil
     parts = []
     node.each do |child|
-      unless prev.nil? || prev.type == :code || child.type == :code
-        parts << source_between( prev, child )
+      unless prev.nil?
+        between = source_between( prev, child )
+        
+        # We may need to modify the source strings *surrounding* specific
+        # nodes...
+        # 
+        # `:code` is an example thus far: it stores the code string in
+        # `#string_content` so - unlike `:emph` and `:strong` where the
+        # delimiters end up in the "before first child" and "after last child"
+        # *inside* the node's source slice - in `:code` they end up *outside*,
+        # in the source between it and the previous and next sibling nodes.
+        # 
+        # 
+        # 
+        if mean_streak.type_renderers[:code]
+          # There is a renderer for the `:code` type, so assume that it will
+          # take are of any surrounding characters for `:code` strings and
+          # chomp off the starting and ending backticks
+          if prev.type == :code
+            # Previous node is `:code`, chomp off any leading backtick
+            between = between[1..-1] if between.start_with?( '`' )
+          elsif child.type == :code
+            # Current node is `:code`, chomp off any leading backtick
+            between = between[0..-2] if between.end_with?( '`' )
+          end
+        end
+        
+        parts << between
       end
       
       parts << render_node( child )
@@ -279,17 +287,24 @@ class NRSER::MeanStreak::Document
     parts.join
   end
   
+  
+  def render_node_2 prev_node, source_before, node, source_after, next_node
+    
+  end
+  
 
-  def render_node node #, output = ''
-    case node.type
-    when :emph
-      # pastel.italic node.map( &method( __method__ ) ).join
-      pastel.italic render_children( node )
-    when :strong
-      # pastel.bold node.map( &method( __method__ ) ).join
-      pastel.bold render_children( node )
-    when :code
-      pastel.magenta node.string_content
+  def render_node node
+    if mean_streak.type_renderers[node.type]
+      mean_streak.type_renderers[node.type].call self, node
+    # case node.type
+    # when :emph
+    #   # pastel.italic node.map( &method( __method__ ) ).join
+    #   pastel.italic render_children( node )
+    # when :strong
+    #   # pastel.bold node.map( &method( __method__ ) ).join
+    #   pastel.bold render_children( node )
+    # when :code
+    #   pastel.magenta node.string_content
     else
       if node.first
         # Has children
