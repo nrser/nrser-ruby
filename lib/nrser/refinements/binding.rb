@@ -1,7 +1,6 @@
 module NRSER
+  # Harness to include {NRSER::Ext::Binding} in {Binding}
   refine Binding do
-    def erb str
-      NRSER.template self, str
-    end
-  end  
+    include NRSER::Ext::Binding
+  end
 end # NRSER
