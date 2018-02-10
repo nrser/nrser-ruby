@@ -33,7 +33,8 @@ module NRSER::Types
     #   by {#from_s}.
     # 
     # @param [nil | #call | #to_proc] to_data:
-    #   
+    #   Optional callable (or object that responds to `#to_proc` so we can
+    #   get a callable) to call to turn type members into "data".
     # 
     def initialize name: nil, from_s: nil, to_data: nil, from_data: nil
       @name = name

@@ -6,16 +6,6 @@
 # uncontrollable mutability of Ruby and the importance of type checks)
 # need to be required in the "Post-Processing" section at the bottom.
 # 
-require_relative './types/type'
-require_relative './types/is'
-require_relative './types/nil'
-require_relative './types/is_a'
-require_relative './types/where'
-require_relative './types/combinators'
-require_relative './types/maybe'
-require_relative './types/attrs'
-require_relative './types/in'
-
 
 # Refinements
 # =======================================================================
@@ -31,6 +21,7 @@ module NRSER::Types
   
   L_PAREN = '(' # '❪'
   R_PAREN = ')' # '❫'
+  RESPONDS_WITH = '→'
   
   # Make a {NRSER::Types::Type} from a value.
   # 
@@ -141,10 +132,40 @@ module NRSER::Types
       },
       
       Hash => ->(hash) {
-        
+        raise NotImplementedError, "Haven't gotten to it yet!"
       },
     }
   end # .from_repr
+  
+  
+  # Define a type factory.
+  # 
+  # @!macro [attach] factory
+  #   @param [Hash] **options
+  #     Common type construction options, see {Type#initialize}.
+  #   
+  #   @return [NRSER::Types::Type]
+  #     The type.
+  # 
+  def self.factory name, maybe: true, aliases: [], &body
+    define_singleton_method name, &body
+    
+    aliases.each do |alias_name|
+      singleton_class.send :alias_method, alias_name, name
+    end
+    
+    if maybe && !name.to_s.end_with?( '?' )
+      maybe_name = "#{ name }?".to_sym
+      
+      define_singleton_method maybe_name do |*args, **options|
+        maybe public_send( name, *args ), **options
+      end
+      
+      aliases.each do |alias_name|
+        singleton_class.send :alias_method, "#{ alias_name }?", maybe_name
+      end
+    end
+  end
   
 end # NRSER::Types
 
@@ -154,6 +175,16 @@ end # NRSER::Types
 # 
 # Files that define constants that need the proceeding infrastructure.
 # 
+
+require_relative './types/type'
+require_relative './types/is'
+require_relative './types/nil'
+require_relative './types/is_a'
+require_relative './types/where'
+require_relative './types/combinators'
+require_relative './types/maybe'
+require_relative './types/attrs'
+require_relative './types/in'
 
 require_relative './types/when'
 require_relative './types/any'

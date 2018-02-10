@@ -8,57 +8,46 @@ using NRSER
   
 module NRSER::Types
   
-  # Eigenclass (Singleton Class)
-  # ========================================================================
-  # 
-  class << self
-    # @!group Type Factory Functions
-    
-    def str length: nil, **options
-      if length.nil?
-        IsA.new String, from_s: ->(s) { s }, **options
-      else
-        intersection \
-          IsA.new( String, from_s: ->(s) { s } ),
-          NRSER::Types.length( length ),
-          **options
-      end
-    end # string
-    
-    alias_method :string, :str
-    
-    
-    def empty_str **options
-      str length: 0, name: 'EmptyString', **options
-    end
-    
-    
-    def non_empty_str **options
-      str length: {min: 1}, **options
-    end # .non_empty_str
-    
-    
-    private
-    # ========================================================================
-      
-      
-      # @todo Document make_string_type method.
-      # 
-      # @param [type] arg_name
-      #   @todo Add name param description.
-      # 
-      # @return [return_type]
-      #   @todo Document return value.
-      # 
-      def make_string_type length: nil, match: nil
-        # method body...
-      end # #make_string_type
-      
-      
-    # end private
-    
-  end # class << self (Eigenclass)
+  # @!group Type Factory Functions
   
-  STR = str( name: 'StringType' ).freeze
+  def self.str length: nil, encoding: nil, **options
+    if [length, encoding].all?( &:nil? )
+      IsA.new String, from_s: ->(s) { s }, **options
+      
+    else
+      types = [str]
+      types << self.length( length ) if length
+      types << attrs( encoding: encoding ) if encoding
+      
+      intersection *types, **options
+    end
+  end # string
+  
+  singleton_class.send :alias_method, :string, :str
+  
+  
+  # Get a {Type} only satisfied by empty strings.
+  # 
+  # @param [String] name: (default 'EmptyString')
+  # 
+  factory :empty_str do |name: 'EmptyString', **options|
+    str length: 0, name: name, **options
+  end
+  
+  
+  factory :non_empty_str do |**options|
+    str length: {min: 1}, **options
+  end
+  
+  
+  factory :char do |**options|
+    str length: 1, name: "Character", **options
+  end
+  
+  
+  # 
+  factory :uft_8, aliases: [:utf8] do |name: 'UTF8String', **options|
+    str encoding: Encoding::UTF_8, name: name, **options
+  end
   
 end # NRSER::Types
