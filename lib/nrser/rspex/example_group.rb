@@ -194,24 +194,6 @@ module NRSER::RSpex::ExampleGroup
   end # #describe_module
   
   
-  def describe_class klass, bind_subject: true, **metadata, &block
-    description = "#{ NRSER::RSpex::PREFIXES[:class] } #{ klass.name }"
-    
-    describe(
-      description,
-      type: :class,
-      class: klass,
-      **metadata
-    ) do
-      if bind_subject
-        subject { klass }
-      end
-      
-      module_exec &block
-    end
-  end # #describe_class
-  
-  
   def describe_group title, **metadata, &block
     describe(
       "#{ NRSER::RSpex::PREFIXES[:group] } #{ title }",
@@ -221,22 +203,6 @@ module NRSER::RSpex::ExampleGroup
       module_exec &block
     end
   end # #describe_class
-  
-  
-  def describe_method name, **metadata, &block
-    describe(
-      "#{ NRSER::RSpex::PREFIXES[:method] } #{ name }",
-      type: :method,
-      method_name: name,
-      **metadata
-    ) do
-      if name.is_a? Symbol
-        subject { super().method name }
-      end
-      
-      module_exec &block
-    end
-  end # #describe_method
   
   
   def describe_attribute symbol, **metadata, &block
@@ -296,3 +262,5 @@ require_relative './example_group/describe_setup'
 require_relative './example_group/describe_use_case'
 require_relative './example_group/describe_instance'
 require_relative './example_group/describe_called_with'
+require_relative './example_group/describe_method'
+require_relative './example_group/describe_class'

@@ -98,10 +98,13 @@ module NRSER::RSpex::Format
   def self.prepend_type type, description
     return description if type.nil?
     
-    prefixes = RSpec.configuration.x_type_prefixes
+    # prefixes = RSpec.configuration.x_type_prefixes
+    # 
+    # prefix = prefixes[type] ||
+    #           pastel.magenta( i( type.to_s.upcase.gsub('_', ' ') ) )
     
-    prefix = prefixes[type] ||
-              pastel.magenta( i( type.to_s.upcase.gsub('_', ' ') ) )
+    # prefix = "*" + type.to_s.upcase.gsub('_', ' ') + "*"
+    prefix = pastel.magenta( i( type.to_s.upcase.gsub('_', ' ') ) )
     
     "#{ prefix } #{ description }"
   end # .format_type
@@ -127,13 +130,13 @@ module NRSER::RSpex::Format
         elsif part.is_a? String
           part
         else
-          short_s part
+          NRSER::RSpex.short_s part
         end
       }.
       join( ' ' ).
       squish.
       thru { |description|
-        mean_streak.render prepend_type( type, description )
+        prepend_type type, mean_streak.render( description )
       }
   end # .description
   

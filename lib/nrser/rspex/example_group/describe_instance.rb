@@ -11,7 +11,7 @@ module NRSER::RSpex::ExampleGroup
   #   @todo Document return value.
   # 
   def describe_instance *constructor_args, &body
-    describe_x_type ".new(", Args(*constructor_args), ")",
+    describe_x ".new", Args(*constructor_args),
       type: :instance,
       metadata: {
         constructor_args: constructor_args,

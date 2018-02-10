@@ -11,11 +11,13 @@ describe_spec_file(
   spec_path: __FILE__,
   class: NRSER::MeanStreak,
 ) do
-  describe_instance do
-    describe_method :render do
-      describe_called_with "hey" do
-        it { is_expected.to eq "hey" }
-      end # called with "hey"
+  describe_class NRSER::MeanStreak do
+    describe_instance do
+      describe_method :render do
+        describe_called_with "hey" do
+          it { is_expected.to eq "heyy" }
+        end # called with "hey"
+      end
     end
   end
 end # describe_spec_file

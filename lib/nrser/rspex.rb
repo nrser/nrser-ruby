@@ -270,7 +270,7 @@ RSpec.configure do |config|
   config.x_type_prefixes = \
     NRSER::RSpex::PREFIXES
   
-  config.add_setting :x_style, default: :unicode
+  config.add_setting :x_style, default: :esc_seq
 end
 
 # Make available at the top-level
