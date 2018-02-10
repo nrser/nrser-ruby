@@ -32,27 +32,13 @@ module NRSER::RSpex::Format
   end
   
   
-  def self.transpose_A_z string, lower_a:, upper_a:
-    string
-      .gsub( /[A-Z]/ ) { |char|
-        [upper_a.ord + (char.ord - 'A'.ord)].pack 'U*'
-      }
-      .gsub( /[a-z]/ ) { |char|
-        [lower_a.ord + (char.ord - 'a'.ord)].pack 'U*'
-      }
-  end
-  
-  
-  # Italicize a string
+  # Italicize a string via "Unicode Math Italic" substitution.
   # 
-  # @param [type] arg_name
-  #   @todo Add name param description.
-  # 
-  # @return [return_type]
-  #   @todo Document return value.
+  # @param [String] string
+  # @return [String]
   # 
   def self.unicode_italic string
-    transpose_A_z string, lower_a: '𝑎', upper_a: '𝐴'
+    NRSER.u_italic string
   end # .italic
   
   
@@ -73,9 +59,18 @@ module NRSER::RSpex::Format
   end
   
   
+  # Bold a string via "Unicode Math Bold" substitution.
+  # 
+  # @param [String] string
+  # @return [String]
+  # 
+  def self.unicode_bold string
+    NRSER.u_bold string
+  end
+  
+  
   def self.bold string
-    # FIXME   Should switch on config once {.unicode_bold} is written
-    esc_seq_bold string
+    public_send "#{ RSpec.configuration.x_style }_#{ __method__ }", string
   end
   
   singleton_class.send :alias_method, :b, :bold
@@ -123,7 +118,12 @@ module NRSER::RSpex::Format
     parts.
       map { |part|
         if part.respond_to? :to_desc
-          md_code_quote part.to_desc
+          desc = part.to_desc
+          if desc.empty?
+            ''
+          else
+            md_code_quote part.to_desc
+          end
         elsif part.is_a? String
           part
         else

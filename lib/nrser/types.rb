@@ -6,6 +6,7 @@
 # uncontrollable mutability of Ruby and the importance of type checks)
 # need to be required in the "Post-Processing" section at the bottom.
 # 
+require_relative './types/type'
 
 # Refinements
 # =======================================================================
@@ -147,7 +148,7 @@ module NRSER::Types
   #   @return [NRSER::Types::Type]
   #     The type.
   # 
-  def self.factory name, maybe: true, aliases: [], &body
+  def self.def_factory name, maybe: true, aliases: [], &body
     define_singleton_method name, &body
     
     aliases.each do |alias_name|
@@ -157,8 +158,29 @@ module NRSER::Types
     if maybe && !name.to_s.end_with?( '?' )
       maybe_name = "#{ name }?".to_sym
       
+      # HACK  Ugh maybe I wrote this quick to fix it, not sure if it's a decent
+      #       idea.. basically, need to figure out what `options` keys go
+      #       to {.maybe} and which ones go to the regular factory... matters
+      #       for shit like {.attrs} and {.hash_type} 'cause they use option
+      #       keys (whether they *should* is something I've debated... sigh,
+      #       it is what it is for now).
+      #       
+      #       So they options that go to {.maybe} just go strait through to
+      #       {Type#initialize}, so just grab that method, see what keys it
+      #       takes, and then can slice and dice off that...
+      # 
+      maybe_option_keys = Set.new \
+        Type.
+          instance_method( :initialize ).
+          parameters.
+          select { |param_type, name| param_type == :key }.
+          map { |param_type, name| name }
+      
       define_singleton_method maybe_name do |*args, **options|
-        maybe public_send( name, *args ), **options
+        maybe_options = options.slice *maybe_option_keys
+        factory_options = options.except *maybe_option_keys
+        
+        maybe public_send( name, *args, **factory_options ), **maybe_options
       end
       
       aliases.each do |alias_name|
@@ -176,7 +198,6 @@ end # NRSER::Types
 # Files that define constants that need the proceeding infrastructure.
 # 
 
-require_relative './types/type'
 require_relative './types/is'
 require_relative './types/nil'
 require_relative './types/is_a'

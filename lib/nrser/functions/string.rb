@@ -1,15 +1,29 @@
 # frozen_string_literal: true
 
 require_relative './string/looks_like'
+require_relative './string/style'
 
 module NRSER
   
-  # @!group String Functions
+  # Constants
+  # ==========================================================================
   
+  # Regular expression used to match whitespace.
+  # 
+  # @return [Regexp]
+  # 
   WHITESPACE_RE = /\A[[:space:]]*\z/
   
+  
+  # Unicode ellipsis character.
+  # 
+  # @return [String]
+  # 
   UNICODE_ELLIPSIS = '…'
   
+  
+  # @!group String Functions
+  # ==========================================================================
   
   def self.whitespace? string
     string =~ WHITESPACE_RE
@@ -310,5 +324,7 @@ module NRSER
   end # .constantize
   
   singleton_class.send :alias_method, :to_const, :constantize
+  
+  # @!endgroup String Functions
   
 end # module NRSER

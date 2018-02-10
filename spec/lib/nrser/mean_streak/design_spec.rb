@@ -1,4 +1,5 @@
 # encoding: UTF-8
+# frozen_string_literal: true
 
 describe_spec_file(
   spec_path: __FILE__,

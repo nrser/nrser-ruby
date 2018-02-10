@@ -46,7 +46,7 @@ module NRSER::Types
   # @example Type where first element of an Enumerable is a String
   #   string_first = intersection Enumerable, attrs(first: String)
   # 
-  factory :attrs do |attrs, **options|
+  def_factory :attrs do |attrs, **options|
     Attrs.new attrs, **options
   end
   

@@ -30,17 +30,17 @@ module NRSER::Types
   # 
   # @param [String] name: (default 'EmptyString')
   # 
-  factory :empty_str do |name: 'EmptyString', **options|
+ def_factory :empty_str do |name: 'EmptyString', **options|
     str length: 0, name: name, **options
   end
   
   
-  factory :non_empty_str do |**options|
+ def_factory :non_empty_str do |**options|
     str length: {min: 1}, **options
   end
   
   
-  factory :char do |**options|
+ def_factory :char do |**options|
     str length: 1, name: "Character", **options
   end
   
@@ -49,8 +49,16 @@ module NRSER::Types
   # 
   # @param [String] name: (default 'UTF8String')
   # 
-  factory :uft_8, aliases: [:utf8] do |name: 'UTF8String', **options|
+ def_factory :uft_8, aliases: [:utf8] do |name: 'UTF8String', **options|
     str encoding: Encoding::UTF_8, name: name, **options
+  end
+  
+  
+  def_factory(
+    :utf_8_char,
+    aliases: [:utf8_char]
+  ) do |name: 'UTF8Character', **options|
+    str length: 1, encoding: Encoding::UTF_8, name: name, **options
   end
   
 end # NRSER::Types

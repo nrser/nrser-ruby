@@ -47,16 +47,13 @@ module NRSER::Types
   # @return [NRSER::Types::Type]
   #   Newly constructed hash type from `args`.
   # 
-  def self.hash_type *args
+  def_factory :hash_type, aliases: [:dict, :hash_] do |*args|
     if args.empty?
       HASH
     else
       HashType.new *args
     end
   end
-  
-  singleton_class.send :alias_method, :dict, :hash_type
-  singleton_class.send :alias_method, :hash_, :hash_type
   
   HASH = HashType.new.freeze
   

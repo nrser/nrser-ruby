@@ -59,4 +59,33 @@ module NRSER::Ext::String
     NRSER::words self, *args, &block
   end
   
+  
+  # @!group Unicode Stylization
+  # ==========================================================================
+  
+  # Calls {NRSER.u_italic} on `self`
+  def u_italic
+    NRSER.u_italic self
+  end
+  
+  
+  # Calls {NRSER.u_bold} on `self`
+  def u_bold
+    NRSER.u_bold self
+  end
+  
+  
+  # Calls {NRSER.u_bold_italic} on `self`
+  def u_bold_italic
+    NRSER.u_bold_italic self
+  end
+  
+  
+  # Calls {NRSER.u_mono} on `self`
+  def u_mono
+    NRSER.u_mono self
+  end
+  
+  # @!endgroup Unicode Stylization
+  
 end # module NRSER::Ext::String

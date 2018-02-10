@@ -18,6 +18,7 @@ module NRSER::Char; end
 # ============================================================================
 
 require_relative './char/special'
+require_relative './char/alpha_numeric_sub'
 
 
 # Definitions
