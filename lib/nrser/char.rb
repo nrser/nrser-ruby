@@ -141,9 +141,7 @@ module NRSER::Char
       from_i source
     else
       raise ArgumentError.new binding.erb <<-END
-        Expected hex String like '12AB' or Integer, got <%= source.class %>
-        
-        Found:
+        Expected hex String like '12AB' or Integer, got <%= source.class %>:
         
             <%= source.pretty_inspect %>
         
