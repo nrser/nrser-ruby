@@ -45,6 +45,9 @@ module NRSER::Types
   end
   
   
+  # A type satisfied by UTF-8 encoded strings.
+  # 
+  # @param [String] name: (default 'UTF8String')
   # 
   factory :uft_8, aliases: [:utf8] do |name: 'UTF8String', **options|
     str encoding: Encoding::UTF_8, name: name, **options

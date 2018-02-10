@@ -39,6 +39,8 @@ module NRSER::Types
   end # Attrs
   
   
+  # @!group Type Factory Functions
+  
   # Get a {Type} that checks the types of one or more attributes on values.
   # 
   # @example Type where first element of an Enumerable is a String
