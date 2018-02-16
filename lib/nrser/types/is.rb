@@ -21,7 +21,9 @@ module NRSER::Types
     end
     
     def == other
-      equal?(other) || @value === other.value
+      equal?(other) ||
+      ( self.class == other.class &&
+        @value == other.value )
     end
     
     # @return [String]
