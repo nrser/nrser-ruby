@@ -104,6 +104,7 @@ module NRSER::Types
         path,
         where { |path| path.to_pn.absolute? },
         name: name,
+        from_s: ->( s ) { File.expand_path s },
         **options
     end
     

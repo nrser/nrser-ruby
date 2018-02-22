@@ -31,19 +31,41 @@ module NRSER::Types
     end
     
     
-    # a combinator may attempt to parse from a string if any of it's types
-    # can do so
-    def has_from_s?
-      @types.any? {|type| type.has_from_s?}
-    end
-    
-    
-    # a combinator iterates through each of it's types, trying the
-    # conversion and seeing if the result satisfies the combinator type
-    # itself. the first such value found is returned.
+    # Parse a satisfying value from a {String} or raise a {TypeError}.
+    # 
+    # If this type has it's own `@from_s` that was provided via the `from_s:`
+    # keyword at construction, then that and **only** that is **always** used
+    # - the type will never try any of the combined types' `#from_s`.
+    # 
+    # It's considered *the* way to parse a string into a value that satisfies
+    # the type. If it fails, a {TypeError} will be raised (or any error the
+    # `@from_s` proc itself raises before we get to checking it).
+    # 
+    # If the type doesn't have it's own `@from_s`, each of the combined types'
+    # `#from_s` will be tried in sequence, and the first value that satisfies
+    # the combined type will be returned.
+    # 
+    # This is obviously much less efficient, but provides a nice automatic
+    # mechanism for parsing from strings for combined types. If none of the
+    # combined types' `#from_s` succeed (or if there are none) a {TypeError}
+    # is raised.
+    # 
+    # @param [String] s
+    #   String to parse.
+    # 
+    # @return [Object]
+    #   Object that satisfies the type.
+    # 
+    # @raise [TypeError]
+    #   See write up above.
+    # 
     def from_s s
+      unless @from_s.nil?
+        return check @from_s.call( s )
+      end
+      
       @types.each { |type|
-        if type.respond_to? :from_s
+        if type.has_from_s?
           begin
             return check type.from_s(s)
           rescue TypeError => e
@@ -57,15 +79,20 @@ module NRSER::Types
     end
     
     
-    # Overridden to delegate functionality to the combined types:
+    # Overridden to delegate functionality to the combined types.
     # 
-    # A combinator may attempt to parse from a string if any of it's types
-    # can do so.
+    # A combinator may attempt to parse from a string if:
+    # 
+    # 1.  It has it's own `@from_s` provided at construction.
+    # 
+    # 2.  Any of it's combined types can parse from a string.
+    # 
+    # See {#from_s} for details of how it actually happens.
     # 
     # @return [Boolean]
     # 
     def has_from_s?
-      @types.any? {|type| type.has_from_s?}
+      super() || @types.any? { |type| type.has_from_s? }
     end # has_from_s
     
     
