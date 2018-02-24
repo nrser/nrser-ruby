@@ -1,3 +1,5 @@
+require_relative './string/active_support'
+
 # Extension methods for {String}
 # 
 module NRSER::Ext::String

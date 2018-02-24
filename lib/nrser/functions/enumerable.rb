@@ -1,6 +1,8 @@
 require_relative './enumerable/find_map'
 require_relative './enumerable/find_all_map'
 require_relative './enumerable/include_slice'
+require_relative './enumerable/associate'
+require_relative './enumerable/map_values'
 
 module NRSER
   
@@ -34,61 +36,6 @@ module NRSER
     object.is_a?( ::Enumerable ) &&
       object.respond_to?( :each_pair )
   end # .hash_like?
-  
-
-  # Maps an enumerable object to a *new* hash with the same keys and values
-  # obtained by calling `block` with the current key and value.
-  # 
-  # If `enumerable` *does not* respond to `#to_pairs` then it's
-  # treated as a hash where the elements iterated by `#each` are it's keys
-  # and all it's values are `nil`.
-  # 
-  # In this way, {NRSER.map_values} handles Hash, Array, Set, OpenStruct,
-  # and probably pretty much anything else reasonable you may throw at it.
-  # 
-  # @param [#each_pair, #each] enum
-  # 
-  # @yieldparam [Object] key
-  #   The key that will be used for whatever value the block returns in the
-  #   new hash.
-  # 
-  # @yieldparam [nil, Object] value
-  #   If `enumerable` responds to `#each_pair`, the second parameter it yielded
-  #   along with `key`. Otherwise `nil`.
-  # 
-  # @yieldreturn [Object]
-  #   Value for the new hash.
-  # 
-  # @return [Hash]
-  # 
-  # @raise [TypeError]
-  #   If `enumerable` does not respond to `#each_pair` or `#each`.
-  # 
-  def self.map_values enum, &block
-    result = {}
-    
-    if enum.respond_to? :each_pair
-      enum.each_pair { |key, value|
-        result[key] = block.call key, value
-      }
-    elsif enum.respond_to? :each
-      enum.each { |key|
-        result[key] = block.call key, nil
-      }
-    else
-      raise ArgumentError.new erb binding, <<-END
-        First argument to {NRSER.map_values} must respond to #each_pair or #each
-        
-        Received
-            
-            <%= enum.pretty_inspect %>
-        
-        of class <%= enum.class %>
-      END
-    end
-    
-    result
-  end # .map_values
   
   
   # Find all entries in an {Enumerable} for which `&block` returns a truthy
@@ -216,38 +163,6 @@ module NRSER
     
     enum.first
   end # .only!
-  
-  
-  # Convert an enumerable to a hash by passing each entry through `&block` to
-  # get it's key, raising an error if multiple entries map to the same key.
-  # 
-  # @param [Enumerable<V>] enum
-  #   Enumerable containing the values for the hash.
-  # 
-  # @param [Proc<(V)=>K>] &block
-  #   Block that maps `enum` values to their hash keys.
-  # 
-  # @return [Hash<K, V>]
-  # 
-  # @raise [NRSER::ConflictError]
-  #   If two values map to the same key.
-  # 
-  def self.to_h_by enum, &block
-    enum.each_with_object( {} ) { |element, result|
-      key = block.call element
-      
-      if result.key? key
-        raise NRSER::ConflictError.new erb binding, <<-END
-          Key <%= key.inspect %> is already in results with value:
-          
-              <%= result[key].pretty_inspect %>
-          
-        END
-      end
-      
-      result[key] = element
-    }
-  end # .to_h_by
   
   
   # Create an {Enumerator} that iterates over the "values" of an

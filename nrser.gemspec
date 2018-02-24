@@ -44,6 +44,19 @@ Gem::Specification.new do |spec|
   # 
   spec.add_dependency 'commonmarker', '~> 0.17.7'
   
+  # Now that NRSER hasn't been runtime dependency free for a while, I think
+  # it just makes sense to depend on ActiveSupport... it is extremely widely
+  # used, heavily battle-tested, and includes a *lot* of useful things I kept
+  # finding myself porting over.
+  # 
+  # However, I don't really like how requiring things *outside* `core_ext`
+  # will require things in `core_ext`, causing extension of core classes when
+  # you didn't ask for it and don't know about it without digging into the
+  # source, but, whatever... it's so common that I feel like most stuff has
+  # had to learn to live with its monkey business.
+  # 
+  spec.add_dependency 'activesupport', '~> 5.1.4'
+  
   # Development Dependencies
   # ----------------------------------------------------------------------------
 

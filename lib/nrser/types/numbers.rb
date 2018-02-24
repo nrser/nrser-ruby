@@ -77,15 +77,16 @@ module NRSER::Types
   # Integer greater than zero.
   # 
   
-  POS_INT = intersection(
-    INT,
-    bounded(min: 1),
-    name: 'PosIntType'
-  ).freeze
-  
   def self.pos_int
-    POS_INT
+    intersection(
+      INT,
+      bounded(min: 1),
+      name: 'ℤ⁺'
+    ).freeze
   end
+  
+  # Ugh sometimes the naturals have 0, so omit it...
+  # singleton_class.send :alias_method, :natural, :pos_int
   
   
   # Negative Integer
@@ -98,7 +99,7 @@ module NRSER::Types
     intersection(
       INT,
       bounded(max: -1),
-      name: 'NegIntType'
+      name: 'ℤ⁻'
     ).freeze
   end
   
@@ -110,20 +111,19 @@ module NRSER::Types
   # as bounded instead of a union.
   # 
   
-  def self.natural **options
-    intersection INT, bounded(min: 0), name: 'ℕ', **options
+  def self.non_neg_int **options
+    # Alternative symbol: 'ℤ⋆'
+    intersection INT, bounded(min: 0), name: '{0}∪ℤ⁺', **options
   end
   
-  singleton_class.send :alias_method, :non_neg_int, :natural
-  singleton_class.send :alias_method, :unsigned, :natural
+  singleton_class.send :alias_method, :unsigned, :non_neg_int
   
   
-  def self.natural? **options
+  def self.non_neg_int? **options
     maybe non_neg_int, **options
   end
   
-  singleton_class.send :alias_method, :non_neg_int?, :natural?
-  singleton_class.send :alias_method, :unsigned?, :natural?
+  singleton_class.send :alias_method, :unsigned?, :non_neg_int?
   
   
   # Non-Positive Integer
@@ -133,7 +133,7 @@ module NRSER::Types
   # 
   
   def self.non_pos_int **options
-    intersection INT, bounded(max: 0), name: 'NonPosIntType', **options
+    intersection INT, bounded(max: 0), name: '{0}∪ℤ⁻', **options
   end
    
 end # NRSER::Types

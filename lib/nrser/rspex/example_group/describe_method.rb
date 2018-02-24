@@ -16,7 +16,8 @@ module NRSER::RSpex::ExampleGroup
       -> { super().method method_name }
     end
     
-    name_prefix = if self.metadata.key? :constructor_args
+    name_prefix = if  self.respond_to?( :metadata ) &&
+                      self.metadata.key?( :constructor_args )
       '#'
     else
       '.'
@@ -30,7 +31,7 @@ module NRSER::RSpex::ExampleGroup
       type: :method,
       metadata: {
         **metadata,
-        method_name: name,
+        method_name: method_name,
       },
       subject_block: subject_block,
       &body

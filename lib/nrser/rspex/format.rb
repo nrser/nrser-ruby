@@ -76,8 +76,18 @@ module NRSER::RSpex::Format
   singleton_class.send :alias_method, :b, :bold
   
   
+  def self.rspec_syntax_highlighter
+    @rspec_syntax_highlighter ||= \
+      RSpec::Core::Formatters::SyntaxHighlighter.new RSpec.configuration
+  end
+  
+  
   def self.code string
-    pastel.yellow string
+    if string =~ /\A\#[a-zA-Z][a-zA-Z0-9_]*(?:\?|\!)?/
+      pastel.bold.blue string
+    else
+      rspec_syntax_highlighter.highlight string.lines
+    end
   end
   
   

@@ -97,9 +97,3 @@ class NRSER::RSpex::Described::Class < NRSER::RSpex::Described
     
   end
 end # class NRSER::RSpex::Described::Class
-
-
-
-
-# Post-Processing
-# =======================================================================

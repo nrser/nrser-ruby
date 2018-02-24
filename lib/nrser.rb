@@ -20,7 +20,6 @@ require 'singleton'
 # Deps
 # -----------------------------------------------------------------------
 require 'hamster'
-require 'semantic_logger'
 
 
 # Hi there!
@@ -47,13 +46,11 @@ require 'semantic_logger'
 # 
 # Enjoy!
 # 
-module NRSER
-  include SemanticLogger::Loggable
-end
 
 # 1.  Load up version, which has {NRSER::ROOT} in it and depends on nothing
-#     else
+#     else, then logging
 require_relative './nrser/version'
+require_relative './nrser/logging'
 
 # 2.  Load up extension mixins first - they don't invoke anything, just define
 #     methods

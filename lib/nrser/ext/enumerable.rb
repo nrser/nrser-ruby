@@ -23,9 +23,18 @@ module NRSER::Ext::Enumerable
   end
   
   
-  # See {NRSER.to_h_by}
-  def to_h_by &block
-    NRSER.to_h_by self, &block
+  # See {NRSER.assoc_by}
+  def assoc_by &block
+    NRSER.assoc_by self, &block
+  end
+  
+  # Old name
+  alias_method :to_h_by, :assoc_by
+  
+  
+  # See {NRSER.assoc_to}
+  def assoc_to &block
+    NRSER.assoc_to  self, &block
   end
   
   
