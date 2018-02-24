@@ -50,7 +50,7 @@ module NRSER
   #   @todo Document return value.
   # 
   def self.deep_symbolize_keys object, &block
-    deep_transform_keys( object ) { key.to_sym rescue key }
+    deep_transform_keys( object ) { |key| key.to_sym rescue key }
   end # .deep_symbolize_keys
   
 
