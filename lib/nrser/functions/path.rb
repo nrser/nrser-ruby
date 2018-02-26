@@ -12,6 +12,29 @@ module NRSER
   end
   
   
+  # Get the directory for a path - if the path is a directory, it's returned
+  # (converted to a {Pathname}). It's not a directory, it's {Pathname#dirname}
+  # will be returned.
+  # 
+  # Expands the path (so that `~` paths work).
+  # 
+  # @param [String | Pathname] path
+  #   File or directory path.
+  # 
+  # @return [Pathname]
+  #   Absolute directory path.
+  # 
+  def self.dir_from path
+    pn = pn_from( path ).expand_path
+    
+    if pn.directory?
+      pn
+    else
+      pn.dirname
+    end
+  end # .dir_from
+  
+  
   # @todo Document glob? method.
   # 
   # @param [type] arg_name

@@ -13,13 +13,26 @@ require 'open3'
 # =======================================================================
 
 module NRSER
-  def self.git_root from
-    path = Pathname.new( from ).expand_path
-    path = path.dirname unless path.directory?
+  # Get the absolute path to the root directory of the Git repo that
+  # `path` is in.
+  # 
+  # @note
+  #   In submodules, this will return the root of the submodule, **NOT**
+  #   of the top-level repo.
+  # 
+  # @param [String | Pathname] path
+  #   Path in Git repo that you want to find the root of.
+  #   
+  #   Accepts relative and user (`~/...`) paths.
+  # 
+  # @return [Pathname]
+  # 
+  def self.git_root path = Pathname.getwd
+    dir = dir_from path
     
     out, err, status = Open3.capture3 \
       'git rev-parse --show-toplevel',
-      chdir: path.to_s
+      chdir: dir.to_s
     
     if status != 0
       message = \
@@ -29,6 +42,7 @@ module NRSER
       raise SystemCallError.new message, status.exitstatus
     end
     
-    out.chomp
+    Pathname.new out.chomp
   end
+  
 end
