@@ -61,7 +61,9 @@ module NRSER
       
       # See if every entry in the slice from `enum` matches the corresponding
       # one in `slice`
-      return true if enum_slice.zip( slice ).all?( &is_match )
+      return true if enum_slice.zip( slice ).all? { |(enum_entry, slice_entry)|
+        is_match.call enum_entry, slice_entry
+      }
       
       # Otherwise, just continue on through `enum` looking for that first
       # match until the number of `enum` entries left is too few for `slice`
