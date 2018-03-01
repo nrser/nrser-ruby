@@ -6,19 +6,19 @@ describe_spec_file(
   
   it "returns the element when only one is found" do
     expect(
-      subject.call [1, 2, 3] { |i| i == 2 }
+      subject.( [1, 2, 3] ) { |i| i == 2 }
     ).to be 2
   end
   
   it "raises TypeError when more than one element is found" do
     expect {
-      subject.call [1, 2, 3] { |i| i >= 2 }
+      subject.( [1, 2, 3] ) { |i| i >= 2 }
     }.to raise_error TypeError
   end
   
   it "raises TypeError when no elements are found" do
     expect {
-      subject.call [1, 2, 3] { |i| false }
+      subject.( [1, 2, 3] ) { |i| false }
     }.to raise_error TypeError
   end
   
