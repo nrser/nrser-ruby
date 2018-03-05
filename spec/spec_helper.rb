@@ -4,7 +4,6 @@ $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 
 require 'nrser'
 
-require 'nrser/logger'
 require 'nrser/rspex'
 
 RSpec.configure do |config|
