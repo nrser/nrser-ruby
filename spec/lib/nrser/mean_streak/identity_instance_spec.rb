@@ -15,7 +15,7 @@ describe_spec_file(
     describe_instance do
       describe_method :render do
         describe_called_with "hey" do
-          it { is_expected.to eq "heyy" }
+          it { is_expected.to eq "hey" }
         end # called with "hey"
       end
     end
