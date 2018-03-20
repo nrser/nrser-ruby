@@ -14,6 +14,7 @@ require 'semantic_logger'
 # Project / Package
 # -----------------------------------------------------------------------
 require_relative './logging/formatters'
+require_relative './logging/appender'
 
 
 # Definitions
@@ -58,11 +59,18 @@ module NRSER
     
     # Delegation
     # ============================================================================
-    
-    def_single_delegators \
+     
+    def_single_delegators(
       SemanticLogger,
-      :index_to_level,
-      :level_to_index
+      :application,
+      :application=,
+      :[],
+      # NOTE  These are funky due to different in SemLog's int level and Ruby
+      #       stdlib / Rails logger int levels, so omit for now.
+      #
+      # :index_to_level,
+      # :level_to_index
+    )
     
     
     # Module Attributes
@@ -74,12 +82,36 @@ module NRSER
     # Module (Class) Methods
     # =====================================================================
     
-    
+    # Normalize a level name or number to a symbol, raising if it's not valid.
+    # 
+    # Relies on Semantic Logger's "internal" {SemanticLogger.level_to_index}
+    # method.
+    # 
+    # @see https://github.com/rocketjob/semantic_logger/blob/97247126de32e6ecbf74cbccaa3b3732768d52c5/lib/semantic_logger/semantic_logger.rb#L454
+    # 
+    # @param [Symbol | String | Integer]
+    #   Representation of a level in one of the following formats:
+    #   
+    #   1.  {Symbol} - verified as member of {SemanticLogger::LEVELS} and
+    #       returned.
+    #    
+    #   2.  {String} - accepts string representations of the level symbols,
+    #       case insensitive.
+    #   
+    #   3.  {Integer} - interpreted as a Ruby StdLib Logger / Rails Logger
+    #       level, which are **different** than Semantic Logger's!
+    # 
+    # @return [:trace | :debug | :info | :warn | :error | :fatal]
+    #   Log level symbol.
+    # 
+    # @raise
+    #   When `level` is invalid.
+    # 
     def self.level_sym_for level
-      if level.is_a? Symbol
+      if SemanticLogger::LEVELS.include? level
         level
       else
-        index_to_level level_to_index( level )
+        SemanticLogger.index_to_level SemanticLogger.level_to_index( level )
       end
     end
     
@@ -100,26 +132,18 @@ module NRSER
     
     # Set the global default log level.
     # 
-    # @param [Symbol | String | Fixnum] level
-    #   Representation of a {#level} in one of the following formats:
-    #   
-    #   1.  {Symbol} - `:trace`, `:debug`, `:info`, `:warn`, `:error`
-    #       or `:fatal`.
-    #       
-    #   2.  {String} - A string that when `#downcase`'d matches the `#to_s`
-    #       of one of the symbols.
-    #       
-    #       > Example:
+    # @param level  (see .level_sym_for)
+    # @return       (see .level_sym_for)
+    # @raise        (see .level_sym_for)
     #   
     def self.level= level
       SemanticLogger.default_level = level_sym_for level
     end
     
     
-    # @todo Document try_level_to_index method.
+    # Try to set the level, logging a warning and returning `nil` if it fails.
     # 
     # @param level (see .level=)
-    #   
     # 
     # @return [Symbol]
     #   The level symbol if it was set successfully.
@@ -136,8 +160,24 @@ module NRSER
           error: error
         nil
       end
-    end # .try_level_to_index
+    end # .try_set_level
     
+    
+    def self.level_from_ENV prefix:
+      if NRSER.truthy? ENV["#{ prefix }_TRACE"]
+        return :trace
+      elsif NRSER.truthy? ENV["#{ prefix }_DEBUG"]
+        return :debug
+      end
+      
+      level = ENV["#{ prefix }_LOG_LEVEL"]
+      
+      unless level.nil? || level == ''
+        return level
+      end
+      
+      nil
+    end
     
     
     # Setup logging.
@@ -147,45 +187,43 @@ module NRSER
     # 
     # @return [nil]
     # 
-    def self.setup  level: nil,
-                    dest: $stderr,
-                    env_var_prefix: 'NRSER',
-                    say_hi: :debug
+    def self.setup! level: nil,
+                    dest: nil,
+                    sync: false,
+                    say_hi: :debug,
+                    application: 'NRSER',
+                    env_var_prefix: nil
       
       unless @__mutex.try_lock
         raise ThreadError, <<~END
-          Mutext is already held.
+          Mutex is already held.
           
           You should pretty generally NOT have multiple threads trying to
           setup logging at once or re-enter {NRSER::Logging.setup}!
         END
       end
       
-      # Wrap around everything to make sure we release the mutext
+      # Wrap around everything to make sure we release the mutex
       begin
-        unless dest.nil?
-          # Remove the appender if we already had one
-          # 
-          # TODO I guess this is a reasonable way to handle this?
-          # 
-          SemanticLogger.remove_appender( @appender ) if @appender
-          
-          # Create the appender and set the instance variable
-          @appender = SemanticLogger.add_appender(
-            io: dest,
-            formatter: NRSER::Logging::Formatters::Color.new,
-          )
-        end
+        self.appender = dest unless dest.nil?
+        
+        # Force synchronous logging
+        sync! if sync
         
         # If we didn't receive a level, check the ENV
         if level.nil?
-          level =   ENV["#{ env_var_prefix }_DEBUG"] ||
-                    ENV["#{ env_var_prefix }_LOG_LEVEL"]
+          if env_var_prefix.nil?
+            env_var_prefix = application.gsub( /[^a-zA-Z0-0_]+/, '_' ).upcase
+          end
+          
+          level = level_from_ENV prefix: env_var_prefix
         end
         
         # If we ended up with a level, try to set it (will only log a warning
         # if it fails, not raise, which could crash things on boot)
         try_set_level level unless level.nil?
+        
+        self.application = application unless application.nil?
         
       ensure
         # Make sure we release the mutex; don't need to hold it for the rest
@@ -197,7 +235,7 @@ module NRSER
         say_hi
       when Symbol, String, Fixnum
         begin
-          level_index < level_to_index( say_hi )
+          level_index < SemanticLogger.level_to_index( say_hi )
         rescue Exception => error
           logger.warn "Bad `say_hi` kwd in {NRSER::Logging.setup}",
             say_hi: say_hi,
@@ -217,12 +255,99 @@ module NRSER
       if will_say_hi
         logger.info "Hi! Logging is setup",
           level: self.level,
-          dest: dest
+          dest: dest,
+          sync: sync
       end
       
       nil
     rescue Exception => error
-    end # .setup
+      # Suppress errors in favor of a warning
+      
+      logger.warn \
+        message: "Error setting up logging",
+        payload: {
+          args: {
+            level: level,
+            dest: dest,
+            env_var_prefix: env_var_prefix,
+            say_hi: say_hi,
+          },
+        },
+        exception: error
+      
+      nil
+    end # .setup!
+    
+    
+    # Call {.setup!} with some default keywords that are nice for CLI apps.
+    # 
+    # @param  (see .setup!)
+    # @return (see .setup!)
+    # 
+    def self.setup_for_cli! dest: $stderr,
+                            sync: true,
+                            **kwds
+      setup! dest: dest, sync: sync, **kwds
+    end # .setup_for_cli!
+    
+    
+    # Hack up SemanticLogger to do sync logging in the main thread
+    # 
+    # @return [nil]
+    # 
+    def self.sync!
+      # Create a {Locd::Logging::Appender::Sync}, which implements the
+      # {SemanticLogger::Appender::Async} interface but just forwards directly
+      # to it's appender in the same thread, and point it where
+      # {SemanticLogger::Processor.instance} (which is an Async) points.
+      # 
+      sync_appender = NRSER::Logging::Appender::Sync.new \
+        appender: SemanticLogger::Processor.instance.appender
+      
+      # Swap our sync in for the async
+      SemanticLogger::Processor.instance_variable_set \
+        :@processor,
+        sync_appender
+      
+      nil
+    end
+    
+    
+    # The current "main" appender (destination), if any.
+    # 
+    # This is just to simplify things in simple cases, you can always still
+    # add multiple appenders.
+    # 
+    # @return [SemanticLogger::Subscriber | nil]
+    # 
+    def self.appender
+      @appender
+    end
+    
+    
+    def self.appender= value
+      # Save ref to current appender (if any) so we can remove it after adding
+      # the new one.
+      old_appender = @appender
+      
+      @appender = case value
+      when Hash
+        SemanticLogger.add_appender value
+      when String, Pathname
+        SemanticLogger.add_appender file_name: value.to_s
+      else
+        SemanticLogger.add_appender \
+          io: value,
+          formatter: NRSER::Logging::Formatters::Color.new
+      end
+      
+      # Remove the old appender (if there was one). This is done after adding
+      # the new one so that failing won't result with no appenders.
+      SemanticLogger.remove_appender( old_appender ) if old_appender
+      
+      @appender
+    end
+    
     
   end # module Logging
 end # module NRSER

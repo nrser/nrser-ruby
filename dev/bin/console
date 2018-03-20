@@ -6,7 +6,7 @@ require 'nrser'
 using NRSER
 using NRSER::Types
 
-NRSER::Logging.setup
+NRSER::Logging.setup!
 
 
 # You can add fixtures and/or initialization code here to make experimenting

@@ -32,9 +32,29 @@ class NRSER::Logging::Formatters::Color < ::SemanticLogger::Formatters::Color
   # Constants
   # ======================================================================
   
+  # ANSI escape sequence to start "Dark Gray" color.
+  # 
+  # @return [String]
+  # 
+  ANSI_ESC_DARK_GRAY = "\e[1;30m"
+  
   
   # Class Methods
   # ======================================================================
+  
+  # @todo Document default_color_map method.
+  # 
+  # @param [type] arg_name
+  #   @todo Add name param description.
+  # 
+  # @return [SemanticLogger::Formatters::Color::ColorMap]
+  # 
+  def self.default_color_map
+    SemanticLogger::Formatters::Color::ColorMap.new(
+      debug: SemanticLogger::AnsiColors::MAGENTA,
+      trace: ANSI_ESC_DARK_GRAY,
+    )
+  end # .default_color_map
   
   
   # Attributes
@@ -46,7 +66,7 @@ class NRSER::Logging::Formatters::Color < ::SemanticLogger::Formatters::Color
   
   # Instantiate a new `ColorFormatter`.
   def initialize  ap: {multiline: true},
-                  color_map: {debug: ::SemanticLogger::AnsiColors::MAGENTA},
+                  color_map: self.class.default_color_map,
                   time_format: ::SemanticLogger::Formatters::Base::TIME_FORMAT,
                   log_host: false,
                   log_application: false
@@ -123,7 +143,7 @@ class NRSER::Logging::Formatters::Color < ::SemanticLogger::Formatters::Color
     self.logger = logger
     
     [
-      # time, annoyingly noisy and don't really need for local CLI app
+      time, # annoyingly noisy and don't really need for local CLI app
       level,
       process_info,
       tags,
