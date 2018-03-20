@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.authors       = ["nrser"]
   spec.email         = ["neil@neilsouza.com"]
   spec.summary       = %q{basic ruby utils i use in a lot of stuff.}
-  spec.homepage      = "https://github.com/nrser/nrser-ruby"
+  spec.homepage      = "https://github.com/nrser/nrser.rb"
   spec.license       = "MIT"
   
   spec.required_ruby_version = '>= 2.3.0'
