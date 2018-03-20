@@ -25,7 +25,7 @@ module NRSER::RSpex::ExampleGroup
   # @return [void]
   # 
   def describe_called_with *args, &body
-    describe_x_type List(*args),
+    describe_x Args(*args),
       type: :called_with,
       subject_block: -> { super().call *args },
       &body
