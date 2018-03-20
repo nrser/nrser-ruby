@@ -248,6 +248,8 @@ module NRSER::RSpex
   
   class Args < List
     def to_desc max = nil
+      return '()' if empty?
+      
       if last.is_a?( Hash )
         [
           List.new( self[0..-2] ).to_desc,
