@@ -106,14 +106,34 @@ class NRSER::MeanStreak
   end # #parse
   
   
+  # Render a {NRSER::MeanStreak::Document} or a source string.
+  # 
+  # @param [NRSER::MeanStreak::Document | String] doc_or_source
+  #   Document or source to render.
+  # 
+  # @return [String]
+  #   Rendered string.
+  # 
   def render doc_or_source
-    doc = if doc_or_source.is_a? NRSER::MeanStreak::Document
-      doc_or_source
-    else
-      parse doc_or_source
-    end
+    case doc_or_source
+    when NRSER::MeanStreak::Document
+      doc_or_source.render
+      
+    when ''
+      # Short-circuit for empty strings because CommonMark's document
+      # node for empty strings returns a weird `#sourcepos` that ends before it
+      # begins (start: line 1, column 1; end: line 0, column 0).
+      # 
+      # Going to protect against line 0 / column 0 in
+      # {NRSER::MeanStreak::Document#source_byte_indexes} too but since the
+      # empty strings just renders the empty string we can just return that
+      # here.
+      # 
+      ''
     
-    doc.render
+    else
+      parse( doc_or_source ).render
+    end
   end
   
   

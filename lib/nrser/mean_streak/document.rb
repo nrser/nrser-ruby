@@ -32,6 +32,16 @@ class NRSER::MeanStreak::Document
   # ======================================================================
   
   
+  # Classes
+  # ============================================================================
+  
+  # A position in a source.
+  # 
+  class SourcePosition
+    # def initialize source,
+  end
+  
+  
   # Class Methods
   # ======================================================================
   
@@ -54,7 +64,6 @@ class NRSER::MeanStreak::Document
   
   singleton_class.send :alias_method, :from_string, :parse
   singleton_class.send :alias_method, :from_s, :parse
-  
   
   
   # Attributes
@@ -114,17 +123,35 @@ class NRSER::MeanStreak::Document
   end
   
   
+  # @return [Hash<Symbol, Hash<Symbol, Integer>>]
+  #   Looks like:
+  #   
+  #       {
+  #          first_byte: {
+  #            line: Non-negative Integer,
+  #            column: Non-negative Integer,
+  #            index: Non-negative Integer,
+  #          },
+  #          last_byte: {
+  #            line: Non-negative Integer,
+  #            column: Non-negative Integer,
+  #            index: Non-negative Integer,
+  #          },
+  #       }
+  # 
+  # All integers are zero-indexed byte array indexes.
+  # 
   def source_byte_indexes node
     pos = node.sourcepos
     
     indexes = {
       first_byte: {
-        line: pos[:start_line] - 1,
-        column: pos[:start_column] - 1,
+        line: [0, pos[:start_line] - 1].max,
+        column: [0, pos[:start_column] - 1].max,
       },
       last_byte: {
-        line: pos[:end_line] - 1,
-        column: pos[:end_column] - 1,
+        line: [0, pos[:end_line] - 1].max,
+        column: [0, pos[:end_column] - 1].max,
       },
     }
     
@@ -136,7 +163,15 @@ class NRSER::MeanStreak::Document
   end
   
   
+  # Computes the *byte* index for a `line` and `column` in the source, both
+  # of which *are in bytes*.
+  # 
+  # @param [Integer] line:
+  #   
+  # 
   def source_byte_index line:, column:
+    t.hash_(keys: t.sym, values: t.non_neg_int?).check( line: line, column: column)
+    
     # source_lines[0...line].map( &:bytesize ).reduce( column, :+ )
     byte_index = column
     if line > 0
