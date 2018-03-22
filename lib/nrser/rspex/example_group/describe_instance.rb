@@ -16,8 +16,9 @@ module NRSER::RSpex::ExampleGroup
       metadata: {
         constructor_args: constructor_args,
       },
-      # subject_block: -> { super().new *described_args },
-      subject_block: -> { super().new *described_constructor_args },
+      subject_block: -> {
+        described_class.new *described_constructor_args
+      },
       &body
   end # #describe_instance
   
