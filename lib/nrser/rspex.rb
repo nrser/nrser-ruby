@@ -25,6 +25,8 @@ require 'commonmarker'
 # Project / Package
 # -----------------------------------------------------------------------
 require 'nrser'
+require 'nrser/core_ext'
+
 require_relative './rspex/example'
 require_relative './rspex/example_group'
 require_relative './rspex/shared_examples'
@@ -163,19 +165,7 @@ module NRSER::RSpex
     file:         '𝐹',
   )
   
-  # PREFIXES_MATH_GREEK = PREFIXES_BASE.merge(
-  #   # module: "𝓜 𝓸𝓭𝓾𝓵𝓮",
-  #   module:       '𝛭',
-  #   method:       '𝜆',
-  #   class:        '𝛤',
-  #   attribute:    '𝛼',
-  # )
-  
   PREFIXES = PREFIXES_MATH_ITALIC
-  
-  # PREFIXES = PREFIXES_MATH_ITALIC.map_values { |k, v|
-  #   RSpec::Core::Formatters::ConsoleCodes.wrap( v, :cyan )
-  # }
   
   
   # Module (Class) Functions

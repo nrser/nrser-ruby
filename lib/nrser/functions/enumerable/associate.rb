@@ -11,11 +11,11 @@ module NRSER
   # get it's key, raising an error if multiple entries map to the same key.
   # 
   # @example Basic usage
-  #   ['a', :b].to_h_by &:class
+  #   ['a', :b].assoc_by &:class
   #   # => {String=>"a", Symbol=>:b}
   # 
   # @example Conflict error
-  #   [:a, :b].to_h_by &:class
+  #   [:a, :b].assoc_by &:class
   #   # NRSER::ConflictError: Key Symbol is already in results with value:
   #   #
   #   #     :a
@@ -37,7 +37,7 @@ module NRSER
       key = block.call element
       
       if result.key? key
-        raise NRSER::ConflictError.new erb binding, <<-END
+        raise NRSER::ConflictError.new binding.erb <<-END
           Key <%= key.inspect %> is already in results with value:
           
               <%= result[key].pretty_inspect %>
@@ -47,10 +47,7 @@ module NRSER
       
       result[key] = element
     }
-  end # .to_h_by
-  
-  singleton_class.send :alias_method, :to_h_by, :assoc_by
-  
+  end # .assoc_by
   
   
   # Create a {Hash} mapping the entries in `enum` to the value returned by
@@ -97,7 +94,7 @@ module NRSER
       
       hash[entry] = value
     }
-  end # .map_to
+  end # .assoc_to
   
   
 end # module NRSER

@@ -259,7 +259,7 @@ module NRSER::Meta::Props
       prop.set_from_values_hash self, values
     }
     
-    # TODO  Now trigger all eager defaults (check prop getting trigger 
+    # TODO  Now trigger all eager defaults (check prop getting trigger
     #       correctly)
   end # #initialize_props
   
@@ -282,7 +282,7 @@ module NRSER::Meta::Props
   def to_h only_own: false, only_primary: false
     self.class.
       props(only_own: only_own, only_primary: only_primary).
-      map_values { |name, prop| prop.get self }
+      transform_values { |prop| prop.get self }
   end # #to_h
   
   

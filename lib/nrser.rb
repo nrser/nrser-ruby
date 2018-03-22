@@ -52,9 +52,8 @@ require 'hamster'
 require_relative './nrser/version'
 require_relative './nrser/logging'
 
-# 2.  Load up extension mixins first - they don't invoke anything, just define
-#     methods
-require_relative './nrser/ext'
+# Tons need this for error messages
+require_relative './nrser/core_ext/binding'
 
 # 3.  Then load up the refinements, which either include the extension mixins
 #     or directly define proxies and methods (but don't execute them).

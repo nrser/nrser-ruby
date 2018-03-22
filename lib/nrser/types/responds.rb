@@ -25,9 +25,7 @@ module NRSER::Types
     def initialize  map,
                     public: true,
                     **options
-      @map = NRSER.map_values(map) { |args, type|
-        NRSER::Types.make type
-      }
+      @map = map.transform_values { |type| NRSER::Types.make type }
     end # #initialize
     
     

@@ -1,15 +1,6 @@
-# Instance methods to extend {Enumerable} objects.
+# Instance methods to extend {Enumerable}.
 # 
-# Refined into many of them, including {Array}, {Set}, {Hash} and {OpenStruct},
-# and may be independently used as well.
-# 
-module NRSER::Ext::Enumerable
-  
-  # See {NRSER.map_values}
-  def map_values &block
-    NRSER.map_values self, &block
-  end
-  
+module Enumerable
   
   # See {NRSER.find_bounded}
   def find_bounded bounds, &block
@@ -27,9 +18,6 @@ module NRSER::Ext::Enumerable
   def assoc_by &block
     NRSER.assoc_by self, &block
   end
-  
-  # Old name
-  alias_method :to_h_by, :assoc_by
   
   
   # See {NRSER.assoc_to}
@@ -79,4 +67,4 @@ module NRSER::Ext::Enumerable
   end
   
   
-end # module NRSER::Ext::Enumerable
+end # module Enumerable

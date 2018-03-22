@@ -29,7 +29,6 @@ using NRSER
 # @todo document NRSER::Env::Path class.
 class NRSER::Env::Path
   include Enumerable
-  include NRSER::Ext::Enumerable
   
   # Constants
   # ======================================================================

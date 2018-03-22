@@ -1,6 +1,6 @@
+require 'pathname'
 
-# @todo document NRSER::Ext::Pathname module.
-module NRSER::Ext::Pathname
+class Pathname
   
   # override to accept Pathname instances.
   # 
@@ -13,6 +13,9 @@ module NRSER::Ext::Pathname
   def start_with? *prefixes
     to_s.start_with? *prefixes.map(&:to_s)
   end
+  
+  
+  alias_method :_original_sub, :sub
   
   
   # override sub to support Pathname instances as patterns.
@@ -29,9 +32,9 @@ module NRSER::Ext::Pathname
   def sub pattern, replacement
     case pattern
     when Pathname
-      super pattern.to_s, replacement
+      _original_sub pattern.to_s, replacement
     else
-      super pattern, replacement
+      _original_sub pattern, replacement
     end
   end
 
@@ -71,4 +74,4 @@ module NRSER::Ext::Pathname
     NRSER.find_up! rel_path, **kwds, from: self
   end # #find_root
   
-end # module NRSER::Ext::Pathname
+end # class Pathname

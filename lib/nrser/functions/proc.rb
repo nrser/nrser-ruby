@@ -41,7 +41,6 @@ module NRSER
   end # .public_sender
   
   singleton_class.send :alias_method, :sender, :public_sender
-  singleton_class.send :alias_method, :sndr, :public_sender
   
   
   # Create a {Proc} that sends the arguments to a receiver via `#send`,
@@ -94,8 +93,6 @@ module NRSER
     }
   end # .chainer
   
-  singleton_class.send :alias_method, :chnr, :chainer
-  
   
   # Return a {Proc} that accepts a single argument that must respond to `#[]`
   # and retrieves `key` from it.
@@ -107,9 +104,7 @@ module NRSER
   # 
   def self.retriever key
     ->( indexed ) { indexed[key] }
-  end # .getter
-  
-  singleton_class.send :alias_method, :rtvr, :retriever
+  end # .retriever
   
   
 end # module NRSER

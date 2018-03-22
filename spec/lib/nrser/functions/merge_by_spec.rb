@@ -42,7 +42,7 @@ describe "NRSER.merge_by" do
     }
     
     subject {
-      super().call current, update, &[:item_id].digger
+      super().call current, update, &[:item_id].to_digger
     }
     
     it {

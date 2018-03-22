@@ -21,8 +21,8 @@ module NRSER
   #   Final array of merged hashes. Don't depend on order.
   # 
   def self.merge_by current, *updates, &merge_key
-    updates.reduce( to_h_by current, &merge_key ) { |result, update|
-      deep_merge! result, to_h_by( update, &merge_key )
+    updates.reduce( assoc_by current, &merge_key ) { |result, update|
+      result.deep_merge! assoc_by( update, &merge_key )
     }.values
   end # .merge_by
     

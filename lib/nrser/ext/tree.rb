@@ -1,3 +1,6 @@
+module NRSER::Ext; end
+
+
 # Instance methods that are refined in to the Ruby built-ins that we consider
 # trees: {Array}, {Hash} and {OpenStruct}.
 # 

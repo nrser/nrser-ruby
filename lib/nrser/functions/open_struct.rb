@@ -1,9 +1,4 @@
 module NRSER
-  
-  # Eigenclass (Singleton Class)
-  # ========================================================================
-  # 
-  class << self
     
     # Deeply convert a {Hash} to an {OpenStruct}.
     # 
@@ -14,7 +9,7 @@ module NRSER
     # @raise [TypeError]
     #   If `hash` is not a {Hash}.
     # 
-    def to_open_struct hash, freeze: false
+    def self.to_open_struct hash, freeze: false
       unless hash.is_a? Hash
         raise TypeError,
               "Argument must be hash (found #{ hash.inspect })"
@@ -23,38 +18,33 @@ module NRSER
       _to_open_struct hash, freeze: freeze
     end # #to_open_struct
     
-    
-    private
-    
-      def _to_open_struct value, freeze:
-        result = case value
-        when OpenStruct
-          # Just assume it's already taken care of if it's already an OpenStruct
-          value
-          
-        when Hash
-          OpenStruct.new(
-            map_values(value) { |k, v| _to_open_struct v, freeze: freeze }
-          )
-          
-        when Array
-          value.map { |v| _to_open_struct v, freeze: freeze }
-          
-        when Set
-          Set.new value.map { |v| _to_open_struct v, freeze: freeze }
+  
+    def self._to_open_struct value, freeze:
+      result = case value
+      when OpenStruct
+        # Just assume it's already taken care of if it's already an OpenStruct
+        value
         
-        else
-          value
-        end
+      when Hash
+        OpenStruct.new(
+          value.transform_values { |v| _to_open_struct v, freeze: freeze }
+        )
         
-        if freeze
-          result.freeze
-        end
+      when Array
+        value.map { |v| _to_open_struct v, freeze: freeze }
         
-        result
-      end # ._to_open_struct
-    # end private
+      when Set
+        Set.new value.map { |v| _to_open_struct v, freeze: freeze }
+      
+      else
+        value
+      end
+      
+      result.freeze if freeze
+      
+      result
+    end # ._to_open_struct
     
-  end # class < self (Eigenclass)
+    private_class_method :_to_open_struct
   
 end # module NRSER

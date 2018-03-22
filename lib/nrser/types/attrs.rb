@@ -1,8 +1,7 @@
-require 'nrser/refinements'
+require 'nrser/core_ext/hash'
 require 'nrser/types/type'
 require 'nrser/types/combinators'
 
-using NRSER
   
 module NRSER::Types
   class Attrs < NRSER::Types::Type
@@ -14,9 +13,7 @@ module NRSER::Types
           "Must provide at least one attribute name/type pair"
       end
       
-      @attrs = NRSER.map_values(attrs) { |name, type|
-        NRSER::Types.make type
-      }
+      @attrs = attrs.transform_values { |type| NRSER::Types.make type }
     end
     
     def default_name
@@ -118,7 +115,7 @@ module NRSER::Types
       
     when ::Hash
       # It's keyword args
-      kwds = NRSER.symbolize_keys args[0]
+      kwds = args[0].sym_keys
       
       # Pull any :min and :max in the keywords
       bounds[:min] = kwds.delete :min

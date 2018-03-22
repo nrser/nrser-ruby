@@ -1,7 +1,7 @@
 describe_spec_file(
   spec_path: __FILE__,
   module: NRSER,
-  method: :to_h_by,
+  method: :assoc_by,
 ) do
     
   describe "when map does not result in duplicate keys" do

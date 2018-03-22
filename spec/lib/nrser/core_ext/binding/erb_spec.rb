@@ -1,11 +1,11 @@
-require 'spec_helper'
+require 'nrser/core_ext/binding'
 
-describe 'NRSER.template' do
+describe 'Binding#erb' do
   it "processes a simple template" do
     x = 1
 
     expect(
-      NRSER.template binding, <<-BLOCK
+      binding.erb <<-BLOCK
         x is <%= x %>
       BLOCK
     ).to eq NRSER.dedent <<-BLOCK
@@ -14,7 +14,7 @@ describe 'NRSER.template' do
   end
 
   it "handles edge cases" do
-    expect( NRSER.template binding, ''     ).to eq ''
-    expect( NRSER.template binding, 'blah' ).to eq 'blah'
+    expect( binding.erb ''     ).to eq ''
+    expect( binding.erb 'blah' ).to eq 'blah'
   end
 end # template

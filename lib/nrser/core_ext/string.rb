@@ -1,11 +1,8 @@
+require 'active_support/core_ext/string/filters'
+
 # Extension methods for {String}
 # 
-module NRSER::Ext::String
-  
-  def squish
-    NRSER.squish self
-  end
-  
+class String
   
   def unblock
     NRSER.unblock self
@@ -88,4 +85,4 @@ module NRSER::Ext::String
   
   # @!endgroup Unicode Stylization
   
-end # module NRSER::Ext::String
+end # class String

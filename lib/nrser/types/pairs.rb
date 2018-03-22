@@ -9,6 +9,8 @@
 
 # Project / Package
 # -----------------------------------------------------------------------
+require 'nrser/core_ext/hash'
+
 require_relative './combinators'
 
 
@@ -54,7 +56,7 @@ module NRSER::Types
   #   Name to give the new type.
   # 
   # @param [Hash] **options
-  #   Other options to pass to 
+  #   Other options to pass to
   # 
   # @return [NRSER::Types::Type]
   # 
@@ -70,7 +72,7 @@ module NRSER::Types
     
     if hash_options.empty?
       intersection is_a( Hash ), length( 1 ), **options
-    else    
+    else
       intersection \
         hash_type( **hash_options ),
         length( 1 ),
@@ -94,7 +96,7 @@ module NRSER::Types
     if options.empty?
       PAIR
     else
-      type_options = NRSER.slice_keys! options, :key, :value
+      type_options = options.slice! :key, :value
       
       union \
         array_pair( **type_options ),
@@ -106,4 +108,3 @@ module NRSER::Types
   PAIR = pair( name: 'PairType' ).freeze
   
 end # module NRSER::Types
-

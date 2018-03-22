@@ -44,6 +44,9 @@ Gem::Specification.new do |spec|
   # 
   spec.add_dependency 'commonmarker', '~> 0.17.7'
   
+  # All sorts of goodies (and monkey business)
+  spec.add_dependency 'activesupport', '~> 5.1'
+  
   # Development Dependencies
   # ----------------------------------------------------------------------------
 

@@ -2,7 +2,6 @@ require_relative './enumerable/find_map'
 require_relative './enumerable/find_all_map'
 require_relative './enumerable/include_slice'
 require_relative './enumerable/associate'
-require_relative './enumerable/map_values'
 
 module NRSER
   
@@ -64,7 +63,7 @@ module NRSER
     NRSER::Types.
       length(bounds).
       check(enum.find_all &block) { |type:, value:|
-        erb binding, <<-END
+        binding.erb <<-END
           
           Length of found elements (<%= value.length %>) FAILED to
           satisfy <%= type.to_s %>.

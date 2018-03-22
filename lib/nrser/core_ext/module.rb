@@ -7,11 +7,8 @@
 #   
 #   Hence the target functions have been prefixed with `f_`.
 # 
-module NRSER::Ext::Module
+class Module
 
-  # @!group Module Methods
-  # ==========================================================================
-  
   # Calls {NRSER.class_method_objects_for} with `self` as first arg.
   def class_method_objects *args
     NRSER.class_method_objects_for self, *args
@@ -59,4 +56,4 @@ module NRSER::Ext::Module
   
   # @!endgroup Module Methods
   
-end # module NRSER::Ext::String
+end # class Module

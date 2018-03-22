@@ -1,6 +1,5 @@
 require_relative './include_slice/array_include_slice'
 
-using NRSER
 
 module NRSER
   
