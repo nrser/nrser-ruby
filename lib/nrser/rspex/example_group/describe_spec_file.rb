@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+using NRSER
+
 module NRSER::RSpex::ExampleGroup
   
   # **EXPERIMENTAL**
