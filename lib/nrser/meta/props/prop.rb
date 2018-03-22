@@ -138,7 +138,7 @@ class NRSER::Meta::Props::Prop
       if default.nil?
         # If it's `nil`, we will use it as the default value *if* this
         # is a primary prop *and* the type is satisfied by `nil`
-        @has_default = source? && @type.test( default )
+        @has_default = !source? && @type.test( default )
         return
       end
       
@@ -390,10 +390,14 @@ class NRSER::Meta::Props::Prop
         set instance, default
       else
         raise TypeError.new binding.erb <<-ERB
-          Prop <#= full_name %> has no default value and no value was provided
+          Prop <%= full_name %> has no default value and no value was provided
           in values:
           
               <%= values.pretty_inspect %>
+          
+          Prop:
+          
+              <%= self.pretty_inspect %>
           
         ERB
       end
