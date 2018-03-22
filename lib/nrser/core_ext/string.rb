@@ -1,3 +1,4 @@
+require 'pathname'
 require 'active_support/core_ext/string/filters'
 
 # Extension methods for {String}
