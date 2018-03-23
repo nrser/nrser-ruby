@@ -259,15 +259,38 @@ class NRSER::Meta::Props::Prop
   alias_method :default?, :has_default?
   
   
-  def default
+  # Get the default value for the property given the instance and values.
+  # 
+  # @todo
+  #   This is a shitty hack stop-gap until I really figure our how this should
+  #   work.
+  # 
+  # @param [NRSER::Meta::Props] instance
+  #   Instance being built.
+  # 
+  # @param [Hash<Symbol, Object>] **values
+  #   Values provided for initialization.
+  # 
+  # @return [Object]
+  #   Default value.
+  # 
+  # @raise [NameError]
+  #   If the prop doesn't have a default.
+  # 
+  def default instance, **values
     if has_default?
       if Proc === @default
-        @default.call
+        case @default.arity
+        when 0
+          @default.call
+        else
+          @default.call instance, **values
+        end
       else
         @default
       end
     else
-      raise NameError.new NRSER.squish <<-END
+      raise NameError.new <<-END.squish
         Prop #{ self } has no default value.
       END
     end
@@ -387,7 +410,7 @@ class NRSER::Meta::Props::Prop
         # else
         #   default
         # end
-        set instance, default
+        set instance, default( instance, **values )
       else
         raise TypeError.new binding.erb <<-ERB
           Prop <%= full_name %> has no default value and no value was provided

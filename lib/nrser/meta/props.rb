@@ -12,6 +12,7 @@ module NRSER::Meta::Props
   DEFAULT_CLASS_KEY = '__class__';
   
   PROPS_VARIABLE_NAME = :@__NRSER_props
+  INVARIANTS_VARIABLE_NAME = :@__NRSER_invariants
   PROP_VALUES_VARIABLE_NAME = :@__NRSER_prop_values
   
   
@@ -25,13 +26,15 @@ module NRSER::Meta::Props
   # 
   
   
-  # @todo Document get_props_ref method.
+  # Get the **mutable reference** to the hash that holds
+  # {NRSER::Meta::Props::Prop} instances (for this class only - inherited
+  # props are added in `.props`).
   # 
-  # @param [type] arg_name
-  #   @todo Add name param description.
+  # @param [Class<NRSER::Meta::Props>] klass
+  #   Propertied class to get the ref for.
   # 
-  # @return [return_type]
-  #   @todo Document return value.
+  # @return [Hash<Symbol, NRSER::Meta::Props::Prop>]
+  #   Map of prop names to instances.
   # 
   def self.get_props_ref klass
     unless klass.instance_variable_defined? PROPS_VARIABLE_NAME
@@ -40,6 +43,25 @@ module NRSER::Meta::Props
     
     klass.instance_variable_get PROPS_VARIABLE_NAME
   end # .get_props_ref
+  
+  
+  # Get the **mutable reference** to the set that holds additional types
+  # invariants that instances must satisfy (for this class only - inherited
+  # invariants are added in `.invariants`).
+  # 
+  # @param [Class<NRSER::Meta::Props>] klass
+  #   Propertied class to get the ref for.
+  # 
+  # @return [Set<NRSER::Types::Type>]
+  #   Set of invariant types.
+  # 
+  def self.get_invariants_ref klass
+    unless klass.instance_variable_defined? INVARIANTS_VARIABLE_NAME
+      klass.instance_variable_set INVARIANTS_VARIABLE_NAME, Set.new
+    end
+    
+    klass.instance_variable_get INVARIANTS_VARIABLE_NAME
+  end # .get_invariants_ref
   
   
   # Instantiate a class from a data hash. The hash must contain the
@@ -240,27 +262,51 @@ module NRSER::Meta::Props
     end # #from_data
     
     
+    def invariants only_own: false
+      parent = if !only_own && superclass.respond_to?( :invariants )
+        superclass.invariants only_own: false
+      else
+        Set.new
+      end
+      
+      parent + NRSER::Meta::Props.get_invariants_ref( self )
+    end
+    
+    
+    def invariant type
+      NRSER::Meta::Props.get_invariants_ref( self ).add type
+    end
+    
   end # module ClassMethods
   
   
   # Mixed-In Instance Methods
   # =====================================================================
   
-  # @todo Document initialize_props method.
+  # Initialize the properties from a hash.
   # 
-  # @param [type] arg_name
-  #   @todo Add name param description.
+  # Called from `#initialize` in {NRSER::Meta::Props::Base}, but if you just
+  # mix in {NRSER::Meta::Props} you need to call it yourself.
   # 
-  # @return [return_type]
-  #   @todo Document return value.
+  # @param [Hash<(String | Symbol) => Object>] values
+  #   Property values. Keys will be normalized to symbols.
+  # 
+  # @return [nil]
   # 
   def initialize_props values
     self.class.props(only_primary: true).each { |name, prop|
-      prop.set_from_values_hash self, values
+      prop.set_from_values_hash self, values.to_options
     }
     
     # TODO  Now trigger all eager defaults (check prop getting trigger
     #       correctly)
+    
+    # Check additional type invariants
+    self.class.invariants.each do |type|
+      type.check self
+    end
+    
+    nil
   end # #initialize_props
   
   
@@ -271,13 +317,16 @@ module NRSER::Meta::Props
   end
   
   
-  # @todo Document to_h method.
+  # Create a new hash with property names mapped to values.
   # 
-  # @param [type] arg_name
-  #   @todo Add name param description.
+  # @param [Boolean] only_own:
+  #   When `true`, don't include parent properties.
+  # 
+  # @param [Boolean] only_primary:
+  #   When `true`, don't include sourced properties.
   # 
   # @return [Hash<Symbol, Object>]
-  #   @todo Document return value.
+  #   Map of prop names to values.
   # 
   def to_h only_own: false, only_primary: false
     self.class.
@@ -297,11 +346,21 @@ module NRSER::Meta::Props
   # supports symbol values, they have poor portability across languages,
   # and they mean the same thing in this situation.
   # 
-  # @param [type] arg_name
-  #   @todo Add name param description.
+  # @param [Boolean] only_own:
+  #   When `true`, don't include parent properties.
+  # 
+  # @param [Boolean] only_primary:
+  #   When `true`, don't include sourced properties.
+  # 
+  # @param [Boolean] add_class:
+  #   Add a special key with the class' name as the value.
+  # 
+  # @param [String] class_key:
+  #   Name for special class key.
   # 
   # @return [Hash<String, Object>]
-  #   @todo Document return value.
+  #   Map of property names as strings to their "data" value, plus the special
+  #   class identifier key and value, if requested.
   # 
   def to_data only_own: false,
               only_primary: false,
