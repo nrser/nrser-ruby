@@ -77,6 +77,7 @@ require_relative './nrser/collection'
 require_relative './nrser/functions'
 require_relative './nrser/types'
 require_relative './nrser/meta'
+require_relative './nrser/data'
 require_relative './nrser/mean_streak'
 
 # 5.  Stuff that *uses* the refinements *at require time* (usually defining

@@ -7,8 +7,8 @@ using NRSER
 # Definitions
 # =======================================================================
 
-class NRSER::Meta::Props::Base
-  include NRSER::Meta::Props
+class NRSER::Data::Props::Base
+  include NRSER::Data::Props
   
   def initialize **values
     initialize_props values
@@ -28,4 +28,4 @@ class NRSER::Meta::Props::Base
       #<#{ self.class.name } #{ props_str }>
     END
   end # #to_s
-end # class NRSER::Meta::Props::Base
+end # class NRSER::Data::Props::Base

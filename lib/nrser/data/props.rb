@@ -8,7 +8,7 @@ using NRSER::Types
 # Definitions
 # =======================================================================
 
-module NRSER::Meta::Props
+module NRSER::Data::Props
   DEFAULT_CLASS_KEY = '__class__';
   
   PROPS_VARIABLE_NAME = :@__NRSER_props
@@ -20,20 +20,20 @@ module NRSER::Meta::Props
   # =====================================================================
   # 
   # These are *NOT* mixed in to including classes, and must be accessed
-  # via `NRSER::Meta::Props.<method_name>`.
+  # via `NRSER::Data::Props.<method_name>`.
   # 
   # They're utilities that should only really need to be used internally.
   # 
   
   
   # Get the **mutable reference** to the hash that holds
-  # {NRSER::Meta::Props::Prop} instances (for this class only - inherited
+  # {NRSER::Data::Props::Prop} instances (for this class only - inherited
   # props are added in `.props`).
   # 
-  # @param [Class<NRSER::Meta::Props>] klass
+  # @param [Class<NRSER::Data::Props>] klass
   #   Propertied class to get the ref for.
   # 
-  # @return [Hash<Symbol, NRSER::Meta::Props::Prop>]
+  # @return [Hash<Symbol, NRSER::Data::Props::Prop>]
   #   Map of prop names to instances.
   # 
   def self.get_props_ref klass
@@ -49,7 +49,7 @@ module NRSER::Meta::Props
   # invariants that instances must satisfy (for this class only - inherited
   # invariants are added in `.invariants`).
   # 
-  # @param [Class<NRSER::Meta::Props>] klass
+  # @param [Class<NRSER::Data::Props>] klass
   #   Propertied class to get the ref for.
   # 
   # @return [Set<NRSER::Types::Type>]
@@ -77,7 +77,7 @@ module NRSER::Meta::Props
   # 
   # @param
   # 
-  # @return [NRSER::Meta::Props]
+  # @return [NRSER::Data::Props]
   #   Instance of a propertied class.
   # 
   def self.UNSAFE_load_instance_from_data data, class_key: DEFAULT_CLASS_KEY
@@ -103,7 +103,7 @@ module NRSER::Meta::Props
     klass = class_name.to_const
     
     # Make sure it's one of ours
-    unless klass.included_modules.include?( NRSER::Meta::Props )
+    unless klass.included_modules.include?( NRSER::Data::Props )
       raise ArgumentError.new binding.erb <<-ERB
         Can not load instance from data - bad class name.
         
@@ -119,7 +119,7 @@ module NRSER::Meta::Props
         
             <%= klass.inspect %>
         
-        but that class does not include the NRSER::Meta::Props mixin, which we
+        but that class does not include the NRSER::Data::Props mixin, which we
         check for to help protect against executing an unrelated `.from_data`
         class method when attempting to load.
         
@@ -136,7 +136,7 @@ module NRSER::Meta::Props
   end # .UNSAFE_load_instance_from_data
   
   
-  # Hook to extend the including class with {NRSER::Meta::Props:ClassMethods}
+  # Hook to extend the including class with {NRSER::Data::Props:ClassMethods}
   def self.included base
     base.extend ClassMethods
   end
@@ -155,9 +155,9 @@ module NRSER::Meta::Props
     #   Don't include super-class properties.
     # 
     # @param [Boolean] only_primary:
-    #   Don't include properties that have a {NRSER::Meta::Props::Prop#source}.
+    #   Don't include properties that have a {NRSER::Data::Props::Prop#source}.
     # 
-    # @return [Hash{ Symbol => NRSER::Meta::Props::Prop }]
+    # @return [Hash{ Symbol => NRSER::Data::Props::Prop }]
     #   Hash mapping property name to property instance.
     # 
     def props only_own: false, only_primary: false
@@ -167,7 +167,7 @@ module NRSER::Meta::Props
         {}
       end
       
-      own_props = NRSER::Meta::Props.get_props_ref self
+      own_props = NRSER::Data::Props.get_props_ref self
       
       if only_primary
         own_props.each {|name, prop|
@@ -189,14 +189,14 @@ module NRSER::Meta::Props
     #   The name of the property.
     # 
     # @param [Hash{ Symbol => Object }] **opts
-    #   Constructor options for {NRSER::Meta::Props::Prop}.
+    #   Constructor options for {NRSER::Data::Props::Prop}.
     # 
-    # @return [NRSER::Meta::Props::Prop]
+    # @return [NRSER::Data::Props::Prop]
     #   The newly created prop, thought you probably don't need it (it's
     #   already all bound up on the class at this point), but why not?
     # 
     def prop name, **opts
-      ref = NRSER::Meta::Props.get_props_ref self
+      ref = NRSER::Data::Props.get_props_ref self
       
       t.sym.check name
       
@@ -269,12 +269,12 @@ module NRSER::Meta::Props
         Set.new
       end
       
-      parent + NRSER::Meta::Props.get_invariants_ref( self )
+      parent + NRSER::Data::Props.get_invariants_ref( self )
     end
     
     
     def invariant type
-      NRSER::Meta::Props.get_invariants_ref( self ).add type
+      NRSER::Data::Props.get_invariants_ref( self ).add type
     end
     
   end # module ClassMethods
@@ -285,8 +285,8 @@ module NRSER::Meta::Props
   
   # Initialize the properties from a hash.
   # 
-  # Called from `#initialize` in {NRSER::Meta::Props::Base}, but if you just
-  # mix in {NRSER::Meta::Props} you need to call it yourself.
+  # Called from `#initialize` in {NRSER::Data::Props::Base}, but if you just
+  # mix in {NRSER::Data::Props} you need to call it yourself.
   # 
   # @param [Hash<(String | Symbol) => Object>] values
   #   Property values. Keys will be normalized to symbols.
@@ -365,7 +365,7 @@ module NRSER::Meta::Props
   def to_data only_own: false,
               only_primary: false,
               add_class: true,
-              class_key: NRSER::Meta::Props::DEFAULT_CLASS_KEY
+              class_key: NRSER::Data::Props::DEFAULT_CLASS_KEY
               
     self.class.props(only_own: false, only_primary: false).
       map { |name, prop|

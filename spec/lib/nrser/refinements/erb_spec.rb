@@ -1,12 +1,7 @@
-require 'spec_helper'
-
-require 'nrser/refinements'
-using NRSER
-
 require 'nrser/refinements/types'
 using NRSER::Types
 
-require 'nrser/meta/props'
+require 'nrser/data/props'
 
 describe 'Binding#erb' do
   it "refines NRSER.erb into Binding" do
@@ -87,7 +82,7 @@ END
   
   
   it "works on a real-world example" do
-    ERBSpecTester = Class.new( NRSER::Meta::Props::Base ) do
+    ERBSpecTester = Class.new( NRSER::Data::Props::Base ) do
       prop :x, type: t.int, from_data: {hey: 'ho', lets: 'go!'}
     end
     

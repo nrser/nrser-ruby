@@ -7,7 +7,7 @@ require 'nrser/refinements/types'
 using NRSER::Types
 
 
-describe NRSER::Meta::Props do
+describe NRSER::Data::Props do
   
   context "simple Point class" do
     
@@ -15,7 +15,7 @@ describe NRSER::Meta::Props do
     # =====================================================================
     
     let(:point_class) {
-      Class.new(NRSER::Meta::Props::Base) do
+      Class.new(NRSER::Data::Props::Base) do
         # So that error messages look right
         def self.name; 'Point'; end
         
@@ -38,7 +38,7 @@ describe NRSER::Meta::Props do
       it {
         is_expected.to be_a( Hash ).and have_attributes \
           keys: eq( [:x, :y, :blah] ),
-          values: all( be_a NRSER::Meta::Props::Prop )
+          values: all( be_a NRSER::Data::Props::Prop )
       }
       
       describe 'primary props `x` and `y`' do
@@ -47,7 +47,7 @@ describe NRSER::Meta::Props do
             subject { super()[name] }
             
             include_examples "expect subject", to: {
-              be_a: NRSER::Meta::Props::Prop,
+              be_a: NRSER::Data::Props::Prop,
               have_attributes: {
                 source?: false,
                 primary?: true,
@@ -61,7 +61,7 @@ describe NRSER::Meta::Props do
         subject { super()[:blah] }
         
         include_examples "expect subject", to: {
-          be_a: NRSER::Meta::Props::Prop,
+          be_a: NRSER::Data::Props::Prop,
           have_attributes: {
             source?: true,
             primary?: false,
@@ -84,7 +84,7 @@ describe NRSER::Meta::Props do
           and have_attributes(
             keys: eq( [:x, :y] ),
             values: all(
-              be_a( NRSER::Meta::Props::Prop ).
+              be_a( NRSER::Data::Props::Prop ).
                 and have_attributes source?: false, primary?: true
             )
           )
@@ -160,5 +160,5 @@ describe NRSER::Meta::Props do
     
   end # simple Point class
   
-end # NRSER::Meta::Props
+end # NRSER::Data::Props
 

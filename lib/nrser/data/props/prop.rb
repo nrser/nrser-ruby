@@ -10,7 +10,7 @@ using NRSER::Types
 
 module NRSER; end
 module NRSER::Meta; end
-module NRSER::Meta::Props; end
+module NRSER::Data::Props; end
 
 
 # Definitions
@@ -21,7 +21,7 @@ module NRSER::Meta::Props; end
 # 
 # Props are immutable by design.
 # 
-class NRSER::Meta::Props::Prop
+class NRSER::Data::Props::Prop
   
   # The class the prop was defined in.
   # 
@@ -75,8 +75,8 @@ class NRSER::Meta::Props::Prop
   # 
   # You should not need to construct a `Prop` directly unless you are doing
   # custom meta-programming - they should be constructed for you via the
-  # `.prop` "macro" defined at {NRSER::Meta::Props::ClassMethods#prop}
-  # that is extended in to classes including {NRSER::Meta::Props}.
+  # `.prop` "macro" defined at {NRSER::Data::Props::ClassMethods#prop}
+  # that is extended in to classes including {NRSER::Data::Props}.
   # 
   # @param [nil | Proc | Object] default:
   #   A default value or a {Proc} used to get default values for *primary*
@@ -195,7 +195,7 @@ class NRSER::Meta::Props::Prop
   # Instance Methods
   # ============================================================================
   
-  # Used by the {NRSER::Meta::Props::ClassMethods.prop} "macro" method to
+  # Used by the {NRSER::Data::Props::ClassMethods.prop} "macro" method to
   # determine if it should create a reader method on the propertied class.
   # 
   # @return [Boolean]
@@ -216,7 +216,7 @@ class NRSER::Meta::Props::Prop
   end # #create_reader?
   
   
-  # Used by the {NRSER::Meta::Props::ClassMethods.prop} "macro" method to
+  # Used by the {NRSER::Data::Props::ClassMethods.prop} "macro" method to
   # determine if it should create a writer method on the propertied class.
   # 
   # Right now, we don't create writers, but we will probably make them an
@@ -265,7 +265,7 @@ class NRSER::Meta::Props::Prop
   #   This is a shitty hack stop-gap until I really figure our how this should
   #   work.
   # 
-  # @param [NRSER::Meta::Props] instance
+  # @param [NRSER::Data::Props] instance
   #   Instance being built.
   # 
   # @param [Hash<Symbol, Object>] **values
@@ -461,7 +461,7 @@ class NRSER::Meta::Props::Prop
   #     -   The `to_data:` proc is called with the property value as the sole
   #         argument and the result is returned as the data.
   # 
-  # @param [NRSER::Meta::Props] instance
+  # @param [NRSER::Data::Props] instance
   #   Instance to get the property value form.
   # 
   # @return [Object]
@@ -575,14 +575,14 @@ class NRSER::Meta::Props::Prop
     # 
     def values instance
       unless instance.instance_variable_defined?(
-        NRSER::Meta::Props::PROP_VALUES_VARIABLE_NAME
+        NRSER::Data::Props::PROP_VALUES_VARIABLE_NAME
       )
         instance.instance_variable_set \
-          NRSER::Meta::Props::PROP_VALUES_VARIABLE_NAME, {}
+          NRSER::Data::Props::PROP_VALUES_VARIABLE_NAME, {}
       end
       
       instance.instance_variable_get \
-        NRSER::Meta::Props::PROP_VALUES_VARIABLE_NAME
+        NRSER::Data::Props::PROP_VALUES_VARIABLE_NAME
     end # #value
   
-end # class NRSER::Meta::Props::Prop
+end # class NRSER::Data::Props::Prop

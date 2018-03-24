@@ -13,7 +13,7 @@
 # Project / Package
 # -----------------------------------------------------------------------
 
-require 'nrser/meta/props'
+require 'nrser/data/props'
 
 
 # Refinements
@@ -36,7 +36,7 @@ class NRSER::Meta::Source::Location < Hamster::Vector
   # Mixins
   # ============================================================================
   
-  include NRSER::Meta::Props
+  include NRSER::Data::Props
   
   
   # Constants
