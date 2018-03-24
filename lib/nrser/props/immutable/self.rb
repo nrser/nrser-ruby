@@ -79,7 +79,7 @@ module NRSER::Props::Immutable::Self
   
   # Instantiate a new `NRSER::Props::Immutable::Vector`.
   def initialize source = {}
-    if self.class.metadata.storage == NRSER::Props::Storage::Key
+    if self.class.metadata.storage.is_a? NRSER::Props::Storage::Key
       values = self.respond_to?( :each_pair ) ? {} : []
       
       self.class.props( only_primary: true ).values.each do |prop|
@@ -88,12 +88,14 @@ module NRSER::Props::Immutable::Self
       
       super values
     
-    elsif self.class.metadata.storage == \
+    elsif self.class.metadata.storage.is_a? \
             NRSER::Props::Storage::InstanceVariables
       self.class.props( only_primary: true ).values.each do |prop|
         instance_variable_set "@#{ prop.key }",
                               prop.create_value( self, source )
       end
+      
+      freeze
       
     else
       raise "BAD BAD!"
