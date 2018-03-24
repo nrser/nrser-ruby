@@ -1,7 +1,7 @@
 require 'nrser/refinements/types'
 using NRSER::Types
 
-require 'nrser/data/props'
+require 'nrser/props'
 
 describe 'Binding#erb' do
   it "refines NRSER.erb into Binding" do
@@ -82,7 +82,9 @@ END
   
   
   it "works on a real-world example" do
-    ERBSpecTester = Class.new( NRSER::Data::Base ) do
+    ERBSpecTester = Class.new do
+      include NRSER::Props::Immutable
+      
       prop :x, type: t.int, from_data: {hey: 'ho', lets: 'go!'}
     end
     

@@ -17,6 +17,7 @@ require 'cmds'
 # Project / Package
 # -----------------------------------------------------------------------
 require 'nrser'
+require 'nrser/refinements/types'
 require 'nrser/rspex'
 
 # Local Tree
@@ -28,6 +29,9 @@ RSpec.configure do |config|
   unless ENV['LABS']
     config.filter_run_excluding labs: true
   end
+  
+  config.example_status_persistence_file_path = \
+    NRSER::ROOT / 'tmp' / ".rspec_status"
 end
 
 

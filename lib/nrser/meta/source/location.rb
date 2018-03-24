@@ -13,7 +13,8 @@
 # Project / Package
 # -----------------------------------------------------------------------
 
-require 'nrser/data/props'
+require 'nrser/props'
+require 'nrser/props/immutable/self'
 
 
 # Refinements
@@ -31,12 +32,13 @@ module NRSER::Meta::Source; end
 # =======================================================================
 
 # @todo document NRSER::Meta::Source::Location class.
+# class NRSER::Meta::Source::Location < NRSER::Props::Immutable::Vector
 class NRSER::Meta::Source::Location < Hamster::Vector
   
   # Mixins
   # ============================================================================
   
-  include NRSER::Data::Props
+  include NRSER::Props::Immutable::Self
   
   
   # Constants
@@ -47,7 +49,7 @@ class NRSER::Meta::Source::Location < Hamster::Vector
   # ======================================================================
   
   
-  # Attributes
+  # Data
   # ======================================================================
   
   prop  :file, type: t.abs_path?, default: nil, key: 0
@@ -57,55 +59,9 @@ class NRSER::Meta::Source::Location < Hamster::Vector
   # Constructor
   # ======================================================================
   
-  # Instantiate a new `NRSER::Meta::Source::Location`.
-  def initialize *args
-    initialize_props \
-      case args.length
-      when 0
-        { file: nil,
-          line: nil }
-      when 1
-        case args[0]
-        when nil
-          { file: nil,
-            line: nil }
-        when Array
-          { file: args[0][0],
-            line: args[0][1] }
-        when Hash
-          args[0]
-        when NRSER::Meta::Source::Location
-          # TODO Props should handle this case automatically...
-          args[0].to_h
-        else
-          raise TypeError.new binding.erb <<~END
-            Single argument must be `nil`, `Array`, `Hash` or
-            `NRSER::Meta::Source::Location`, found arg:
-            
-                <%= args[0].pretty_inspect %>
-            
-          END
-        end
-      when 2
-        { file: args[0],
-          line: args[1] }
-      else
-        raise ArgumentError.new binding.erb <<~END
-          Expects at most two arguments, found args:
-          
-              <%= args.pretty_inspect %>
-          
-          END
-      end
-    
-    super [file, line]
-  end # #initialize
-  
   
   # Instance Methods
   # ======================================================================
-  
-  
   
   # @todo Document valid? method.
   # 

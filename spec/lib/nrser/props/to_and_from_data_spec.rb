@@ -1,13 +1,9 @@
-require 'nrser/data/props'
+require 'nrser/props'
 
-require 'nrser/refinements'
-using NRSER
-
-require 'nrser/refinements/types'
 using NRSER::Types
 
 
-describe NRSER::Data::Props do
+describe NRSER::Props do
   
   describe_section "to and from data" do
   # ========================================================================
@@ -16,7 +12,9 @@ describe NRSER::Data::Props do
     unsigned = t.unsigned
     
     before( :all ) {
-      Cat = @cat_class = Class.new( NRSER::Data::Base ) do
+      Cat = @cat_class = Class.new do
+        include NRSER::Props::Immutable
+        
         prop :name, type: non_empty_str
         prop :breed, type: non_empty_str
         prop :age, type: unsigned
@@ -33,7 +31,9 @@ describe NRSER::Data::Props do
         #               instance variable of the new class.
         cat_class = @cat_class
         
-        @owner_class = Class.new( NRSER::Data::Base ) do
+        @owner_class = Class.new do
+          include NRSER::Props::Immutable
+          
           prop :name, type: non_empty_str
           
           prop :cat, type: cat_class

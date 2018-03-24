@@ -1,13 +1,6 @@
-require 'spec_helper'
-
-require 'nrser/refinements'
-using NRSER
-
-require 'nrser/refinements/types'
 using NRSER::Types
 
-
-describe NRSER::Data::Props do
+describe NRSER::Props do
   
   context "simple Point class" do
     
@@ -15,7 +8,9 @@ describe NRSER::Data::Props do
     # =====================================================================
     
     let(:point_class) {
-      Class.new(NRSER::Data::Base) do
+      Class.new do
+        include NRSER::Props::Immutable
+        
         # So that error messages look right
         def self.name; 'Point'; end
         
@@ -38,7 +33,7 @@ describe NRSER::Data::Props do
       it {
         is_expected.to be_a( Hash ).and have_attributes \
           keys: eq( [:x, :y, :blah] ),
-          values: all( be_a NRSER::Data::Prop )
+          values: all( be_a NRSER::Props::Prop )
       }
       
       describe 'primary props `x` and `y`' do
@@ -47,7 +42,7 @@ describe NRSER::Data::Props do
             subject { super()[name] }
             
             include_examples "expect subject", to: {
-              be_a: NRSER::Data::Prop,
+              be_a: NRSER::Props::Prop,
               have_attributes: {
                 source?: false,
                 primary?: true,
@@ -57,11 +52,11 @@ describe NRSER::Data::Props do
         end
       end # primary props `x` and `y`'
       
-      describe "derived (sourced) prop `blah`" do        
+      describe "derived (sourced) prop `blah`" do
         subject { super()[:blah] }
         
         include_examples "expect subject", to: {
-          be_a: NRSER::Data::Prop,
+          be_a: NRSER::Props::Prop,
           have_attributes: {
             source?: true,
             primary?: false,
@@ -84,7 +79,7 @@ describe NRSER::Data::Props do
           and have_attributes(
             keys: eq( [:x, :y] ),
             values: all(
-              be_a( NRSER::Data::Prop ).
+              be_a( NRSER::Props::Prop ).
                 and have_attributes source?: false, primary?: true
             )
           )
@@ -160,5 +155,4 @@ describe NRSER::Data::Props do
     
   end # simple Point class
   
-end # NRSER::Data::Props
-
+end # NRSER::Props::Props

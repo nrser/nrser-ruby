@@ -23,7 +23,7 @@ using NRSER::Types
 # Definitions
 # =======================================================================
 
-module NRSER::Data::Props
+module NRSER::Props
   DEFAULT_CLASS_KEY = '__class__';
   
   PROPS_VARIABLE_NAME = :@__NRSER_props
@@ -35,20 +35,20 @@ module NRSER::Data::Props
   # =====================================================================
   # 
   # These are *NOT* mixed in to including classes, and must be accessed
-  # via `NRSER::Data::Props.<method_name>`.
+  # via `NRSER::Props::Props.<method_name>`.
   # 
   # They're utilities that should only really need to be used internally.
   # 
   
   
   # Get the **mutable reference** to the hash that holds
-  # {NRSER::Data::Prop} instances (for this class only - inherited
+  # {NRSER::Props::Prop} instances (for this class only - inherited
   # props are added in `.props`).
   # 
-  # @param [Class<NRSER::Data::Props>] klass
+  # @param [Class<NRSER::Props::Props>] klass
   #   Propertied class to get the ref for.
   # 
-  # @return [Hash<Symbol, NRSER::Data::Prop>]
+  # @return [Hash<Symbol, NRSER::Props::Prop>]
   #   Map of prop names to instances.
   # 
   def self.get_props_ref klass
@@ -64,7 +64,7 @@ module NRSER::Data::Props
   # invariants that instances must satisfy (for this class only - inherited
   # invariants are added in `.invariants`).
   # 
-  # @param [Class<NRSER::Data::Props>] klass
+  # @param [Class<NRSER::Props::Props>] klass
   #   Propertied class to get the ref for.
   # 
   # @return [Set<NRSER::Types::Type>]
@@ -92,7 +92,7 @@ module NRSER::Data::Props
   # 
   # @param
   # 
-  # @return [NRSER::Data::Props]
+  # @return [NRSER::Props::Props]
   #   Instance of a propertied class.
   # 
   def self.UNSAFE_load_instance_from_data data, class_key: DEFAULT_CLASS_KEY
@@ -118,7 +118,7 @@ module NRSER::Data::Props
     klass = class_name.to_const
     
     # Make sure it's one of ours
-    unless klass.included_modules.include?( NRSER::Data::Props )
+    unless klass.included_modules.include?( NRSER::Props::Props )
       raise ArgumentError.new binding.erb <<-ERB
         Can not load instance from data - bad class name.
         
@@ -134,7 +134,7 @@ module NRSER::Data::Props
         
             <%= klass.inspect %>
         
-        but that class does not include the NRSER::Data::Props mixin, which we
+        but that class does not include the NRSER::Props::Props mixin, which we
         check for to help protect against executing an unrelated `.from_data`
         class method when attempting to load.
         
@@ -151,7 +151,7 @@ module NRSER::Data::Props
   end # .UNSAFE_load_instance_from_data
   
   
-  # Hook to extend the including class with {NRSER::Data::Props:ClassMethods}
+  # Hook to extend the including class with {NRSER::Props::Props:ClassMethods}
   def self.included base
     base.extend ClassMethods
   end
@@ -170,9 +170,9 @@ module NRSER::Data::Props
     #   Don't include super-class properties.
     # 
     # @param [Boolean] only_primary:
-    #   Don't include properties that have a {NRSER::Data::Prop#source}.
+    #   Don't include properties that have a {NRSER::Props::Prop#source}.
     # 
-    # @return [Hash{ Symbol => NRSER::Data::Prop }]
+    # @return [Hash{ Symbol => NRSER::Props::Prop }]
     #   Hash mapping property name to property instance.
     # 
     def props only_own: false, only_primary: false
@@ -182,7 +182,7 @@ module NRSER::Data::Props
         {}
       end
       
-      own_props = NRSER::Data::Props.get_props_ref self
+      own_props = NRSER::Props::Props.get_props_ref self
       
       if only_primary
         own_props.each {|name, prop|
@@ -204,14 +204,14 @@ module NRSER::Data::Props
     #   The name of the property.
     # 
     # @param [Hash{ Symbol => Object }] **opts
-    #   Constructor options for {NRSER::Data::Prop}.
+    #   Constructor options for {NRSER::Props::Prop}.
     # 
-    # @return [NRSER::Data::Prop]
+    # @return [NRSER::Props::Prop]
     #   The newly created prop, thought you probably don't need it (it's
     #   already all bound up on the class at this point), but why not?
     # 
     def prop name, **opts
-      ref = NRSER::Data::Props.get_props_ref self
+      ref = NRSER::Props::Props.get_props_ref self
       
       t.sym.check name
       
@@ -222,7 +222,7 @@ module NRSER::Data::Props
         END
       end
       
-      prop = NRSER::Data::Prop.new self, name, **opts
+      prop = NRSER::Props::Prop.new self, name, **opts
       ref[name] = prop
       
       if prop.create_reader?
@@ -284,12 +284,12 @@ module NRSER::Data::Props
         Set.new
       end
       
-      parent + NRSER::Data::Props.get_invariants_ref( self )
+      parent + NRSER::Props::Props.get_invariants_ref( self )
     end
     
     
     def invariant type
-      NRSER::Data::Props.get_invariants_ref( self ).add type
+      NRSER::Props::Props.get_invariants_ref( self ).add type
     end
     
   end # module ClassMethods
@@ -298,127 +298,7 @@ module NRSER::Data::Props
   # Mixed-In Instance Methods
   # =====================================================================
   
-  # Initialize the properties from a hash.
-  # 
-  # Called from `#initialize` in {NRSER::Data::Base}, but if you just
-  # mix in {NRSER::Data::Props} you need to call it yourself.
-  # 
-  # @param [Hash<(String | Symbol) => Object>] values
-  #   Property values. Keys will be normalized to symbols.
-  # 
-  # @return [nil]
-  # 
-  def initialize_props values
-    self.class.props(only_primary: true).each { |name, prop|
-      prop.set_from_values_hash self, values.to_options
-    }
-    
-    # TODO  Now trigger all eager defaults (check prop getting trigger
-    #       correctly)
-    
-    # Check additional type invariants
-    self.class.invariants.each do |type|
-      type.check self
-    end
-    
-    nil
-  end # #initialize_props
   
-  
-  def merge overrides = {}
-    self.class.new(
-      self.to_h(only_primary: true).merge(overrides.symbolize_keys)
-    )
-  end
-  
-  
-  # Create a new hash with property names mapped to values.
-  # 
-  # @param [Boolean] only_own:
-  #   When `true`, don't include parent properties.
-  # 
-  # @param [Boolean] only_primary:
-  #   When `true`, don't include sourced properties.
-  # 
-  # @return [Hash<Symbol, Object>]
-  #   Map of prop names to values.
-  # 
-  def to_h only_own: false, only_primary: false
-    self.class.
-      props(only_own: only_own, only_primary: only_primary).
-      transform_values { |prop| prop.get self }
-  end # #to_h
-  
-  
-  # Create a "data" representation suitable for transport, storage, etc.
-  # 
-  # The result is meant to consist of only basic data types and structures -
-  # strings, numbers, arrays, hashes, datetimes, etc... though it depends on
-  # any custom objects it encounters correctly responding to `#to_data` for
-  # this to happen (as is implemented from classes that mix in Props here).
-  # 
-  # Prop names are converted to strings (from symbols) since though YAML
-  # supports symbol values, they have poor portability across languages,
-  # and they mean the same thing in this situation.
-  # 
-  # @param [Boolean] only_own:
-  #   When `true`, don't include parent properties.
-  # 
-  # @param [Boolean] only_primary:
-  #   When `true`, don't include sourced properties.
-  # 
-  # @param [Boolean] add_class:
-  #   Add a special key with the class' name as the value.
-  # 
-  # @param [String] class_key:
-  #   Name for special class key.
-  # 
-  # @return [Hash<String, Object>]
-  #   Map of property names as strings to their "data" value, plus the special
-  #   class identifier key and value, if requested.
-  # 
-  def to_data only_own: false,
-              only_primary: false,
-              add_class: true,
-              class_key: NRSER::Data::Props::DEFAULT_CLASS_KEY
-              
-    self.class.props(only_own: false, only_primary: false).
-      map { |name, prop|
-        [name.to_s, prop.to_data(self)]
-      }.
-      to_h.
-      tap { |hash|
-        hash[class_key] = self.class.name if add_class
-      }
-  end # #to_data
-  
-  
-  # Language Inter-Op
-  # ---------------------------------------------------------------------
-  
-  # Get a JSON {String} encoding the instance's data.
-  # 
-  # @param [Array] *args
-  #   I really don't know. `#to_json` takes at last one argument, but I've
-  #   had trouble finding a spec for it :/
-  # 
-  # @return [String]
-  # 
-  def to_json *args
-    to_data.to_json *args
-  end # #to_json
-  
-  
-  # Get a YAML {String} encoding the instance's data.
-  # 
-  # @param [Array] *args
-  #   I really don't know... whatever {YAML.dump} sends to it i guess.
-  # 
-  # @return [String]
-  #   
-  def to_yaml *args
-    to_data.to_yaml *args
-  end
   
   
 end # module Props

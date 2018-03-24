@@ -22,7 +22,7 @@ using NRSER::Types
 # =======================================================================
 
 module NRSER; end
-module NRSER::Data; end
+module NRSER::Props; end
 
 
 # Definitions
@@ -33,7 +33,7 @@ module NRSER::Data; end
 # 
 # Props are immutable by design.
 # 
-class NRSER::Data::Prop
+class NRSER::Props::Prop
   
   # The class the prop was defined in.
   # 
@@ -48,6 +48,15 @@ class NRSER::Data::Prop
   # @return [Symbol]
   #     
   attr_reader :name
+  
+  
+  
+  # The key under which the value will be stored in the storage.
+  # 
+  # @return [String | Symbol | Integer]
+  #     
+  attr_reader :key
+  
   
   
   # The type of the valid values for the property.
@@ -87,8 +96,8 @@ class NRSER::Data::Prop
   # 
   # You should not need to construct a `Prop` directly unless you are doing
   # custom meta-programming - they should be constructed for you via the
-  # `.prop` "macro" defined at {NRSER::Data::Props::ClassMethods#prop}
-  # that is extended in to classes including {NRSER::Data::Props}.
+  # `.prop` "macro" defined at {NRSER::Props::Props::ClassMethods#prop}
+  # that is extended in to classes including {NRSER::Props::Props}.
   # 
   # @param [nil | Proc | Object] default:
   #   A default value or a {Proc} used to get default values for *primary*
@@ -113,11 +122,13 @@ class NRSER::Data::Prop
                   default: nil,
                   source: nil,
                   to_data: nil,
-                  from_data: nil
+                  from_data: nil,
+                  key: nil
     
     # Set these up first so {#to_s} works in case we need to raise errors.
     @defined_in = defined_in
     @name = t.sym.check name
+    @key = key || @name
     @type = t.make type
     
     @to_data = to_data
@@ -207,7 +218,7 @@ class NRSER::Data::Prop
   # Instance Methods
   # ============================================================================
   
-  # Used by the {NRSER::Data::Props::ClassMethods.prop} "macro" method to
+  # Used by the {NRSER::Props::Props::ClassMethods.prop} "macro" method to
   # determine if it should create a reader method on the propertied class.
   # 
   # @return [Boolean]
@@ -228,7 +239,7 @@ class NRSER::Data::Prop
   end # #create_reader?
   
   
-  # Used by the {NRSER::Data::Props::ClassMethods.prop} "macro" method to
+  # Used by the {NRSER::Props::Props::ClassMethods.prop} "macro" method to
   # determine if it should create a writer method on the propertied class.
   # 
   # Right now, we don't create writers, but we will probably make them an
@@ -277,11 +288,11 @@ class NRSER::Data::Prop
   #   This is a shitty hack stop-gap until I really figure our how this should
   #   work.
   # 
-  # @param [NRSER::Data::Props] instance
+  # @param [NRSER::Props::Props] instance
   #   Instance being built.
   # 
-  # @param [Hash<Symbol, Object>] **values
-  #   Values provided for initialization.
+  # @param [Hash<Symbol, Object>] source_values
+  #   Source values provided for initialization.
   # 
   # @return [Object]
   #   Default value.
@@ -289,21 +300,21 @@ class NRSER::Data::Prop
   # @raise [NameError]
   #   If the prop doesn't have a default.
   # 
-  def default instance, **values
+  def default instance, source_values
     if has_default?
       if Proc === @default
         case @default.arity
         when 0
           @default.call
         else
-          @default.call instance, **values
+          @default.call instance, source_values
         end
       else
         @default
       end
     else
-      raise NameError.new <<-END.squish
-        Prop #{ self } has no default value.
+      raise NameError.new binding.erb <<-END
+        Prop <%= full_name %> has no default value.
       END
     end
   end
@@ -370,7 +381,10 @@ class NRSER::Data::Prop
         end
       end
     else
-      values(instance)[name]
+      NRSER::Props::Metadata.
+        metadata_for( instance.class ).
+        storage.
+        get instance, key
     end
   end # #get
   
@@ -383,7 +397,7 @@ class NRSER::Data::Prop
   # @return [return_type]
   #   @todo Document return value.
   # 
-  def set instance, value
+  def check! value
     type.check( value ) do
       binding.erb <<-END
         Value of type <%= value.class.name %> for prop <%= self.full_name %>
@@ -399,9 +413,7 @@ class NRSER::Data::Prop
         
       END
     end
-    
-    values(instance)[name] = value
-  end # #set
+  end # #check!
   
   
   # @todo Document set_from_hash method.
@@ -412,32 +424,66 @@ class NRSER::Data::Prop
   # @return [return_type]
   #   @todo Document return value.
   # 
-  def set_from_values_hash instance, **values
-    if values.key? name
-      set instance, values[name]
-    else
-      if default?
-        # set instance, if !default.nil? && default.respond_to?( :dup )
-        #   default.dup
-        # else
-        #   default
-        # end
-        set instance, default( instance, **values )
+  def create_value instance, source
+    if source.respond_to? :each_pair
+      if source.key? name
+        check! source[name]
+        
+      elsif source.key? name.to_s
+        check! source[name.to_s]
+        
+      elsif default?
+        check! default( instance, source )
+        
       else
-        raise TypeError.new binding.erb <<-ERB
+        raise TypeError.new binding.erb <<-END
           Prop <%= full_name %> has no default value and no value was provided
-          in values:
+          in source:
           
-              <%= values.pretty_inspect %>
+              <%= source.pretty_inspect %>
           
           Prop:
           
               <%= self.pretty_inspect %>
           
-        ERB
+        END
       end
+      
+    elsif source.respond_to? :each_index
+      unless t.non_neg_int === key
+        raise ArgumentError.new binding.erb <<-END
+          Indexed source provided for prop <%= full_name %>, but key <%= key %>
+          is not a non-negative integer.
+          
+          Source:
+          
+              <%= source.pretty_inspect %>
+          
+          Prop:
+          
+              <%= self.pretty_inspect %>
+          
+        END
+      end
+      
+      if key >= source.count
+        check! default( instance, source )
+        
+      else
+        check! source[key]
+      end
+      
+    else
+      raise ArgumentError.new binding.erb <<~END
+        `source` argument must respond to `#each_pair` or `#each_index`
+        
+        Found:
+        
+            <%= source.pretty_inspect %>
+        
+      END
     end
-  end # #set_from_hash
+  end # #create_value
   
   
   # Get the "data" value - a basic scalar or structure of hashes, arrays and
@@ -473,7 +519,7 @@ class NRSER::Data::Prop
   #     -   The `to_data:` proc is called with the property value as the sole
   #         argument and the result is returned as the data.
   # 
-  # @param [NRSER::Data::Props] instance
+  # @param [NRSER::Props::Props] instance
   #   Instance to get the property value form.
   # 
   # @return [Object]
@@ -574,27 +620,4 @@ class NRSER::Data::Prop
     "#<#{ self.class.name } #{ full_name }:#{ type }>"
   end # #to_s
   
-  
-  private
-    
-    # @todo Document values method.
-    # 
-    # @param [type] arg_name
-    #   @todo Add name param description.
-    # 
-    # @return [return_type]
-    #   @todo Document return value.
-    # 
-    def values instance
-      unless instance.instance_variable_defined?(
-        NRSER::Data::Props::PROP_VALUES_VARIABLE_NAME
-      )
-        instance.instance_variable_set \
-          NRSER::Data::Props::PROP_VALUES_VARIABLE_NAME, {}
-      end
-      
-      instance.instance_variable_get \
-        NRSER::Data::Props::PROP_VALUES_VARIABLE_NAME
-    end # #value
-  
-end # class NRSER::Data::Prop
+end # class NRSER::Props::Prop
