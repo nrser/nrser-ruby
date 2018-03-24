@@ -16,7 +16,7 @@ describe NRSER::Data::Props do
     unsigned = t.unsigned
     
     before( :all ) {
-      Cat = @cat_class = Class.new( NRSER::Data::Props::Base ) do
+      Cat = @cat_class = Class.new( NRSER::Data::Base ) do
         prop :name, type: non_empty_str
         prop :breed, type: non_empty_str
         prop :age, type: unsigned
@@ -33,7 +33,7 @@ describe NRSER::Data::Props do
         #               instance variable of the new class.
         cat_class = @cat_class
         
-        @owner_class = Class.new( NRSER::Data::Props::Base ) do
+        @owner_class = Class.new( NRSER::Data::Base ) do
           prop :name, type: non_empty_str
           
           prop :cat, type: cat_class

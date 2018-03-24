@@ -1,3 +1,3 @@
 module NRSER::Data; end
 
-require_relative './data/props'
+require_relative './data/base'

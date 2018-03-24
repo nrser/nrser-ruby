@@ -82,7 +82,7 @@ END
   
   
   it "works on a real-world example" do
-    ERBSpecTester = Class.new( NRSER::Data::Props::Base ) do
+    ERBSpecTester = Class.new( NRSER::Data::Base ) do
       prop :x, type: t.int, from_data: {hey: 'ho', lets: 'go!'}
     end
     

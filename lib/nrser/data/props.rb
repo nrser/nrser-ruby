@@ -1,7 +1,22 @@
+# Requirements
+# =======================================================================
+
+# Stdlib
+# -----------------------------------------------------------------------
+
+# Deps
+# -----------------------------------------------------------------------
+
+# Project / Package
+# -----------------------------------------------------------------------
+require 'nrser/refinements/types'
+
+require_relative './prop'
+
+
 # Refinements
 # =======================================================================
 
-using NRSER
 using NRSER::Types
 
 
@@ -27,13 +42,13 @@ module NRSER::Data::Props
   
   
   # Get the **mutable reference** to the hash that holds
-  # {NRSER::Data::Props::Prop} instances (for this class only - inherited
+  # {NRSER::Data::Prop} instances (for this class only - inherited
   # props are added in `.props`).
   # 
   # @param [Class<NRSER::Data::Props>] klass
   #   Propertied class to get the ref for.
   # 
-  # @return [Hash<Symbol, NRSER::Data::Props::Prop>]
+  # @return [Hash<Symbol, NRSER::Data::Prop>]
   #   Map of prop names to instances.
   # 
   def self.get_props_ref klass
@@ -155,9 +170,9 @@ module NRSER::Data::Props
     #   Don't include super-class properties.
     # 
     # @param [Boolean] only_primary:
-    #   Don't include properties that have a {NRSER::Data::Props::Prop#source}.
+    #   Don't include properties that have a {NRSER::Data::Prop#source}.
     # 
-    # @return [Hash{ Symbol => NRSER::Data::Props::Prop }]
+    # @return [Hash{ Symbol => NRSER::Data::Prop }]
     #   Hash mapping property name to property instance.
     # 
     def props only_own: false, only_primary: false
@@ -189,9 +204,9 @@ module NRSER::Data::Props
     #   The name of the property.
     # 
     # @param [Hash{ Symbol => Object }] **opts
-    #   Constructor options for {NRSER::Data::Props::Prop}.
+    #   Constructor options for {NRSER::Data::Prop}.
     # 
-    # @return [NRSER::Data::Props::Prop]
+    # @return [NRSER::Data::Prop]
     #   The newly created prop, thought you probably don't need it (it's
     #   already all bound up on the class at this point), but why not?
     # 
@@ -201,13 +216,13 @@ module NRSER::Data::Props
       t.sym.check name
       
       if ref.key? name
-        raise ArgumentError.new NRSER.squish <<-END
+        raise ArgumentError.new <<-END.squish
           Prop #{ name.inspect } already set for #{ self }:
           #{ ref[name].inspect }
         END
       end
       
-      prop = Prop.new self, name, **opts
+      prop = NRSER::Data::Prop.new self, name, **opts
       ref[name] = prop
       
       if prop.create_reader?
@@ -285,7 +300,7 @@ module NRSER::Data::Props
   
   # Initialize the properties from a hash.
   # 
-  # Called from `#initialize` in {NRSER::Data::Props::Base}, but if you just
+  # Called from `#initialize` in {NRSER::Data::Base}, but if you just
   # mix in {NRSER::Data::Props} you need to call it yourself.
   # 
   # @param [Hash<(String | Symbol) => Object>] values
@@ -407,10 +422,3 @@ module NRSER::Data::Props
   
   
 end # module Props
-
-
-# Post-Processing
-# =======================================================================
-
-require_relative './props/prop'
-require_relative './props/base'

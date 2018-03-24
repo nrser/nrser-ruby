@@ -1,13 +1,31 @@
-# Refinements
+# Requirements
 # =======================================================================
 
-using NRSER
+# Stdlib
+# -----------------------------------------------------------------------
+
+# Deps
+# -----------------------------------------------------------------------
+
+# Project / Package
+# -----------------------------------------------------------------------
+require 'nrser/refinements/types'
+
+require_relative './props'
+require_relative './base'
+
+
+# Declarations
+# =======================================================================
+
+module NRSER; end
+module NRSER::Data; end
 
 
 # Definitions
 # =======================================================================
 
-class NRSER::Data::Props::Base
+class NRSER::Data::Base
   include NRSER::Data::Props
   
   def initialize **values
@@ -28,4 +46,4 @@ class NRSER::Data::Props::Base
       #<#{ self.class.name } #{ props_str }>
     END
   end # #to_s
-end # class NRSER::Data::Props::Base
+end # class NRSER::Data::Base

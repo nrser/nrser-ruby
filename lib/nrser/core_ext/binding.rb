@@ -1,3 +1,4 @@
+require_relative './string'
 require_relative './enumerable'
 
 # Extension methods for {Binding}

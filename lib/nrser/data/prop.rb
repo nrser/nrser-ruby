@@ -1,7 +1,20 @@
+# Requirements
+# =======================================================================
+
+# Stdlib
+# -----------------------------------------------------------------------
+
+# Deps
+# -----------------------------------------------------------------------
+
+# Project / Package
+# -----------------------------------------------------------------------
+require 'nrser/refinements/types'
+
+
 # Refinements
 # =======================================================================
 
-using NRSER
 using NRSER::Types
 
 
@@ -9,8 +22,7 @@ using NRSER::Types
 # =======================================================================
 
 module NRSER; end
-module NRSER::Meta; end
-module NRSER::Data::Props; end
+module NRSER::Data; end
 
 
 # Definitions
@@ -21,7 +33,7 @@ module NRSER::Data::Props; end
 # 
 # Props are immutable by design.
 # 
-class NRSER::Data::Props::Prop
+class NRSER::Data::Prop
   
   # The class the prop was defined in.
   # 
@@ -585,4 +597,4 @@ class NRSER::Data::Props::Prop
         NRSER::Data::Props::PROP_VALUES_VARIABLE_NAME
     end # #value
   
-end # class NRSER::Data::Props::Prop
+end # class NRSER::Data::Prop

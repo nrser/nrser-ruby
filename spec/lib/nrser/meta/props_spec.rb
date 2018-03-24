@@ -15,7 +15,7 @@ describe NRSER::Data::Props do
     # =====================================================================
     
     let(:point_class) {
-      Class.new(NRSER::Data::Props::Base) do
+      Class.new(NRSER::Data::Base) do
         # So that error messages look right
         def self.name; 'Point'; end
         
@@ -38,7 +38,7 @@ describe NRSER::Data::Props do
       it {
         is_expected.to be_a( Hash ).and have_attributes \
           keys: eq( [:x, :y, :blah] ),
-          values: all( be_a NRSER::Data::Props::Prop )
+          values: all( be_a NRSER::Data::Prop )
       }
       
       describe 'primary props `x` and `y`' do
@@ -47,7 +47,7 @@ describe NRSER::Data::Props do
             subject { super()[name] }
             
             include_examples "expect subject", to: {
-              be_a: NRSER::Data::Props::Prop,
+              be_a: NRSER::Data::Prop,
               have_attributes: {
                 source?: false,
                 primary?: true,
@@ -61,7 +61,7 @@ describe NRSER::Data::Props do
         subject { super()[:blah] }
         
         include_examples "expect subject", to: {
-          be_a: NRSER::Data::Props::Prop,
+          be_a: NRSER::Data::Prop,
           have_attributes: {
             source?: true,
             primary?: false,
@@ -84,7 +84,7 @@ describe NRSER::Data::Props do
           and have_attributes(
             keys: eq( [:x, :y] ),
             values: all(
-              be_a( NRSER::Data::Props::Prop ).
+              be_a( NRSER::Data::Prop ).
                 and have_attributes source?: false, primary?: true
             )
           )
