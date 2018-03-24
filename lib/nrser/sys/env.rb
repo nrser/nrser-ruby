@@ -3,7 +3,8 @@
 # Declarations
 # =======================================================================
 
-module NRSER::Env; end
+module NRSER::Sys; end
+module NRSER::Sys::Env; end
 
 
 # Post-Processing

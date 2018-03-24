@@ -14,12 +14,18 @@ require 'pp'
 require 'ostruct'
 require 'json'
 require 'yaml'
-require 'logger'
 require 'singleton'
 
 # Deps
 # -----------------------------------------------------------------------
 require 'hamster'
+
+### Active Support
+# 
+# We're not going to import all of it, but here we'll import the stuff we
+# always want to use and then add pieces in places as needed.
+# 
+require 'active_support/core_ext/object/json'
 
 
 # Hi there!
@@ -67,7 +73,6 @@ require_relative './nrser/char'
 require_relative './nrser/errors'
 require_relative './nrser/no_arg'
 require_relative './nrser/message'
-require_relative './nrser/env'
 require_relative './nrser/collection'
 require_relative './nrser/functions'
 require_relative './nrser/types'

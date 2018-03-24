@@ -1,6 +1,8 @@
+require 'nrser/sys/env'
+
 describe_spec_file(
   spec_path:        __FILE__,
-  class:            NRSER::Env::Path,
+  class:            NRSER::Sys::Env::Path,
   instance_method:  :insert,
 ) do
   
@@ -9,7 +11,7 @@ describe_spec_file(
     to the string result from `#to_s`
   } do
     
-    let( :path ) { NRSER::Env::Path.new source }
+    let( :path ) { NRSER::Sys::Env::Path.new source }
     subject { path.insert( *args ).to_s }
     
     describe_use_case(
