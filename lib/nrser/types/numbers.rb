@@ -77,12 +77,12 @@ module NRSER::Types
   # Integer greater than zero.
   # 
   
-  def self.pos_int
-    intersection(
-      INT,
-      bounded(min: 1),
-      name: 'ℤ⁺'
-    ).freeze
+  def_factory :pos_int do |name: 'ℤ⁺', **options|
+    all_of \
+      int,
+      bounded( min: 1 ),
+      name: name,
+      **options
   end
   
   # Ugh sometimes the naturals have 0, so omit it...
