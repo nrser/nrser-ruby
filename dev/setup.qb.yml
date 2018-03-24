@@ -27,6 +27,10 @@
     full_name: rocketjob/semantic_logger
     version: v4.2.0
   
+  - role: qb/dev/ref/repo/git
+    full_name: hamstergem/hamster
+    version: v3.0.0
+  
   tasks:
   
   - name: >-
