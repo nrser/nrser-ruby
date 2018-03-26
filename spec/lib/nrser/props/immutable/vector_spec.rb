@@ -80,6 +80,14 @@ describe NRSER::Props::Immutable::Vector do
       point_2d_int.new source
     end
     
+    # We're going to define these sources at the example group level so that
+    # we can use them easily in `it_behaves_like`, but `subject` needs them
+    # at the example level, so we provide this little helper:
+    
+    def source
+      self.class.source
+    end
+    
     # and let's define our expectations for a point successfully created from
     # a source:
     
@@ -120,31 +128,37 @@ describe NRSER::Props::Immutable::Vector do
       
     end
     
-    describe "From an (x,y) pair Array" do
+    
+    describe "From an [x, y] pair Array" do
     # ------------------------------------------------------------------------
       
       # Let the `source` be the {Array} `[1, 2]`.
-      # 
-      # > **NOTE**
-      # >
-      # > We do some dumb shit because I don't know how to get RSpec to handle
-      # > this property... need `source` to be available in examples so that
-      # > `subject` can get it but also to the example group so that we can
-      # > use it in `it_behaves_like`..? :/
-      # 
       
       def self.source
         [1, 2]
-      end
-      
-      def source
-        self.class.source
       end
       
       # Now we should be able to construct a point. Test that it behaves like
       # we defined above:
       
       it_behaves_like "Point2DInt from source", x: source[0], y: source[1]
+      
+    end
+    
+    
+    describe "From an {x:, y:} Hash" do
+    # ------------------------------------------------------------------------
+      
+      # Let the `source` be the {Hash} `{x: 1, y: 2}`.
+      
+      def self.source
+        {x: 1, y: 2}
+      end
+      
+      # Now we should be able to construct a point. Test that it behaves like
+      # we defined above:
+      
+      it_behaves_like "Point2DInt from source", source
       
     end
   end
