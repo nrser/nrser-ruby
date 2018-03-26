@@ -38,18 +38,7 @@ class NRSER::Meta::Source::Location < Hamster::Vector
   # Mixins
   # ============================================================================
   
-  # include NRSER::Props::Immutable::Self
-  
-  
-  
   include NRSER::Props::Immutable::Vector
-  
-  
-  
-  # include NRSER::Props
-  # 
-  # props.immutable = true
-  # props.storage = :[]
   
   
   # Constants
@@ -67,10 +56,46 @@ class NRSER::Meta::Source::Location < Hamster::Vector
   prop  :line, type: t.pos_int?, default: nil, key: 1
   
   
-  
   # Constructor
   # ============================================================================
   
+  # Override to allow argument to be `nil` for when {Method#source_location}
+  # weirdly returns `nil`.
+  # 
+  # @param [(#[] & (#each_pair | #each_index)) | nil ] source
+  #   Source to construct from:
+  #   
+  #   1.  `#[] & (#each_pair | #each_index)`
+  #       1.  Hash-like that responds to `#each_pair` and contains prop
+  #           value sources keyed by their names.
+  #           
+  #           Supports standard propertied class construction.
+  #           
+  #           **Examples:**
+  #           
+  #               {file: '/some/abs/path.rb', line: 88}
+  #               {file: '/some/abs/path.rb', line: nil}
+  #               {file: nil, line: 88}
+  #               {file: nil, line: nil}
+  #               {}
+  #           
+  #       2.  Array-like that responds to `#each_index` and contains prop
+  #           values sources indexed by their non-negative integer indexes.
+  #           
+  #           Supports the output of {Method#source_location}.
+  #           
+  #           **Examples:**
+  #           
+  #               ['/some/abs/path.rb', 88]
+  #               ['/some/abs/path.rb', nil]
+  #               [nil, 88]
+  #               [nil, nil]
+  #               []
+  #           
+  #   2.  `nil` - Swapped for `{]` to support times I'm pretty sure I've seen
+  #       {Method#source_location} return strait-up `nil`.
+  #   
+  # 
   def initialize source
     source = {} if source.nil?
     super source
