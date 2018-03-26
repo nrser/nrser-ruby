@@ -22,11 +22,10 @@ module NRSER::Props::Immutable; end
 # Definitions
 # =======================================================================
 
-# Mixin for classes that extend {Hamster::Vector} and will use itself as the
-# property value storage, requiring that property keys be non-negative
-# integers.
+# Mixin for classes that extend {Hamster::Hash} and will use itself as the
+# property value storage.
 # 
-module NRSER::Props::Immutable::Vector
+module NRSER::Props::Immutable::Hash
   
   # Constants
   # ==========================================================================
@@ -38,9 +37,9 @@ module NRSER::Props::Immutable::Vector
   # ======================================================================
   
   def self.included base
-    unless base < Hamster::Vector
+    unless base < Hamster::Hash
       raise binding.erb <<~END
-        This class is only for including in {Hamster::Vector} subclasses!
+        This class is only for including in {Hamster::Hash} subclasses!
       END
     end
     
@@ -58,15 +57,15 @@ module NRSER::Props::Immutable::Vector
   # Methods mixed in at the class-level.
   # 
   module ClassMethods
-    # {Hamster::Vector} uses `.alloc` to quickly create derived instances
+    # {Hamster::Hash} uses `.alloc` to quickly create derived instances
     # when it knows the instance variables. We need to hook into that to
     # check the prop types.
     # 
-    # @param (see Hamster::Vector.alloc)
+    # @param (see Hamster::Hash.alloc)
     # 
-    # @return [Hamster::Vector]
+    # @return [Hamster::Hash]
     #   The new instance, which will be of the propertied subclass of
-    #   {Hamster::Vector}.
+    #   {Hamster::Hash}.
     # 
     # @raise [TypeError]
     #   If the prop values of the new vector don't satisfy the prop types.
@@ -87,10 +86,13 @@ module NRSER::Props::Immutable::Vector
   # Since including classes are using themselves as storage, we need to tap
   # into the `#initialize` chain in order to load property values from sources
   # and pass an {Array} up to the super-method to instantiate the
-  # {Hamster::Vector}.
+  # {Hamster::Hash}.
   # 
   def initialize source = {}
-    values = []
+    # Handles things like `[[:x, 1], [:y, 2]]`
+    source = source.to_h unless source.respond_to?( :each_pair )
+    
+    values = {}
     
     self.class.props( only_primary: true ).values.each do |prop|
       values[prop.key] = prop.create_value self, source
@@ -99,4 +101,4 @@ module NRSER::Props::Immutable::Vector
     super values
   end # #initialize
   
-end # module NRSER::Props::Immutable::Vector
+end # module NRSER::Props::Immutable::Hash
