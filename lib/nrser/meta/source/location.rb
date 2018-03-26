@@ -67,6 +67,16 @@ class NRSER::Meta::Source::Location < Hamster::Vector
   prop  :line, type: t.pos_int?, default: nil, key: 1
   
   
+  
+  # Constructor
+  # ============================================================================
+  
+  def initialize source
+    source = {} if source.nil?
+    super source
+  end
+  
+  
   # Instance Methods
   # ======================================================================
   
