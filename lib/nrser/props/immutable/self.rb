@@ -46,7 +46,6 @@ module NRSER::Props::Immutable::Self
   # Class Methods
   # ======================================================================
   
-  
   # @todo Document storage_for method.
   # 
   # @param [type] arg_name

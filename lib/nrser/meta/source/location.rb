@@ -14,7 +14,7 @@
 # -----------------------------------------------------------------------
 
 require 'nrser/props'
-require 'nrser/props/immutable/self'
+require 'nrser/props/immutable/vector'
 
 
 # Refinements
@@ -32,13 +32,24 @@ module NRSER::Meta::Source; end
 # =======================================================================
 
 # @todo document NRSER::Meta::Source::Location class.
-# class NRSER::Meta::Source::Location < NRSER::Props::Immutable::Vector
+# 
 class NRSER::Meta::Source::Location < Hamster::Vector
   
   # Mixins
   # ============================================================================
   
-  include NRSER::Props::Immutable::Self
+  # include NRSER::Props::Immutable::Self
+  
+  
+  
+  include NRSER::Props::Immutable::Vector
+  
+  
+  
+  # include NRSER::Props
+  # 
+  # props.immutable = true
+  # props.storage = :[]
   
   
   # Constants
@@ -49,32 +60,29 @@ class NRSER::Meta::Source::Location < Hamster::Vector
   # ======================================================================
   
   
-  # Data
+  # Props
   # ======================================================================
   
   prop  :file, type: t.abs_path?, default: nil, key: 0
   prop  :line, type: t.pos_int?, default: nil, key: 1
   
   
-  # Constructor
-  # ======================================================================
-  
-  
   # Instance Methods
   # ======================================================================
   
-  # @todo Document valid? method.
+  # Do we have a file and a line?
   # 
-  # @param [type] arg_name
-  #   @todo Add name param description.
+  # Sometimes `#source_location` gives back `nil` values or just `nil`
+  # (in which case we set both {#file} and {#line} to `nil`). I think this
+  # has to do with C extensions and other weirdness.
   # 
-  # @return [return_type]
-  #   @todo Document return value.
+  # Anyways, this helps you handle it.
+  # 
+  # @return [Boolean]
   # 
   def valid?
     !( file.nil? && line.nil? )
   end # #valid?
-  
   
   
   # @return [String]
@@ -83,7 +91,6 @@ class NRSER::Meta::Source::Location < Hamster::Vector
   def to_s
     "#{ file || '???' }:#{ line || '???' }"
   end # #to_s
-  
   
   
 end # class NRSER::Meta::Source::Location
