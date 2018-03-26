@@ -34,7 +34,7 @@ module NRSER::Props::Immutable::Vector
   STORAGE = NRSER::Props::Storage::Key.new immutable: true
   
   
-  # Class Methods
+  # Module Methods
   # ======================================================================
   
   def self.included base
@@ -47,11 +47,42 @@ module NRSER::Props::Immutable::Vector
     base.include NRSER::Props
     base.metadata.storage STORAGE
     base.metadata.freeze
+    
+    base.extend ClassMethods
   end
   
   
-  # Constructor
+  # Mixin Methods
   # ======================================================================
+  
+  # Methods mixed in at the class-level.
+  # 
+  module ClassMethods
+    # {Hamster::Vector} uses `.alloc` to quickly create derived instances
+    # when it knows the instance variables. We need to hook into that to
+    # check the prop types.
+    # 
+    # @param (see Hamster::Vector.alloc)
+    # 
+    # @return [Hamster::Vector]
+    #   The new instance, which will be of the propertied subclass of
+    #   {Hamster::Vector}.
+    # 
+    # @raise [TypeError]
+    #   If the prop values of the new vector don't satisfy the prop types.
+    # 
+    def alloc root, size, levels
+      super( root, size, levels ).tap do |new_instance|
+        self.props( only_primary: true ).values.each do |prop|
+          prop.check! new_instance[prop.key]
+        end
+      end
+    end
+  end # module ClassMethods
+  
+  
+  # Constructor
+  # ----------------------------------------------------------------------------
   
   # Since including classes are using themselves as storage, we need to tap
   # into the `#initialize` chain in order to load property values from sources
