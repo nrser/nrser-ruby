@@ -1,4 +1,5 @@
 require 'nrser/props'
+require 'nrser/props/immutable/hash_variable'
 
 using NRSER::Types
 
@@ -13,7 +14,7 @@ describe NRSER::Props do
     
     before( :all ) {
       Cat = @cat_class = Class.new do
-        include NRSER::Props::Immutable
+        include NRSER::Props::Immutable::HashVariable
         
         prop :name, type: non_empty_str
         prop :breed, type: non_empty_str
@@ -32,7 +33,7 @@ describe NRSER::Props do
         cat_class = @cat_class
         
         @owner_class = Class.new do
-          include NRSER::Props::Immutable
+          include NRSER::Props::Immutable::HashVariable
           
           prop :name, type: non_empty_str
           

@@ -121,6 +121,12 @@ describe NRSER::Props::Immutable::Hash do
         it { is_expected.to eq x: x, y: y }
       end
       
+      # We should see our custom `#to_s` value
+      
+      describe_attribute :to_s do
+        it { is_expected.to eq "(#{ x }, #{ y })" }
+      end
+      
     end
     
     

@@ -7,5 +7,3 @@ module NRSER::Props
     base.extend   NRSER::Props::ClassMethods
   end
 end
-
-require_relative './props/immutable'

@@ -2,6 +2,7 @@ require 'nrser/refinements/types'
 using NRSER::Types
 
 require 'nrser/props'
+require 'nrser/props/immutable/hash_variable'
 
 describe 'Binding#erb' do
   it "refines NRSER.erb into Binding" do
@@ -83,7 +84,7 @@ END
   
   it "works on a real-world example" do
     ERBSpecTester = Class.new do
-      include NRSER::Props::Immutable
+      include NRSER::Props::Immutable::HashVariable
       
       prop :x, type: t.int, from_data: {hey: 'ho', lets: 'go!'}
     end

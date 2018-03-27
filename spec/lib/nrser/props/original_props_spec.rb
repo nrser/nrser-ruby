@@ -1,3 +1,6 @@
+require 'nrser/props'
+require 'nrser/props/immutable/hash_variable'
+
 using NRSER::Types
 
 describe NRSER::Props do
@@ -9,7 +12,7 @@ describe NRSER::Props do
     
     let(:point_class) {
       Class.new do
-        include NRSER::Props::Immutable
+        include NRSER::Props::Immutable::HashVariable
         
         # So that error messages look right
         def self.name; 'Point'; end
