@@ -65,7 +65,7 @@ module NRSER
       value = if hash.key? entry
         case on_conflict
         when :raise
-          raise NRSER::ConflictError.new erb binding, <<-END
+          raise NRSER::ConflictError.new binding.erb <<-END
             Entry <%= entry %> appears more than once in `enum`
             
             This would cause conflict in the resulting {Hash}.

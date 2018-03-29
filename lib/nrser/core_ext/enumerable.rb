@@ -15,14 +15,14 @@ module Enumerable
   
   
   # See {NRSER.assoc_by}
-  def assoc_by &block
-    NRSER.assoc_by self, &block
+  def assoc_by *args, &block
+    NRSER.assoc_by self, *args, &block
   end
   
   
   # See {NRSER.assoc_to}
-  def assoc_to &block
-    NRSER.assoc_to  self, &block
+  def assoc_to *args, &block
+    NRSER.assoc_to self, *args, &block
   end
   
   

@@ -81,8 +81,26 @@ module NRSER::RSpex::Format
   end
   
   
+  def self.method_name? string
+    # Must start with `#` or `.`
+    return false unless ['#', '.'].any? { |c| string[0] == c }
+    
+    name = string[1..-1]
+    
+    case name
+    when  '!', '~', '+', '**', '-', '*', '/', '%', '+', '-', '<<', '>>', '&',
+          '|', '^', '<', '<=', '>=', '>', '==', '===', '!=', '=~', '!~', '<=>',
+          '[]',
+          /\A[a-zA-Z_][a-zA-Z0-9_]*(?:\?|\!|=)?/
+      true
+    else
+      false
+    end
+  end
+  
+  
   def self.code string
-    if string =~ /\A\#[a-zA-Z][a-zA-Z0-9_]*(?:\?|\!)?/
+    if method_name? string
       pastel.bold.blue string
     else
       rspec_syntax_highlighter.highlight string.lines
@@ -107,12 +125,6 @@ module NRSER::RSpex::Format
   def self.prepend_type type, description
     return description if type.nil?
     
-    # prefixes = RSpec.configuration.x_type_prefixes
-    # 
-    # prefix = prefixes[type] ||
-    #           pastel.magenta( i( type.to_s.upcase.gsub('_', ' ') ) )
-    
-    # prefix = "*" + type.to_s.upcase.gsub('_', ' ') + "*"
     prefix = pastel.magenta( i( type.to_s.upcase.gsub('_', ' ') ) )
     
     "#{ prefix } #{ description }"
@@ -128,18 +140,38 @@ module NRSER::RSpex::Format
   # 
   def self.description *parts, type: nil
     parts.
-      map { |part|
+      flat_map { |part|
         if part.respond_to? :to_desc
           desc = part.to_desc
           if desc.empty?
             ''
           else
-            md_code_quote part.to_desc
+            md_code_quote desc
           end
-        elsif part.is_a? String
-          part
         else
-          NRSER::RSpex.short_s part
+          case part
+          when Module
+            mod = part
+            
+            name_desc = if mod.anonymous?
+              "(anonymous #{ part.class })"
+            else
+              md_code_quote mod.name
+            end
+            
+            [name_desc, description( mod.source_location )]
+            
+          when NRSER::Meta::Source::Location
+            if part.valid?
+              "(#{ NRSER::RSpex.dot_rel_path( part.file ) }:#{ part.line })"
+            else
+              ''
+            end
+          when String
+            part
+          else
+            NRSER::RSpex.short_s part
+          end
         end
       }.
       join( ' ' ).
@@ -150,7 +182,3 @@ module NRSER::RSpex::Format
   end # .description
   
 end # module NRSER::RSpex::Format
-
-
-# Post-Processing
-# =======================================================================

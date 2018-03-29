@@ -22,6 +22,7 @@ require 'nrser/props/immutable/vector'
 
 using NRSER::Types
 
+
 # Declarations
 # =======================================================================
 
@@ -41,12 +42,37 @@ class NRSER::Meta::Source::Location < Hamster::Vector
   include NRSER::Props::Immutable::Vector
   
   
-  # Constants
-  # ======================================================================
-  
-  
   # Class Methods
-  # ======================================================================
+  # ============================================================================
+  
+  # Given an {Enumerable} of {Method} objects, return a {Hash} mapping their
+  # {Method#name} to the method's {NRSER::Meta::Source::Location}.
+  # 
+  # @note
+  #   We map the names instead of the {Method} objects themselves because
+  #   aliases produce two different {Method} objects that `#==` and `#hash`
+  #   the same, preventing them both from being {Hash} keys.
+  # 
+  # @param [Enumerable<Method>] methods
+  #   Methods you want the source locations for.
+  # 
+  # @param [Boolean] only_valid:
+  #   When `true` filter the results to only those that are {#valid?}.
+  # 
+  # @return [Hash<Symbol, NRSER::Meta::Source::Location>]
+  #   Map of method name to their source locations.
+  # 
+  def self.for_methods methods, only_valid: false
+    all = methods.map { |method|
+      [ method.name, NRSER::Meta::Source::Location.new( method ) ]
+    }.to_h
+    
+    if only_valid
+      all.select { |method, location| location.valid? }
+    else
+      all
+    end
+  end # .for_methods
   
   
   # Props
@@ -97,6 +123,7 @@ class NRSER::Meta::Source::Location < Hamster::Vector
   #   
   # 
   def initialize source
+    source = source.source_location if source.respond_to? :source_location
     source = {} if source.nil?
     super source
   end

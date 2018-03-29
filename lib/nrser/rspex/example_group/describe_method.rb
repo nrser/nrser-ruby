@@ -3,7 +3,7 @@
 
 module NRSER::RSpex::ExampleGroup
   
-  # @todo Document describe_method method.
+  # Describe a method of the parent subject.
   # 
   # @return [void]
   # 
@@ -23,11 +23,32 @@ module NRSER::RSpex::ExampleGroup
       '.'
     end
     
+    method = if self.try( :metadata )
+      getter = if self.metadata.key?( :constructor_args )
+        :instance_method
+      else
+        :method
+      end
+      
+      target = self.metadata[:class] || self.metadata[:module]
+      
+      if target
+        begin
+          target.public_send getter, method_name
+        rescue
+          nil
+        end
+      end
+    end
+    
     name_string = NRSER::RSpex::Format.md_code_quote \
       "#{ name_prefix }#{ method_name }"
     
     # Create the RSpec example group context
-    describe_x name_string, *description,
+    describe_x \
+      name_string,
+      NRSER::Meta::Source::Location.new( method ),
+      *description,
       type: :method,
       metadata: {
         **metadata,

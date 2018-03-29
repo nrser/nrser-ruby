@@ -34,15 +34,12 @@ using NRSER::Types
 # ----------------------------------------------------------------------------
 # 
 
-describe NRSER::Props::Immutable::Hash do
-
-# TODO  Fix this shit!
-# 
-# describe_spec_file(
-#   spec_path: __FILE__,
-# ) do
+describe_spec_file(
+  spec_path: __FILE__,
+  module: NRSER::Props::Immutable::Hash,
+) do
   
-  describe "Simple 2D Integer Point" do
+  describe_setup "Simple 2D Integer Point" do
   # ==========================================================================
   
     # Complete Fixture Class
@@ -51,13 +48,14 @@ describe NRSER::Props::Immutable::Hash do
     # First, let's look at a working example:
     # 
     
-    let :point_2d_int do
+    subject :point_2d_int do
       Class.new( Hamster::Hash ) do
         include NRSER::Props::Immutable::Hash
         
         # So that error messages look right. You don't need this in "regularly"
         # defined classes.
         def self.name; 'Point2DInt'; end
+        def self.inspect; name; end
         
         # It's vital that we include the `key:` keyword argument, and that the
         # values are non-negative integer indexes for the vector.
@@ -130,7 +128,7 @@ describe NRSER::Props::Immutable::Hash do
     end
     
     
-    describe_section "Creating a Point" do
+    describe_setup "Creating a Point from `source`" do
     # ========================================================================
       
       # Our subject will be a Point2dInt created from a `source` value that we
@@ -140,52 +138,41 @@ describe NRSER::Props::Immutable::Hash do
         point_2d_int.new source
       end
       
-      # We're going to define these sources at the example group level so that
-      # we can use them easily in `it_behaves_like`, but `subject` needs them
-      # at the example level, so we provide this little helper:
       
-      def source
-        self.class.source
-      end
-      
-      
-      describe "From an {x:, y:} Hash" do
+      describe_case "From an `{x: Integer, y: Integer}` literal `Hash`" do
       # ------------------------------------------------------------------------
         
         # Let the `source` be the {Hash} `{x: 1, y: 2}`.
         
-        def self.source
-          {x: 1, y: 2}
+        describe_when source: {x: 1, y: 2} do
+          
+          # Now we should be able to construct a point. Test that it behaves
+          # like we defined above:
+          
+          it_behaves_like "Point2DInt", source
+          
         end
-        
-        # Now we should be able to construct a point. Test that it behaves like
-        # we defined above:
-        
-        it_behaves_like "Point2DInt", source
-        
       end
       
-      describe "From a Hamster::Hash[x:, y:]" do
-      # ------------------------------------------------------------------------
+      
+      describe_case "From a `Hamster::Hash[x: Integer, y: Integer]`" do
+      # --------------------------------------------------------------------
       # 
       # All that `#initialize` cares about is that it can access the `source`
       # via `#[]` and that it can tell if it should use names or integer
       # index by looking for `#each_pair` and `#each_index`, respectively.
       # 
         
-        # Let the `source` be the `Hamster::Hash[x: 1, y: 2]`.
-        
-        def self.source
-          Hamster::Hash[x: 1, y: 2]
+        describe_when source: Hamster::Hash[x: 1, y: 2] do
+
+          # Now we should be able to construct a point. Test that it behaves
+          # like we defined above:
+          
+          it_behaves_like "Point2DInt", source.to_h
+          
         end
-        
-        # Now we should be able to construct a point. Test that it behaves like
-        # we defined above:
-        
-        it_behaves_like "Point2DInt", source.to_h
-        
       end
-    end # section Creating a Point
+    end # .new - Creating a Point
     # ************************************************************************
     
     

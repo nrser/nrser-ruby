@@ -18,6 +18,7 @@ module NRSER::RSpex::ExampleGroup
     
     describe_x \
       NRSER::RSpex::Format.md_code_quote( klass.name ),
+      klass.source_location,
       *description,
       type: :class,
       metadata: {

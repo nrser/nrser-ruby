@@ -178,22 +178,6 @@ module NRSER::RSpex::ExampleGroup
   end
   
   
-  def describe_module mod, bind_subject: true, **metadata, &block
-    describe(
-      "#{ NRSER::RSpex::PREFIXES[:module] } #{ mod.name }",
-      type: :module,
-      module: mod,
-      **metadata
-    ) do
-      if bind_subject
-        subject { mod }
-      end
-      
-      module_exec &block
-    end
-  end # #describe_module
-  
-  
   def describe_group title, **metadata, &block
     describe(
       "#{ NRSER::RSpex::PREFIXES[:group] } #{ title }",
@@ -203,21 +187,6 @@ module NRSER::RSpex::ExampleGroup
       module_exec &block
     end
   end # #describe_class
-  
-  
-  def describe_attribute symbol, **metadata, &block
-    describe(
-      "#{ NRSER::RSpex::PREFIXES[:attribute] } ##{ symbol }",
-      type: :attribute,
-      **metadata
-    ) do
-      subject { super().public_send symbol }
-      module_exec &block
-    end
-  end # #describe_attribute
-  
-  # Shorter name
-  alias_method :describe_attr, :describe_attribute
   
   
   # Define a `context` block with `let` bindings and evaluate the `body`
@@ -259,8 +228,11 @@ require_relative './example_group/describe_x'
 require_relative './example_group/describe_spec_file'
 require_relative './example_group/describe_when'
 require_relative './example_group/describe_setup'
-require_relative './example_group/describe_use_case'
+require_relative './example_group/describe_case'
 require_relative './example_group/describe_instance'
+require_relative './example_group/describe_instance_method'
 require_relative './example_group/describe_called_with'
 require_relative './example_group/describe_method'
 require_relative './example_group/describe_class'
+require_relative './example_group/describe_attribute'
+require_relative './example_group/describe_module'

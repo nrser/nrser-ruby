@@ -6,13 +6,16 @@ module NRSER::RSpex::ExampleGroup
   # 
   # @return [void]
   # 
-  def describe_use_case *description, where: {}, **metadata, &body
+  def describe_case *description, where: {}, **metadata, &body
     describe_x \
       *description,
-      type: :use_case,
+      type: :case,
       bindings: where,
       metadata: metadata,
       &body
-  end # #describe_use_case
+  end # #describe_case
+  
+  # Older name
+  alias_method :describe_use_case, :describe_case
   
 end # module NRSER::RSpex::ExampleGroup

@@ -4,8 +4,8 @@ module NRSER::RSpex::ExampleGroup
   
   def describe_instance_method name, **metadata, &block
     describe(
-      "#{ NRSER::RSpex::PREFIXES[:method] } #{ name }",
-      type: :method,
+      "##{ name }",
+      type: :instance_method,
       method_name: name,
       **metadata
     ) do

@@ -34,14 +34,14 @@ module NRSER::RSpex::ExampleGroup
   # @param [Hash<Symbol, Object>] bindings:
   #   
   # 
-  # @return [return_type]
-  #   @todo Document return value.
+  # @return [void]
   # 
   def describe_x  *description,
                   type:,
                   metadata: {},
                   bindings: {},
                   add_binding_desc: true,
+                  bind_subject: true,
                   subject_block: nil,
                   &body
     
@@ -67,30 +67,44 @@ module NRSER::RSpex::ExampleGroup
       END
     end
     
+    # Add description of the bindings, if we have any and were told to
     unless bindings.empty? || add_binding_desc == false
-      # bindings_desc = NRSER::RSpex::Opts[bindings].to_desc
-      bindings_desc = ["(", bindings.ai( multiline: false ), ")"]
+      bindings_desc =  NRSER::RSpex::Format.md_code_quote \
+        bindings.map { |name, value|
+          "#{ name } = #{ value.inspect }"
+        }.join( '; ' )
       
       if description.empty?
-        description = bindings.ai( multiline: false )
+        description = bindings_desc
       else
-        description += ["(", bindings.ai( multiline: false ), ")"]
+        description << "(" + bindings_desc + ")"
       end
     end
     
-    formatted = NRSER::RSpex::Format.description *description, type: type
-    
-    describe formatted, **metadata, type: type do
-      subject( &subject_block ) if subject_block
+    # Call up to RSpec's `#describe` method
+    describe(
+      NRSER::RSpex::Format.description( *description, type: type ),
+      **metadata,
+      type: type,
+    ) do
+      if subject_block && bind_subject
+        subject &subject_block
+      end
       
       unless bindings.empty?
         bindings.each { |name, value|
           let( name ) { unwrap value, context: self }
+          
+          unless value.is_a? Wrapper
+            define_singleton_method name do
+              value
+            end
+          end
         }
       end
       
       module_exec &body
-    end # description,
+    end # describe
     
   end # #describe_x
   
