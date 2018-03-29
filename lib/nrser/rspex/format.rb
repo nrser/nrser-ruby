@@ -198,6 +198,10 @@ module NRSER::RSpex::Format
           
           when Pathname
             pathname part
+          
+          when NRSER::Message
+            [part.symbol, part.args].
+              map( &NRSER::RSpex.method( :short_s ) ).join( ', ' )
             
           else
             NRSER::RSpex.short_s part

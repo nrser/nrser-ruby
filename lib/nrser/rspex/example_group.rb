@@ -16,17 +16,6 @@ module NRSER::RSpex; end
 # 
 module NRSER::RSpex::ExampleGroup
   
-  def describe_message symbol, *args, &body
-    description = \
-      "message #{ [symbol, *args].map( &NRSER::RSpex.method( :short_s ) ).join( ', ' ) }"
-    
-    describe description, type: :message do
-      subject { NRSER::Message.new symbol, *args }
-      module_exec &body
-    end
-  end
-  
-  
   # For use when `subject` is a {NRSER::Message}. Create a new context for
   # the `receiver` where the subject is the result of sending that message
   # to the receiver.
@@ -161,6 +150,7 @@ require_relative './example_group/describe_case'
 require_relative './example_group/describe_class'
 require_relative './example_group/describe_instance_method'
 require_relative './example_group/describe_instance'
+require_relative './example_group/describe_message'
 require_relative './example_group/describe_method'
 require_relative './example_group/describe_module'
 require_relative './example_group/describe_setup'
