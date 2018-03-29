@@ -135,37 +135,17 @@ module NRSER::RSpex
   # Constants
   # =====================================================================
   
-  # Symbols
-  # ---------------------------------------------------------------------
+  # Symbol characters for specific example group types.
   # 
   # Sources:
   # 
   # -   https://en.wikipedia.org/wiki/Mathematical_operators_and_symbols_in_Unicode
   # 
-  
-  PREFIXES_BASE = {
+  PREFIXES = {
     section: '§',
     group: '•',
     invocation: '𝑓⟮𝑥⟯',
   }
-  
-  PREFIXES_MATH_ITALIC = PREFIXES_BASE.merge(
-    module:       '𝑀',
-    method:       '𝑚',
-    class:        '𝐶',
-    attribute:    '𝑎',
-    file:         '𝐹',
-  )
-  
-  PREFIXES_MATH_CURSIVE_WORDS = PREFIXES_BASE.merge(
-    module:       '𝓜 𝓸𝓭𝓾𝓵𝓮',
-    method:       '𝓶𝓮𝓽',
-    class:        '𝐶',
-    attribute:    '𝑎',
-    file:         '𝐹',
-  )
-  
-  PREFIXES = PREFIXES_MATH_ITALIC
   
   
   # Module (Class) Functions

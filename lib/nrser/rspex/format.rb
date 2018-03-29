@@ -131,6 +131,31 @@ module NRSER::RSpex::Format
   end # .format_type
   
   
+  def self.pathname pn
+    if pn.absolute?
+      rel = pn.relative_path_from Pathname.getwd
+      
+      if rel.split( File::SEPARATOR ).first == '..'
+        File.join '.', rel
+      else
+        pn.to_s
+      end
+    else
+      if pn.exist?
+        File.join '.', pn
+      else
+        lib_pn = Pathname.getwd / 'lib' / pn
+        
+        if lib_pn.exist?
+          File.join '.', lib_pn.relative_path_from( Pathname.getwd )
+        else
+          pn.to_s
+        end
+      end
+    end
+  end
+  
+  
   # @todo Document format method.
   # 
   # @param [type] arg_name
@@ -167,10 +192,16 @@ module NRSER::RSpex::Format
             else
               ''
             end
+            
           when String
             part
+          
+          when Pathname
+            pathname part
+            
           else
             NRSER::RSpex.short_s part
+            
           end
         end
       }.

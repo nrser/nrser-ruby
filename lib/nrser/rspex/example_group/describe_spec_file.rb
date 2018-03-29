@@ -46,7 +46,7 @@ module NRSER::RSpex::ExampleGroup
   #   
   #   Probably possible to extract this somehow without having to provide it?
   # 
-  # @return [nil]
+  # @return (see #describe_x)
   # 
   def describe_spec_file  description: nil,
                           spec_path:,
@@ -57,6 +57,7 @@ module NRSER::RSpex::ExampleGroup
     chain = []
     
     [
+      :source_file,
       :module,
       :class,
       :instance,
@@ -78,8 +79,6 @@ module NRSER::RSpex::ExampleGroup
     ) do
       dive_x *chain, bind_subject: bind_subject, &body
     end
-    
-    nil
   end # #describe_spec_file
   
 end # module NRSER::RSpex::ExampleGroup

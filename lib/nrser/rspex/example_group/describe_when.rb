@@ -1,18 +1,20 @@
+# encoding: UTF-8
 # frozen_string_literal: true
 
 module NRSER::RSpex::ExampleGroup
   
-  # Define a example group block with `let` bindings and evaluate the `body`
-  # block in it.
+  # Define a example group with the keyword args as bindings.
+  # 
+  # @see #describe_x
+  # 
+  # @param *description (see #describe_x)
   # 
   # @param [Hash<Symbol, Object>] **bindings
-  #   Map of symbol names to value to bind using `let`.
+  #   See the `bindings` keyword arg in {#describe_x}.
   # 
-  # @param [#call] &body
-  #   Body block to evaluate in the context.
+  # @param &body (see #describe_x)
   # 
-  # @return
-  #   Whatever `context` returns.
+  # @return (see #describe_x)
   # 
   def describe_when *description, **bindings, &body
     describe_x \

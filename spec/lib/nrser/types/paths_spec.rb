@@ -1,10 +1,10 @@
-require 'spec_helper'
+describe_spec_file(
+  spec_path: __FILE__,
+  source_file: 'nrser/types/paths.rb',
+  module: NRSER::Types,
+) do
 
-describe_file 'types/paths.rb' do
-
-  describe "NRSER::Types.dir_path" do
-    subject { NRSER::Types.method :dir_path }
-    
+  describe_method :dir_path do
     include_examples 'make type',
       accepts: [
         '.',
@@ -20,10 +20,10 @@ describe_file 'types/paths.rb' do
         Pathname.getwd => Pathname.getwd.to_s,
       }
       
-  end # NRSER::Types.dir_path
-
-  describe "NRSER::Types.file_path" do
-    subject { NRSER::Types.method :file_path }
+  end # method .dir_path
+  
+  
+  describe_method :file_path do
     
     include_examples 'make type',
       accepts: [
@@ -67,12 +67,10 @@ describe_file 'types/paths.rb' do
         }
     end # custom name
       
-  end # NRSER::Types.dir_path
+  end # method .dir_path
   
   
-  describe 'NRSER::Types.path_seg' do
-    subject { NRSER::Types.method :path_seg }
-    
+  describe_method :path_seg do
     include_examples 'make type',
       accepts: [
         'hey',
@@ -89,9 +87,8 @@ describe_file 'types/paths.rb' do
             name: 'POSIXPathSegment',
           }
         }
-      }    
+      }
     
-  end # NRSER::Types.path_seg
-  
+  end # method .path_seg
   
 end
