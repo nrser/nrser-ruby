@@ -114,7 +114,7 @@ module NRSER
     end
     
     alias_method :to_sender, :to_proc
-
+    
     
     # Send this instance to a receiver object.
     # 

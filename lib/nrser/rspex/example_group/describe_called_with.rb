@@ -31,12 +31,7 @@ module NRSER::RSpex::ExampleGroup
       &body
   end # #describe_called_with
   
-  # Aliases to other names I was using at first... not preferring their use
-  # at the moment.
-  # 
-  # The `when_` one sucks because Atom de-dents the line, and `describe_`
-  # is just clearer what the block is doing for people reading it.
+  # Short / old name
   alias_method :called_with, :describe_called_with
-  alias_method :when_called_with, :describe_called_with
   
 end # module NRSER::RSpex::ExampleGroup

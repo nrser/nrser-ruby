@@ -23,16 +23,29 @@ module NRSER::RSpex::ExampleGroup
   #   key.
   # 
   # @param [Hash<Symbol, Object>] metadata:
-  #   Metadata to add to the new example group.
+  #   [RSpec metadata][] to add to the new example group.
   #   
   #   In addition to the keys RSpec will reject, we prohibit `:type` *unless*
   #   it is the same as the `type` keyword argument or `nil`.
   #   
   #   In either of these cases, the `type` keyword arg will be used for the new
   #   example group's `:type` metadata value.
+  #   
+  #   [RSpec metadata]: https://relishapp.com/rspec/rspec-core/docs/metadata/user-defined-metadata
   # 
   # @param [Hash<Symbol, Object>] bindings:
+  #   Name to value pairs to bind in the new example group.
   #   
+  #   All values will be bound at the example group and example levels -
+  #   though if they are {Wrapper}, that wrapper will be available at the
+  #   group level, while they will be automatically unwrapped at the
+  #   example level (as the requisite context is available there).
+  # 
+  # @param [Boolean] bind_subject:
+  #   When `true` (and there is a `subject_block`) bind the `subject` inside
+  #   the new example group.
+  # 
+  # 
   # 
   # @return [void]
   # 
@@ -91,15 +104,15 @@ module NRSER::RSpex::ExampleGroup
         subject &subject_block
       end
       
+      # Bind bindings
       unless bindings.empty?
         bindings.each { |name, value|
+          # Example-level binding
           let( name ) { unwrap value, context: self }
           
-          unless value.is_a? Wrapper
-            define_singleton_method name do
-              value
-            end
-          end
+          # Example group-level binding (which may return a {Wrapper} that
+          # of course can not be unwrapped at the group level)
+          define_singleton_method( name ) { value }
         }
       end
       

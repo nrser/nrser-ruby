@@ -125,7 +125,11 @@ module NRSER::RSpex::Format
   def self.prepend_type type, description
     return description if type.nil?
     
-    prefix = pastel.magenta( i( type.to_s.upcase.gsub('_', ' ') ) )
+    prefixes = RSpec.configuration.x_type_prefixes
+    
+    prefix = pastel.magenta(
+      prefixes[type] || i( type.to_s.upcase.gsub('_', ' ') )
+    )
     
     "#{ prefix } #{ description }"
   end # .format_type

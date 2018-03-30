@@ -9,14 +9,14 @@ describe "NRSER.each_branch" do
   
   context "called without a block" do
     context "called with arrays" do
-      when_called_with( [] ) {
+      describe_called_with( [] ) {
         it {
           is_expected.to be_a( Enumerator ).
             and have_attributes size: 0
         }
       }
       
-      when_called_with( [:x, :y, :z] ) {
+      describe_called_with( [:x, :y, :z] ) {
         it {
           is_expected.to be_a( Enumerator ).
             and have_attributes size: 3
@@ -25,7 +25,7 @@ describe "NRSER.each_branch" do
     end # called with arrays
     
     context "called with hashes" do
-      when_called_with( {} ) {
+      describe_called_with( {} ) {
         it {
           is_expected.to be_a( Enumerator ).
             and have_attributes size: 0

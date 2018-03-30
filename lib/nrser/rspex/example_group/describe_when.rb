@@ -24,4 +24,9 @@ module NRSER::RSpex::ExampleGroup
       &body
   end
   
+  # Old name (used to be different method)
+  
+  alias_method :context_where, :describe_when
+  
+  
 end # module NRSER::RSpex::ExampleGroup

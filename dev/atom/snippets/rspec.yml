@@ -42,18 +42,24 @@
         
         # @todo Document ${1:describe_method} method.
         # 
-        # @return [void]
+        # @param bind_subject:  (see #describe_x)
+        # @param &body          (see #describe_x)
+        # 
+        # @return (see #describe_x)
         # 
         def ${1:describe_method} *args, **kwds, &body
           # Do custom setup / prep...
           
-          # Create the RSpec example group context
-          describe description, **metadata do
-            # Invoke let, subject, etc...
-            
-            # Exec the body in the example group context
-            module_exec &body
-          end
+          # Pass up to {#describe_x}
+          describe_x \\
+            *description,
+            type: type,
+            # metadata: metadata,
+            # bind_subject: bind_subject,
+            # subject_block: -> {
+            #   # ...
+            # },
+            &body
         end # #${1:describe_method}
         
       end # module NRSER::RSpex::ExampleGroup
