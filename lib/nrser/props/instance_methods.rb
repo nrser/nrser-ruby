@@ -40,32 +40,32 @@ module NRSER::Props::InstanceMethods
   # 
   # @return [nil]
   # 
-  def initialize_props source_values
-    array = []
-    hash = {}
-    
-    self.class.props(only_primary: true).values.each { |prop|
-      value = prop.create_value self, source_values
-      case prop.key
-      when Integer
-        array[key] = value
-      when Symbol
-        hash[key] = value
-      else
-        raise "SHOULD NEVER HAPPEN, prop.key: #{ prop.pretty_inspect }"
-      end
-    }
-    
-    # TODO  Now trigger all eager defaults (check prop getting trigger
-    #       correctly)
-    
-    # Check additional type invariants
-    self.class.invariants.each do |type|
-      type.check self
-    end
-    
-    nil
-  end # #initialize_props
+  # def initialize_props source_values
+  #   array = []
+  #   hash = {}
+  # 
+  #   self.class.props(only_primary: true).values.each { |prop|
+  #     value = prop.create_value self, source_values
+  #     case prop.key
+  #     when Integer
+  #       array[key] = value
+  #     when Symbol
+  #       hash[key] = value
+  #     else
+  #       raise "SHOULD NEVER HAPPEN, prop.key: #{ prop.pretty_inspect }"
+  #     end
+  #   }
+  # 
+  #   # TODO  Now trigger all eager defaults (check prop getting trigger
+  #   #       correctly)
+  # 
+  #   # Check additional type invariants
+  #   self.class.invariants.each do |type|
+  #     type.check self
+  #   end
+  # 
+  #   nil
+  # end # #initialize_props
   
   
   def merge overrides = {}

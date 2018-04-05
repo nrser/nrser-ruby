@@ -81,13 +81,16 @@ class NRSER::Props::Storage::InstanceVariable
   end
   
   
-  def get instance, key
-    sub_storage.get instance.instance_variable_get( @var_name ), key
+  def get instance, prop
+    sub_storage.get instance.instance_variable_get( @var_name ), prop
   end
   
   
-  def put instance, key, value
-    sub_storage.put instance.instance_variable_get( @var_name ), key, value
+  def put instance, prop, value
+    sub_storage.put \
+      instance.instance_variable_get( @var_name ),
+      prop,
+      value
   end
   
 end

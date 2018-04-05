@@ -50,13 +50,11 @@ class NRSER::Props::Prop
   attr_reader :name
   
   
-  
   # The key under which the value will be stored in the storage.
   # 
-  # @return [String | Symbol | Integer]
+  # @return [nil | Integer]
   #     
-  attr_reader :key
-  
+  attr_reader :index
   
   
   # The type of the valid values for the property.
@@ -65,7 +63,14 @@ class NRSER::Props::Prop
   #     
   attr_reader :type
   
-    
+  
+  # Names of any props this one depends on (to create a default).
+  # 
+  # @return [Array<Symbol>]
+  #     
+  attr_reader :deps
+  
+  
   # Optional name of instance variable (including the `@` prefix) or getter
   # method (method that takes no arguments) that provides the property's
   # value.
@@ -123,13 +128,16 @@ class NRSER::Props::Prop
                   source: nil,
                   to_data: nil,
                   from_data: nil,
-                  key: nil
+                  index: nil
     
     # Set these up first so {#to_s} works in case we need to raise errors.
     @defined_in = defined_in
     @name = t.sym.check name
-    @key = key || @name
+    @index = t.non_neg_int?.check index
     @type = t.make type
+    
+    # Will be overridden in {#init_default!} if needed
+    @deps = []
     
     @to_data = to_data
     @from_data = from_data
@@ -189,8 +197,54 @@ class NRSER::Props::Prop
         END
       end
       
-      # It must be a {Proc} or be frozen
-      unless Proc === default || default.frozen?
+      if Proc === default
+        case default.arity
+        when 0
+          # pass, no deps
+        when 1
+          # Check that it's valid and set deps
+          @deps = default.parameters.map do |param|
+            unless  Array === param &&
+                    :keyreq == param[0]
+              raise ArgumentError.new binding.erb <<~END
+                Prop default Proc that take args must take only required
+                keywords (`:keyreq` type)
+                
+                This is because this is how the props system figures out
+                any dependency orders.
+                
+                Found:
+                
+                    <%= default.parameters %>
+                
+                For `default` for prop <%= full_name %>:
+                
+                    <%= self.pretty_inspect %>
+                
+              END
+            end
+            
+            # The keyword name
+            param[1]
+          end
+        else
+          raise ArgumentError.new binding.erb <<~END
+            Non-proc default values must be frozen
+          
+            Default values that are *not* a {Proc} are shared between *all*
+            instances of the prop'd class, and as such *must* be immutable
+            (`#frozen? == true`).
+            
+            Found `default`:
+            
+                <%= default.pretty_inspect %>
+            
+            when constructing prop <%= name.inspect %>
+            for class <%= defined_in.name %>
+          END
+        end
+      
+      elsif !default.frozen?
         raise ArgumentError.new binding.erb <<-END
           Non-proc default values must be frozen
         
@@ -288,9 +342,6 @@ class NRSER::Props::Prop
   #   This is a shitty hack stop-gap until I really figure our how this should
   #   work.
   # 
-  # @param [NRSER::Props::Props] instance
-  #   Instance being built.
-  # 
   # @param [Hash<Symbol, Object>] source_values
   #   Source values provided for initialization.
   # 
@@ -300,14 +351,14 @@ class NRSER::Props::Prop
   # @raise [NameError]
   #   If the prop doesn't have a default.
   # 
-  def default instance, source_values
+  def default **values
     if has_default?
       if Proc === @default
         case @default.arity
         when 0
           @default.call
         else
-          @default.call instance, source_values
+          @default.call **values.slice( deps )
         end
       else
         @default
@@ -384,7 +435,7 @@ class NRSER::Props::Prop
       NRSER::Props::Metadata.
         metadata_for( instance.class ).
         storage.
-        get instance, key
+        get instance, self
     end
   end # #get
   
@@ -416,74 +467,38 @@ class NRSER::Props::Prop
   end # #check!
   
   
-  # @todo Document set_from_hash method.
+  # Create a type-checked value for the prop.
   # 
-  # @param [type] arg_name
-  #   @todo Add name param description.
+  # @param [Hash<Symbol, Object>] **values
+  #   
   # 
   # @return [return_type]
   #   @todo Document return value.
   # 
-  def create_value instance, source
-    if source.respond_to? :each_pair
-      if source.key? name
-        check! source[name]
-        
-      elsif source.key? name.to_s
-        check! source[name.to_s]
-        
-      elsif default?
-        check! default( instance, source )
-        
-      else
-        raise TypeError.new binding.erb <<-END
-          Prop <%= full_name %> has no default value and no value was provided
-          in source:
-          
-              <%= source.pretty_inspect %>
-          
-          Prop:
-          
-              <%= self.pretty_inspect %>
-          
-        END
-      end
-      
-    elsif source.respond_to? :each_index
-      unless t.non_neg_int === key
-        raise ArgumentError.new binding.erb <<-END
-          Indexed source provided for prop <%= full_name %>, but key <%= key %>
-          is not a non-negative integer.
-          
-          Source:
-          
-              <%= source.pretty_inspect %>
-          
-          Prop:
-          
-              <%= self.pretty_inspect %>
-          
-        END
-      end
-      
-      if key >= source.count
-        check! default( instance, source )
-        
-      else
-        check! source[key]
-      end
-      
+  def resolve_value_from **values
+    value = if values.key? name
+      values[name]
+    
+    elsif default?
+      default **values
+    
     else
-      raise ArgumentError.new binding.erb <<~END
-        `source` argument must respond to `#each_pair` or `#each_index`
+      raise TypeError.new binding.erb <<-END
+        Prop <%= full_name %> has no default value and no value was provided
         
-        Found:
+        Received values:
         
-            <%= source.pretty_inspect %>
+            <%= values.pretty_inspect %>
+        
+        Prop:
+        
+            <%= self.pretty_inspect %>
         
       END
     end
-  end # #create_value
+    
+    check! value
+  end
   
   
   # Get the "data" value - a basic scalar or structure of hashes, arrays and
@@ -579,7 +594,7 @@ class NRSER::Props::Prop
       # The custom `from_data` configuration specifies a string or symbol name,
       # which we interpret as a class method on the defining class and call
       # with the data to produce a value.
-      @defined_in.send @to_data, data
+      @defined_in.send @from_data, data
     
     when Proc
       # The custom `from_data` configuration provides a procedure, which we

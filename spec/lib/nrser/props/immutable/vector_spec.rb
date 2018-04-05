@@ -59,8 +59,8 @@ describe NRSER::Props::Immutable::Vector do
         
         # It's vital that we include the `key:` keyword argument, and that the
         # values are non-negative integer indexes for the vector.
-        prop :x, type: t.int, key: 0
-        prop :y, type: t.int, key: 1
+        prop :x, type: t.int, index: 0
+        prop :y, type: t.int, index: 1
         
         # Just for fun and to show the capabilities, define a `#to_s` to nicely
         # print the point.

@@ -78,8 +78,8 @@ class NRSER::Meta::Source::Location < Hamster::Vector
   # Props
   # ======================================================================
   
-  prop  :file, type: t.abs_path?, default: nil, key: 0
-  prop  :line, type: t.pos_int?, default: nil, key: 1
+  prop  :file, type: t.abs_path?, default: nil, index: 0
+  prop  :line, type: t.pos_int?, default: nil, index: 1
   
   
   # Constructor

@@ -31,7 +31,7 @@ module NRSER::Props; end
 # 
 module NRSER::Props::Immutable::HashVariable
   
-  KEY_STORAGE = NRSER::Props::Storage::Key.new immutable: true
+  KEY_STORAGE = NRSER::Props::Storage::Key.new immutable: true, key_type: :name
   
   INSTANCE_VARIABLE_STORAGE = \
     NRSER::Props::Storage::InstanceVariable.new sub_storage: KEY_STORAGE
@@ -51,15 +51,32 @@ module NRSER::Props::Immutable::HashVariable
   # ======================================================================
   
   # Instantiate a new `NRSER::Props::Immutable::Vector`.
-  def initialize source = {}
-    values = {}
+  def initialize_props values = {}
+    prop_values = {}
     
-    self.class.props( only_primary: true ).values.each do |prop|
-      values[prop.key] = prop.create_value self, source
-    end
+    self.class.metadata.each_prop_value_from( values ) { |prop, value|
+      prop_values[prop.name] = value
+    }
     
     instance_variable_set self.class.metadata.storage.var_name,
                           Hamster::Hash.new( values )
+
+    # Check additional type invariants
+    self.class.invariants.each do |type|
+      type.check self
+    end
   end # #initialize
   
-end # module NRSER::Props::Immutable
+end # module NRSER::Props::Immutable::HashVariable
+
+
+# @todo document NRSER::Props::Immutable::HashVariable::Base module.
+class NRSER::Props::Immutable::HashVariable::Base
+  
+  include NRSER::Props::Immutable::HashVariable
+  
+  def initialize values = {}
+    initialize_props values
+  end
+  
+end # class NRSER::Props::Immutable::HashVariable::Base

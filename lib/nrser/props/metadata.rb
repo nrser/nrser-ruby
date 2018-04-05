@@ -7,11 +7,12 @@
 # Stdlib
 # -----------------------------------------------------------------------
 
-# Deps
-# -----------------------------------------------------------------------
+# Topological sort for ordering props by default dependencies
+require 'tsort'
 
 # Project / Package
 # -----------------------------------------------------------------------
+
 require 'nrser/refinements/types'
 
 require_relative './prop'
@@ -21,6 +22,7 @@ require_relative './prop'
 # =======================================================================
 
 using NRSER::Types
+
 
 # Declarations
 # =======================================================================
@@ -165,6 +167,85 @@ class NRSER::Props::Metadata
   end # #prop
   
   
+  class TSorter
+    include TSort
+    
+    def initialize entries, &each_child
+      @entries = entries
+      @each_child = each_child
+    end
+    
+    def tsort_each_node &block
+      @entries.each &block
+    end
+    
+    def tsort_each_child node, &block
+      @each_child.call node, &block
+    end
+  end
+  
+  
+  def each_prop_value_from values, &block
+    primary_props = props only_primary: true
+    
+    # Normalize values to a `Hash<Symbol, VALUE>` so everything can deal with
+    # one form
+    normalized_values = {}
+    
+    if values.respond_to? :each_pair
+      values.each_pair { |key, value|
+        name = case key
+        when Symbol
+          key
+        when String
+          key.to_sym
+        else
+          key.to_s.to_sym
+        end
+        
+        normalized_values[name] = value
+      }
+    elsif values.respond_to? :each_index
+      indexed = []
+      
+      primary_props.each_value do |prop|
+        indexed[prop.index] = prop unless prop.index.nil?
+      end
+      
+      values.each_index { |index|
+        prop = indexed[index]
+        normalized_values[prop.name] = values[index] if prop
+      }
+    else
+      raise ArgumentError.new binding.erb <<~END
+        `source` argument must respond to `#each_pair` or `#each_index`
+        
+        Found:
+        
+            <%= source.pretty_inspect %>
+        
+      END
+    end
+    
+    normalized_values.freeze
+    
+    TSorter.new( primary_props.each_value ) { |prop, &on_dep_prop|
+      prop.deps.each { |name|
+        if primary_props.key? name
+          on_dep_prop.call primary_props[name]
+        else
+          raise RuntimeError.new binding.erb <<~END
+            Property <%= prop.full_name %> depends on prop `<%= name %>`,
+            but no primary prop with that name could be found!
+          END
+        end
+      }
+    }.tsort_each do |prop|
+      block.call prop, prop.resolve_value_from( normalized_values )
+    end
+  end
+  
+  
   def invariants only_own: false
     result = if !only_own && superclass_has_metadata?
       superclass_metadata.invariants only_own: false
@@ -201,5 +282,6 @@ class NRSER::Props::Metadata
       @storage = value
     end
   end
+  
   
 end # class NRSER::Props::ClassMetadata

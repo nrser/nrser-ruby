@@ -40,21 +40,17 @@ class NRSER::Props::Storage::InstanceVariables
   end
   
   
-  def get instance, key
-    instance.instance_variable_get "@#{ key }"
+  def get instance, prop
+    instance.instance_variable_get "@#{ prop.name }"
   end
   
   
-  def put instance, key, value
+  def put instance, prop, value
     if immutable?
       raise RuntimeError.new binding.erb <<~END
         Properties of #{ instance.class.name } are immutable.
         
-        Tried to set key
-        
-            <%= key.pretty_inspect %>
-        
-        to value
+        Tried to set prop #{ prop.name } to value
         
             <%= value.pretty_inspect %>
         
@@ -65,7 +61,7 @@ class NRSER::Props::Storage::InstanceVariables
       END
     end
     
-    instance.instance_variable_set "@#{ key }", value
+    instance.instance_variable_set "@#{ prop.name }", value
   end
   
 end

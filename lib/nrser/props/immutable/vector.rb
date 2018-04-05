@@ -31,7 +31,7 @@ module NRSER::Props::Immutable::Vector
   # Constants
   # ==========================================================================
   
-  STORAGE = NRSER::Props::Storage::Key.new immutable: true
+  STORAGE = NRSER::Props::Storage::Key.new immutable: true, key_type: :index
   
   
   # Module Methods
@@ -73,8 +73,8 @@ module NRSER::Props::Immutable::Vector
     # 
     def alloc *args
       super( *args ).tap do |new_instance|
-        self.props( only_primary: true ).values.each do |prop|
-          prop.check! new_instance[prop.key]
+        self.props( only_primary: true ).each_value do |prop|
+          prop.check! new_instance[prop.index]
         end
       end
     end
@@ -89,14 +89,19 @@ module NRSER::Props::Immutable::Vector
   # and pass an {Array} up to the super-method to instantiate the
   # {Hamster::Vector}.
   # 
-  def initialize source = {}
-    values = []
+  def initialize values = {}
+    super_values = []
     
-    self.class.props( only_primary: true ).values.each do |prop|
-      values[prop.key] = prop.create_value self, source
+    self.class.metadata.each_prop_value_from( values ) { |prop, value|
+      super_values[prop.index] = value
+    }
+    
+    super super_values
+    
+    # Check additional type invariants
+    self.class.invariants.each do |type|
+      type.check self
     end
-    
-    super values
   end # #initialize
   
 end # module NRSER::Props::Immutable::Vector

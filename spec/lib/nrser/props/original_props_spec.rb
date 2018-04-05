@@ -11,9 +11,7 @@ describe NRSER::Props do
     # =====================================================================
     
     let(:point_class) {
-      Class.new do
-        include NRSER::Props::Immutable::HashVariable
-        
+      Class.new( NRSER::Props::Immutable::HashVariable::Base ) do
         # So that error messages look right
         def self.name; 'Point'; end
         

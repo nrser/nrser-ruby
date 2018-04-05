@@ -13,9 +13,9 @@ describe NRSER::Props do
     unsigned = t.unsigned
     
     before( :all ) {
-      Cat = @cat_class = Class.new do
-        include NRSER::Props::Immutable::HashVariable
-        
+      Cat = @cat_class = Class.new(
+        NRSER::Props::Immutable::HashVariable::Base
+      ) do
         prop :name, type: non_empty_str
         prop :breed, type: non_empty_str
         prop :age, type: unsigned
@@ -32,8 +32,9 @@ describe NRSER::Props do
         #               instance variable of the new class.
         cat_class = @cat_class
         
-        @owner_class = Class.new do
-          include NRSER::Props::Immutable::HashVariable
+        @owner_class = Class.new(
+          NRSER::Props::Immutable::HashVariable::Base
+        ) do
           
           prop :name, type: non_empty_str
           

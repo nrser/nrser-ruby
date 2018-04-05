@@ -95,12 +95,12 @@ module NRSER::Types
   # Integer less than zero.
   # 
   
-  def self.neg_int
-    intersection(
-      INT,
-      bounded(max: -1),
-      name: 'ℤ⁻'
-    ).freeze
+  def_factory :neg_int do |name: 'ℤ⁻', **options|
+    all_of \
+      int,
+      bounded( max: -1 ),
+      name: name,
+      **options
   end
   
   
@@ -111,19 +111,16 @@ module NRSER::Types
   # as bounded instead of a union.
   # 
   
-  def self.non_neg_int **options
-    # Alternative symbol: 'ℤ⋆'
-    intersection INT, bounded(min: 0), name: '{0}∪ℤ⁺', **options
+  def_factory(
+    :non_neg_int,
+    aliases: [:unsigned, :index]
+  ) do |name: 'ℕ⁰', **options|
+    all_of \
+      int,
+      bounded( min: 0 ),
+      name: name,
+      **options
   end
-  
-  singleton_class.send :alias_method, :unsigned, :non_neg_int
-  
-  
-  def self.non_neg_int? **options
-    maybe non_neg_int, **options
-  end
-  
-  singleton_class.send :alias_method, :unsigned?, :non_neg_int?
   
   
   # Non-Positive Integer
