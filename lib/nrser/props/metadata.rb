@@ -4,16 +4,12 @@
 # Requirements
 # =======================================================================
 
-# Stdlib
-# -----------------------------------------------------------------------
-
-# Topological sort for ordering props by default dependencies
-require 'tsort'
-
 # Project / Package
 # -----------------------------------------------------------------------
 
 require 'nrser/refinements/types'
+
+require 'nrser/graph/tsorter'
 
 require_relative './prop'
 
@@ -167,33 +163,43 @@ class NRSER::Props::Metadata
   end # #prop
   
   
-  class TSorter
-    include TSort
-    
-    def initialize entries, &each_child
-      @entries = entries
-      @each_child = each_child
-    end
-    
-    def tsort_each_node &block
-      @entries.each &block
-    end
-    
-    def tsort_each_child node, &block
-      @each_child.call node, &block
-    end
-  end
-  
-  
-  def each_prop_value_from values, &block
+  # Check primary prop values and fill in defaults, yielding `(Prop, VALUE)`
+  # to the `&block`.
+  # 
+  # Used when initializing instances.
+  # 
+  # @param [#each_pair | #each_index] values
+  #   Collection of prop values itterable by key/value pairs or by indexed
+  #   entries.
+  # 
+  # @param [Proc<(NRSER::Props::Prop, VALUE)>] &block
+  #   Block that will receive primary prop and value pairs.
+  # 
+  # @raise [TypeError]
+  #   If a value is does not satisfy it's {NRSER::Props::Prop#type}.
+  # 
+  # @raise [ArgumentError]
+  #   If `values` doesn't respond to `#each_pair` or `#each_index`.
+  # 
+  # @raise [NameError]
+  #   If a value is not provided for a primary prop and a default can not
+  #   be created.
+  # 
+  # @raise [TSort::Cyclic]
+  #   If any of the primary prop's {NRSER::Props::Prop#deps} for dependency
+  #   cycles.
+  # 
+  def each_primary_prop_value_from values, &block
     primary_props = props only_primary: true
     
     # Normalize values to a `Hash<Symbol, VALUE>` so everything can deal with
-    # one form
-    normalized_values = {}
+    # one form. Default values will be set here as they're resolved and made
+    # available to subsequent {Prop#default} calls.
+    values_by_name = {}
     
     if values.respond_to? :each_pair
       values.each_pair { |key, value|
+        # Figure out the prop name {Symbol}
         name = case key
         when Symbol
           key
@@ -203,7 +209,12 @@ class NRSER::Props::Metadata
           key.to_s.to_sym
         end
         
-        normalized_values[name] = value
+        # If the `name` corresponds to a primary prop set it in the values by
+        # name
+        # 
+        # TODO  Should check that the name is not already set?
+        # 
+        values_by_name[name] = value if primary_props.key? name
       }
     elsif values.respond_to? :each_index
       indexed = []
@@ -214,7 +225,7 @@ class NRSER::Props::Metadata
       
       values.each_index { |index|
         prop = indexed[index]
-        normalized_values[prop.name] = values[index] if prop
+        values_by_name[prop.name] = values[index] if prop
       }
     else
       raise ArgumentError.new binding.erb <<~END
@@ -227,9 +238,16 @@ class NRSER::Props::Metadata
       END
     end
     
-    normalized_values.freeze
-    
-    TSorter.new( primary_props.each_value ) { |prop, &on_dep_prop|
+    # Topological sort the primary props by their default dependencies.
+    # 
+    NRSER::Graph::TSorter.new(
+      primary_props.each_value
+    ) { |prop, &on_dep_prop|
+      # 
+      # This block is responsible for receiving a {Prop} and a callback
+      # block and invoking that callback block on each of the prop's
+      # dependencies (if any).
+      # 
       prop.deps.each { |name|
         if primary_props.key? name
           on_dep_prop.call primary_props[name]
@@ -241,9 +259,27 @@ class NRSER::Props::Metadata
         end
       }
     }.tsort_each do |prop|
-      block.call prop, prop.resolve_value_from( normalized_values )
-    end
-  end
+      # {Prop} instances will now be yielded in an order that allows any
+      # inter-dependencies to be resolved (as long as there weren't dependency
+      # cycles, which {NRSER::Graph::TSorter} will raise if it finds)
+      
+      # If we have a value for the prop, just check that
+      if values_by_name.key? prop.name
+        prop.check! values_by_name[prop.name]
+      else
+        # Otherwise, get the default value, providing the values we already
+        # know in case the default is a {Proc} that needs some of them.
+        # 
+        # We set that value in `values_by_name` so that subsequent
+        # {Prop#default} calls can use it.
+        # 
+        values_by_name[prop.name] = prop.default **values_by_name
+      end
+      
+      # Yield the {Prop} and it's value back to the `&block`
+      block.call prop, values_by_name[prop.name]
+    end # .tsort_each
+  end # #each_primary_prop_value_from
   
   
   def invariants only_own: false

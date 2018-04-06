@@ -54,7 +54,7 @@ module NRSER::Props::Immutable::HashVariable
   def initialize_props values = {}
     prop_values = {}
     
-    self.class.metadata.each_prop_value_from( values ) { |prop, value|
+    self.class.metadata.each_primary_prop_value_from( values ) { |prop, value|
       prop_values[prop.name] = value
     }
     

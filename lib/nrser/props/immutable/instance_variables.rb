@@ -40,8 +40,8 @@ module NRSER::Props::Immutable::InstanceVariables
   # Since the {NRSER::Props::Immutable::InstanceVariables} mix-in does *not*
   # need to tap into the initialize chain,
   # 
-  def initialize_props source = {}
-    self.class.metadata.each_prop_value_from( values ) { |prop, value|
+  def initialize_props values = {}
+    self.class.metadata.each_primary_prop_value_from( values ) { |prop, value|
       instance_variable_set "@#{ prop.name }", value
     }
     

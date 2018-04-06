@@ -229,18 +229,11 @@ class NRSER::Props::Prop
           end
         else
           raise ArgumentError.new binding.erb <<~END
-            Non-proc default values must be frozen
-          
-            Default values that are *not* a {Proc} are shared between *all*
-            instances of the prop'd class, and as such *must* be immutable
-            (`#frozen? == true`).
+            Prop default Proc must take no params or only required keywords
+            ({Proc#arity} of 0 or 1).
             
-            Found `default`:
+            Default to prop <%= full_name %> has arity <%= default.arity %>.
             
-                <%= default.pretty_inspect %>
-            
-            when constructing prop <%= name.inspect %>
-            for class <%= defined_in.name %>
           END
         end
       
@@ -342,8 +335,8 @@ class NRSER::Props::Prop
   #   This is a shitty hack stop-gap until I really figure our how this should
   #   work.
   # 
-  # @param [Hash<Symbol, Object>] source_values
-  #   Source values provided for initialization.
+  # @param [Hash<Symbol, Object>] values
+  #   Other prop values known at this point, keyed by name.
   # 
   # @return [Object]
   #   Default value.
@@ -358,14 +351,15 @@ class NRSER::Props::Prop
         when 0
           @default.call
         else
-          @default.call **values.slice( deps )
+          kwds = values.slice *deps
+          @default.call **kwds
         end
       else
         @default
       end
     else
       raise NameError.new binding.erb <<-END
-        Prop <%= full_name %> has no default value.
+        Prop <%= full_name %> has no default value (and none provided).
       END
     end
   end
@@ -465,40 +459,6 @@ class NRSER::Props::Prop
       END
     end
   end # #check!
-  
-  
-  # Create a type-checked value for the prop.
-  # 
-  # @param [Hash<Symbol, Object>] **values
-  #   
-  # 
-  # @return [return_type]
-  #   @todo Document return value.
-  # 
-  def resolve_value_from **values
-    value = if values.key? name
-      values[name]
-    
-    elsif default?
-      default **values
-    
-    else
-      raise TypeError.new binding.erb <<-END
-        Prop <%= full_name %> has no default value and no value was provided
-        
-        Received values:
-        
-            <%= values.pretty_inspect %>
-        
-        Prop:
-        
-            <%= self.pretty_inspect %>
-        
-      END
-    end
-    
-    check! value
-  end
   
   
   # Get the "data" value - a basic scalar or structure of hashes, arrays and
