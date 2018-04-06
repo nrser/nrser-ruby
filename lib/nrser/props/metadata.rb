@@ -169,7 +169,7 @@ class NRSER::Props::Metadata
   # Used when initializing instances.
   # 
   # @param [#each_pair | #each_index] values
-  #   Collection of prop values itterable by key/value pairs or by indexed
+  #   Collection of prop values iterable by key/value pairs or by indexed
   #   entries.
   # 
   # @param [Proc<(NRSER::Props::Prop, VALUE)>] &block
