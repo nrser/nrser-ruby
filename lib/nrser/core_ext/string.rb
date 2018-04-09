@@ -21,11 +21,6 @@ class String
   end
   
   
-  def truncate *args
-    NRSER.truncate self, *args
-  end
-  
-  
   # See {NRSER.constantize}
   def constantize
     NRSER.constantize self

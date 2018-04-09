@@ -95,45 +95,6 @@ module NRSER
     
   end # .lazy_filter_repeated_blank_lines
   
-
-  # Truncates a given +text+ after a given <tt>length</tt> if +text+ is longer than <tt>length</tt>:
-  #
-  #   'Once upon a time in a world far far away'.truncate(27)
-  #   # => "Once upon a time in a wo..."
-  #
-  # Pass a string or regexp <tt>:separator</tt> to truncate +text+ at a natural break:
-  #
-  #   'Once upon a time in a world far far away'.truncate(27, separator: ' ')
-  #   # => "Once upon a time in a..."
-  #
-  #   'Once upon a time in a world far far away'.truncate(27, separator: /\s/)
-  #   # => "Once upon a time in a..."
-  #
-  # The last characters will be replaced with the <tt>:omission</tt> string (defaults to "...")
-  # for a total length not exceeding <tt>length</tt>:
-  #
-  #   'And they found that many people were sleeping better.'.truncate(25, omission: '... (continued)')
-  #   # => "And they f... (continued)"
-  # 
-  # adapted from
-  # 
-  # <https://github.com/rails/rails/blob/7847a19f476fb9bee287681586d872ea43785e53/activesupport/lib/active_support/core_ext/string/filters.rb#L46>
-  # 
-  def self.truncate(str, truncate_at, options = {})
-    return str.dup unless str.length > truncate_at
-
-    omission = options[:omission] || '...'
-    length_with_room_for_omission = truncate_at - omission.length
-    stop = \
-      if options[:separator]
-        str.rindex(options[:separator], length_with_room_for_omission) || length_with_room_for_omission
-      else
-        length_with_room_for_omission
-      end
-
-    "#{str[0, stop]}#{omission}"
-  end # .truncate
-  
   
   # Cut the middle out of a sliceable object with length and stick an ellipsis
   # in there instead.
@@ -141,7 +102,7 @@ module NRSER
   # Categorized with {String} functions 'cause that's where it started, and
   # that's probably how it will primarily continue to be used, but tested to
   # work on {Array} and should for other classes that satisfy the same
-  # slice and  interface.
+  # slice and interface.
   # 
   # @param [V & #length & #slice & #<< & #+] source
   #   Source object. In practice, {String} and {Array} work. In theory,
