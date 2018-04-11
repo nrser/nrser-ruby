@@ -11,18 +11,27 @@
 # Need {Module#anonymous?}
 require 'active_support/core_ext/module/anonymous'
 
+
 # Project / Package
 # ------------------------------------------------------------------------
 
 require_relative './type'
 
+
 module NRSER::Types
+  
+  # Type satisfied only by it's exact {#value} object (identity comparison
+  # via `#equal?`).
+  # 
   class Is < NRSER::Types::Type
+    
+    # Attributes
+    # ========================================================================
+    
     attr_reader :value
     
     def initialize value, **options
       super **options
-      
       @value = value
     end
     
@@ -55,7 +64,12 @@ module NRSER::Types
     
   end # Is
   
-  # an exact value (using ===)
+  
+  # Satisfied by the exact value only (identity comparison via
+  # `#equal?`).
+  # 
+  # Useful for things like {Module}, {Class}, {Fixnum}, {Symbol}, `true`, etc.
+  # 
   def_factory :is do |value, **options|
     Is.new value, **options
   end

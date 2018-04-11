@@ -35,7 +35,7 @@ class NRSER::Types::CheckError < ::TypeError
   
   # The value that failed the type check.
   # 
-  # @return [attr_type]
+  # @return [*]
   #     
   attr_reader :value
   
@@ -43,7 +43,20 @@ class NRSER::Types::CheckError < ::TypeError
   # Constructor
   # ========================================================================
   
-  def initialize value:, type:, details: nil, **kwds
+  # Construct a `NicerError`.
+  # 
+  # @param [*] value:
+  #   The {#value} that failed the check.
+  # 
+  # @param [NRSER::Types::Type] type:
+  #   The type that was checked.
+  # 
+  # @param details: (see NRSER::NicerError#initialize)
+  # 
+  # @param **kwds
+  #   See {NRSER::NicerError#initialize}
+  # 
+  def initialize *message, value:, type:, details: nil, **kwds
     @value = value
     @type = type
     
@@ -53,11 +66,21 @@ class NRSER::Types::CheckError < ::TypeError
     end
     
     super \
-      "Value", value, "failed check for type", type.name,
+      *message,
       type: type,
       value: value,
       details: details,
       **kwds
   end
+  
+  
+  # Build default message when none provided.
+  # 
+  # @return [String]
+  # 
+  def default_message
+    ["Value", value.inspect, "failed check for type", type.name]
+  end # #default_message
+  
   
 end # class NRSER::Types::TypeError

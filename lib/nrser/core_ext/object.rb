@@ -7,6 +7,19 @@ class Object
   end
   
   
+  # Just an alias for `#equal?` that is easier for to remember.
+  # 
+  # @param [*] other
+  #   Something else.
+  # 
+  # @return [Boolean]
+  #   `true` if `self` and `other` are the same object.
+  # 
+  def is? other
+    equal? other
+  end
+  
+  
   # See {NRSER.truthy?}.
   def truthy?
     NRSER.truthy? self

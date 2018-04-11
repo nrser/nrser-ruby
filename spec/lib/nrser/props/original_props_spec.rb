@@ -136,7 +136,7 @@ describe NRSER::Props do
         raising: {
           [ {x: 1, y: 'why?'} ] => [
             TypeError,
-            /Value of type String for prop Point\#y\s+failed type check/m
+            /Value \"why\?\" failed check for type/m
           ],
         }
     end # .new

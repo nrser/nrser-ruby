@@ -1,24 +1,151 @@
 # encoding: UTF-8
 # frozen_string_literal: true
 
+
+# Requirements
+# ========================================================================
+
+# Stdlib
+# ------------------------------------------------------------------------
+
+# Using {PP.pp} as default dumper.
 require 'pp'
 
 
 # Definitions
 # =======================================================================
 
-# A mixin for {Exception} and utilities to make errors nicer.
+# A mixin for {Exception} and utilities to make life better... even when things
+# go wrong.
+# 
+# "Nicer" errors do a few things:
+# 
+# 1.  **`message` is a splat/`Array`**
+#     
+#     Accept an {Array} `message` instead of just a string, dumping non-string
+#     values and joining everything together.
+#     
+#     This lets you deal with printing/dumping all in one place instead of
+#     ad-hoc'ing `#to_s`, `#inspect`, `#pretty_inspect`, etc. all over the
+#     place (though you can still dump values yourself of course since string
+#     pass right through).
+#     
+#     Write things like:
+# 
+#         MyError.new "The value", value, "sucks, it should be", expected
+# 
+#     This should cut down the amount of typing when raising as well, which
+#     is always welcome.
+#     
+#     It also allows for a future where we get smarter about dumping things,
+#     offer configuration options, switch on environments (slow, rich dev
+#     versus fast, concise prod), etc.
+# 
+# 2.  **"Extended" Messages**
+#     
+#     The normal message that we talked about in (1) - that we call the
+#     *summary message* or *super-message* (since it gets passed up to the
+#     built-in Exception's `#initialize`) - is intended to be:
+#     
+#     1.  Very concise
+#         -   A single line well under 80 characters if possible.
+#             
+#         -   This just seems like how Ruby exception messages were meant to
+#             be, I guess, and in many situations it's all you would want or
+#             need (production, when it just gets rescued anyways,
+#             there's no one there to read it, etc.).
+#             
+#     2.  Cheap to render.
+#         -   We may be trying to do lot very quickly on a production system.
+#     
+#     However - especially when developing - it can be really nice to add
+#     considerably more detail and feedback to errors.
+#     
+#     To support this important use case as well, `NicerError` introduces the
+#     idea of an *extended message* that does not need to be rendered and
+#     output along with the *summary/super-message*.
+#     
+#     It's rendering is done on-demand, so systems that are not configured to
+#     use it will pay a minimal cost for it's existence.
+#     
+#     > See {#extended_message}.
+#     
+#     The extended message is composed of:
+#     
+#     1.  Text *details*, optionally rendered via {Binding.erb} when a
+#         binding is provided.
+#     
+#     2.  A *context* of name and value pairs to dump.
+#         
+#     Both are provided as optional keyword parameters to {#initialize}.
 # 
 module NRSER::NicerError
   
   # Constants
   # ========================================================================
   
-  DEFAULT_FORMAT_WIDTH = 78
+  # Default column width
+  DEFAULT_COLUMN_WIDTH = 78
   
   
   # Module Methods
   # ==========================================================================
+  
+  # Column width to format for (just summary/super-message at the moment).
+  # 
+  # @todo
+  #   Implement terminal width detection like Thor?
+  # 
+  # @return [Fixnum]
+  #   Positive integer.
+  # 
+  def self.column_width
+    DEFAULT_COLUMN_WIDTH
+  end
+  
+  
+  # Construct a nicer error.
+  # 
+  # @param [Array] *message
+  #   Main message segments.
+  # 
+  # @param [Binding?] binding:
+  #   When provided any details string will be rendered using it's
+  #   {Binding#erb} method.
+  # 
+  # @param [nil | String | Proc<()=>String> | #to_s] details:
+  #   Additional text details to add to the extended message. When:
+  #   
+  #   1.  `nil` - no details will be added.
+  #       
+  #   2.  `String` - the value will be used. If `binding:` is provided, it
+  #       will be rendered against it as ERB.
+  #       
+  #   3.  `Proc<()=>String>` - if and when an extended message is needed
+  #       the proc will be called, and the resulting string will be used
+  #       as in (2).
+  #       
+  #   4.  `#to_s` - catch all; if and when an extended message is needed
+  #       `#to_s` will be called on the value and the result will be used
+  #       as in (2).
+  # 
+  # @param [Hash<Symbol, VALUE>] **context
+  #   Any additional names and values to dump with an extended message.
+  # 
+  def initialize  *message,
+                  binding: nil,
+                  details: nil,
+                  **context
+    @binding = binding
+    @context = context
+    @details = details
+    
+    message = default_message if message.empty?
+    super_message = format_message *message
+    
+    super super_message
+  end # #initialize
+  
   
   # Format a segment of the error message.
   # 
@@ -30,49 +157,35 @@ module NRSER::NicerError
   # @return [String]
   #   The formatted string for the segment.
   # 
-  def self.format_message_segment segment
+  def format_message_segment segment
     return segment if String === segment
     
     # TODO  Do better!
     segment.inspect
-  end # .format_message_segment
+  end # #format_message_segment
   
   
-  def self.format_width
-    DEFAULT_FORMAT_WIDTH
+  # Format the main message by converting args to strings and joining them.
+  # 
+  # @param [Array] *message
+  #   Message segments.
+  # 
+  # @return [String]
+  #   Formatted and joined message ready to pass up to the built-in
+  #   exception's `#initialize`.
+  # 
+  def format_message *message
+    message.map( &method( :format_message_segment ) ).join( ' ' )
   end
   
   
-  # Construct a nicer error.
+  # Main message to use when none provided to {#initialize}.
   # 
-  # @param [Array] *message
-  #   Main message segments.
+  # @return [String]
   # 
-  # @return [return_type]
-  #   @todo Document return value.
-  # 
-  def initialize  *message,
-                  binding: nil,
-                  details: nil,
-                  **context
-    
-    super_message = case message.length
-    when 0
-      "(no message)"
-    when 1
-      message[0]
-    else
-      message.
-        map( &NRSER::NicerError.method( :format_message_segment ) ).
-        join ' '
-    end
-    
-    @binding = binding
-    @context = context
-    @details = details
-    
-    super super_message
-  end # #initialize
+  def default_message
+    "(no message)"
+  end
   
   
   # Any additional context values to add to extended messages provided to
@@ -85,7 +198,7 @@ module NRSER::NicerError
   end
   
   
-  # Render details (first time, then cached) and return the string.
+  # Render details (first time only, then cached) and return the string.
   # 
   # @return [String?]
   # 
@@ -97,11 +210,7 @@ module NRSER::NicerError
       else
         contents = case @details
         when Proc
-          if @binding.nil?
-            @details.call
-          else
-            @binding.erb @details.call
-          end
+          @details.call
         when String
           @details
         else
@@ -111,6 +220,10 @@ module NRSER::NicerError
         if contents.empty?
           nil
         else
+          if @binding
+            contents = binding.erb contents
+          end
+          
           "# Details\n\n" + contents
         end
       end
@@ -130,7 +243,7 @@ module NRSER::NicerError
           value_str = PP.pp \
             value,
             ''.dup,
-            (NRSER::NicerError.format_width - name_str.length - 2)
+            (NRSER::NicerError.column_width - name_str.length - 2)
           
           if value_str.lines.count > 1
             "#{ name_str }:\n\n#{ value_str.indent 4 }\n"
@@ -143,6 +256,12 @@ module NRSER::NicerError
   end
   
   
+  # Return the extended message, rendering if necessary (cached after first
+  # call).
+  # 
+  # @return [String]
+  #   Will be empty if there is no extended message.
+  # 
   def extended_message
     @extended_message ||= begin
       sections = []
@@ -155,19 +274,65 @@ module NRSER::NicerError
   end
   
   
-  def to_s
-    message = super
+  # Get just the *summary/super-message*.
+  # 
+  # @return [String]
+  # 
+  def message
+    to_s extended: false
+  end
+  
+  
+  # Should we add the extended message to {#to_s} output?
+  # 
+  # @todo
+  #   Just returns `true` for now... should be configurable in the future.
+  # 
+  # @return [Boolean]
+  # 
+  def add_extended_message?
+    true
+  end
+  
+  
+  # Get the message or the extended message.
+  # 
+  # @note
+  #   This is a bit weird, having to do with what I can tell about the
+  #   built-in errors and how they handle their message - they have *no*
+  #   instance variables, and seem to rely on `#to_s` to get the message
+  #   out of C-land, however that works.
+  #   
+  #   {Exception#message} just forwards here, so I overrode that with
+  #   {#message} to just get the *summary/super-message* from this method.
+  # 
+  # @param [Boolean?] extended:
+  #   Flag to explicitly control summary/super or extended message:
+  #   
+  #   1.  `nil` - call {#add_extended_message?} to decide (default).
+  #   2.  `false` - return just the *summary/super-message*.
+  #   3.  `true` - always add the *extended message* (unless it's empty).
+  # 
+  # @return [String]
+  # 
+  def to_s extended: nil
+    # The way to get the superclass' message
+    message = super()
     
-    if true && !extended_message.empty?
+    # If `extended` is explicitly `false` then just return that
+    return message if extended == false
+    
+    # Otherwise, see if the extended message was explicitly requested,
+    # of if we're configured to provide it as well.
+    # 
+    # Either way, don't add it it's empty.
+    # 
+    if  (extended || add_extended_message?) &&
+        !extended_message.empty?
       message + "\n\n" + extended_message
     else
       message
     end
-  end
-  
-  
-  def raise_
-    raise self
   end
   
 end # module NRSER::NicerError
