@@ -24,7 +24,7 @@ using NRSER
 module NRSER::Types
   
   # Tuple type - array of fixed length and types (though those could be
-  # {NRSER::Types::ANY}).
+  # {NRSER::Types.any}).
   # 
   class TupleType < NRSER::Types::ArrayType
     

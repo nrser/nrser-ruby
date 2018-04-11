@@ -22,19 +22,19 @@ module NRSER::Types
     # ========================================================================
     
     # In order to provide the same interface as {HashOfType}, this method
-    # always returns {NRSER::Types::ANY}.
+    # always returns {NRSER::Types.any}.
     # 
     # @return [NRSER::Types::Type]
     # 
-    def keys; NRSER::Types::ANY; end
+    def keys; NRSER::Types.any; end
     
     
     # In order to provide the same interface as {HashOfType}, this method
-    # always returns {NRSER::Types::ANY}.
+    # always returns {NRSER::Types.any}.
     # 
     # @return [NRSER::Types::Type]
     # 
-    def values; NRSER::Types::ANY; end
+    def values; NRSER::Types.any; end
     
     
     protected
@@ -86,13 +86,13 @@ module NRSER::Types
             end
           end
           
-          key = if keys == NRSER::Types::ANY
+          key = if keys == NRSER::Types.any
             key_str
           else
             keys.from_s key_str
           end
           
-          value = if values == NRSER::Types::ANY
+          value = if values == NRSER::Types.any
             value_str
           else
             values.from_s value_str
@@ -133,8 +133,8 @@ module NRSER::Types
     # Constructor
     # ========================================================================
     
-    def initialize  keys: NRSER::Types::ANY,
-                    values: NRSER::Types::ANY,
+    def initialize  keys: NRSER::Types.any,
+                    values: NRSER::Types.any,
                     **options
       super **options
       

@@ -41,8 +41,8 @@ module NRSER::Types
   def self.array_pair **options
     return ARRAY_PAIR if options.empty?
     
-    key   = options.delete(:key)    || ANY
-    value = options.delete(:value)  || ANY
+    key   = options.delete(:key)    || any
+    value = options.delete(:value)  || any
     
     tuple key, value, **options
   end # .array_pair

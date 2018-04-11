@@ -29,15 +29,13 @@ module NRSER::Types
     
   end # class Any
   
-  ANY = AnyType.new
-  
   # Anything at all...
   # 
   def_factory(
     :any,
     aliases: [ :all ],
-  ) do |**options|
-    AnyType.new **options
+  ) do
+    @_any_type_instance ||= AnyType.new
   end
   
 end # NRSER::Types
