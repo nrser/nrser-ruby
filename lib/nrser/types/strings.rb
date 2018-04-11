@@ -10,7 +10,7 @@ module NRSER::Types
   
   # @!group Type Factory Functions
   
-  def self.str length: nil, encoding: nil, **options
+  def_factory :str do |length: nil, encoding: nil, **options|
     if [length, encoding].all?( &:nil? )
       IsA.new String, from_s: ->(s) { s }, **options
       

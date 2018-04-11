@@ -1,7 +1,5 @@
-require 'spec_helper'
-
-require 'nrser/refinements'
-using NRSER
+# encoding: UTF-8
+# frozen_string_literal: true
 
 require 'nrser/refinements/types'
 using NRSER::Types
@@ -10,8 +8,11 @@ using NRSER::Types
 # NRSER::Types.array
 # ========================================================================
 # 
-describe "NRSER::Types.array" do
-  subject { t.method :array }
+describe_spec_file(
+  spec_path: __FILE__,
+  module: NRSER::Types,
+  method: :array,
+) do
   
   it_behaves_like 'type maker method'
   
@@ -49,7 +50,7 @@ describe "NRSER::Types.array" do
       to: {
         have_attributes: {
           class: t::ArrayType,
-          name: 'ArrayType',
+          name: 'Array',
         }
       }
     }
@@ -79,4 +80,3 @@ describe "NRSER::Types.array" do
 end # NRSER::Types.array
 
 # ************************************************************************
-

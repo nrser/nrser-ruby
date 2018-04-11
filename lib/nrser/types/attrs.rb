@@ -1,10 +1,37 @@
-require 'nrser/core_ext/hash'
-require 'nrser/types/type'
-require 'nrser/types/combinators'
+# encoding: UTF-8
+# frozen_string_literal: true
 
+
+# Requirements
+# ========================================================================
+
+# Project / Package
+# ------------------------------------------------------------------------
+
+require 'nrser/core_ext/hash'
+
+require_relative './type'
+require_relative './combinators'
+require_relative './is'
+
+
+# Definitions
+# ========================================================================
   
 module NRSER::Types
-  class Attrs < NRSER::Types::Type
+  
+  # Specify types for value attributes.
+  # 
+  class AttrsType < NRSER::Types::Type
+    
+    # Construct an `AttrsType`.
+    # 
+    # @param [Hash<Symbol, TYPE>] attrs
+    #   Map of attribute names to their types (`TYPE` values will be passed
+    #   through {NRSER::Types.make} to get a type instance).
+    #   
+    #   May not be empty.
+    # 
     def initialize attrs, **options
       super **options
       
@@ -13,10 +40,15 @@ module NRSER::Types
           "Must provide at least one attribute name/type pair"
       end
       
-      @attrs = attrs.transform_values { |type| NRSER::Types.make type }
+      @attrs = attrs.transform_values &NRSER::Types.maker
     end
     
-    def default_name
+    
+    # @see NRSER::Types::Type#explain
+    # 
+    # @return [String]
+    # 
+    def explain
       attrs_str = @attrs.map { |name, type|
         "##{ name }#{ RESPONDS_WITH }#{ type.name }"
       }.join(', ')
@@ -28,12 +60,19 @@ module NRSER::Types
       end
     end
     
-    def test value
+    
+    # @see NRSER::Types::Type#test
+    # 
+    # @return [Boolean]
+    # 
+    def test? value
       @attrs.all? { |name, type|
-        value.respond_to?(name) && type.test(value.method(name).call)
+        value.respond_to?( name ) &&
+          type.test?( value.method( name ).call )
       }
     end
-  end # Attrs
+    
+  end # AttrsType
   
   
   # @!group Type Factory Functions
@@ -44,7 +83,7 @@ module NRSER::Types
   #   string_first = intersection Enumerable, attrs(first: String)
   # 
   def_factory :attrs do |attrs, **options|
-    Attrs.new attrs, **options
+    AttrsType.new attrs, **options
   end
   
   
@@ -111,6 +150,11 @@ module NRSER::Types
     case args[0]
     when ::Integer
       # It's just a length
+      return attrs(
+        { length: is( non_neg_int.check!( args[0] ) ) },
+        **options
+      )
+      
       bounds[:min] = bounds[:max] = non_neg_int.check args[0]
       
     when ::Hash

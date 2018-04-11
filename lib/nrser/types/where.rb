@@ -10,7 +10,7 @@ module NRSER::Types
       @predicate = predicate
     end
     
-    def test value
+    def test? value
       !!@predicate.call(value)
     end
   end # Where

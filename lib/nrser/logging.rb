@@ -189,9 +189,9 @@ module NRSER
     # 
     def self.setup! level: nil,
                     dest: nil,
-                    sync: false,
+                    sync: nil,
                     say_hi: :debug,
-                    application: 'NRSER',
+                    application: nil,
                     env_var_prefix: nil
       
       unless @__mutex.try_lock
@@ -207,8 +207,8 @@ module NRSER
       begin
         self.appender = dest unless dest.nil?
         
-        # Force synchronous logging
-        sync! if sync
+        # Set sync/async processor state
+        self.sync = !!sync unless sync.nil?
         
         # If we didn't receive a level, check the ENV
         if level.nil?
@@ -291,6 +291,58 @@ module NRSER
     end # .setup_for_cli!
     
     
+    def self.sync?
+      SemanticLogger::Processor.instance.is_a? NRSER::Logging::Appender::Sync
+    end
+    
+    
+    def self.sync= bool
+      # Make sure we received a bool
+      unless bool.equal?( true ) || bool.equal?( false )
+        logger.warn "Expected arg to .sync= to be Boolean, skipping",
+          arg: bool
+        
+        return nil
+      end
+      
+      # Take no action if we're already in the desired state
+      return bool if bool == sync?
+      
+      # Ok, need to make a change
+      if sync?
+        # Switch to async
+        
+        # We *should* already have the async processor
+        @async_processor ||= SemanticLogger::Appender::Async.new(
+          name:           'SemanticLogger::Processor',
+          appender:       SemanticLogger::Processor.instance.appender,
+          max_queue_size: -1,
+        )
+        
+        @sync_processor ||= SemanticLogger::Processor.instance
+        
+        # Swap the async in for our sync
+        SemanticLogger::Processor.instance_variable_set \
+          :@processor,
+          @async_processor
+        
+      else
+        @async_processor ||= SemanticLogger::Processor.instance
+        @sync_processor ||= NRSER::Logging::Appender::Sync.new \
+          appender: SemanticLogger::Processor.instance.appender
+        
+        # Swap our sync in for the async
+        SemanticLogger::Processor.instance_variable_set \
+          :@processor,
+          @sync_processor
+      end
+      
+      bool
+    end
+    
+    private_class_method :sync=
+    
+    
     # Hack up SemanticLogger to do sync logging in the main thread
     # 
     # @return [nil]
@@ -347,6 +399,8 @@ module NRSER
       
       @appender
     end
+    
+    private_class_method :appender=
     
     
   end # module Logging

@@ -132,7 +132,7 @@ module NRSER::Props::InstanceMethods
       }.
       to_h.
       tap { |hash|
-        hash[class_key] = self.class.name if add_class
+        hash[class_key] = self.class.safe_name if add_class
       }
   end # #to_data
   

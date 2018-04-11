@@ -3,8 +3,11 @@
 require "bundler/setup"
 require 'nrser'
 require 'nrser/core_ext'
+require 'nrser/refinements/types'
+require 'nrser/refinements/sugar'
 
 using NRSER::Types
+using NRSER::Sugar
 
 NRSER::Logging.setup!
 

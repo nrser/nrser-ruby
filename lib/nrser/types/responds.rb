@@ -39,7 +39,7 @@ module NRSER::Types
         "#{ args[0] }(#{ args_str })=#{ type.name }"
       }.join(', ')
       
-      "#{ self.class.short_name } #{ attrs_str }"
+      "#{ self.class.demod_name } #{ attrs_str }"
     end
     
     
@@ -51,7 +51,7 @@ module NRSER::Types
     # @return [return_type]
     #   @todo Document return value.
     # 
-    def test value
+    def test? value
       @map.all? { |args, type|
         response = if @public
           value.public_send *args

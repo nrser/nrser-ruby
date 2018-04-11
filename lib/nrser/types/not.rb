@@ -22,7 +22,7 @@ module NRSER::Types
     # Instance Methods
     # ======================================================================
     
-    def test value
+    def test? value
       ! @type.test( value )
     end
     

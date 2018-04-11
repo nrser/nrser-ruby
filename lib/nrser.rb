@@ -56,6 +56,10 @@ require 'active_support/core_ext/object/json'
 # 1.  Load up version, which has {NRSER::ROOT} in it and depends on nothing
 #     else, then logging
 require_relative './nrser/version'
+
+# {Module.safe_name} is really useful all around, including in logging
+require_relative './nrser/core_ext/module/names'
+
 require_relative './nrser/logging'
 
 # Tons need this for error messages

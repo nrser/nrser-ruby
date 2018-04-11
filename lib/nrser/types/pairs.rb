@@ -71,7 +71,10 @@ module NRSER::Types
     }
     
     if hash_options.empty?
-      intersection is_a( Hash ), length( 1 ), **options
+      intersection \
+        is_a( Hash ),
+        length( 1 ),
+        **options
     else
       intersection \
         hash_type( **hash_options ),
@@ -92,19 +95,13 @@ module NRSER::Types
   # @return [return_type]
   #   @todo Document return value.
   # 
-  def self.pair **options
-    if options.empty?
-      PAIR
-    else
-      type_options = options.slice! :key, :value
-      
-      union \
-        array_pair( **type_options ),
-        hash_pair( **type_options ),
-        **options
-    end
+  def_factory :pair do |**options|
+    type_options = options.extract! :key, :value
+    
+    union \
+      array_pair( **type_options ),
+      hash_pair( **type_options ),
+      **options
   end # #pair
-  
-  PAIR = pair( name: 'PairType' ).freeze
   
 end # module NRSER::Types

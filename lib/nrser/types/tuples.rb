@@ -28,30 +28,41 @@ module NRSER::Types
   # 
   class TupleType < NRSER::Types::ArrayType
     
-    # Constants
-    # ======================================================================
-    
-    
-    # Class Methods
-    # ======================================================================
-    
-    
     # Attributes
     # ======================================================================
+    
+    # The types of each of the tuple indexes.
+    # 
+    # @return [Array<NRSER::Types::Type>]
+    #     
+    attr_reader :types
     
     
     # Constructor
     # ======================================================================
     
     # Instantiate a new `TupleType`.
+    # 
+    # @param [Array] *types
+    #   Tuple value types by their index in the tuples.
+    #   
+    #   Entries are passed through {NRSER::Types.make} to create the type
+    #   if needed.
+    # 
+    # @param [Hash<Symbol, *>] **options
+    #   Type options; see {NRSER::Types::Type#initialize}.
+    # 
     def initialize *types, **options
       super **options
-      @types = types.map &NRSER::Types.method(:make)
+      @types = types.map( &NRSER::Types.method(:make) ).freeze
     end # #initialize
     
     
-    def default_name
-      '[' + @types.map( &:name ).join( ', ' ) + ']'
+    # @return [String]
+    #   See {NRSER::Types::Type#explain}
+    # 
+    def explain
+      'Array<(' + @types.map( &:name ).join( ', ' ) + ')>'
     end
     
     
@@ -66,7 +77,7 @@ module NRSER::Types
     # @return [return_type]
     #   @todo Document return value.
     # 
-    def test value
+    def test? value
       # Test the super class first
       return false unless super( value )
       
@@ -77,7 +88,7 @@ module NRSER::Types
       @types.each_with_index.all? { |type, index|
         type.test value[index]
       }
-    end # #test
+    end # #test?
     
     
     # @return [Boolean]
@@ -106,15 +117,14 @@ module NRSER::Types
   end # class TupleType
   
 
-  # @todo Document tuple method.
+  # Get a tuple type.
   # 
-  # @param [type] arg_name
-  #   @todo Add name param description.
+  # @param *types (see TupleType#initialize)
+  # @param **options (see TupleType#initialize)
   # 
-  # @return [return_type]
-  #   @todo Document return value.
+  # @return [NRSER::Types::Type]
   # 
-  def self.tuple *types, **options
+  def_factory :tuple do |*types, **options|
     TupleType.new *types, **options
   end # .tuple
   

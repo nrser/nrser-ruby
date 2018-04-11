@@ -1,16 +1,7 @@
+# encoding: UTF-8
 # frozen_string_literal: true
 
-# Requirements
-# =======================================================================
-
-# Stdlib
-# -----------------------------------------------------------------------
-
-# Deps
-# -----------------------------------------------------------------------
-
-# Project / Package
-# -----------------------------------------------------------------------
+require 'pp'
 
 
 # Definitions
@@ -20,91 +11,163 @@
 # 
 module NRSER::NicerError
   
+  # Constants
+  # ========================================================================
   
-  # TODO document `context` attribute.
+  DEFAULT_FORMAT_WIDTH = 78
+  
+  
+  # Module Methods
+  # ==========================================================================
+  
+  # Format a segment of the error message.
   # 
-  # @return [Hash<Symbol, V>]
-  #     
-  attr_reader :context
-  
-  
-  # @todo Document render_message method.
+  # Strings are simply returned. Other things are inspected (for now).
   # 
-  # @param [type] arg_name
-  #   @todo Add name param description.
+  # @param [Object] segment
+  #   The segment.
+  # 
+  # @return [String]
+  #   The formatted string for the segment.
+  # 
+  def self.format_message_segment segment
+    return segment if String === segment
+    
+    # TODO  Do better!
+    segment.inspect
+  end # .format_message_segment
+  
+  
+  def self.format_width
+    DEFAULT_FORMAT_WIDTH
+  end
+  
+  
+  # Construct a nicer error.
+  # 
+  # @param [Array] *message
+  #   Main message segments.
   # 
   # @return [return_type]
   #   @todo Document return value.
   # 
-  def self.render_message message,
-                          context: {},
-                          add_context: true,
-                          &get_extended_message
+  def initialize  *message,
+                  binding: nil,
+                  details: nil,
+                  **context
     
-    # 1.  Figure out if `message` is just the "short message" (single line)
-    #     or if it's "old-style" where it's just the whole thing.
-    
-    message_lines = message.lines
-    
-    if message_lines.length > 1
-      message_lines = NRSER.dedent message_lines, return_lines: true
-      short_message = message_lines.first.chomp
-      extended_message_lines = message_lines.rest
+    super_message = case message.length
+    when 0
+      "(no message)"
+    when 1
+      message[0]
     else
-      short_message = message
-      extended_message_lines = nil
+      message.
+        map( &NRSER::NicerError.method( :format_message_segment ) ).
+        join ' '
     end
     
-    # Ok, `short_message` is a single line string
-    #     `extended_message_lines` is an array of string lines or `nil`
-    
-    # 2.
-      
-    if get_extended_message
-      got_extended_message = if get_extended_message.arity == 0
-        get_extended_message.call
-      else
-        get_extended_message.call context
-      end
-      
-      got_extended_message_lines = NRSER.dedent \
-        got_extended_message,
-        return_lines: true
-      
-      if extended_message_lines
-        extended_message_lines += [
-          "\n",
-          *got_extended_message_lines
-        ]
-      else
-        extended_message_lines = got_extended_message_lines
-      end
-    end
-    
-    if add_context
-      extended_message_lines += [
-        "Context:\n",
-        "\n"
-        "\n    <%=  %>"
-      ]
-    end
-      
-  end # .render_message
-  
-  
-  # @todo Document initialize method.
-  # 
-  # @param [type] arg_name
-  #   @todo Add name param description.
-  # 
-  # @return [return_type]
-  #   @todo Document return value.
-  # 
-  def initialize  message,
-                  context: {},
-                  add_context: true,
-                  &
+    @binding = binding
     @context = context
+    @details = details
+    
+    super super_message
   end # #initialize
+  
+  
+  # Any additional context values to add to extended messages provided to
+  # {#initialize}.
+  # 
+  # @return [Hash<Symbol, *>]
+  # 
+  def context
+    @context
+  end
+  
+  
+  # Render details (first time, then cached) and return the string.
+  # 
+  # @return [String?]
+  # 
+  def details_section
+    @details_section ||= begin
+      # No details if we have nothing to work with
+      if @details.nil?
+        nil
+      else
+        contents = case @details
+        when Proc
+          if @binding.nil?
+            @details.call
+          else
+            @binding.erb @details.call
+          end
+        when String
+          @details
+        else
+          @details.to_s
+        end
+        
+        if contents.empty?
+          nil
+        else
+          "# Details\n\n" + contents
+        end
+      end
+    end
+  end
+  
+  
+  # @return [String?]
+  # 
+  def context_section
+    @context_section ||= begin
+      if context.empty?
+        nil
+      else
+        "# Context:\n\n" + context.map { |name, value|
+          name_str = name.to_s
+          value_str = PP.pp \
+            value,
+            ''.dup,
+            (NRSER::NicerError.format_width - name_str.length - 2)
+          
+          if value_str.lines.count > 1
+            "#{ name_str }:\n\n#{ value_str.indent 4 }\n"
+          else
+            "#{ name_str }: #{ value_str }\n"
+          end
+        }.join
+      end
+    end
+  end
+  
+  
+  def extended_message
+    @extended_message ||= begin
+      sections = []
+      
+      sections << details_section unless details_section.nil?
+      sections << context_section unless context_section.nil?
+      
+      joined = sections.join "\n\n"
+    end
+  end
+  
+  
+  def to_s
+    message = super
+    
+    if true && !extended_message.empty?
+      message + "\n\n" + extended_message
+    else
+      message
+    end
+  end
+  
+  
+  def raise_
+    raise self
+  end
   
 end # module NRSER::NicerError

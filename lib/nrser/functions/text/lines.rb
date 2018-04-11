@@ -44,7 +44,8 @@ module NRSER
     when Array
       text
     else
-      raise TypeError, "Expected String or Array, found #{ text.class.name }"
+      raise TypeError,
+        "Expected String or Array, found #{ text.class.safe_name }"
     end
   end
   

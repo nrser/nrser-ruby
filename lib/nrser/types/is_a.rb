@@ -21,12 +21,12 @@ module NRSER::Types
     end
     
     
-    def default_name
-      @klass.name
+    def explain
+      @klass.safe_name
     end
     
     
-    def test value
+    def test? value
       value.is_a? @klass
     end
     
@@ -69,7 +69,7 @@ module NRSER::Types
   
   
   # class membership
-  def self.is_a klass, **options
+  def_factory :is_a do |klass, **options|
     IsA.new klass, **options
   end
 end # NRSER::Types

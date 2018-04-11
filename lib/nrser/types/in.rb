@@ -1,11 +1,5 @@
-# Refinements
-# =======================================================================
-
-using NRSER
-
-
-# Definitions
-# =======================================================================
+# encoding: UTF-8
+# frozen_string_literal: true
 
 module NRSER::Types
   
@@ -17,8 +11,11 @@ module NRSER::Types
   # 
   # @return [NRSER::Types::Type]
   # 
-  def self.in group, **options
-    where( name: "In(#{ group })", **options ) { |value|
+  def_factory(
+    :in,
+    aliases: [ :member_of ],
+  ) do |group, **options|
+    where( name: "In<#{ group }>", **options ) { |value|
       group.include? value
     }
   end # .in

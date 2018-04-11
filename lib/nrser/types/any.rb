@@ -1,12 +1,43 @@
-require 'nrser/refinements'
-require 'nrser/types/where'
-
+# encoding: UTF-8
+# frozen_string_literal: true
   
 module NRSER::Types
-  ANY = where(name: 'AnyType', from_s: ->(s) { s }) { true }.freeze
   
-  # anything
-  def self.any
-    ANY
+  # A type for anything - {#test?} always returns `true`.
+  # 
+  class AnyType < NRSER::Types::Type
+    
+    def test? value; true; end
+    def explain; '*'; end
+    def custom_from_s string; string; end
+    
+    # {AnyType} instances are all equal.
+    # 
+    # @note
+    #   `other`'s class must be {AnyType} exactly - we make no assumptions
+    #   about anything that has subclasses {AnyType}.
+    # 
+    # @param [*] other
+    #   Object to compare to.
+    # 
+    # @return [Boolean]
+    #   `true` if `other#class` equals {AnyType}.
+    # 
+    def == other
+      other.class == AnyType
+    end
+    
+  end # class Any
+  
+  ANY = AnyType.new
+  
+  # Anything at all...
+  # 
+  def_factory(
+    :any,
+    aliases: [ :all ],
+  ) do |**options|
+    AnyType.new **options
   end
+  
 end # NRSER::Types

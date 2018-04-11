@@ -1,8 +1,21 @@
-# Refinements
+# encoding: UTF-8
+# frozen_string_literal: true
+
+# Requirements
 # =======================================================================
 
-require 'nrser/refinements'
-using NRSER
+# Stdlib
+# -----------------------------------------------------------------------
+
+# Deps
+# -----------------------------------------------------------------------
+
+# Project / Package
+# -----------------------------------------------------------------------
+
+# Just require the errors here so we don't need to do it everywhere
+require_relative './errors/check_error'
+require_relative './errors/from_string_error'
 
 
 # Definitions
@@ -10,10 +23,6 @@ using NRSER
 
 module NRSER::Types
   class Type
-    def self.short_name
-      name.split('::').last
-    end
-    
     
     # Constructor
     # =====================================================================
@@ -82,14 +91,61 @@ module NRSER::Types
     end # #initialize
     
     
+    # Instance Methods
+    # ========================================================================
+    
+    # Talking about ourselves
+    # ------------------------------------------------------------------------
+    
+    # What this type likes to be called (and displayed as by default).
+    # 
+    # Custom names can be provided when constructing most types via the
+    # `name:` keyword, which allows thinking about composite and complicated
+    # types in simpler and application-specific terms.
+    # 
+    # Realizing subclasses **should not** override this method - they should
+    # pass a `name:` keyword up to {#initialize}, which sets the `@name`
+    # instance variable that is then used here.
+    # 
+    # If no name is provided to {#initialize}, this method will fall back to
+    # {#explain}.
+    # 
+    # @return [String]
+    # 
     def name
-      @name || default_name
+      @name || explain
     end
     
-    def default_name
-      self.class.short_name
+    
+    # A string that gives our best concise description of the type's logic,
+    # in particular exposing any composite types that it's made up of.
+    # 
+    # Used as the {#name} when a custom one is not provided.
+    # 
+    # Meant for inline display, so the result *should not* contain newlines.
+    # 
+    # Realizing subclasses **should** override this method, as this
+    # implementation only returns the class' name (and just the last segment,
+    # for brevity's sake).
+    # 
+    # @example Base implementation is not very interesting
+    #   MyType = Class.new NRSER::Types::Type
+    #   my_type = MyType.new
+    #   my_type.explain
+    #   # => "MyType"
+    # 
+    # @return [String]
+    # 
+    def explain
+      self.class.demod_name
     end
     
+    
+    # Validation
+    # ------------------------------------------------------------------------
+    # 
+    # The core of what a type does.
+    # 
     
     # See if a value satisfies the type.
     # 
@@ -99,71 +155,96 @@ module NRSER::Types
     # @return [Boolean]
     #   `true` if the `value` satisfies the type.
     # 
-    def test value
+    def test? value
       raise NotImplementedError
     end
     
+    # Old name
+    def test value; test? value; end
     
-    def check value, &make_fail_message
+    
+    # Check that a `value` satisfies the type.
+    # 
+    # @return [Object]
+    #   The value itself.
+    # 
+    def check! value, &details
       # success case
-      return value if test value
+      return value if test? value
       
-      msg = if make_fail_message
-        make_fail_message.call type: self, value: value
-      else
-        NRSER.squish <<-END
-          value #{ value.inspect } failed check #{ self.to_s }
-        END
-      end
-      
-      raise TypeError.new msg
+      raise NRSER::Types::CheckError.new \
+        value: value,
+        type: self,
+        details: details
     end
     
+    # Old name for {#check!} without the bang.
+    def check *args, &block; check! *args, &block; end
     
-    # Overridden to customize behavior for the {#from_s} and {#to_data}
-    # methods - those methods are always defined, but we have {#respond_to?}
-    # return `false` if they lack the underlying instance variables needed
-    # to execute.
+    
+    # Loading Values
+    # ------------------------------------------------------------------------
     # 
-    # @example
-    #   t1 = t.where { |value| true }
-    #   t1.respond_to? :from_s
-    #   # => false
-    #   
-    #   t2 = t.where( from_s: ->(s){ s.split ',' } ) { |value| true }
-    #   t2.respond_to? :from_s
-    #   # => true
+    # Types include facilities for loading values from representations and
+    # encodings.
     # 
-    # @param [Symbol | String] name
-    #   Method name to ask about.
+    # This was initially driven by the desire to use types to
+    # declare CLI parameter schemas, as way to dispatch with the often
+    # limited and arbitrary support most "CLI frameworks" have for declaring
+    # option types - things like "you can have an integer, and you can
+    # have an array, but you can't have an array of integers".
     # 
-    # @param [Boolean] include_all
-    #   IDK, part of Ruby API that is passed up to `super`.
+    # By using compossible types that can load values from strings we get a
+    # system where you can easily declare whatever complex and granular types
+    # you desire and have the machine automatically load and validate them,
+    # as well as provide reasonable generated feedback when something doesn't
+    # meet expectations, which has worked out quite well so far start to cut
+    # down the amount of repetitive and error-prone "did I get what I need?
+    # No, did I get exactly what I need?" bullshit in receiving data.
+    # 
+    # This approach is now being expanded to "data" - an ill-formed concept
+    # I've been brewing of "reasonable common and portable data
+    # representation" and the {NRSER::Props} system, which has been coming
+    # along as well.
+    # 
+    
+    
+    # Test if the type knows how to load values from strings.
+    # 
+    # Looks for the `@from_s` instance variable or a `#custom_from_s`
+    # method.
+    # 
+    # If this method returns `true`, then we expect {#from_s} to succeed.
+    # 
+    # Realizing classes should only need to override this method to extend
+    # the test to parameterized types.
     # 
     # @return [Boolean]
     # 
-    def respond_to? name, include_all = false
-      if name == :from_s || name == 'from_s'
-        has_from_s?
-      elsif name == :to_data || name == 'to_data'
-        has_to_data?
-      else
-        super name, include_all
-      end
-    end # #respond_to?
+    def has_from_s?
+      !@from_s.nil? ||
+        # Need the `true` second arg to include protected methods
+        respond_to?( :custom_from_s, true )
+    end
     
     
-    # Load a value of this type from a string representation by passing `s`
-    # to the {@from_s} {Proc}.
+    # Load a value of this type from a string representation by passing
+    # `string` to the {@from_s} {Proc}.
     # 
-    # Checks the value {@from_s} returns with {#check} before returning it, so
+    # Checks the value {@from_s} returns with {#check!} before returning it, so
     # you know it satisfies this type.
     # 
-    # @param [String] s
+    # Realizing classes **should not** need to override this - they can define
+    # a `#custom_from_s` instance method for it to use, allowing individual
+    # types to still override that by providing a `from_s:` proc keyword
+    # arg at construction. This also lets them avoid checking the returned
+    # value, since we do so here.
+    # 
+    # @param [String] string
     #   String representation.
     # 
     # @return [Object]
-    #   Value that has passed {#check}.
+    #   Value that has passed {#check!}.
     # 
     # @raise [NoMethodError]
     #   If this type doesn't know how to load values from strings.
@@ -180,32 +261,40 @@ module NRSER::Types
     # @raise [TypeError]
     #   If the value loaded does not pass {#check}.
     # 
-    def from_s s
-      if @from_s.nil?
+    def from_s string
+      unless has_from_s?
         raise NoMethodError, "#from_s not defined"
       end
       
-      check @from_s.call( s )
+      value = if @from_s
+        @from_s.call string
+      else
+        custom_from_s string
+      end
+      
+      check! value
+    end
+    
+    
+    # Test if the type can load values from "data" - basic values and
+    # collections like {Array} and {Hash} forming tree-like structures.
+    # 
+    # Realizing classes *may* need to override this to extend checking to
+    # parameterized types.
+    # 
+    # @return [Boolean]
+    # 
+    def has_from_data?
+      !@from_data.nil?
     end
     
     
     def from_data data
-      if @from_data.nil?
+      unless has_from_data?
         raise NoMethodError, "#from_data not defined"
       end
       
-      check @from_data.call( data )
-    end
-    
-    
-    # Test if the type knows how to load values from strings.
-    # 
-    # If this method returns `true`, then we expect {#from_s} to succeed.
-    # 
-    # @return [Boolean]
-    # 
-    def has_from_s?
-      ! @from_s.nil?
+      check! @from_data.call( data )
     end
     
     
@@ -220,11 +309,6 @@ module NRSER::Types
     def has_to_data?
       ! @to_data.nil?
     end # #has_to_data?
-    
-    
-    def has_from_data?
-      ! @from_data.nil?
-    end
     
     
     # Dumps a value of this type to "data" - structures and values suitable
@@ -246,20 +330,52 @@ module NRSER::Types
     
     
     # Language Inter-Op
-    # =====================================================================
+    # ----------------------------------------------------------------------------
     
-    
-    # @return [String]
-    #   a brief string description of the type - just it's {#name} surrounded
-    #   by some back-ticks to make it easy to see where it starts and stops.
+    # Proxies to {#name}.
     # 
-    def to_s
-      "{ x ∈ #{ name } }"
-    end
+    # @return [String]
+    # 
+    def to_s; name; end
     
     
-    # Inspecting
-    # ---------------------------------------------------------------------
+    # Overridden to customize behavior for the {#from_s}, {#from_data} and
+    # {#to_data} methods - those methods are always defined, but we have
+    # {#respond_to?} return `false` if they lack the underlying instance
+    # variables needed to execute.
+    # 
+    # @example
+    #   t1 = t.where { |value| true }
+    #   t1.respond_to? :from_s
+    #   # => false
+    #   
+    #   t2 = t.where( from_s: ->(s){ s.split ',' } ) { |value| true }
+    #   t2.respond_to? :from_s
+    #   # => true
+    # 
+    # @param [Symbol | String] name
+    #   Method name to ask about.
+    # 
+    # @param [Boolean] include_all
+    #   IDK, part of Ruby API that is passed up to `super`.
+    # 
+    # @return [Boolean]
+    # 
+    def respond_to? name, include_all = false
+      case name.to_sym
+      when :from_s
+        has_from_s?
+      when :from_data
+        has_from_data?
+      when :to_data
+        has_to_data?
+      else
+        super name, include_all
+      end
+    end # #respond_to?
+    
+    
+    ### Inspecting
     # 
     # Due to their combinatoric nature, types can quickly become large data
     # hierarchies, and the built-in {#inspect} will produce a massive dump
@@ -270,11 +386,11 @@ module NRSER::Types
     # 
     # As a solution, we alias the built-in `#inspect` as {#builtin_inspect},
     # so it's available in situations where you really want all those gory
-    # details, and point {#inspect} to {#to_s}.
+    # details, and point {#inspect} to {#explain}.
     # 
     
     alias_method :builtin_inspect, :inspect
-    alias_method :inspect, :to_s
+    def inspect; explain; end
     
     
     # Hook into Ruby's *case subsumption* operator to allow usage in `case`
@@ -282,11 +398,11 @@ module NRSER::Types
     # 
     # TODO  Want to switch {NRSER::Types.match} over to use `===`!
     # 
-    # @param value (see #test)
-    # @return (see #test)
+    # @param value (see #test?)
+    # @return (see #test?)
     #   
     def === value
-      test value
+      test? value
     end
     
   end # Type

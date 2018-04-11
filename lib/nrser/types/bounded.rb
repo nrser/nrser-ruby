@@ -27,7 +27,7 @@ module NRSER::Types
       @max = max
     end
     
-    def test value
+    def test? value
       return false if @min && value < @min
       return false if @max && value > @max
       true
@@ -42,7 +42,7 @@ module NRSER::Types
         "#{ name }=#{ value }"
       }.join(', ')
       
-      "#{ self.class.short_name } #{ attrs_str }"
+      "#{ self.class.demod_name } #{ attrs_str }"
     end
     
   end # Bounded

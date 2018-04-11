@@ -79,12 +79,12 @@ class NRSER::Props::Metadata
   # ======================================================================
   
   def superclass_has_metadata?
-    self.class.has_metadata? @klass.superclass
+    @klass.superclass.respond_to? :metadata
   end
   
   
   def superclass_metadata
-     self.class.metadata_for @klass.superclass
+     @klass.superclass.metadata
   end
   
   

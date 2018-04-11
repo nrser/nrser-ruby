@@ -48,7 +48,7 @@ class NRSER::Props::Storage::InstanceVariables
   def put instance, prop, value
     if immutable?
       raise RuntimeError.new binding.erb <<~END
-        Properties of #{ instance.class.name } are immutable.
+        Properties of #{ instance.class.safe_name } are immutable.
         
         Tried to set prop #{ prop.name } to value
         

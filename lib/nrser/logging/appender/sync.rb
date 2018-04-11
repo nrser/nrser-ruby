@@ -80,7 +80,7 @@ class NRSER::Logging::Appender::Sync
   #   lag_check_interval: [Integer]
   #     Number of messages to process before checking for slow logging.
   #     Default: 1,000
-  def initialize  appender:, name: appender.class.name
+  def initialize  appender:, name: appender.class.safe_name
     @appender = appender
   end
   

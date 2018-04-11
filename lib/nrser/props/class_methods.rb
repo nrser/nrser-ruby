@@ -84,7 +84,7 @@ module NRSER::Props::ClassMethods
     values = {}
     props = self.props
     
-    data.each { |data_key, data_value|
+    data.each_pair { |data_key, data_value|
       prop_key = case data_key
       when Symbol
         data_key

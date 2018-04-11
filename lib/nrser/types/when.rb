@@ -49,7 +49,7 @@ module NRSER::Types
     # Instance Methods
     # ======================================================================
     
-    def test value
+    def test? value
       @object === value
     end
     

@@ -1,10 +1,7 @@
 # encoding: UTF-8
 # frozen_string_literal: true
 
-require 'nrser/refinements'
 require 'nrser/types/type'
-
-using NRSER
 
 # base class for Union and Intersection which combine over a set of types.
 module NRSER::Types
@@ -18,13 +15,13 @@ module NRSER::Types
     end
     
     
-    def default_name
+    def explain
       if self.class::JOIN_SYMBOL
-        NRSER::Types::L_PAREN +
+        NRSER::Types::L_PAREN + ' ' +
         @types.map { |type| type.name }.join( self.class::JOIN_SYMBOL ) +
-        NRSER::Types::R_PAREN
+        + ' ' + NRSER::Types::R_PAREN
       else
-        "#{ self.class.short_name }<" +
+        "#{ self.class.demod_name }<" +
         @types.map {|type| type.name }.join(',') +
         ">"
       end
@@ -137,9 +134,9 @@ module NRSER::Types
   end
   
   class Union < Combinator
-    JOIN_SYMBOL = ' ⋁ '
+    JOIN_SYMBOL = ' | ' # ' ⋁ '
     
-    def test value
+    def test? value
       @types.any? {|type| type.test value}
     end
   end # Union
@@ -154,10 +151,10 @@ module NRSER::Types
   
   class Intersection < Combinator
     # JOIN_SYMBOL = ', '
-    JOIN_SYMBOL = ' ⋀ '
+    JOIN_SYMBOL = ' & ' # ' ⋀ '
     
-    def test value
-      @types.all? { |type| type.test value}
+    def test? value
+      @types.all? { |type| type.test? value}
     end
   end
   
@@ -173,7 +170,7 @@ module NRSER::Types
   class XOR < Combinator
     JOIN_SYMBOL = ' ⊕ '
     
-    def test value
+    def test? value
       @types.count { |type| type === value } == 1
     end
     

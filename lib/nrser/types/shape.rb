@@ -43,7 +43,7 @@ module NRSER::Types
     # Instance Methods
     # ======================================================================
     
-    def test value
+    def test? value
       begin
         @pairs.all? { |k, v|
           v === value[k]

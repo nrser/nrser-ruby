@@ -1,3 +1,6 @@
+# encoding: UTF-8
+# frozen_string_literal: true
+
 # Abstract infrastructure for type creation - stuff that doesn't define any
 # concrete type instances.
 # 
@@ -6,13 +9,8 @@
 # uncontrollable mutability of Ruby and the importance of type checks)
 # need to be required in the "Post-Processing" section at the bottom.
 # 
-require_relative './types/type'
 
-# Refinements
-# =======================================================================
-
-using NRSER
-
+require 'nrser/logging'
 
 # Stuff to help you define, test, check and match types in Ruby.
 # 
@@ -20,9 +18,31 @@ using NRSER
 # 
 module NRSER::Types
   
+  # Sub-Tree Requirements
+  # ========================================================================
+  
+  require_relative './types/type'
+  require_relative './types/factory'
+  
+  
+  # Mixins
+  # ========================================================================
+  
+  extend Factory
+  include NRSER::Logging::Mixin
+  
+  
+  # Constants
+  # ========================================================================
+  
   L_PAREN = '(' # '❪'
   R_PAREN = ')' # '❫'
   RESPONDS_WITH = '→'
+  ASSOC = '=>'
+  
+  
+  # Module Methods
+  # ========================================================================
   
   # Make a {NRSER::Types::Type} from a value.
   # 
@@ -55,15 +75,50 @@ module NRSER::Types
   end
   
   
-  # raise an error if value doesn't match type.
-  def self.check value, type
-    make(type).check value
+  # The {.make} method reference; for easy map and such.
+  # 
+  # @return [Method]
+  # 
+  def self.maker
+    method :make
   end
   
   
-  def self.test value, type
+  # Create a {NRSER::Types::Type} from `type` with {.make} and check that
+  # `value` satisfies it, raising if it doesn't.
+  # 
+  # @param [*] value
+  #   Value to type check.
+  # 
+  # @param [*] type
+  #   Type to check value against.
+  # 
+  # @return
+  #   The `value` parameter.
+  # 
+  # @raise [NRSER::Types::CheckError]
+  #   If the value fails the type check.
+  # 
+  def self.check! value, type
+    make( type ).check! value
+  end
+  
+  # Old name
+  singleton_class.send :alias_method, :check, :check!
+  
+  
+  # Create a {NRSER::Types::Type} from `type` with {.make} and test if
+  # `value` satisfies it.
+  # 
+  # @return [Boolean]
+  #   `true` if `value` satisfies `type`.
+  # 
+  def self.test? value, type
     make(type).test value
   end
+  
+  # Old name
+  singleton_class.send :alias_method, :test, :test?
   
   
   def self.match value, *clauses
@@ -95,7 +150,7 @@ module NRSER::Types
     end
     
     enum.each { |type, expression|
-      if test value, type
+      if test? value, type
         # OK, we matched! Is the corresponding expression callable?
         if expression.respond_to? :call
           # It is; invoke and return result.
@@ -138,57 +193,6 @@ module NRSER::Types
     }
   end # .from_repr
   
-  
-  # Define a type factory.
-  # 
-  # @!macro [attach] factory
-  #   @param [Hash] **options
-  #     Common type construction options, see {Type#initialize}.
-  #   
-  #   @return [NRSER::Types::Type]
-  #     The type.
-  # 
-  def self.def_factory name, maybe: true, aliases: [], &body
-    define_singleton_method name, &body
-    
-    aliases.each do |alias_name|
-      singleton_class.send :alias_method, alias_name, name
-    end
-    
-    if maybe && !name.to_s.end_with?( '?' )
-      maybe_name = "#{ name }?".to_sym
-      
-      # HACK  Ugh maybe I wrote this quick to fix it, not sure if it's a decent
-      #       idea.. basically, need to figure out what `options` keys go
-      #       to {.maybe} and which ones go to the regular factory... matters
-      #       for shit like {.attrs} and {.hash_type} 'cause they use option
-      #       keys (whether they *should* is something I've debated... sigh,
-      #       it is what it is for now).
-      #       
-      #       So they options that go to {.maybe} just go strait through to
-      #       {Type#initialize}, so just grab that method, see what keys it
-      #       takes, and then can slice and dice off that...
-      # 
-      maybe_option_keys = Set.new \
-        Type.
-          instance_method( :initialize ).
-          parameters.
-          select { |param_type, name| param_type == :key }.
-          map { |param_type, name| name }
-      
-      define_singleton_method maybe_name do |*args, **options|
-        maybe_options = options.slice *maybe_option_keys
-        factory_options = options.except *maybe_option_keys
-        
-        maybe public_send( name, *args, **factory_options ), **maybe_options
-      end
-      
-      aliases.each do |alias_name|
-        singleton_class.send :alias_method, "#{ alias_name }?", maybe_name
-      end
-    end
-  end
-  
 end # NRSER::Types
 
 
@@ -218,7 +222,7 @@ require_relative './types/numbers'
 require_relative './types/strings'
 require_relative './types/symbols'
 require_relative './types/labels'
-require_relative './types/array'
+require_relative './types/arrays'
 require_relative './types/hashes'
 require_relative './types/paths'
 require_relative './types/tuples'

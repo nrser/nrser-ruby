@@ -53,11 +53,11 @@ module NRSER
       raise TypeError.new binding.erb <<-END
         Both `enum` and `slice` must be {Enumerable}
         
-        enum (<%= enum.class.name %>):
+        enum (<%= enum.class.safe_name %>):
         
             <%= enum.pretty_inspect %>
         
-        slice (<%= slice.class.name %>):
+        slice (<%= slice.class.safe_name %>):
         
             <%= slice.pretty_inspect %>
         

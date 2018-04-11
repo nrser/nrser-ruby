@@ -35,6 +35,8 @@ module NRSER::Props; end
 # 
 class NRSER::Props::Prop
   
+  include NRSER::Logging::Mixin
+  
   # The class the prop was defined in.
   # 
   # @return [Class]
@@ -178,7 +180,7 @@ class NRSER::Props::Prop
       # for sourced props
       if source?
         raise ArgumentError.new binding.erb <<-END
-          Can not construct {<%= self.class.name %>} with `default` and `source`
+          Can not construct {<%= self.class.safe_name %>} with `default` and `source`
           
           Props with {#source} always get their value from that source, so
           defaults don't make any sense.
@@ -400,36 +402,35 @@ class NRSER::Props::Prop
   end # #primary?
   
   
-  # @todo Document get method.
+  # Get the value of the prop from an instance.
   # 
-  # @param [type] arg_name
-  #   @todo Add name param description.
+  # @note
+  #   At the moment, values are **not** type-checked when reading. Primary
+  #   values are checked when setting, so they should be ok, but this does
+  #   leave the possibility that props with a {#source} may return values
+  #   that do not satisfy their types... :/
   # 
-  # @return [return_type]
-  #   @todo Document return value.
+  # @param [NRSER::Props] instance
+  #   An instance of {#defined_in}.
+  # 
+  # @return
+  #   Value from the instance's prop value storage (for {#primary?} props)
+  #   or it's {#source}.
   # 
   def get instance
     if source?
       if instance_variable_source?
         instance.instance_variable_get source
       else
-        case source
-        when String, Symbol
-          instance.send source
-        when Proc
-          instance.instance_exec &source
-        else
-          raise TypeError.squished <<-END
-            Expected `Prop#source` to be a String, Symbol or Proc;
-            found #{ source.inspect }
-          END
-        end
+        t.match source,
+          t.or( String, Symbol ),
+            ->( name ) { instance.send name },
+          Proc,
+            ->( block ) { instance.instance_exec &block }
       end
     else
-      NRSER::Props::Metadata.
-        metadata_for( instance.class ).
-        storage.
-        get instance, self
+      # Go through the storage engine
+      instance.class.metadata.storage.get instance, self
     end
   end # #get
   
@@ -443,9 +444,9 @@ class NRSER::Props::Prop
   #   @todo Document return value.
   # 
   def check! value
-    type.check( value ) do
+    type.check!( value ) do
       binding.erb <<-END
-        Value of type <%= value.class.name %> for prop <%= self.full_name %>
+        Value of type <%= value.class.safe_name %> for prop <%= self.full_name %>
         failed type check.
         
         Must satisfy type:
@@ -592,7 +593,7 @@ class NRSER::Props::Prop
   #   a short string describing the instance.
   # 
   def to_s
-    "#<#{ self.class.name } #{ full_name }:#{ type }>"
+    "#<#{ self.class.safe_name } #{ full_name }:#{ type }>"
   end # #to_s
   
 end # class NRSER::Props::Prop

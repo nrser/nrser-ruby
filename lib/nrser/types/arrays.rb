@@ -36,10 +36,8 @@ module NRSER::Types
     # does is not recognized as an encoding format (as of writing, JSON is
     # the only format we attempt to detect).
     # 
-    # Splits 
+    # Splits
     DEFAULT_SPLIT_WITH = /\,\s*/m
-    
-    attr_reader :item_type
     
     def initialize split_with: DEFAULT_SPLIT_WITH, **options
       super ::Array, **options
@@ -47,14 +45,7 @@ module NRSER::Types
     end
     
     
-    def default_name
-      self.class.short_name
-    end
-    
-    
-    def item_type
-      NRSER::Types.any
-    end
+    def item_type; NRSER::Types.any; end
     
     
     # Called on an array of string items that have been split
@@ -99,14 +90,10 @@ module NRSER::Types
   end # ArrayType
   
   
-  # Static instance that is satisfied by anything that is an {Array}.
-  ARRAY = ArrayType.new.freeze
-  
-  
   # Type for arrays where every entry satisfies a specific type.
   # 
   # Broken out from {ArrayType} so that {TupleType} can inherit from
-  # {ArrayType} and get share it's string handling functionality without 
+  # {ArrayType} and get share it's string handling functionality without
   # receiving the entry type stuff (which it handles differently).
   # 
   class ArrayOfType < ArrayType
@@ -135,12 +122,12 @@ module NRSER::Types
     # Instance Methods
     # ======================================================================
     
-    def default_name
+    def explain
       "#{ super() }<#{ @item_type }>"
     end
     
     
-    def test value
+    def test? value
       # Check the super method first, which will test if `value` is an Array
       # instance, and return `false` if it's not.
       return false unless super( value )
@@ -168,7 +155,7 @@ module NRSER::Types
     # @todo
     #   I'm not even sure why this is implemented... was it used somewhere?
     #   
-    #   It doesn't seems too well thought out... seems like the reality of 
+    #   It doesn't seems too well thought out... seems like the reality of
     #   comparing types is much more complicated?
     # 
     def == other
@@ -180,35 +167,22 @@ module NRSER::Types
   end # class ArrayOfType
   
   
-  # Eigenclass (Singleton Class)
-  # ========================================================================
+  # {NRSER::Types::ArrayType} / {NRSER::Types::ArrayOfType} factory function.
   # 
-  class << self
-    
-    # @!group Type Factory Functions
-    
-    # {NRSER::Types::ArrayType} / {NRSER::Types::ArrayOfType} factory function.
-    # 
-    # @param [Type | Object] item_type
-    #   Optional type of items.
-    # 
-    # @return [NRSER::Types::Type]
-    # 
-    def array item_type = any, **options
-      if item_type == any
-        if options.empty?
-          ARRAY
-        else
-          ArrayType.new **options
-        end
-      else
-        ArrayOfType.new item_type, **options
-      end
-    end # #array
-    
-    alias_method :list, :array
-    
-  end # class << self (Eigenclass)
-  
+  # @param [Type | Object] item_type
+  #   Optional type of items.
+  # 
+  # @return [NRSER::Types::Type]
+  # 
+  def_factory(
+    :array,
+    aliases: [:list],
+  ) do |item_type = any, **options|
+    if item_type == any
+      ArrayType.new **options
+    else
+      ArrayOfType.new item_type, **options
+    end
+  end # #array
   
 end # NRSER::Types

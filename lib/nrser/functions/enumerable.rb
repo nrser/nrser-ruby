@@ -1,4 +1,3 @@
-require_relative './enumerable/find_map'
 require_relative './enumerable/find_all_map'
 require_relative './enumerable/include_slice'
 require_relative './enumerable/associate'

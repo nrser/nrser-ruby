@@ -63,7 +63,7 @@ class NRSER::Props::Storage::Key
     
     if immutable?
       raise RuntimeError.new binding.erb <<~END
-        Properties of #{ instance.class.name } are immutable.
+        Properties of #{ instance.class.safe_name } are immutable.
         
         Tried to set key
         
