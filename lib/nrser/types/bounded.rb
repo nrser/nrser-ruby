@@ -6,15 +6,17 @@ using NRSER
 module NRSER::Types
   class Bounded < NRSER::Types::Type
     
-    # @!attribute [r] min
-    #   @return [Number]
-    #     Minimum value.
+    # Minimum value.
+    # 
+    # @return [Number]
+    #     
     attr_reader :min
     
     
-    # @!attribute [r] max
-    #   @return [Number]
-    #     Minimum value.
+    # Minimum value.
+    # 
+    # @return [Number]
+    # 
     attr_reader :max
     
     
@@ -33,7 +35,7 @@ module NRSER::Types
       true
     end
     
-    def default_name
+    def explain
       attrs_str = ['min', 'max'].map {|name|
         [name, instance_variable_get("@#{ name }")]
       }.reject {|name, value|
@@ -42,12 +44,12 @@ module NRSER::Types
         "#{ name }=#{ value }"
       }.join(', ')
       
-      "#{ self.class.demod_name } #{ attrs_str }"
+      "#{ self.class.demod_name }<#{ attrs_str }>"
     end
     
   end # Bounded
   
-  def self.bounded **options
+  def_factory :bounded do |**options|
     Bounded.new **options
   end
    
