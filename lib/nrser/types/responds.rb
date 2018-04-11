@@ -96,7 +96,7 @@ module NRSER::Types
     # 
     def respond_to name, **options
       responds(
-        {[:respond_to?, name] => NRSER::Types::TRUE},
+        {[:respond_to?, name] => NRSER::Types.true},
         **options
       )
     end # #respond_to

@@ -11,13 +11,20 @@ require_relative './combinators'
   
 module NRSER::Types
   
-  # @todo document TrueType class.
-  class TrueType < Is
+  # Abstract base class for {TrueType} and {FalseType}.
+  # 
+  class BooleanType < Is
     
-    # Instantiate a new `TrueType`.
+    # Instantiate a new `BooleanType`.
     # 
-    def initialize **options
-      super true, **options
+    def initialize value, **options
+      # Check it's a boolean
+      unless true.equal?( value ) || false.equal?( value )
+        raise ArgumentError.new \
+          "`value` arg must be `true` or `false`, found #{ value.inspect }"
+      end
+      
+      super value, **options
     end # #initialize
     
     
@@ -25,7 +32,7 @@ module NRSER::Types
     # ========================================================================
       
       def custom_from_s string
-        return true if NRSER::TRUTHY_STRINGS.include?( string.downcase )
+        return value if self::STRINGS.include?( string.downcase )
         
         raise NRSER::Types::FromStringError.new \
           type: self,
@@ -35,7 +42,7 @@ module NRSER::Types
             <<~END
               Down-cased `string` must be one of:
               
-                  <%= NRSER::TRUTHY_STRINGS.to_a %>
+                  <%= self::STRINGS.to_a %>
             END
           }
       end
@@ -45,33 +52,57 @@ module NRSER::Types
   end # class TrueType
   
   
+  # A type for only the `true`.
+  # 
+  # Provides a {#custom_from_s} to load from CLI options and ENV var-like
+  # string values.
+  # 
+  class TrueType < BooleanType
+    
+    STRINGS = NRSER::TRUTHY_STRINGS
+    
+    # Instantiate a new `TrueType`.
+    # 
+    def initialize **options
+      super true, **options
+    end # #initialize
+    
+  end # class TrueType
+  
+  
+  # A type for only `false`.
+  # 
+  # Provides a {#custom_from_s} to load from CLI options and ENV var-like
+  # string values.
+  # 
+  class FalseType < BooleanType
+    
+    STRINGS = NRSER::FALSY_STRINGS
+    
+    # Instantiate a new `TrueType`.
+    # 
+    def initialize **options
+      super false, **options
+    end # #initialize
+    
+  end # class FalseType
+  
+  
   def_factory :true do |**options|
     TrueType.new **options
   end
   
-  TRUE = self.true
   
-  FALSE = is false, name: 'false', from_s: ->(string) {
-    if ['false', 'f', '0', 'no', 'n', 'off'].include? string.downcase
-      false
-    else
-      raise TypeError, "can not convert to true: #{ string.inspect }"
-    end
-  }
-  
-  def self.false
-    FALSE
+  def_factory :false do |**options|
+    FalseType.new **options
   end
   
-  BOOL = union TRUE, FALSE
   
-  # true or false
-  def self.bool
-    BOOL
-  end
-  
-  def self.boolean
-    bool
+  def_factory(
+    :bool,
+    aliases: [:boolean],
+  ) do |**options|
+    union self.true, self.false, **options
   end
   
 end # NRSER::Types
