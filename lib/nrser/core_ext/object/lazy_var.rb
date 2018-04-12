@@ -1,45 +1,31 @@
 # encoding: UTF-8
 # frozen_string_literal: true
 
-# Requirements
-# =======================================================================
-
-# Stdlib
-# -----------------------------------------------------------------------
-
-# Deps
-# -----------------------------------------------------------------------
-
-# Project / Package
-# -----------------------------------------------------------------------
-
-
-# Refinements
-# =======================================================================
-
-
-# Declarations
-# =======================================================================
-
-
-# Definitions
-# =======================================================================
 
 class Object
   
-  # @todo Document lazy_instance_var method.
+  # If the instance variable `name` is not defined, sets it to the result
+  # of `&block`. Always returns the instance variable's value.
   # 
-  # @param [type] arg_name
-  #   @todo Add name param description.
+  # Useful for lazy values that can be `nil` or `false`, since `||=` will
+  # always re-evaluate in their cases.
   # 
-  # @return [return_type]
-  #   @todo Document return value.
+  # @param [Symbol] name
+  #   The name of the instance variable. Needs to have that `@` on the
+  #   front, like `:@x`.
   # 
-  def lazy_var name, &getter
+  # @param [Proc<() => VALUE>] &block
+  #   The block to call to get the value.
+  # 
+  # @return [VALUE]
+  #   The value of the instance variable.
+  # 
+  def lazy_var name, &block
     unless instance_variable_defined? name
-      instance_variable_set name, getter.call
+      instance_variable_set name, block.call
     end
     
     instance_variable_get name
   end # #lazy_instance_var
+  
 end
