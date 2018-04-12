@@ -23,7 +23,7 @@ describe_class NRSER::AbstractMethodError do
         NRSER::TestFixtures::AbstractMethodError::Base.new.f
       }.to raise_error(
         NRSER::AbstractMethodError,
-        /Base is an abstract class/
+        /Method #f is abstract/
       )
     end
     
@@ -34,10 +34,17 @@ describe_class NRSER::AbstractMethodError do
     it "explains that an implementing class needs to be found or written" do
       expect {
         NRSER::TestFixtures::AbstractMethodError::Sub.new.f
-      }.to raise_error(
-        NRSER::AbstractMethodError,
-        /find a subclass of .*Sub to instantiate or write your own/
-      )
+      }.to raise_error NRSER::AbstractMethodError
+      
+      
+      message = begin
+        NRSER::TestFixtures::AbstractMethodError::Sub.new.f
+      rescue Exception => e
+        e.to_s
+      end
+      
+      expect( message ).to match \
+        /find a subclass of NRSER::TestFixtures::AbstractMethodError::Sub to instantiate/
     end
     
   end # when raising method is invoked through instance of a subclass

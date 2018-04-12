@@ -11,7 +11,7 @@ module NRSER::Types
     
     def initialize *types, **options
       super **options
-      @types = types.map {|type| NRSER::Types.make type}
+      @types = types.map { |type| NRSER::Types.make type }
     end
     
     
@@ -22,7 +22,7 @@ module NRSER::Types
         + ' ' + NRSER::Types::R_PAREN
       else
         "#{ self.class.demod_name }<" +
-        @types.map {|type| type.name }.join(',') +
+          @types.map { |type| type.name }.join( ',' ) +
         ">"
       end
     end
@@ -56,7 +56,7 @@ module NRSER::Types
     # @raise [TypeError]
     #   See write up above.
     # 
-    def from_s s
+    def custom_from_s s
       unless @from_s.nil?
         return check @from_s.call( s )
       end
@@ -89,7 +89,7 @@ module NRSER::Types
     # @return [Boolean]
     # 
     def has_from_s?
-      super() || @types.any? { |type| type.has_from_s? }
+      !@from_s.nil? || @types.any? { |type| type.has_from_s? }
     end # has_from_s
     
     
@@ -117,7 +117,7 @@ module NRSER::Types
     # 
     def to_data value
       @types.each { |type|
-        if type.respond_to? :to_data
+        if type.has_to_data?
           return type.to_data value
         end
       }
@@ -133,38 +133,41 @@ module NRSER::Types
     end
   end
   
+  
   class Union < Combinator
     JOIN_SYMBOL = ' | ' # ' ⋁ '
     
     def test? value
-      @types.any? {|type| type.test value}
+      @types.any? { |type| type.test value }
     end
   end # Union
   
+  
   # match any of the types
-  def self.union *types, **options
-    NRSER::Types::Union.new *types, **options
+  def_factory(
+    :union,
+    aliases: [:one_of, :or],
+  ) do |*types, **options|
+    Union.new *types, **options
   end
   
-  singleton_class.send :alias_method, :one_of, :union
-  singleton_class.send :alias_method, :or, :union
   
   class Intersection < Combinator
-    # JOIN_SYMBOL = ', '
     JOIN_SYMBOL = ' & ' # ' ⋀ '
     
     def test? value
-      @types.all? { |type| type.test? value}
+      @types.all? { |type| type.test? value }
     end
   end
   
+  
   # match all of the types
-  def self.intersection *types, **options
+  def_factory(
+    :intersection,
+    aliases: [:all_of, :and],
+  ) do |*types, **options|
     Intersection.new *types, **options
   end
-  
-  singleton_class.send :alias_method, :all_of, :intersection
-  singleton_class.send :alias_method, :and, :intersection
   
   
   class XOR < Combinator
@@ -173,15 +176,10 @@ module NRSER::Types
     def test? value
       @types.count { |type| type === value } == 1
     end
-    
-    # def default_name
-    #   '⊕'
-    #   "( #{ @types.map { |t| t.name }.join ' ⊕ ' } )"
-    # end
   end
   
   
-  def self.xor *types, **options
+  def_factory :xor do |*types, **options|
     XOR.new *types, **options
   end
   

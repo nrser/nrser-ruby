@@ -152,7 +152,7 @@ module NRSER::Types
     # @see NRSER::Types::Type#has_from_s?
     # 
     def has_from_s?
-      super() && [keys, values].all?( &:has_from_s )
+      !@from_s.nil? || [keys, values].all?( &:has_from_s )
     end
     
     

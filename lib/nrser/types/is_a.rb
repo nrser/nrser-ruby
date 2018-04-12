@@ -3,73 +3,92 @@ require 'nrser/types/type'
 using NRSER
 
 module NRSER::Types
+  # Type satisfied by class membership (or mixin presence for modules).
+  # 
+  # Tests via the subject value's `#is_a?` method.
+  # 
   class IsA < NRSER::Types::Type
-    attr_reader :klass
+    attr_reader :mod
     
-    def initialize klass, **options
-      unless klass.is_a?( Class ) || klass.is_a?( Module )
-        raise ArgumentError.new binding.erb <<-ERB
-          `klass` argument must be a Class or Module, found:
-          
-              <%= klass.pretty_inspect %>
-          
-        ERB
+    def initialize mod, init_from_data: false, **options
+      unless mod.is_a?( Module )
+        raise ArgumentError,
+          "`mod` argument must be a Module (inc. Class), " \
+          "received #{ mod.inspect }"
       end
       
       super **options
-      @klass = klass
+      
+      @init_from_data = !!init_from_data
+      
+      @mod = mod
     end
     
     
     def explain
-      @klass.safe_name
+      mod.safe_name
     end
     
     
     def test? value
-      value.is_a? @klass
+      value.is_a? mod
     end
     
     
-    # If {#klass} responds to `#from_data`, call that and check results.
+    
+    # @todo Document init_from_data? method.
     # 
-    # Otherwise, forward up to {NRSER::Types::Type#from_data}.
+    # @param [type] arg_name
+    #   @todo Add name param description.
     # 
-    # @param [Object] data
-    #   Data to create the value from that will satisfy the type.
+    # @return [return_type]
+    #   @todo Document return value.
     # 
-    # @return [Object]
-    #   Instance of {#klass}.
+    def init_from_data?
+      @init_from_data
+    end # #init_from_data?
+    
+    
+    
+    # Forwards to `mod.from_data`.
     # 
-    def from_data data
-      if @from_data.nil?
-        if @klass.respond_to? :from_data
-          check @klass.from_data( data )
-        else
-          super data
-        end
+    # @param data (see NRSER::Types::Type#from_data)
+    # @return     (see NRSER::Types::Type#from_data)
+    # @raise      (see NRSER::Types::Type#from_data)
+    # 
+    def custom_from_data data
+      if init_from_data?
+        mod.new data
       else
-        @from_data.call data
+        mod.from_data data
       end
     end
     
     
+    # Overrides {NRSER::Types::Type#has_from_data?} to respond `true` when
+    # there is a instance-specific `@from_data` or the {#mod} responds to
+    # `.from_data`.
+    # 
+    # @return [Boolean]
+    # 
     def has_from_data?
-      @from_data || @klass.respond_to?( :from_data )
+      @from_data ||
+        init_from_data? ||
+        mod.respond_to?( :from_data )
     end
     
     
     def == other
       equal?( other ) ||
       ( self.class == other.class &&
-        self.klass == other.klass )
+        self.mod == other.mod )
     end
     
   end # IsA
   
   
   # class membership
-  def_factory :is_a do |klass, **options|
-    IsA.new klass, **options
+  def_factory :is_a do |mod, **options|
+    IsA.new mod, **options
   end
 end # NRSER::Types

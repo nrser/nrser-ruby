@@ -6,6 +6,12 @@ module NRSER::Types
   # Type that tests value for membership in a group object via that object's
   # `#include?` method.
   # 
+  # @todo
+  #   I think I want to get rid of {.where}... which would elevate this to
+  #   it's own class as a "fundamental" concept (I guess)... not so sure,
+  #   really. The idea of membership is pretty wide-spread and important,
+  #   but it's a bit a vague and inconsistently implemented things. 
+  # 
   # @param [#include?] group
   #   `#include?` will be called on this value to determine type membership.
   # 

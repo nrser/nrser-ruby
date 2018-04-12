@@ -12,6 +12,7 @@ require 'semantic_logger'
 # Project / Package
 # -----------------------------------------------------------------------
 
+require_relative './mixin'
 
 # Refinements
 # =======================================================================
@@ -20,14 +21,14 @@ require 'semantic_logger'
 # Declarations
 # =======================================================================
 
-module NRSER::Logging; end
-module NRSER::Logging::Formatters; end
+module NRSER::Log; end
+module NRSER::Log::Formatters; end
 
 
 # Definitions
 # =======================================================================
 
-class NRSER::Logging::Formatters::Color < ::SemanticLogger::Formatters::Color
+class NRSER::Log::Formatters::Color < ::SemanticLogger::Formatters::Color
   
   # Constants
   # ======================================================================
@@ -37,6 +38,12 @@ class NRSER::Logging::Formatters::Color < ::SemanticLogger::Formatters::Color
   # @return [String]
   # 
   ANSI_ESC_DARK_GRAY = "\e[1;30m"
+  
+  
+  # Mixins
+  # ========================================================================
+  
+  include NRSER::Log::Formatters::Mixin
   
   
   # Class Methods
@@ -53,6 +60,7 @@ class NRSER::Logging::Formatters::Color < ::SemanticLogger::Formatters::Color
     SemanticLogger::Formatters::Color::ColorMap.new(
       debug: SemanticLogger::AnsiColors::MAGENTA,
       trace: ANSI_ESC_DARK_GRAY,
+      warn: SemanticLogger::AnsiColors::YELLOW,
     )
   end # .default_color_map
   
@@ -82,12 +90,23 @@ class NRSER::Logging::Formatters::Color < ::SemanticLogger::Formatters::Color
   # ======================================================================
   
   
+  def name
+    form = AwesomePrint::Inspector.new.instance_variable_get :@formatter
+    form.colorize log.name, :class
+  end
+  
+  
   # Upcase the log level.
   # 
   # @return [String]
   # 
   def level
     "#{ color }#{ log.level.upcase }#{ color_map.clear }"
+  end
+  
+  
+  def time
+    "#{ color }#{ super() }#{ color_map.clear }"
   end
   
   
@@ -142,22 +161,24 @@ class NRSER::Logging::Formatters::Color < ::SemanticLogger::Formatters::Color
     self.log    = log
     self.logger = logger
     
-    [
-      time, # annoyingly noisy and don't really need for local CLI app
-      level,
-      process_info,
-      tags,
-      named_tags,
-      duration,
-      name,
-    ].compact.join( ' ' ) +
-    "\n" +
-    [
-      message,
-      payload,
-      exception,
-    ].compact.join(' ') +
-    "\n" # I like extra newline to space shit out
+    render_log
+    
+    # [
+    #   time, # annoyingly noisy and don't really need for local CLI app
+    #   level,
+    #   process_info,
+    #   tags,
+    #   named_tags,
+    #   duration,
+    #   name,
+    # ].compact.join( ' ' ) +
+    # "\n" +
+    # [
+    #   message,
+    #   payload,
+    #   exception,
+    # ].compact.join(' ') +
+    # "\n" # I like extra newline to space shit out
     
   end # #call
   

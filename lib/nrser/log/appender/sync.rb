@@ -16,7 +16,7 @@
 # Useful for CLI applications where you want to see output in sync with
 # operations.
 # 
-class NRSER::Logging::Appender::Sync
+class NRSER::Log::Appender::Sync
   
   # Mixins
   # ============================================================================
@@ -145,4 +145,4 @@ class NRSER::Logging::Appender::Sync
   #   Sync appender is always active
   def active?; true; end
 
-end # class NRSER::Logging::Appender::Sync
+end # class NRSER::Log::Appender::Sync

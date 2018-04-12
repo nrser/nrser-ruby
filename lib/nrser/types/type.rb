@@ -149,6 +149,11 @@ module NRSER::Types
     
     # See if a value satisfies the type.
     # 
+    # Realizing classes **must** implement this method.
+    # 
+    # This implementation just defines the API; it always raises
+    # {NRSER::AbstractMethodError}.
+    # 
     # @param [Object] value
     #   Value to test for type satisfaction.
     # 
@@ -156,10 +161,17 @@ module NRSER::Types
     #   `true` if the `value` satisfies the type.
     # 
     def test? value
-      raise NotImplementedError
+      raise NRSER::AbstractMethodError.new( self, __method__ )
     end
     
-    # Old name
+    # Old name for {#test?}.
+    # 
+    # @deprecated
+    # 
+    # @param  (see #test?)
+    # @return (see #test?)
+    # @raise  (see #test?)
+    # 
     def test value; test? value; end
     
     
@@ -214,10 +226,13 @@ module NRSER::Types
     # Looks for the `@from_s` instance variable or a `#custom_from_s`
     # method.
     # 
-    # If this method returns `true`, then we expect {#from_s} to succeed.
+    # @note
+    #   When this method returns `true` it simply indicates that some method
+    #   of loading from strings exists - the load itself can of course still
+    #   fail.
     # 
-    # Realizing classes should only need to override this method to extend
-    # the test to parameterized types.
+    # Realizing classes should only need to override this method to limited or
+    # expand the scope relative to parameterized types.
     # 
     # @return [Boolean]
     # 
@@ -279,22 +294,42 @@ module NRSER::Types
     # Test if the type can load values from "data" - basic values and
     # collections like {Array} and {Hash} forming tree-like structures.
     # 
-    # Realizing classes *may* need to override this to extend checking to
-    # parameterized types.
+    # Realizing classes *may* need to override this to limited or expand
+    # responses relative to parameterized types.
     # 
     # @return [Boolean]
     # 
     def has_from_data?
-      !@from_data.nil?
+      !@from_data.nil? ||
+        # Need the `true` second arg to include protected methods
+        respond_to?( :custom_from_data, true )
     end
     
     
+    # Try to load a value from "data" - basic values and
+    # collections like {Array} and {Hash} forming tree-like structures.
+    # 
+    # @param [*] data
+    #   Data to try to load from.
+    # 
+    # @raise [NoMethodError]
+    #   If {#has_from_data?} returns `false`.
+    # 
+    # @raise [NRSER::Types::CheckError]
+    #   If the load result does not satisfy the type (see {#check!}).
+    # 
     def from_data data
       unless has_from_data?
         raise NoMethodError, "#from_data not defined"
       end
       
-      check! @from_data.call( data )
+      value = if @from_data
+        @from_data.call data
+      else
+        custom_from_data data
+      end
+      
+      check! value
     end
     
     
@@ -329,14 +364,25 @@ module NRSER::Types
     end # #to_data
     
     
-    # Language Inter-Op
-    # ----------------------------------------------------------------------------
+    # Language Integration Instance Methods
+    # ------------------------------------------------------------------------
     
     # Proxies to {#name}.
     # 
     # @return [String]
     # 
     def to_s; name; end
+    
+    
+    # Hook into Ruby's *case subsumption* operator to allow usage in `case`
+    # statements! Forwards to {#test?}.
+    # 
+    # @param value (see #test?)
+    # @return (see #test?)
+    #   
+    def === value
+      test? value
+    end
     
     
     # Overridden to customize behavior for the {#from_s}, {#from_data} and
@@ -391,19 +437,6 @@ module NRSER::Types
     
     alias_method :builtin_inspect, :inspect
     def inspect; explain; end
-    
-    
-    # Hook into Ruby's *case subsumption* operator to allow usage in `case`
-    # statements!
-    # 
-    # TODO  Want to switch {NRSER::Types.match} over to use `===`!
-    # 
-    # @param value (see #test?)
-    # @return (see #test?)
-    #   
-    def === value
-      test? value
-    end
     
   end # Type
 end # NRSER::Types

@@ -9,7 +9,7 @@ require 'nrser/refinements/sugar'
 using NRSER::Types
 using NRSER::Sugar
 
-NRSER::Logging.setup!
+NRSER::Log.setup_for_console!
 
 
 # You can add fixtures and/or initialization code here to make experimenting

@@ -10,7 +10,8 @@
 # need to be required in the "Post-Processing" section at the bottom.
 # 
 
-require 'nrser/logging'
+# Want to mix logging in
+require 'nrser/log'
 
 # Stuff to help you define, test, check and match types in Ruby.
 # 
@@ -29,7 +30,7 @@ module NRSER::Types
   # ========================================================================
   
   extend Factory
-  include NRSER::Logging::Mixin
+  include NRSER::Log::Mixin
   
   
   # Constants
@@ -121,6 +122,10 @@ module NRSER::Types
   singleton_class.send :alias_method, :test, :test?
   
   
+  # @todo
+  #   Switch {NRSER::Types.match} to use `===`! Should allow us to avoid
+  #   making types for everything?
+  #   
   def self.match value, *clauses
     if clauses.empty?
       raise ArgumentError.new NRSER.dedent <<-END

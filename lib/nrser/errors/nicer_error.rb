@@ -11,6 +11,8 @@
 # Using {PP.pp} as default dumper.
 require 'pp'
 
+require 'nrser/core_ext/object/lazy_var'
+
 
 # Definitions
 # =======================================================================
@@ -198,23 +200,28 @@ module NRSER::NicerError
   end
   
   
+  def details
+    @details
+  end
+  
+  
   # Render details (first time only, then cached) and return the string.
   # 
   # @return [String?]
   # 
   def details_section
-    @details_section ||= begin
+    lazy_var :@details_section do
       # No details if we have nothing to work with
-      if @details.nil?
+      if details.nil?
         nil
       else
-        contents = case @details
+        contents = case details
         when Proc
-          @details.call
+          details.call
         when String
-          @details
+          details
         else
-          @details.to_s
+          details.to_s
         end
         
         if contents.empty?
@@ -234,7 +241,7 @@ module NRSER::NicerError
   # @return [String?]
   # 
   def context_section
-    @context_section ||= begin
+    lazy_var :@context_section do
       if context.empty?
         nil
       else

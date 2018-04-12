@@ -35,7 +35,7 @@ module NRSER::Props; end
 # 
 class NRSER::Props::Prop
   
-  include NRSER::Logging::Mixin
+  include NRSER::Log::Mixin
   
   # The class the prop was defined in.
   # 
