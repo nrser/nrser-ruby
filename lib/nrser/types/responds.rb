@@ -33,7 +33,7 @@ module NRSER::Types
     # ======================================================================
     
     
-    def default_name
+    def explain
       attrs_str = @map.map { |args, type|
         args_str = args[1..-1].map(&:inspect).join ', '
         "#{ args[0] }(#{ args_str })=#{ type.name }"

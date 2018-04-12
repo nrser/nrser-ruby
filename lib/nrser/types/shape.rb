@@ -53,7 +53,7 @@ module NRSER::Types
       end
     end
     
-    def default_name
+    def explain
       inner = @pairs.map { |k, v|
         "[#{ k.inspect }]→#{ v.name }"
       }.join( ", " )

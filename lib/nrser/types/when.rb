@@ -54,7 +54,7 @@ module NRSER::Types
     end
     
     
-    def default_name
+    def explain
       @object.to_s
     end
     

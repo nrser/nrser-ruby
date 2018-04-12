@@ -27,7 +27,7 @@ module NRSER::Types
     end
     
     
-    def default_name
+    def explain
       "!#{ @type.name }"
     end
     
