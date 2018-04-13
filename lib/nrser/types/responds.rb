@@ -38,7 +38,7 @@ module NRSER::Types
     # Constructor
     # ======================================================================
     
-    # Instantiate a new `Responds`.
+    # Instantiate a new `Respond`.
     def initialize  to:,
                     with:,
                     publicly: true,

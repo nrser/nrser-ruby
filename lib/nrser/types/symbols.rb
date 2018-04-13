@@ -1,33 +1,35 @@
-require 'nrser/refinements'
-require 'nrser/types/is'
-require 'nrser/types/is_a'
+require_relative './is'
+require_relative './is_a'
 
-require 'nrser/refinements'
-using NRSER
-  
 module NRSER::Types
 
-  def self.sym **options
-    IsA.new(
-      Symbol,
-      from_s: :to_sym.to_proc,
+  def_factory(
+    :Symbol,
+    aliases: [ :sym, :symbol ],
+  ) do |from_s: :to_sym.to_proc, **options|
+    is_a \
+      ::Symbol,
+      from_s: from_s,
       **options
-    )
   end # sym
   
-  singleton_class.send :alias_method, :symbol, :sym
   
-  
-  def self.empty_sym **options
-    is :'', name: 'EmptySymbol', **options
+  def_factory(
+    :EmptySymbol,
+    aliases: [ :empty_sym, :empty_symbol ],
+  ) do |name: 'EmptySymbol', **options|
+    is :'', name: name, **options
   end
   
   
-  def self.non_empty_sym **options
+  def_factory(
+    :NonEmptySymbol,
+    aliases: [ :non_empty_sym, :non_empty_symbol ],
+  ) do |name: 'NonEmptySymbol', **options|
     intersection \
       sym,
       self.not( empty_sym ),
-      name: 'NonEmptySymbol',
+      name: name,
       **options
   end
   

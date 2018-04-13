@@ -1,29 +1,13 @@
+# encoding: UTF-8
+# frozen_string_literal: true
+
 # Requirements
 # =======================================================================
 
-# Stdlib
-# -----------------------------------------------------------------------
-
-# Deps
-# -----------------------------------------------------------------------
-
 # Project / Package
 # -----------------------------------------------------------------------
-require 'nrser/types/type'
-require 'nrser/types/is_a'
 
-
-# Refinements
-# =======================================================================
-
-require 'nrser/refinements'
-using NRSER
-
-
-# Declarations
-# =======================================================================
-
-module NRSER; end
+require_relative './is_a'
 
 
 # Definitions
@@ -64,27 +48,20 @@ module NRSER::Types
     end
     
     
-    def from_s s
-      # Use custom {@from_s} if we have one.
-      return check( @from_s.call s ) unless @from_s.nil?
-      
+    def custom_from_s string
       # Does it looks like a JSON array?
-      if NRSER.looks_like_json_array? s
+      if NRSER.looks_like_json_array? string
         # It does! Load it
         begin
-          array = JSON.load( s )
+          return JSON.load( string )
         rescue
           # pass - if we failed to load as JSON, it may just not be JSON, and
           # we can try the split approach below.
-        else
-          # Check value and return. If we fail the check here let the error
-          # bubble up
-          return check array
         end
       end
       
       # Split it with the splitter and check that
-      check items_from_strings( s.split( @split_with ) )
+      items_from_strings( string.split( @split_with ) )
     end
     
   end # ArrayType
@@ -143,7 +120,7 @@ module NRSER::Types
     # @return [Boolean]
     # 
     def has_from_s?
-      @item_type.has_from_s?
+      @from_s || @item_type.has_from_s?
     end
     
     

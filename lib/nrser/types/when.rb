@@ -1,24 +1,13 @@
+# encoding: UTF-8
 # frozen_string_literal: true
 
 # Requirements
 # =======================================================================
 
-# Stdlib
-# -----------------------------------------------------------------------
-
-# Deps
-# -----------------------------------------------------------------------
-
 # Project / Package
 # -----------------------------------------------------------------------
 
-
-# Refinements
-# =======================================================================
-
-
-# Declarations
-# =======================================================================
+require_relative './type'
 
 
 # Definitions
@@ -26,8 +15,30 @@
 
 module NRSER::Types
   
+  # Wraps an object as a type, using Ruby's "case equality" `===` to test
+  # membership (like a `when` clause in a `case` expression).
+  # 
+  # Deals with some data loading too.
+  # 
+  # @note
+  #   This was kinda hacked in when my idiot-ass figured out that all this
+  #   types BS could fit in real well with Ruby's `===`, allowing types to
+  #   be used in `when` clauses.
+  #   
+  #   Previously, {NRSER::Types.make} used to see if something was a module,
+  #   and turn those into `is_a` types, and turn everything else into
+  #   `is`, but this kind of sucked for a bunch of reasons I don't totally
+  #   remember.
+  #   
+  #   Now, if a value is not a special case (like `nil`) or already a type,
+  #   {NRSER::Types.make} turns it into a {When}.
+  #   
+  #   {When} instances are totally Ruby-centric, and are thus mostly to
+  #   support in-runtime testing - you wouldn't want a {When} type to
+  #   be part of an API schema or something - but they're really nice for
+  #   the internal stuff.
+  # 
   class When < Type
-    
     
     # The wrapped {Object} whose `#===` will be used to test membership.
     # 
@@ -55,7 +66,7 @@ module NRSER::Types
     
     
     def explain
-      @object.to_s
+      @object.inspect
     end
     
     # If {#object} responds to `#from_data`, call that and check results.
@@ -95,7 +106,7 @@ module NRSER::Types
   end # class When
   
   
-  def self.when value, **options
+  def_factory :when do |value, **options|
     When.new value, **options
   end
   

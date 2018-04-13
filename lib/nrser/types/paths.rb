@@ -38,7 +38,7 @@ module NRSER::Types
   def_factory :non_empty_pathname do |name: 'NonEmptyPathname', **options|
     all_of \
       pathname,
-      where { |value| value.to_s.length > 0 },
+      attrs( to_s: non_empty_str ),
       name: name,
       **options
   end
@@ -64,7 +64,7 @@ module NRSER::Types
   do |name: 'POSIXPathSegment', **options|
     all_of \
       non_empty_str,
-      where { |string| ! string.include?( '/' ) },
+      respond( to: [:include?, '/'], with: false ),
       name: name,
       **options
   end
@@ -77,7 +77,8 @@ module NRSER::Types
   def_factory :abs_path do |name: 'AbsPath', **options|
     intersection \
       path,
-      where { |path| path.to_pn.absolute? },
+      # Weirdly, there is no {File.absolute?}..
+      attrs( to_pn: attrs( absolute?: true ) ),
       name: name,
       from_s: ->( s ) { File.expand_path s },
       **options
@@ -94,6 +95,7 @@ module NRSER::Types
   def_factory :dir_path do |name: 'DirPath', **options|
     intersection \
       path,
+      # TODO  How to change this from {.where}?
       where { |path| File.directory? path },
       name: name,
       **options
@@ -102,11 +104,10 @@ module NRSER::Types
   
   # Absolute {.path} to a directory (both an {.abs_path} and an {.dir_path}).
   # 
-  # @param [type] name:
-  #   @todo Add name param description.
+  # @param name: (see NRSER::Types::Type#initialize)
   # 
-  # @return [return_type]
-  #   @todo Document return value.
+  # @param **options
+  #   See {NRSER::Types::Type#initialize}
   # 
   def_factory :abs_dir_path do |name: 'AbsDirPath', **options|
     intersection \
@@ -117,9 +118,17 @@ module NRSER::Types
   end # .abs_dir_path
   
   
+  # A {.path} that is a file (using {File.file?} to test).
+  # 
+  # @param name: (see NRSER::Types::Type#initialize)
+  # 
+  # @param **options
+  #   See {NRSER::Types::Type#initialize}
+  # 
   def_factory :file_path do |name: 'FilePath', **options|
     intersection \
       path,
+      # TODO  How to change this from {.where}?
       where { |path| File.file? path },
       name: name,
       **options

@@ -82,7 +82,19 @@ module NRSER::Types
   # @example Type where first element of an Enumerable is a String
   #   string_first = intersection Enumerable, attrs(first: String)
   # 
-  def_factory :attrs do |attrs, **options|
+  def_factory :attrs do |*args|
+    case args.length
+    when 0
+      raise NRSER::ArgumentError.new \
+        "requires at least one argument"
+    when 1
+      attrs = args[0]
+      options = {}
+    when 2
+      attrs = args[0]
+      options = args[1]
+    end
+    
     AttrsType.new attrs, **options
   end
   

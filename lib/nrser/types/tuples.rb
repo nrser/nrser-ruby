@@ -1,21 +1,9 @@
 # Requirements
 # =======================================================================
 
-# Stdlib
-# -----------------------------------------------------------------------
-
-# Deps
-# -----------------------------------------------------------------------
-
 # Project / Package
 # -----------------------------------------------------------------------
-
-
-# Refinements
-# =======================================================================
-
-require 'nrser/refinements'
-using NRSER
+require_relative './arrays'
 
 
 # Definitions
@@ -69,13 +57,11 @@ module NRSER::Types
     # Instance Methods
     # ======================================================================
     
-    # @todo Document test method.
+    # Test value for membership.
     # 
-    # @param [type] arg_name
-    #   @todo Add name param description.
-    # 
-    # @return [return_type]
-    #   @todo Document return value.
+    # @param  (see NRSER::Types::Type#test?)
+    # @return (see NRSER::Types::Type#test?)
+    # @raise  (see NRSER::Types::Type#test?)
     # 
     def test? value
       # Test the super class first
@@ -96,7 +82,7 @@ module NRSER::Types
     #   *all* it's types can load values from strings.
     # 
     def has_from_s?
-      @types.all? &:has_from_s?
+      @from_s || @types.all?( &:has_from_s? )
     end # #has_from_s?
     
     
