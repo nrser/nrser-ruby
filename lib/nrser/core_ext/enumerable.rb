@@ -1,3 +1,6 @@
+require_relative './enumerable/find_map'
+
+
 # Instance methods to extend {Enumerable}.
 # 
 module Enumerable
@@ -55,11 +58,6 @@ module Enumerable
     NRSER.try_find self, &block
   end
   
-  
-  # See {NRSER.find_map}
-  def find_map *args, &block
-    NRSER.find_map self, *args, &block
-  end
   
   # See {NRSER.slice?}
   def slice? *args, &block
