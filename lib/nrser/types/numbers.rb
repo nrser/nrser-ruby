@@ -25,7 +25,10 @@ module NRSER::Types
   # Zero
   # =====================================================================
   
-  def_factory :zero do |from_s: method( :parse_number ), **options|
+  def_factory(
+    :Zero,
+    aliases: [ :zero ],
+  ) do |from_s: method( :parse_number ), **options|
     is \
       0,
       from_s: from_s,
@@ -37,9 +40,9 @@ module NRSER::Types
   # =====================================================================
   
   def_factory(
-    :num,
-    aliases: [ :number, :numeric ],
-  ) do |from_s: method( :parse_number ), **options|
+    :Number,
+    aliases: [ :num, :number, :numeric, :Numeric ],
+  ) do |name: 'Number', from_s: method( :parse_number ), **options|
     IsA.new \
       Numeric,
       from_s: from_s,
@@ -51,8 +54,8 @@ module NRSER::Types
   # =====================================================================
   
   def_factory(
-    :int,
-    aliases: [ :integer, :signed ],
+    :Integer,
+    aliases: [ :int, :integer, :signed ],
   ) do |name: 'ℤ', from_s: method( :parse_number ), **options|
     IsA.new \
       Integer,
@@ -71,8 +74,8 @@ module NRSER::Types
   # 
   
   def_factory(
-    :pos_int,
-    aliases: [ :positive_int, :positive_integer ]
+    :PositiveInteger,
+    aliases: [ :pos_int, :positive_int, :positive_integer ]
   ) do |name: 'ℤ⁺', **options|
     intersection \
       int,
@@ -92,8 +95,8 @@ module NRSER::Types
   # 
   
   def_factory(
-    :neg_int,
-    aliases: [ :negative_int, :negative_integer ],
+    :NegativeInteger,
+    aliases: [ :neg_int, :negative_int, :negative_integer ],
   ) do |name: 'ℤ⁻', **options|
     intersection \
       int,
@@ -111,8 +114,14 @@ module NRSER::Types
   # 
   
   def_factory(
-    :non_neg_int,
-    aliases: [ :unsigned, :index, :non_negative_int, :non_negative_integer ],
+    :NonNegativeInteger,
+    aliases: [
+      :non_neg_int,
+      :unsigned,
+      :index,
+      :non_negative_int,
+      :non_negative_integer,
+    ],
   ) do |name: 'ℕ⁰', **options|
     intersection \
       int,
@@ -129,8 +138,8 @@ module NRSER::Types
   # 
   
   def_factory(
-    :non_pos_int,
-    aliases: [ :non_positive_int, :non_positive_integer ],
+    :NonPositiveInteger,
+    aliases: [ :non_pos_int, :non_positive_int, :non_positive_integer ],
   ) do |name: '{0}∪ℤ⁻', **options|
     intersection \
       int,
