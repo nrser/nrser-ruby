@@ -29,7 +29,7 @@ class Binding
   # @return [Hash<Symbol, Object>]
   # 
   def locals
-    self.local_variables.assoc_to { |symbol| bnd.local_variable_get symbol }
+    self.local_variables.assoc_to { |symbol| local_variable_get symbol }
   end
   
   
@@ -38,7 +38,7 @@ class Binding
   # @return [Array<Object>]
   # 
   def local_values
-    self.local_variables.map { |symbol| bnd.local_variable_get symbol }
+    self.local_variables.map { |symbol| local_variable_get symbol }
   end
   
 end # class Binding
