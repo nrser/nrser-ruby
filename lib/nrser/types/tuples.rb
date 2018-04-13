@@ -62,7 +62,7 @@ module NRSER::Types
     #   See {NRSER::Types::Type#explain}
     # 
     def explain
-      'Array<(' + @types.map( &:name ).join( ', ' ) + ')>'
+      'Array<(' + @types.map( &:explain ).join( ', ' ) + ')>'
     end
     
     

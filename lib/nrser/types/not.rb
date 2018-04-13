@@ -34,7 +34,9 @@ module NRSER::Types
   end # class Not
   
   
-  def self.not type, **options
+  def_factory(
+    :not,
+  ) do |type, **options|
     Not.new type, **options
   end
   

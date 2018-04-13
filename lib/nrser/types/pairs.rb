@@ -12,6 +12,7 @@
 require 'nrser/core_ext/hash'
 
 require_relative './combinators'
+require_relative './tuples'
 
 
 # Refinements
@@ -29,28 +30,31 @@ module NRSER; end
 
 module NRSER::Types
   
-  
-  # @todo Document array_pair method.
+  # Type for key/value pairs encoded as a {.tuple} (Array) of length 2.
   # 
-  # @param [type] arg_name
-  #   @todo Add name param description.
-  # 
-  # @return [return_type]
-  #   @todo Document return value.
-  # 
-  def self.array_pair **options
-    return ARRAY_PAIR if options.empty?
+  def_factory(
+    :array_pair,
+  ) do |name: 'ArrayPair', key: any, value: any, **options|
+    unless options.key? :name
+      options[:name] = if key == any && value == any
+        'ArrayPair'
+      else
+        key = NRSER::Types.make key
+        value = NRSER::Types.make value
+        
+        "ArrayPair<#{ key.name }, #{ value.name }>"
+      end
+    end
     
-    key   = options.delete(:key)    || any
-    value = options.delete(:value)  || any
-    
-    tuple key, value, **options
+    tuple \
+      key,
+      value,
+      # name: name,
+      **options
   end # .array_pair
   
-  ARRAY_PAIR = array_pair( name: 'ArrayPairType' ).freeze
   
-  
-  # Type for a {Hash} that consists of only a single key and value pair.
+  # Type for key/value pairs encoded as {Hash} with a single entry.
   # 
   # @param [String] name:
   #   Name to give the new type.
@@ -58,49 +62,47 @@ module NRSER::Types
   # @param [Hash] **options
   #   Other options to pass to
   # 
-  # @return [NRSER::Types::Type]
-  # 
-  def self.hash_pair **options
-    return HASH_PAIR if options.empty?
-    
-    hash_options = {}
-    {key: :keys, value: :values}.each { |from_key, to_key|
-      if options.key? from_key
-        hash_options[to_key] = options.delete from_key
+  def_factory(
+    :hash_pair,
+  ) do |key: any, value: any, **options|
+    unless options.key? :name
+      options[:name] = if key == any && value == any
+        'HashPair'
+      else
+        key = NRSER::Types.make key
+        value = NRSER::Types.make value
+        
+        "HashPair<#{ key.name }, #{ value.name }>"
       end
-    }
-    
-    if hash_options.empty?
-      intersection \
-        is_a( Hash ),
-        length( 1 ),
-        **options
-    else
-      intersection \
-        hash_type( **hash_options ),
-        length( 1 ),
-        **options
     end
     
+    intersection \
+      hash_type( keys: key, values: value ),
+      length( 1 ),
+      # name: name,
+      **options
   end # .hash_pair
   
-  HASH_PAIR = hash_pair( name: 'HashPairType' ).freeze
-  
 
-  # @todo Document pair method.
+  # A key/value pair, which can be encoded as an Array of length 2 or a
+  # Hash of length 1.
   # 
-  # @param [type] arg_name
-  #   @todo Add name param description.
   # 
-  # @return [return_type]
-  #   @todo Document return value.
-  # 
-  def_factory :pair do |**options|
-    type_options = options.extract! :key, :value
+  def_factory :pair do |key: any, value: any, **options|
+    unless options.key? :name
+      options[:name] = if key == any && value == any
+        'Pair'
+      else
+        key = NRSER::Types.make key
+        value = NRSER::Types.make value
+        
+        "Pair<#{ key.name }, #{ value.name }>"
+      end
+    end
     
     union \
-      array_pair( **type_options ),
-      hash_pair( **type_options ),
+      array_pair( key: key, value: value ),
+      hash_pair( key: key, value: value ),
       **options
   end # #pair
   

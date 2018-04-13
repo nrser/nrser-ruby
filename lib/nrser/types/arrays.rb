@@ -123,7 +123,7 @@ module NRSER::Types
     # ======================================================================
     
     def explain
-      "#{ super() }<#{ @item_type }>"
+      "#{ super() }<#{ item_type.explain }>"
     end
     
     

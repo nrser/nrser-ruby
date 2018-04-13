@@ -1,108 +1,100 @@
+require 'nrser/message'
 require_relative './booleans'
 
 module NRSER::Types
   
-  # Type that encodes messages mapped to result types that member values must
-  # satisfy.
-  class Responds < NRSER::Types::Type
-    
-    # Constants
-    # ======================================================================
-    
-    
-    # Class Methods
-    # ======================================================================
-    
+  # Type holding an {NRSER::Message} and response type. Satisfied by objects
+  # that respond with a value that satisfies the respond type when sent the
+  # message.
+  # 
+  class Respond < NRSER::Types::Type
     
     # Attributes
     # ======================================================================
+    
+    # Message that will be sent to tested values.
+    # 
+    # @return [NRSER::Message]
+    #     
+    attr_reader :message
+    
+    
+    # Type tested values must respond with when sent the message.
+    # 
+    # @return [NRSER::Types::Type]
+    #     
+    attr_reader :response
+    
+    
+    
+    # TODO document `publicly` attribute.
+    # 
+    # @return [Boolean]
+    #     
+    attr_reader :publicly
+    
     
     
     # Constructor
     # ======================================================================
     
     # Instantiate a new `Responds`.
-    def initialize  map,
-                    public: true,
+    def initialize  to:,
+                    with:,
+                    publicly: true,
                     **options
-      @map = map.transform_values { |type| NRSER::Types.make type }
+      @message = NRSER::Message.from *to
+      @publicly = publicly
+      @response = NRSER::Types.make with
+      
+      super **options
     end # #initialize
     
     
     # Instance Methods
     # ======================================================================
     
-    
+    # See {NRSER::Types::Type#explain}.
+    # 
+    # @param  (see NRSER::Types::Type#explain)
+    # @return (see NRSER::Types::Type#explain)
+    # @raise  (see NRSER::Types::Type#explain)
+    # 
     def explain
-      attrs_str = @map.map { |args, type|
-        args_str = args[1..-1].map(&:inspect).join ', '
-        "#{ args[0] }(#{ args_str })=#{ type.name }"
-      }.join(', ')
+      args_str = message.args.map( &:inspect ).join ', '
       
-      "#{ self.class.demod_name } #{ attrs_str }"
+      if message.block
+        args_str += ', ' + message.block.to_s
+      end
+      
+      "##{ message.symbol }(#{ args_str })#{ RESPONDS_WITH }#{ response.explain }"
     end
     
     
-    # @todo Document test method.
+    # Test value for membership.
     # 
-    # @param [type] arg_name
-    #   @todo Add name param description.
-    # 
-    # @return [return_type]
-    #   @todo Document return value.
+    # @param  (see NRSER::Types::Type#test?)
+    # @return (see NRSER::Types::Type#test?)
+    # @raise  (see NRSER::Types::Type#test?)
     # 
     def test? value
-      @map.all? { |args, type|
-        response = if @public
-          value.public_send *args
-        else
-          value.send *args
-        end
-        
-        type.test response
-      }
+      response.test message.send_to( value, publicly: publicly )
     end # #test
-    
     
   end # class Responds
   
+
+  def_factory(
+    :respond,
+  ) do |*args|
+    Respond.new *args
+  end # #responds
   
-  # Eigenclass (Singleton Class)
-  # ========================================================================
-  # 
-  class << self
-    
-    
-    # @todo Document responds method.
-    # 
-    # @param [type] arg_name
-    #   @todo Add name param description.
-    # 
-    # @return [return_type]
-    #   @todo Document return value.
-    # 
-    def responds *args
-      Responds.new *args
-    end # #responds
-    
-    
-    # @todo Document respond_to Responds.
-    # 
-    # @param [type] arg_name
-    #   @todo Add name param description.
-    # 
-    # @return [return_type]
-    #   @todo Document return value.
-    # 
-    def respond_to name, **options
-      responds(
-        {[:respond_to?, name] => NRSER::Types.true},
-        **options
-      )
-    end # #respond_to
-    
-    
-  end # class << self (Eigenclass)
   
+  def_factory(
+    :respond_to
+  ) do |method_name, **options|
+    respond to: [:respond_to?, method_name], with: NRSER::Types.true
+  end # #respond_to
   
 end # module NRSER::Types

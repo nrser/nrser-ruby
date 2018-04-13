@@ -25,12 +25,13 @@ module NRSER::Types
     
     def explain
       if self.class::JOIN_SYMBOL
-        NRSER::Types::L_PAREN + ' ' +
-        @types.map { |type| type.name }.join( self.class::JOIN_SYMBOL ) +
-        + ' ' + NRSER::Types::R_PAREN
+        NRSER::Types::L_PAREN + # ' ' +
+        @types.map { |type| type.explain }.join( self.class::JOIN_SYMBOL ) +
+        # ' ' +
+        NRSER::Types::R_PAREN
       else
         "#{ self.class.demod_name }<" +
-          @types.map { |type| type.name }.join( ',' ) +
+          @types.map { |type| type.explain }.join( ',' ) +
         ">"
       end
     end

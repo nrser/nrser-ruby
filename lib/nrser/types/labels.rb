@@ -16,7 +16,7 @@ module NRSER::Types
   def_factory(
     :label,
   ) do |name: 'Label', **options|
-    union non_empty_str, non_empty_sym, **options
+    union non_empty_str, non_empty_sym, name: name, **options
   end # .label
   
 end # module NRSER::Types

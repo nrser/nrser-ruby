@@ -446,7 +446,16 @@ module NRSER::Types
     # 
     
     alias_method :builtin_inspect, :inspect
-    def inspect; explain; end
+    def inspect
+      name = self.name
+      explain = self.explain
+      
+      if name == explain
+        explain
+      else
+        "#{ name } := #{ explain }"
+      end
+    end
     
     # @!endgroup Language Integration Instance Methods # *********************
     

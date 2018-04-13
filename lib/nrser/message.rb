@@ -52,7 +52,7 @@ module NRSER
     
     # Name of method the message is for.
     # 
-    # @return [Symbol | String]
+    # @return [Symbol]
     #     
     attr_reader :symbol
 
@@ -83,7 +83,7 @@ module NRSER
     #   Optional block that should be sent.
     # 
     def initialize symbol, *args, &block
-      @symbol = symbol
+      @symbol = symbol.to_sym
       @args = args
       @block = block
     end

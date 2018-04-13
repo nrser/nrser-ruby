@@ -174,7 +174,7 @@ module NRSER::Types
     # @return [String]
     # 
     def explain
-      "Hash<#{ @keys.name }, #{ @values.name }>"
+      "Hash<#{ keys.explain }, #{ values.explain }>"
     end
     
   end # HashType
