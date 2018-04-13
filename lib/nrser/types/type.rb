@@ -94,7 +94,7 @@ module NRSER::Types
     # Instance Methods
     # ========================================================================
     
-    # Talking about ourselves
+    # @!group Display Instance Methods
     # ------------------------------------------------------------------------
     
     # What this type likes to be called (and displayed as by default).
@@ -140,8 +140,10 @@ module NRSER::Types
       self.class.demod_name
     end
     
+    # @!endgroup Display Instance Methods # **********************************
     
-    # Validation
+    
+    # @!group Validation Instance Methods
     # ------------------------------------------------------------------------
     # 
     # The core of what a type does.
@@ -193,8 +195,10 @@ module NRSER::Types
     # Old name for {#check!} without the bang.
     def check *args, &block; check! *args, &block; end
     
+    # @!endgroup Validation Instance Methods # *******************************
     
-    # Loading Values
+    
+    # @!group Loading Values Instance Methods
     # ------------------------------------------------------------------------
     # 
     # Types include facilities for loading values from representations and
@@ -219,7 +223,6 @@ module NRSER::Types
     # representation" and the {NRSER::Props} system, which has been coming
     # along as well.
     # 
-    
     
     # Test if the type knows how to load values from strings.
     # 
@@ -332,6 +335,11 @@ module NRSER::Types
       check! value
     end
     
+    # @!endgroup Loading Values Instance Methods # ***************************
+    
+    
+    # @!group Dumping Values Instance Methods
+    # ------------------------------------------------------------------------
     
     # Test if the type has custom information about how to convert it's values
     # into "data" - structures and values suitable for transportation and
@@ -363,8 +371,10 @@ module NRSER::Types
       @to_data.call value
     end # #to_data
     
+    # @!endgroup Dumping Values Instance Methods # ***************************
     
-    # Language Integration Instance Methods
+    
+    # @!group Language Integration Instance Methods
     # ------------------------------------------------------------------------
     
     # Proxies to {#name}.
@@ -437,6 +447,84 @@ module NRSER::Types
     
     alias_method :builtin_inspect, :inspect
     def inspect; explain; end
+    
+    # @!endgroup Language Integration Instance Methods # *********************
+    
+    
+    # @!group Derivation Instance Methods
+    # ------------------------------------------------------------------------
+    # 
+    # Methods for deriving new types from `self`.
+    # 
+    
+    # Return a *union* type satisfied by values that satisfy either `self`
+    # *or* and of `others`.
+    # 
+    # @param [*] other
+    #   Values passed through {NRSER::Types.make} to create the other types.
+    # 
+    # @return [NRSER::Types::Union]
+    # 
+    def union *others
+      require_relative './combinators'
+      
+      NRSER::Types.union self, *others
+    end # #union
+    
+    alias_method :|, :union
+    alias_method :or, :union
+    
+    
+    # Return an *intersection* type satisfied by values that satisfy both
+    # `self` *and* all of `others`.
+    # 
+    # @param [Array] *others
+    #   Values passed through {NRSER::Types.make} to create the other types.
+    # 
+    # @return [NRSER::Types::Intersection]
+    # 
+    def intersection *others
+      require_relative './combinators'
+      
+      NRSER::Types.intersection self, *others
+    end # #intersection
+    
+    alias_method :&, :intersection
+    alias_method :and, :intersection
+    
+    
+    # Return an *exclusive or* type satisfied by values that satisfy either
+    # `self` *or* `other` *but not both*.
+    # 
+    # @param [*] other
+    #   Value passed through {NRSER::Types.make} to create the other type.
+    # 
+    # @return [NRSER::Types::Intersection]
+    # 
+    def xor *others
+      require_relative './combinators'
+      
+      NRSER::Types.xor self, *others
+    end # #^
+    
+    alias_method :^, :xor
+    
+    
+    # Return a "negation" type satisfied by all values that do *not* satisfy
+    # `self`.
+    # 
+    # @return [NRSER::Types::Not]
+    # 
+    def not
+      require_relative './not'
+      
+      NRSER::Types.not self
+    end
+    
+    alias_method :~, :not
+    
+    # @!endgroup Derivation Instance Methods # *******************************
+    
     
   end # Type
 end # NRSER::Types

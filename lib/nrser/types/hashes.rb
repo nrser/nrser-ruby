@@ -191,7 +191,10 @@ module NRSER::Types
   # @return [NRSER::Types::Type]
   #   Newly constructed hash type from `args`.
   # 
-  def_factory :hash_type, aliases: [:dict, :hash_] do |**kwds|
+  def_factory(
+    :hash_type,
+    aliases: [ :dict, :hash_ ]
+  ) do |**kwds|
     if kwds.key?( :keys ) || kwds.key?( :values )
       HashOfType.new **kwds
     else

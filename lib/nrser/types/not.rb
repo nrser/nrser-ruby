@@ -28,20 +28,8 @@ module NRSER::Types
     
     
     def explain
-      "!#{ @type.name }"
+      "~#{ @type.name }"
     end
-    
-    
-    # @return [String]
-    #   a brief string description of the type - just it's {#name} surrounded
-    #   by some back-ticks to make it easy to see where it starts and stops.
-    # 
-    def to_s
-      "{ x ∉ #{ @type.name } }"
-    end
-    
-    alias_method :inspect, :to_s
-    
     
   end # class Not
   

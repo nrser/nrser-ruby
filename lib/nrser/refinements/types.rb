@@ -1,5 +1,5 @@
-module NRSER 
-  module Types 
+module NRSER
+  module Types
     refine Object do
       def t
         NRSER::Types

@@ -1,10 +1,18 @@
-require 'nrser/types/combinators'
+require_relative './combinators'
+require_relative './nil'
 
 module NRSER::Types
     
-  # nil or the argument type
-  def self.maybe type, **options
-    union self.nil, type, name: "#{ type.name }?", **options
+  # Type satisfied by `nil` or the parametrized type.
+  # 
+  def_factory(
+    :maybe,
+  ) do |type, **options|
+    union \
+      self.nil,
+      type,
+      name: (options[:name] || "#{ type.name }?"),
+      **options
   end
   
 end # NRSER::Types

@@ -5,7 +5,15 @@ require 'nrser/types/type'
 
 # base class for Union and Intersection which combine over a set of types.
 module NRSER::Types
+  
+  # Abstract base class for logically combining types to create new ones.
+  # 
   class Combinator < NRSER::Types::Type
+    
+    # The parametrized types, in the order they will be tested.
+    # 
+    # @return [Array<NRSER::Types::Type>]
+    # 
     attr_reader :types
     
     
@@ -131,7 +139,8 @@ module NRSER::Types
         other.class == self.class && other.types == @types
       )
     end
-  end
+  
+  end # class Combinator
   
   
   class Union < Combinator
@@ -140,7 +149,7 @@ module NRSER::Types
     def test? value
       @types.any? { |type| type.test value }
     end
-  end # Union
+  end # class Union
   
   
   # match any of the types
@@ -158,7 +167,7 @@ module NRSER::Types
     def test? value
       @types.all? { |type| type.test? value }
     end
-  end
+  end # class Intersection
   
   
   # match all of the types
@@ -179,7 +188,10 @@ module NRSER::Types
   end
   
   
-  def_factory :xor do |*types, **options|
+  def_factory(
+    :xor,
+    aliases: [ :exclusive_or, :only_one_of ],
+  ) do |*types, **options|
     XOR.new *types, **options
   end
   

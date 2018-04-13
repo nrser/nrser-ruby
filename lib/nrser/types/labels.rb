@@ -1,28 +1,5 @@
-# Requirements
-# =======================================================================
-
-# Stdlib
-# -----------------------------------------------------------------------
-
-# Deps
-# -----------------------------------------------------------------------
-
-# Project / Package
-# -----------------------------------------------------------------------
-
-
-# Refinements
-# =======================================================================
-
-require 'nrser/refinements'
-using NRSER
-
-
-# Declarations
-# =======================================================================
-
-module NRSER; end
-
+require_relative './combinators'
+require_relative './strings'
 
 # Definitions
 # =======================================================================
@@ -36,14 +13,10 @@ module NRSER::Types
   # 
   # @return [NRSER::Types::Type]
   # 
-  def self.label **options
-    if options.empty?
-      LABEL
-    else
-      union non_empty_str, non_empty_sym, **options
-    end
+  def_factory(
+    :label,
+  ) do |name: 'Label', **options|
+    union non_empty_str, non_empty_sym, **options
   end # .label
-  
-  LABEL = label( name: 'LabelType' ).freeze
   
 end # module NRSER::Types
