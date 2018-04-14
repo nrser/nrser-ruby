@@ -29,7 +29,7 @@
 # @todo document NRSER::Log::Mixin module.
 module NRSER::Log::Mixin
   
-  def self.included(base)
+  def self.included base
       base.extend SemanticLogger::Loggable::ClassMethods
       base.class_eval do
         # Returns [SemanticLogger::Logger] class level logger
