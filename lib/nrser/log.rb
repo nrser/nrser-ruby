@@ -97,7 +97,7 @@ module NRSER::Log
     #   if ref.weakref_alive?
     #     return
     # 
-    instance = NRSER::Log::Logger.new name
+    instance = NRSER::Log::Logger.new subject
   end
   
   
