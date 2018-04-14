@@ -11,7 +11,7 @@ module NRSER
   # @return [String]
   # 
   def self.format_exception e
-    "#{ e.message } (#{ e.class }):\n  #{ e.backtrace.join("\n  ") }"
+    "#{ e.to_s } (#{ e.class }):\n  #{ e.backtrace.join("\n  ") }"
   end
   
 end # module NRSER
