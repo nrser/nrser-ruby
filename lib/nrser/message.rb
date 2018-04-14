@@ -89,6 +89,27 @@ module NRSER
     end
     
     
+    def options
+      if args.last.is_a? Hash
+        args.last
+      else
+        {}
+      end
+    end
+    
+    
+    def symbolize_options
+      if args.last.is_a? Hash
+        self.class.new \
+          symbol,
+          *args[0..-2],
+          args.last.sym_keys
+      else
+        self
+      end
+    end
+    
+    
     # Creates a {Proc} that accepts a single `receiver` argument and calls
     # {#sent_to} on it, allowing messages to be used via the `&` operator
     # in `map`, etc.
