@@ -281,7 +281,7 @@ module NRSER::Types
     # 
     def from_s string
       unless has_from_s?
-        raise NoMethodError, "#from_s not defined"
+        raise NoMethodError, "#from_s not defined for type #{ name }"
       end
       
       value = if @from_s
