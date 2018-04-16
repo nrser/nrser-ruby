@@ -10,7 +10,7 @@ module NRSER::Types
   #   I think I want to get rid of {.where}... which would elevate this to
   #   it's own class as a "fundamental" concept (I guess)... not so sure,
   #   really. The idea of membership is pretty wide-spread and important,
-  #   but it's a bit a vague and inconsistently implemented things. 
+  #   but it's a bit a vague and inconsistently implemented things.
   # 
   # @param [#include?] group
   #   `#include?` will be called on this value to determine type membership.
@@ -21,9 +21,18 @@ module NRSER::Types
     :in,
     aliases: [ :member_of ],
   ) do |group, **options|
-    where( name: "In<#{ group }>", **options ) { |value|
-      group.include? value
-    }
+    unless group.respond_to? :include?
+      raise ArgumentError,
+        "In `group` must respond to `:include?`, found #{ group.inspect }"
+    end
+    
+    # TODO  This will get really unwieldy for big groups...
+    options[:name] ||= "In<#{ group }>"
+    
+    # Unless a `from_s` is provided, just use the identity
+    options[:from_s] ||= ->( s ) { s }
+    
+    where( **options ) { |value| group.include? value }
   end # .in
   
 end # module NRSER::Types
