@@ -22,12 +22,13 @@ module NRSER::Types
     aliases: [ :member_of ],
   ) do |group, **options|
     unless group.respond_to? :include?
-      raise ArgumentError,
-        "In `group` must respond to `:include?`, found #{ group.inspect }"
+      raise NRSER::ArgumentError,
+        "In `group` must respond to `:include?`",
+        group: group
     end
     
-    # TODO  This will get really unwieldy for big groups...
-    options[:name] ||= "In<#{ group }>"
+    # Provide a some-what useful default name
+    options[:name] ||= "In<#{ NRSER.smart_ellipsis group.inspect, 64 }>"
     
     # Unless a `from_s` is provided, just use the identity
     options[:from_s] ||= ->( s ) { s }
