@@ -281,15 +281,6 @@ module NRSER::NicerError
   end
   
   
-  # Get just the *summary/super-message*.
-  # 
-  # @return [String]
-  # 
-  def message
-    to_s extended: false
-  end
-  
-  
   # Should we add the extended message to {#to_s} output?
   # 
   # @todo
