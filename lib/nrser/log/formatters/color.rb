@@ -65,6 +65,31 @@ class NRSER::Log::Formatters::Color < ::SemanticLogger::Formatters::Color
   end # .default_color_map
   
   
+  # A **HACK** to get an {AwesomePrint::Formatter} to
+  # {AwesomePrint::Formatter#colorize} with by constructing a new
+  # {AwesomePrint::Inspector} and fishing it out of the `@formatter`
+  # instance variable.
+  # 
+  # This is only done once and the value is cached in a class variable.
+  # 
+  # @see .colorize
+  # 
+  # @private
+  # @return [AwesomePrint::Formatter]
+  # 
+  def self.ap_formatter
+    @@ap_formatter ||= \
+      AwesomePrint::Inspector.new.instance_variable_get :@formatter
+  end
+  
+  private_class_method :ap_formatter
+  
+  
+  def self.colorize string, type
+    ap_formatter.colorize string, type
+  end
+  
+  
   # Attributes
   # ======================================================================
   
@@ -73,7 +98,7 @@ class NRSER::Log::Formatters::Color < ::SemanticLogger::Formatters::Color
   # ======================================================================
   
   # Instantiate a new `ColorFormatter`.
-  def initialize  ap: {multiline: true},
+  def initialize  ap: {multiline: true, raw: true},
                   color_map: self.class.default_color_map,
                   time_format: ::SemanticLogger::Formatters::Base::TIME_FORMAT,
                   log_host: false,
@@ -89,10 +114,8 @@ class NRSER::Log::Formatters::Color < ::SemanticLogger::Formatters::Color
   # Instance Methods
   # ======================================================================
   
-  
   def name
-    form = AwesomePrint::Inspector.new.instance_variable_get :@formatter
-    form.colorize log.name, :class
+    self.class.colorize log.name, :class
   end
   
   
@@ -162,23 +185,6 @@ class NRSER::Log::Formatters::Color < ::SemanticLogger::Formatters::Color
     self.logger = logger
     
     render_log
-    
-    # [
-    #   time, # annoyingly noisy and don't really need for local CLI app
-    #   level,
-    #   process_info,
-    #   tags,
-    #   named_tags,
-    #   duration,
-    #   name,
-    # ].compact.join( ' ' ) +
-    # "\n" +
-    # [
-    #   message,
-    #   payload,
-    #   exception,
-    # ].compact.join(' ') +
-    # "\n" # I like extra newline to space shit out
     
   end # #call
   
