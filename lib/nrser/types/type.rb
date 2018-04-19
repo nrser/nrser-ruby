@@ -179,8 +179,13 @@ module NRSER::Types
     
     # Check that a `value` satisfies the type.
     # 
+    # @see #test?
+    # 
     # @return [Object]
     #   The value itself.
+    # 
+    # @raise [NRSER::Types::CheckError]
+    #   If the value does not satisfy this type.
     # 
     def check! value, &details
       # success case
