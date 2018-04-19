@@ -3,3 +3,5 @@
 --tag pure:"Pure Function"
 --tag status:"Status"
 --plugin yard-commonmarker
+--private
+--protected
