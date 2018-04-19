@@ -71,7 +71,7 @@ class NRSER::Props::Metadata
     @klass = klass
     @props = {}
     @invariants = Set.new
-    @storage
+    @storage = nil
   end # #initialize
   
   
@@ -130,7 +130,7 @@ class NRSER::Props::Metadata
   #   already all bound up on the class at this point), but why not?
   # 
   def prop name, **opts
-    t.sym.check name
+    t.non_empty_sym.check! name
     
     if @props.key? name
       raise ArgumentError.new binding.erb <<~END
@@ -143,18 +143,20 @@ class NRSER::Props::Metadata
     prop = NRSER::Props::Prop.new @klass, name, **opts
     @props[name] = prop
     
-    if prop.create_reader?
-      @klass.class_eval do
-        define_method prop.name do
-          prop.get self
+    prop.names.each do |name|
+      if prop.create_reader? name
+        @klass.class_eval do
+          define_method name do
+            prop.get self
+          end
         end
       end
-    end
-    
-    if prop.create_writer?
-      @klass.class_eval do
-        define_method "#{ prop.name }=" do |value|
-          prop.set self, value
+      
+      if prop.create_writer? name
+        @klass.class_eval do
+          define_method "#{ name }=" do |value|
+            prop.set self, value
+          end
         end
       end
     end

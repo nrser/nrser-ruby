@@ -96,6 +96,13 @@ class NRSER::Props::Prop
   attr_reader :source
   
   
+  # TODO document `aliases` attribute.
+  # 
+  # @return [Array<Symbol>]
+  #     
+  attr_reader :aliases
+  
+  
   # Constructor
   # =====================================================================
   
@@ -130,12 +137,15 @@ class NRSER::Props::Prop
                   source: nil,
                   to_data: nil,
                   from_data: nil,
-                  index: nil
+                  index: nil,
+                  reader: nil,
+                  writer: nil,
+                  aliases: []
     
     # Set these up first so {#to_s} works in case we need to raise errors.
     @defined_in = defined_in
     @name = t.sym.check name
-    @index = t.non_neg_int?.check index
+    @index = t.non_neg_int?.check! index
     @type = t.make type
     
     # Will be overridden in {#init_default!} if needed
@@ -143,6 +153,11 @@ class NRSER::Props::Prop
     
     @to_data = to_data
     @from_data = from_data
+    
+    @reader = t.bool?.check! reader
+    @writer = t.bool?.check! writer
+    
+    @aliases = t.array( t.sym ).check! aliases
     
     # Source
     
@@ -267,13 +282,21 @@ class NRSER::Props::Prop
   # Instance Methods
   # ============================================================================
   
+  def names
+    [name, *aliases]
+  end
+  
+  
   # Used by the {NRSER::Props::Props::ClassMethods.prop} "macro" method to
   # determine if it should create a reader method on the propertied class.
   # 
   # @return [Boolean]
   #   `true` if a reader method should be created for the prop value.
   # 
-  def create_reader?
+  def create_reader? name
+    # If the options was explicitly provided then return that
+    return @reader unless @reader.nil?
+    
     # Always create readers for primary props
     return true if primary?
     
@@ -297,7 +320,13 @@ class NRSER::Props::Prop
   # @return [Boolean]
   #   Always `false` for the moment.
   # 
-  def create_writer?
+  def create_writer? name
+    return @writer unless @writer.nil?
+    
+    storage_immutable = defined_in.metadata.storage.try( :immutable? )
+    
+    return !storage_immutable unless storage_immutable.nil?
+    
     false
   end # #create_writer?
   
@@ -435,13 +464,56 @@ class NRSER::Props::Prop
   end # #get
   
   
-  # @todo Document set method.
+  # Set a value for a the prop on an instance.
   # 
-  # @param [type] arg_name
-  #   @todo Add name param description.
+  # @param [NRSER::Props] instance
+  #   An instance of {#defined_in}.
   # 
-  # @return [return_type]
-  #   @todo Document return value.
+  # @param [*] value
+  #   A value that must satisfy {#type}.
+  # 
+  # @return [nil]
+  # 
+  # @raise [RuntimeError]
+  #   If you try to set a value for a prop that isn't {#primary?}.
+  # 
+  # @raise  (see #check!)
+  # 
+  def set instance, value
+    unless primary?
+      raise RuntimeError.new binding.erb <<~END
+        Only {#primary?} props can be set!
+        
+        Tried to set prop #{ prop.name } to value
+        
+            <%= value.pretty_inspect %>
+        
+        in instance
+        
+            <%= instance.pretty_inspect %>
+        
+      END
+    end
+    
+    instance.class.metadata.storage.put \
+      instance,
+      self,
+      check!( value )
+    
+    nil
+  end # #set
+  
+  
+  # Check that a value satisfies the {#type}, raising if it doesn't.
+  # 
+  # @param [VALUE] value
+  #   Value to check.
+  # 
+  # @return [VALUE]
+  #   `value` arg that was passed in.
+  # 
+  # @raise [NRSER::Types::CheckError]
+  #   If `value` does not satisfy {#type}.
   # 
   def check! value
     type.check!( value ) do
