@@ -25,7 +25,8 @@ require 'hamster'
 # We're not going to import all of it, but here we'll import the stuff we
 # always want to use and then add pieces in places as needed.
 # 
-require 'active_support/core_ext/object/json'
+require 'active_support/json'
+# require 'active_support/core_ext/object/json'
 
 
 # Hi there!
