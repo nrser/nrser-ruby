@@ -100,7 +100,7 @@ module NRSER::Types
   
   def_factory(
     :bool,
-    aliases: [:boolean],
+    aliases: [ :boolean ],
   ) do |**options|
     union self.true, self.false, **options
   end
