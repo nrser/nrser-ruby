@@ -381,7 +381,25 @@ module NRSER::Log
       sync: sync,
       header: header,
       **kwds
-  end # .setup_for_cli!
+  end # .setup_for_console!
+  
+  
+  # Call {.setup!} but provides default for running RSpec tests: sync,
+  # write to
+  # 
+  # @param  (see .setup!)
+  # @return (see .setup!)
+  # 
+  def self.setup_for_rspec! dest: $stderr,
+                              sync: true,
+                              header: { delete: :process_info },
+                              **kwds
+    setup! \
+      dest: dest,
+      sync: sync,
+      header: header,
+      **kwds
+  end # .setup_for_rspec!
   
   # @!endgroup Setup Class Methods
   
