@@ -147,5 +147,30 @@ module NRSER::Types
       name: name,
       **options
   end
-   
+  
+  
+  def_factory(
+    :Unsigned16BitInteger,
+    aliases: [ :uint16, :ushort ],
+  ) do |name: 'uint16', **options|
+    intersection \
+      int,
+      bounded( min: 0, max: ((2 ** 16) - 1) ),
+      name: name,
+      **options
+  end
+  
+  
+  # TODO  Move?
+  def_factory(
+    :UNIXPort,
+    aliases: [ :port, ],
+  ) do |name: 'port', **options|
+    intersection \
+      int,
+      bounded( min: 1, max: (2**16 - 1) ),
+      name: name,
+      **options
+  end
+  
 end # NRSER::Types
