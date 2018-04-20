@@ -40,7 +40,7 @@ describe_spec_file(
     
     describe_attribute :to_h do
       it { is_expected.to be_a Hash }
-      it { is_expected.to eq file: file, line: line }
+      it { is_expected.to eq( {file: file, line: line}.compact ) }
     end # Attribute to_h Description
     
   end # described_class from:
