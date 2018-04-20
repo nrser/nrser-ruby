@@ -356,11 +356,14 @@ module NRSER::Log
   # @param  (see .setup!)
   # @return (see .setup!)
   # 
-  def self.setup_for_cli! dest: $stderr,
+  def self.setup_for_CLI! dest: $stderr,
                           sync: true,
                           **kwds
     setup! dest: dest, sync: sync, **kwds
-  end # .setup_for_cli!
+  end # .setup_for_CLI!
+  
+  # Old name
+  singleton_class.send :alias_method, :setup_for_cli!, :setup_for_CLI!
   
   
   # Call {.setup!} with some default keywords that are nice for interactive
