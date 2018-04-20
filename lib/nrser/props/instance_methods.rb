@@ -27,7 +27,8 @@ module NRSER::Props; end
 # Definitions
 # =======================================================================
 
-# @todo document NRSER::Props::ClassMethods module.
+# Instance methods to mix in to classes that include {NRSER::Props}.
+# 
 module NRSER::Props::InstanceMethods
   
   # Initialize the properties from a hash.
@@ -68,10 +69,19 @@ module NRSER::Props::InstanceMethods
   # end # #initialize_props
   
   
-  def merge overrides = {}
-    self.class.new(
-      self.to_h(only_primary: true).merge(overrides.symbolize_keys)
-    )
+  # @param [Proc<(KEY, CURRENT, UPDATE) => VALUE>] &block
+  #   Optional block to handle conflicts.
+  # 
+  def merge other, &block
+    self.class.new \
+      self.to_h( only_primary: true ).
+      merge( other.symbolize_keys, &block )
+  end
+  
+  
+  def dup
+    self.class.new \
+      self.to_h( only_primary: true )
   end
   
   
@@ -116,7 +126,7 @@ module NRSER::Props::InstanceMethods
   # @param [String] class_key:
   #   Name for special class key.
   # 
-  # @return [Hash<String, Object>]
+  # @return [Hash<String, *>]
   #   Map of property names as strings to their "data" value, plus the special
   #   class identifier key and value, if requested.
   # 
@@ -126,7 +136,7 @@ module NRSER::Props::InstanceMethods
               class_key: '__class__'
               # class_key: NRSER::Props::DEFAULT_CLASS_KEY
               
-    self.class.props(only_own: false, only_primary: false).
+    self.class.props(only_own: only_own, only_primary: only_primary).
       map { |name, prop|
         [name.to_s, prop.to_data(self)]
       }.

@@ -88,6 +88,29 @@ class NRSER::Props::Metadata
   end
   
   
+  def get_prop name
+    name = name.to_s.to_sym unless name.is_a?( Symbol )
+    
+    return @props[name] if @props.key?( name )
+    
+    if superclass_has_metadata?
+      superclass_metadata.get_prop name
+    else
+      nil
+    end
+  end
+  
+  alias_method :[], :get_prop
+  
+  
+  # @todo
+  #   Cache / optimize
+  # 
+  def prop_names only_own: false, only_primary: false
+    Set.new props( only_own: only_own, only_primary: only_primary ).keys
+  end
+  
+  
   # Get a map of property names to property instances.
   # 
   # @param [Boolean] only_own:
@@ -319,6 +342,17 @@ class NRSER::Props::Metadata
     else
       @storage = value
     end
+  end
+  
+  
+  def freeze
+    super()
+  
+    if  superclass_has_metadata? &&
+        !superclass_metadata.frozen?
+      superclass_metadata.freeze
+    end
+    
   end
   
   

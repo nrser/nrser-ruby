@@ -30,9 +30,11 @@ module NRSER::Props::Storage; end
 # @todo document NRSER::Props::Storage::Key module.
 class NRSER::Props::Storage::Key
   
-  def initialize immutable:, key_type:
+  def initialize immutable:, key_type:, get: :[], put: :[]=
     @immutable = !!immutable
     @key_type = key_type
+    @get_method_name = get
+    @put_method_name = put
   end
   
   # Instance Methods
@@ -54,7 +56,7 @@ class NRSER::Props::Storage::Key
   
   
   def get instance, prop
-    instance[key_for( prop )]
+    instance.send @get_method_name, key_for( prop )
   end
   
   
@@ -80,7 +82,7 @@ class NRSER::Props::Storage::Key
       END
     end
     
-    instance[key] = value
+    instance.send @put_method_name, key, value
   end
   
 end # class NRSER::Props::Storage::Key
