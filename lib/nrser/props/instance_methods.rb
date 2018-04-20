@@ -96,10 +96,14 @@ module NRSER::Props::InstanceMethods
   # @return [Hash<Symbol, Object>]
   #   Map of prop names to values.
   # 
-  def to_h only_own: false, only_primary: false
-    self.class.
+  def to_h only_own: false, only_primary: false, compact: true
+    hash = self.class.
       props(only_own: only_own, only_primary: only_primary).
       transform_values { |prop| prop.get self }
+    
+    hash.compact! if compact
+    
+    hash
   end # #to_h
   
   
@@ -133,17 +137,20 @@ module NRSER::Props::InstanceMethods
   def to_data only_own: false,
               only_primary: false,
               add_class: true,
-              class_key: '__class__'
+              class_key: '__class__',
+              compact: true
               # class_key: NRSER::Props::DEFAULT_CLASS_KEY
               
-    self.class.props(only_own: only_own, only_primary: only_primary).
+    hash = self.class.props(only_own: only_own, only_primary: only_primary).
       map { |name, prop|
         [name.to_s, prop.to_data(self)]
       }.
-      to_h.
-      tap { |hash|
-        hash[class_key] = self.class.safe_name if add_class
-      }
+      to_h
+    
+    hash.compact! if compact
+    hash[class_key] = self.class.safe_name if add_class
+    
+    hash
   end # #to_data
   
   
