@@ -2,11 +2,10 @@
 # frozen_string_literal: true
 
 
-
 # Refinements
 # =======================================================================
 
-using NRSER
+require 'nrser/refinements/types'
 using NRSER::Types
 
 
