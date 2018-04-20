@@ -48,6 +48,7 @@ module NRSER::Props::Immutable::Hash
     base.metadata.freeze
     
     base.extend ClassMethods
+    base.include InstanceMethods
   end
   
   
@@ -79,31 +80,32 @@ module NRSER::Props::Immutable::Hash
     end
   end # module ClassMethods
   
-  
-  # Constructor
-  # ----------------------------------------------------------------------------
-  
-  # Since including classes are using themselves as storage, we need to tap
-  # into the `#initialize` chain in order to load property values from sources
-  # and pass an {Array} up to the super-method to instantiate the
-  # {Hamster::Hash}.
-  # 
-  def initialize values = {}
-    # Handles things like `[[:x, 1], [:y, 2]]`
-    values = values.to_h unless values.respond_to?( :each_pair )
+  module InstanceMethods
+    # Constructor
+    # ----------------------------------------------------------------------------
     
-    super_values = {}
-    
-    self.class.metadata.each_primary_prop_value_from( values ) { |prop, value|
-      super_values[prop.name] = value
-    }
-    
-    super super_values
-    
-    # Check additional type invariants
-    self.class.invariants.each do |type|
-      type.check self
-    end
-  end # #initialize
+    # Since including classes are using themselves as storage, we need to tap
+    # into the `#initialize` chain in order to load property values from sources
+    # and pass an {Array} up to the super-method to instantiate the
+    # {Hamster::Hash}.
+    # 
+    def initialize values = {}
+      # Handles things like `[[:x, 1], [:y, 2]]`
+      values = values.to_h unless values.respond_to?( :each_pair )
+      
+      super_values = {}
+      
+      self.class.metadata.each_primary_prop_value_from( values ) { |prop, value|
+        super_values[prop.name] = value
+      }
+      
+      super super_values
+      
+      # Check additional type invariants
+      self.class.invariants.each do |type|
+        type.check self
+      end
+    end # #initialize
+  end
   
 end # module NRSER::Props::Immutable::Hash
