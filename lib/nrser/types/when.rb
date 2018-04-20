@@ -69,6 +69,17 @@ module NRSER::Types
       @object.inspect
     end
     
+    
+    def has_from_s?
+      @from_s || object.respond_to?( :from_s )
+    end
+    
+    
+    def custom_from_s string
+      object.from_s string
+    end
+    
+    
     # If {#object} responds to `#from_data`, call that and check results.
     # 
     # Otherwise, forward up to {NRSER::Types::Type#from_data}.
