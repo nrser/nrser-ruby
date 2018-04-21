@@ -33,6 +33,8 @@ module NRSER::Props; end
 # 
 module NRSER::Props::ClassMethods
   
+  include NRSER::Log::Mixin
+  
   # Get the metadata object for this class, creating it if it doesn't exist.
   # 
   # @return [NRSER::Props::Metadata]
@@ -84,7 +86,7 @@ module NRSER::Props::ClassMethods
     values = {}
     props = self.props
     
-    data.each_pair { |data_key, data_value|
+    data.each_pair do |data_key, data_value|
       prop_key = case data_key
       when Symbol
         data_key
@@ -93,10 +95,10 @@ module NRSER::Props::ClassMethods
       end
       
       if  prop_key &&
-          prop = props[prop_key]
+          (prop = props[prop_key])
         values[prop_key] = prop.value_from_data data_value
       end
-    }
+    end
     
     self.new values
   end # #from_data
