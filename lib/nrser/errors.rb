@@ -54,7 +54,7 @@ module NRSER
         headline = "#{ errors.count } error(s) occurred - #{ class_counts }"
       end
       
-      message = NRSER.erb binding, <<-END
+      message = binding.erb <<-END
         <%= headline %>
         
         <% errors.each_with_index do |error, index| %>
