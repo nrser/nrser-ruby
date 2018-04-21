@@ -603,13 +603,12 @@ class NRSER::Props::Prop
   end # #to_data
   
   
-  # @todo Document value_from_data method.
+  # Load a value for the prop from "data".
   # 
-  # @param [type] arg_name
-  #   @todo Add name param description.
+  # @param [*] data
   # 
-  # @return [return_type]
-  #   @todo Document return value.
+  # @return [VALUE]
+  #   The prop value to use.
   # 
   def value_from_data data
     value = case @from_data
