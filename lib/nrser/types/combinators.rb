@@ -102,6 +102,35 @@ module NRSER::Types
     end # has_from_s
     
     
+    def has_from_data?
+      @types.any? { |type| type.has_from_data? }
+    end
+    
+    
+    # Overridden to
+    def from_data data
+      unless has_from_data?
+        raise NoMethodError, "#from_data not defined"
+      end
+      
+      errors = []
+      
+      types.each do |type|
+        if type.has_from_data?
+          begin
+            return check!( type.from_data data )
+          rescue Exception => error
+            errors << error
+          end
+        end
+      end
+      
+      raise NRSER::MultipleErrors.new \
+        errors,
+        headline: "No type successfully loaded data"
+    end
+    
+    
     # Overridden to delegate functionality to the combined types:
     # 
     # A combinator can convert a value to data if *any* of it's types can.
