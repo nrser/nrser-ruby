@@ -77,14 +77,26 @@ module NRSER::Props::ClassMethods
   # @todo
   #   This needs to be extended to handle prop'd classes nested in
   #   arrays and hashes... but for the moment, it is what it is.
+  #   
+  #   This *may* have been fixed...?
   # 
-  # @param [Hash<String, Object>] data
+  # @param [#each_pair] data
   # 
   # @return [self]
+  # 
+  # @raise [NRSER::ArgumentError]
+  #   If `data` does not respond to `#each_pair`.
   # 
   def from_data data
     values = {}
     props = self.props
+    
+    unless data.respond_to? :each_pair
+      raise NRSER::ArgumentError.new \
+        "`data` argument must respond to `#each_pair`",
+        data: data,
+        class: self
+    end
     
     data.each_pair do |data_key, data_value|
       prop_key = case data_key
