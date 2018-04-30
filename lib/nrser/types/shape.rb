@@ -9,6 +9,17 @@ module NRSER::Types
   
   class Shape < Type
     
+    
+    # Attributes
+    # ========================================================================
+    
+    # TODO document `pairs` attribute.
+    # 
+    # @return [Hash]
+    #     
+    attr_reader :pairs
+    
+    
     # Constructor
     # ======================================================================
     
@@ -17,7 +28,7 @@ module NRSER::Types
       super **options
       @pairs = pairs.map { |k, v|
         [k, NRSER::Types.make( v )]
-      }.to_h
+      }.to_h.freeze
     end # #initialize
     
     
@@ -44,6 +55,17 @@ module NRSER::Types
       else
         '(' + inner + ')'
       end
+    end
+    
+    def has_from_data?
+      pairs.values.all? { |type| type.has_from_data? }
+    end
+    
+    
+    def custom_from_data data
+      pairs.map { |key, type|
+        [ key, type.from_data( data[key] ) ]
+      }.to_h
     end
     
   end # class Shape
