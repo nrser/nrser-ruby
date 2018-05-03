@@ -132,7 +132,7 @@ module NRSER
     # 
     glob = looks_globish?( rel_path ) if glob == :guess
     
-    found = find_map( pn_from( from ).ascend ) { |dir|
+    found = pn_from( from ).ascend.find_map { |dir|
       path = dir / rel_path
       
       found_path = if glob
