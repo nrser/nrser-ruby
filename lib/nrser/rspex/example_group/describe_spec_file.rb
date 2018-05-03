@@ -71,14 +71,19 @@ module NRSER::RSpex::ExampleGroup
       end
     end
     
-    describe_x(
+    describe_x_body = if chain.empty?
+      body
+    else
+      -> { dive_x *chain, bind_subject: bind_subject, &body }
+    end
+    
+    describe_x \
       NRSER::RSpex.dot_rel_path( spec_path ),
       *description,
       type: :spec_file,
       metadata: metadata,
-    ) do
-      dive_x *chain, bind_subject: bind_subject, &body
-    end
+      &describe_x_body
+    
   end # #describe_spec_file
   
 end # module NRSER::RSpex::ExampleGroup
