@@ -142,7 +142,7 @@ module NRSER
     count = enum.count
     
     unless count == 1
-      message = erb binding, <<-END
+      message = binding.erb <<-END
         Expected enumerable to have #count == 1 but it has
         
         #count = <%= enum.count %>
