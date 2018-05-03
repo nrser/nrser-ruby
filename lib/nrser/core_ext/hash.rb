@@ -19,6 +19,9 @@ class Hash
   def str_keys! *args, &block;  stringify_keys! *args, &block;  end
   def str_keys  *args, &block;  stringify_keys  *args, &block;  end
   
+  def to_options! *args, &block;  symbolize_keys! *args, &block;  end
+  def to_options  *args, &block;  symbolize_keys  *args, &block;  end
+  
   
   # See {NRSER.bury!}
   def bury! key_path,
