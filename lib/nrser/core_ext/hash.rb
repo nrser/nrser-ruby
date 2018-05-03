@@ -9,11 +9,15 @@ class Hash
   include NRSER::Ext::Tree
   
   # Short names
-  alias_method :sym_keys!,  :symbolize_keys!
-  alias_method :sym_keys,   :symbolize_keys
+  # 
+  # NOTE  If we use `alias_method` here it breaks subclasses that override
+  #       `#symbolize_keys`, etc. - like {HashWithIndifferentAccess}
+  # 
+  def sym_keys! *args, &block;  symbolize_keys! *args, &block;  end
+  def sym_keys  *args, &block;  symbolize_keys  *args, &block;  end
   
-  alias_method :str_keys!,  :stringify_keys!
-  alias_method :str_keys,   :stringify_keys
+  def str_keys! *args, &block;  stringify_keys! *args, &block;  end
+  def str_keys  *args, &block;  stringify_keys  *args, &block;  end
   
   
   # See {NRSER.bury!}
