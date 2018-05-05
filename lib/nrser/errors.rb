@@ -16,14 +16,10 @@ require_relative './errors/count_error'
 require_relative './errors/argument_error'
 require_relative './errors/type_error'
 require_relative './errors/abstract_method_error'
+require_relative './errors/conflict_error'
 
 
 module NRSER
-  
-  # Indicates some piece of application state is in conflict with the attempted
-  # operation.
-  class ConflictError < StandardError; end
-  
   
   # A wrapper error around a list of other errors.
   # 
