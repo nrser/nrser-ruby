@@ -85,6 +85,21 @@ module NRSER::Types
   end
   
   
+  # A relative path.
+  # 
+  # @todo
+  #   Quick addition, not sure if it's totally right with regard to tilde
+  #   paths and such.
+  # 
+  def_factory :rel_path do |name: 'RelPath', **options|
+    intersection \
+      path,
+      ~abs_path,
+      name: name,
+      **options
+  end
+  
+  
   # A {NRSER::Types.path} that is a directory.
   # 
   # @param [Hash] **options
