@@ -151,6 +151,9 @@ module NRSER::Types
   # 
   # @return [NRSER::Types::Type]
   # 
+  # @todo
+  #   Make `list` into it's own looser interface for "array-like" object API.
+  # 
   def_factory(
     :array,
     aliases: [:list],

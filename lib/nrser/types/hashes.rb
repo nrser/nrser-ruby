@@ -191,9 +191,12 @@ module NRSER::Types
   # @return [NRSER::Types::Type]
   #   Newly constructed hash type from `args`.
   # 
+  # @todo
+  #   Make `map` into it's own looser interface for "hash-like" object API.
+  # 
   def_factory(
     :hash_type,
-    aliases: [ :dict, :hash_ ]
+    aliases: [ :dict, :hash_, :map ]
   ) do |**kwds|
     if kwds.key?( :keys ) || kwds.key?( :values )
       HashOfType.new **kwds
