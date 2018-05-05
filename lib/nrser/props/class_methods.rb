@@ -115,4 +115,23 @@ module NRSER::Props::ClassMethods
     self.new values
   end # #from_data
   
+  
+  # Get an instance from a source.
+  # 
+  # @experimental
+  # 
+  # @param [self | String | Hash] source
+  # @return [self]
+  # 
+  def self.from source
+    return source if source.is_a?( self )
+    return from_s( source ) if source.is_a?( String )
+    return from_data( source ) if source.respond_to?( :each_pair )
+    return from_data( source.to_h ) if source.respond_to?( :to_h )
+    
+    raise NRSER::ArgumentError.new \
+      "Unable to load #{ self } from source",
+      source: source
+  end # .from
+  
 end # module NRSER::Props::ClassMethods
