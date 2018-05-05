@@ -62,6 +62,15 @@ module NRSER::Props::ClassMethods
   end
   
   
+  def prop_for name_or_alias, *props_args
+    sym = name_or_alias.to_sym
+    
+    props( *props_args ).each_value.find { |prop|
+      prop.name == sym || prop.aliases.include?( sym )
+    }
+  end
+  
+  
   def invariants *args, &block
     metadata.invariants *args, &block
   end
@@ -89,7 +98,6 @@ module NRSER::Props::ClassMethods
   # 
   def from_data data
     values = {}
-    props = self.props
     
     unless data.respond_to? :each_pair
       raise NRSER::ArgumentError.new \
@@ -107,7 +115,7 @@ module NRSER::Props::ClassMethods
       end
       
       if  prop_key &&
-          (prop = props[prop_key])
+          (prop = prop_for( prop_key, only_primary: true ))
         values[prop_key] = prop.value_from_data data_value
       end
     end

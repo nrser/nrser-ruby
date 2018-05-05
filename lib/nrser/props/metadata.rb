@@ -38,6 +38,12 @@ class NRSER::Props::Metadata
   VARIABLE_NAME = :@__NRSER_metadata__
   
   
+  # Mixins
+  # ========================================================================
+  
+  include NRSER::Log::Mixin
+  
+  
   # Class Methods
   # ======================================================================
   
@@ -217,6 +223,24 @@ class NRSER::Props::Metadata
   def each_primary_prop_value_from values, &block
     primary_props = props only_primary: true
     
+    props_by_names_and_aliases = {}
+    primary_props.each_value do |prop|
+      [prop.name, *prop.aliases].each do |sym|
+        if props_by_names_and_aliases.key? sym
+          other_prop = props_by_names_and_aliases[sym]
+          
+          prop_sym_is = sym == prop.name ? 'name' : 'alias'
+          other_prop_sym_is = sym == other_prop.name ? 'name' : 'alias'
+          
+          raise NRSER::ConflictError.new \
+            "Prop",  prop.to_desc, prop_sym_is, sym.inspect,
+            "conflicts with", other_prop.to_desc, "of", other_prop_sym_is
+        end
+        
+        props_by_names_and_aliases[sym] = prop
+      end
+    end
+    
     # Normalize values to a `Hash<Symbol, VALUE>` so everything can deal with
     # one form. Default values will be set here as they're resolved and made
     # available to subsequent {Prop#default} calls.
@@ -237,9 +261,9 @@ class NRSER::Props::Metadata
         # If the `name` corresponds to a primary prop set it in the values by
         # name
         # 
-        # TODO  Should check that the name is not already set?
-        # 
-        values_by_name[name] = value if primary_props.key? name
+        if props_by_names_and_aliases.key? name
+          values_by_name[ props_by_names_and_aliases[name].name ] = value
+        end
       }
     elsif values.respond_to? :each_index
       indexed = []
@@ -262,6 +286,14 @@ class NRSER::Props::Metadata
         
       END
     end
+    
+    # Way to noisy, even for trace
+    # logger.trace "Ready to start loading values",
+    #   values: values,
+    #   values_by_name: values_by_name,
+    #   props_by_names_and_aliases: props_by_names_and_aliases.map { |k, v|
+    #     [ k, v.to_desc ]
+    #   }.to_h
     
     # Topological sort the primary props by their default dependencies.
     # 

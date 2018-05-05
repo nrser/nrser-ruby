@@ -18,11 +18,11 @@ require 'nrser/refinements/types'
 using NRSER::Types
 
 
-# Declarations
+# Namespace
 # =======================================================================
 
-module NRSER; end
-module NRSER::Props; end
+module NRSER
+module Props
 
 
 # Definitions
@@ -33,9 +33,16 @@ module NRSER::Props; end
 # 
 # Props are immutable by design.
 # 
-class NRSER::Props::Prop
+class Prop
+  
+  # Mixins
+  # ========================================================================
   
   include NRSER::Log::Mixin
+  
+  
+  # Attributes
+  # ========================================================================
   
   # The class the prop was defined in.
   # 
@@ -154,8 +161,17 @@ class NRSER::Props::Prop
     @to_data = to_data
     @from_data = from_data
     
-    @reader = t.bool?.check! reader
-    @writer = t.bool?.check! writer
+    @reader, @writer = [ reader, writer ].map do |value|
+      t.match value,
+        t.bool?,
+          value,
+          
+        t.hash_( keys: t.sym, values: t.bool ),
+          :freeze.to_proc,
+          
+        t.hash_( keys: t.label, values: t.bool ),
+          ->( hash ) { hash.map { |k, v| [ k.to_sym, v ] }.to_h.freeze }
+    end
     
     @aliases = t.array( t.sym ).check! aliases
     
@@ -201,7 +217,7 @@ class NRSER::Props::Prop
           defaults don't make any sense.
           
           Attempted to construct prop <%= name.inspect %> for class
-          {<%= defined_in.name %>} with:
+          {<%= defined_in_name %>} with:
           
           default:
           
@@ -267,7 +283,7 @@ class NRSER::Props::Prop
               <%= default.pretty_inspect %>
           
           when constructing prop <%= name.inspect %>
-          for class <%= defined_in.name %>
+          for class <%= defined_in_name %>
         END
       end
         
@@ -290,12 +306,27 @@ class NRSER::Props::Prop
   # Used by the {NRSER::Props::Props::ClassMethods.prop} "macro" method to
   # determine if it should create a reader method on the propertied class.
   # 
+  # @param [Symbol] name
+  #   The prop name or alias in question.
+  # 
   # @return [Boolean]
   #   `true` if a reader method should be created for the prop value.
   # 
   def create_reader? name
-    # If the options was explicitly provided then return that
-    return @reader unless @reader.nil?
+    t.sym.check! name
+    
+    # If the options was explicitly provided then use that
+    case @reader
+    when nil
+      # Fall through
+    when Hash
+      return @reader[name] if @reader.key? name
+      # else fall through
+    when true, false
+      return @reader
+    end
+        
+    # return @reader unless @reader.nil?
     
     # Always create readers for primary props
     return true if primary?
@@ -321,7 +352,16 @@ class NRSER::Props::Prop
   #   Always `false` for the moment.
   # 
   def create_writer? name
-    return @writer unless @writer.nil?
+    # If the options was explicitly provided then use that
+    case @writer
+    when nil
+      # Fall through
+    when Hash
+      return @writer[name] if @writer.key? name
+      # else fall through
+    when true, false
+      return @writer
+    end
     
     storage_immutable = defined_in.metadata.storage.try( :immutable? )
     
@@ -329,6 +369,12 @@ class NRSER::Props::Prop
     
     false
   end # #create_writer?
+  
+  
+  def defined_in_name
+    return defined_in.safe_name if defined_in.respond_to?( :safe_name )
+    defined_in.to_s
+  end
   
   
   # Full name with class prop was defined in.
@@ -340,7 +386,7 @@ class NRSER::Props::Prop
   # @return [String]
   # 
   def full_name
-    "#{ defined_in.name }##{ name }"
+    "#{ defined_in_name }##{ name }"
   end # #full_name
   
   
@@ -616,7 +662,9 @@ class NRSER::Props::Prop
       # This {Prop} does not have any custom `from_data` instructions, which
       # means we must rely on the {#type} to covert *data* to a *value*.
       # 
-      if type.has_from_data?
+      if data.is_a?( String ) && type.has_from_s?
+        type.from_s data
+      elsif type.has_from_data?
         type.from_data data
       else
         data
@@ -660,11 +708,23 @@ class NRSER::Props::Prop
   end # #value_from_data
   
   
+  def to_desc
+    "#{ full_name }:#{ type }"
+  end
+  
+  
   # @return [String]
   #   a short string describing the instance.
   # 
   def to_s
-    "#<#{ self.class.safe_name } #{ full_name }:#{ type }>"
+    "#<#{ self.class.safe_name } #{ to_desc }>"
   end # #to_s
   
-end # class NRSER::Props::Prop
+end # class Prop
+
+
+# /Namespace
+# =======================================================================
+
+end # module Props
+end # module NRSER
