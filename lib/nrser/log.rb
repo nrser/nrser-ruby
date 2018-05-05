@@ -560,9 +560,16 @@ module NRSER::Log
     end
     
     if will_say_hi
+      loggable_dest = case dest
+      when Hash
+        dest.map { |k, v| [ k, v.to_s.truncate( 42 ) ] }.to_h
+      else
+        dest.to_s.truncate 42
+      end
+      
       logger.info "Hi! Logging is setup",
         level: self.level,
-        dest: dest,
+        dest: loggable_dest,
         sync: sync
     end
     
