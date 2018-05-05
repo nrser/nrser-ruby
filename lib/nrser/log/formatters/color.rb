@@ -98,7 +98,7 @@ class NRSER::Log::Formatters::Color < ::SemanticLogger::Formatters::Color
   # ======================================================================
   
   # Instantiate a new `ColorFormatter`.
-  def initialize  ap: {multiline: true, raw: true},
+  def initialize  ap: {multiline: true }, # raw: true},
                   color_map: self.class.default_color_map,
                   time_format: ::SemanticLogger::Formatters::Base::TIME_FORMAT,
                   log_host: false,
