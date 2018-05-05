@@ -21,12 +21,14 @@ class String
   end
   
   
-  # See {NRSER.constantize}
-  def constantize
-    NRSER.constantize self
+  def to_const
+    safe_constantize
   end
   
-  alias_method :to_const, :constantize
+  
+  def to_const!
+    constantize
+  end
   
   
   # @return [Pathname]

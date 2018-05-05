@@ -233,59 +233,6 @@ module NRSER
     
   end # .smart_ellipsis
   
-  
-  # Get the constant identified by a string.
-  # 
-  # @pure Return value depends only on parameters.
-  # 
-  # @example
-  #   
-  #   SomeClass == NRSER.constantize(SomeClass.name)
-  # 
-  # Lifted from ActiveSupport.
-  # 
-  # @param [String] camel_cased_word
-  #   The constant's camel-cased, double-colon-separated "name",
-  #   like "NRSER::Types::Array".
-  # 
-  # @return [Object]
-  # 
-  # @raise [NameError]
-  #   When the name is not in CamelCase or is not initialized.
-  # 
-  def self.constantize(camel_cased_word)
-    names = camel_cased_word.split('::')
-
-    # Trigger a built-in NameError exception including the ill-formed constant in the message.
-    Object.const_get(camel_cased_word) if names.empty?
-
-    # Remove the first blank element in case of '::ClassName' notation.
-    names.shift if names.size > 1 && names.first.empty?
-
-    names.inject(Object) do |constant, name|
-      if constant == Object
-        constant.const_get(name)
-      else
-        candidate = constant.const_get(name)
-        next candidate if constant.const_defined?(name, false)
-        next candidate unless Object.const_defined?(name)
-
-        # Go down the ancestors to check if it is owned directly. The check
-        # stops when we reach Object or the end of ancestors tree.
-        constant = constant.ancestors.inject do |const, ancestor|
-          break const    if ancestor == Object
-          break ancestor if ancestor.const_defined?(name, false)
-          const
-        end
-
-        # owner is in Object, so raise
-        constant.const_get(name, false)
-      end
-    end
-  end # .constantize
-  
-  singleton_class.send :alias_method, :to_const, :constantize
-  
   # @!endgroup String Functions
   
 end # module NRSER
