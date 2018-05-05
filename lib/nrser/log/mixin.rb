@@ -85,13 +85,13 @@ module NRSER::Log::Mixin
   def logger
     return @semantic_logger if @semantic_logger
     
-    if respond_to? :create_logger, true
+    if respond_to?( :create_logger, true )
       @semantic_logger = begin
         create_logger
       rescue Exception => error
         self.class.logger.warn \
           "Error creating instance logger",
-          instance: self.inspect,
+          { instance: self.inspect },
           error
         
         self.class.logger
