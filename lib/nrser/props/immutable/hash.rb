@@ -95,9 +95,10 @@ module NRSER::Props::Immutable::Hash
       
       super_values = {}
       
-      self.class.metadata.each_primary_prop_value_from( values ) { |prop, value|
-        super_values[prop.name] = value
-      }
+      self.class.metadata.
+        each_primary_prop_value_from( values ) { |prop, value|
+          super_values[prop.name] = value
+        }
       
       super super_values
       
