@@ -137,9 +137,8 @@ module NRSER::Props::InstanceMethods
   def to_data only_own: false,
               only_primary: false,
               add_class: true,
-              class_key: '__class__',
+              class_key: NRSER::Props::DEFAULT_CLASS_KEY,
               compact: true
-              # class_key: NRSER::Props::DEFAULT_CLASS_KEY
               
     hash = self.class.props(only_own: only_own, only_primary: only_primary).
       map { |name, prop|
