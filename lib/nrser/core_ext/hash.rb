@@ -4,6 +4,7 @@ require 'nrser/ext/tree'
 
 require_relative './hash/extract_values_at'
 require_relative './hash/transform_values_with_keys'
+require_relative './hash/bury'
 
 class Hash
   include NRSER::Ext::Tree
@@ -21,20 +22,6 @@ class Hash
   
   def to_options! *args, &block;  symbolize_keys! *args, &block;  end
   def to_options  *args, &block;  symbolize_keys  *args, &block;  end
-  
-  
-  # See {NRSER.bury!}
-  def bury! key_path,
-            value,
-            parsed_key_type: :guess,
-            clobber: false
-    NRSER.bury! self,
-                key_path,
-                value,
-                parsed_key_type: parsed_key_type,
-                clobber: clobber
-  end
-  
   
   # Checks that `self` contains a single key/value pair (`#length` of 1)
   # and returns it as an array of length 2.
