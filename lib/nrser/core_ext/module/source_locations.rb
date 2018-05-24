@@ -101,7 +101,8 @@ class Module
   def own_instance_method_locations sort: true,
                                     include_initialize: false,
                                     only_valid: false
-    instance_method_locations sort: sort,
+    instance_method_locations false,
+                              sort: sort,
                               include_initialize: include_initialize,
                               only_valid: only_valid
   end
