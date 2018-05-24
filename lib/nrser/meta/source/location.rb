@@ -78,7 +78,27 @@ class NRSER::Meta::Source::Location < Hamster::Vector
   # Props
   # ======================================================================
   
+  # @!attribute [r] file
+  #   The first entry in the source location array, denoting the file path.
+  #   
+  #   @return [String]
+  #     Source file absolute path.
+  #   
+  #   @return [nil]
+  #     No source file available.
+  #   
   prop  :file, type: t.abs_path?, default: nil, index: 0
+  
+  
+  # @!attribute [r] line
+  #   The second entry in the source location array, denoting the line number.
+  #   
+  #   @return [Integer]
+  #     Positive integer line number in the source {#file}.
+  #   
+  #   @return [nil]
+  #     No line number available.
+  #   
   prop  :line, type: t.pos_int?, default: nil, index: 1
   
   
