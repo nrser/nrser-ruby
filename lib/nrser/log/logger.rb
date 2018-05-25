@@ -64,6 +64,41 @@ class NRSER::Log::Logger < SemanticLogger::Logger
   end # class Catcher
   
   
+  class Notifier
+    
+    # Construction
+    # ========================================================================
+    
+    # Instantiate a new `Notifier`.
+    # 
+    # @param [NRSER::Log::Logger] logger
+    #   The logger to use if the block raises.
+    # 
+    # @param [*] on_fail:
+    #   Value to return when `&block` raises.
+    # 
+    def initialize logger
+      @logger = logger
+    end # #initialize
+    
+    
+    # Instance Methods
+    # ========================================================================
+    
+    SemanticLogger::LEVELS.each do |level|
+      define_method level do |message = nil, payload = nil, &block|
+        begin
+          block.call
+        rescue Exception => error
+          @logger.send level, message, payload, error
+          @on_fail
+        end
+      end
+    end
+    
+  end
+  
+  
   # Attributes
   # ========================================================================
   
