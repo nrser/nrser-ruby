@@ -160,6 +160,8 @@ module NRSER::NicerError
   #   The formatted string for the segment.
   # 
   def format_message_segment segment
+    return segment.to_summary if segment.respond_to?( :to_summary )
+    
     return segment if String === segment
     
     # TODO  Do better!
