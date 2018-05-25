@@ -4,20 +4,10 @@
 # Requirements
 # =======================================================================
 
-# Stdlib
-# -----------------------------------------------------------------------
-
 # Deps
 # -----------------------------------------------------------------------
 
 require 'method_decorators'
-
-# Project / Package
-# -----------------------------------------------------------------------
-
-
-# Refinements
-# =======================================================================
 
 
 # Namespace
@@ -29,17 +19,19 @@ module  NRSER
 # Definitions
 # =======================================================================
 
-# @todo document LazyAttr class.
+# Store the result of an attribute method (no args) in an instance variable
+# of the same name and return that value on subsequent calls.
+# 
 class LazyAttr < MethodDecorators::Decorator
   
-  
-  # @todo Document instance_var_name method.
+  # Get the instance variable name for a target method.
   # 
-  # @param [type] arg_name
-  #   @todo Add name param description.
+  # @param [Method] target_method
+  #   The method the decorator is decorating.
   # 
-  # @return [return_type]
-  #   @todo Document return value.
+  # @return [String]
+  #   The name of the instance variable, ready to be provided to
+  #   `#instance_variable_set` (has `@` prefix).
   # 
   def self.instance_var_name target_method
     name = target_method.name.to_s
@@ -55,13 +47,30 @@ class LazyAttr < MethodDecorators::Decorator
   end # .instance_var_name
   
   
-  # @todo Document call method.
+  # Execute the decorator.
   # 
-  # @param [type] arg_name
-  #   @todo Add name param description.
+  # @param [Method] target_method
+  #   The decorated method, already bound to the receiver.
+  #   
+  #   The `method_decorators` gem calls this `orig`, but I thought
+  #   `target_method` made more sense.
   # 
-  # @return [return_type]
-  #   @todo Document return value.
+  # @param [*] receiver
+  #   The object that will receive the call to `target`.
+  #   
+  #   The `method_decorators` gem calls this `this`, but I thought `receiver`
+  #   made more sense.
+  #   
+  #   It's just `target.receiver`, but the API is how it is.
+  # 
+  # @param [Array] *args
+  #   Any arguments the decorated method was called with.
+  # 
+  # @param [Proc?] &block
+  #   The block the decorated method was called with (if any).
+  # 
+  # @return
+  #   Whatever `target_method` returns.
   # 
   def call target_method, receiver, *args, &block
     unless target_method.parameters.empty?
@@ -97,7 +106,6 @@ class LazyAttr < MethodDecorators::Decorator
   end # #call
   
 end # class LazyAttr
-
 
 
 # /Namespace
