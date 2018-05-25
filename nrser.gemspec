@@ -47,6 +47,9 @@ Gem::Specification.new do |spec|
   # All sorts of goodies (and monkey business)
   spec.add_dependency 'activesupport', '~> 5.1'
   
+  # Python-like method decorators (one part of Python I really still like!)
+  spec.add_dependency 'method_decorators', '~> 0.9.6'
+  
   # Development Dependencies
   # ----------------------------------------------------------------------------
 
