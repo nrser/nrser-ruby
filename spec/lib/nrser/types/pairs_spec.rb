@@ -1,8 +1,3 @@
-require 'spec_helper'
-
-require 'nrser/refinements'
-using NRSER
-
 require 'nrser/refinements/types'
 using NRSER::Types
 
@@ -38,4 +33,3 @@ describe "NRSER::Types.hash_pair" do
 end # NRSER::Types.hash_pair
 
 # ************************************************************************
-

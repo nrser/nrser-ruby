@@ -1,8 +1,3 @@
-require 'spec_helper'
-
-require 'nrser/refinements'
-using NRSER
-
 describe "NRSER.each_branch" do
   
   subject { NRSER.method :each_branch }
@@ -65,7 +60,7 @@ describe "NRSER.each_branch" do
         input = [:x, :y, :z]
         result = {}
         super().call( input ) { |index, value|
-          result[index] = value 
+          result[index] = value
         }
         result
       }
@@ -79,4 +74,3 @@ describe "NRSER.each_branch" do
   end # called with a block
   
 end # NRSER.each_branch
-

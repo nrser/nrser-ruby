@@ -1,10 +1,3 @@
-# Refinements
-# =======================================================================
-
-require 'nrser/refinements'
-using NRSER
-
-
 # Examples
 # =====================================================================
 
@@ -135,7 +128,7 @@ describe_method "NRSER.transformer" do
             users: {
               { contact_id: address.parent.id } => {
                 addresses: {
-                  { 
+                  {
                     address_id: address.id } => {
                     district:   address[:address],
                     line_1:     address[:street2],
@@ -176,4 +169,3 @@ describe_method "NRSER.transformer" do
   
   
 end # NRSER.transform
-

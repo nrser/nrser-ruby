@@ -1,9 +1,3 @@
-require 'spec_helper'
-
-require 'nrser/refinements'
-using NRSER
-
-
 # NRSER.merge_by
 # ========================================================================
 # 

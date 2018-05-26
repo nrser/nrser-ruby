@@ -1,8 +1,3 @@
-require 'spec_helper'
-
-require 'nrser/refinements'
-using NRSER
-
 describe "NRSER.transform" do
   subject { NRSER.transform tree, source }
   

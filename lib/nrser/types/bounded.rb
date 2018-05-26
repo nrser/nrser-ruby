@@ -1,7 +1,4 @@
-require 'nrser/refinements'
 require 'nrser/types/type'
-
-using NRSER
   
 module NRSER::Types
   class Bounded < NRSER::Types::Type

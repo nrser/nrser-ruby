@@ -1,8 +1,3 @@
-require 'spec_helper'
-require 'nrser/refinements'
-
-using NRSER
-
 describe "NRSER.indent" do
   it "refines String to add indent" do
     expect(

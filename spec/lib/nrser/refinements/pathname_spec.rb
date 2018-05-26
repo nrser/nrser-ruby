@@ -1,8 +1,3 @@
-require 'spec_helper'
-require 'nrser/refinements'
-
-using NRSER
-
 describe 'Pathname' do
   
   describe '#start_with?' do

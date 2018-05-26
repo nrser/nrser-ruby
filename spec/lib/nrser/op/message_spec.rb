@@ -1,8 +1,3 @@
-require 'spec_helper'
-
-require 'nrser/refinements'
-using NRSER
-
 require 'nrser/refinements/types'
 using NRSER::Types
 
@@ -18,13 +13,13 @@ describe NRSER::Message, type: :class do
         
         describe_called_with NRSER::Message.new( :length ) do
           it { is_expected.to eq [0, 1, 2] }
-        end # called with 
+        end # called with
         
         describe_called_with NRSER::Message.new( :first ) do
           it { is_expected.to eq [nil, 1, 1] }
         end # called with :first
         
-      end # enum 
+      end # enum
       
     end # mapping an Enumerable using &message
     

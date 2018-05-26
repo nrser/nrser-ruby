@@ -1,10 +1,8 @@
-require 'nrser/refinements'
 require 'nrser/types/type'
 require 'nrser/types/is_a'
 require 'nrser/types/combinators'
 require 'nrser/types/bounded'
 
-using NRSER
   
 module NRSER::Types
   # Parse a string into a number.

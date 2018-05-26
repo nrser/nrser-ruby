@@ -1,8 +1,3 @@
-require 'spec_helper'
-
-require 'nrser/refinements'
-using NRSER
-
 require 'nrser/refinements/types'
 using NRSER::Types
 

@@ -1,6 +1,4 @@
-require 'nrser/refinements'
 require 'nrser/types/type'
-using NRSER
 
 module NRSER::Types
   # Type satisfied by class membership (or mixin presence for modules).

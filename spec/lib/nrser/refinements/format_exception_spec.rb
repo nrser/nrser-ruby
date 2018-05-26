@@ -1,11 +1,6 @@
-require 'spec_helper'
-require 'nrser/refinements'
-
-using NRSER
-
 describe "NRSER.format_exception" do
   let(:error) {
-    begin 
+    begin
       raise StandardError.new "blah blah blah"
     rescue Exception => e
       e
