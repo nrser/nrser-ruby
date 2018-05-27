@@ -64,39 +64,161 @@ class NRSER::Log::Logger < SemanticLogger::Logger
   end # class Catcher
   
   
-  class Notifier
+  # Under JRuby a java exception is not a Ruby Exception
+  #   
+  #   Java::JavaLang::ClassCastException.new.is_a?(Exception) => false
+  # 
+  def self.is_exception? value
+    value.is_a?( Exception) ||
+      [:backtrace, :message].all? { |name| value.respond_to? name }
+  end
+  
+  
+  # Normalizes the valid argument formats to {SemanticLogger::Logger}'s
+  # "standard logging methods" into a keywords hash.
+  # 
+  # By "standard logging methods", we mean {SemanticLogger::Logger#debug},
+  # {SemanticLogger::Logger#info}, etc., as detailed in the
+  # [Semantic Logger API][] documentation.
+  # 
+  # [Semantic Logger API]: https://rocketjob.github.io/semantic_logger/api.html
+  # 
+  # Semantic Logger documents the standard logging methods API as
+  # 
+  #     log.info(message, payload_or_exception = nil, exception = nil, &block)
+  # 
+  # or
+  # 
+  #     logger.info(
+  #       message: String?,
+  #       payload: Hash?,
+  #       exception: Object?,
+  #       **metric_keywords
+  #     )
+  # 
+  # Which means that the hash returned by this method can be used as the
+  # argument to the standard logging methods:
+  # 
+  #     def proxy_info_call *args, &block
+  #       logger.info **NRSER::Log::Logger.args_to_kwds( *args ), &block
+  #     end
+  # 
+  # This makes this method very useful when pre-processing log call arguments,
+  # as is done in {NRSER::Log::Plugin} before passing the resulting keywords
+  # to {NRSER::Log::Plugin#call} because the hash this method returns is much
+  # easier to work with than the standard logging methods' multiple valid
+  # argument formats.
+  # 
+  # @param [Array] *args
+  #   Valid arguments for {SemanticLogger::Logger#debug}, etc. - see notes
+  #   above.
+  # 
+  # @return [Hash<Symbol, Object>]
+  #   Always has the following keys (**all** of which can have `nil` value):
+  #   
+  #   -   `message: String?` - we don't actually check that it's a {String},
+  #       but that seems to be pretty much what Semantic Logger expects.
+  #       
+  #   -   `payload: Hash?` - A hash of names to values to log. By convention
+  #       names are {Symbol}, though I'm not sure what happens if they are not.
+  #       
+  #   -   `exception: Object?` - An error to log. This will be an {Exception}
+  #       in MRI. In JRuby, and perhaps elsewhere, they won't be, but they
+  #       should always respond to `#message` and `#backtrace`.
+  #       
+  #   -   `metric: Object?` -
+  # 
+  def self.args_to_kwds *args
+    log_kwds = {
+      message: nil,
+      payload: nil,
+      exception: nil,
+      metric: nil,
+    }
     
-    # Construction
-    # ========================================================================
+    case args.length
+    when 0
+      # pass - they all stay `nil` (which it seems SemLog allows, so we'll
+      # stick to it)
     
-    # Instantiate a new `Notifier`.
-    # 
-    # @param [NRSER::Log::Logger] logger
-    #   The logger to use if the block raises.
-    # 
-    # @param [*] on_fail:
-    #   Value to return when `&block` raises.
-    # 
-    def initialize logger
-      @logger = logger
-    end # #initialize
-    
-    
-    # Instance Methods
-    # ========================================================================
-    
-    SemanticLogger::LEVELS.each do |level|
-      define_method level do |message = nil, payload = nil, &block|
-        begin
-          block.call
-        rescue Exception => error
-          @logger.send level, message, payload, error
-          @on_fail
+    when 1
+      case args[0]
+      when Hash
+        if [:message, :payload, :exception, :metric].
+              any? { |key| args[0].key? key }
+          log_kwds = args[0]
+        else
+          # It's the payload
+          log_kwds[:payload] = args[0]
+        end
+      else
+        if is_exception? args[0]
+          # It's the exception
+          log_kwds[:exception] = args[0]
+        else
+          # It's got to be the message
+          log_kwds[:message] = args[0]
         end
       end
+    
+    when 2
+      if args[0].is_a? Hash
+        log_kwds[:payload] = args[0]
+        log_kwds[:exception] = args[1]
+      else
+        log_kwds[:message] = args[0]
+        
+        if args[1].is_a? Hash
+          log_kwds[:payload] = args[1]
+        else
+          log_kwds[:exception] = args[1]
+        end
+      end
+    
+    when 3
+      log_kwds[:message] = args[0]
+      log_kwds[:payload] = args[1]
+      log_kwds[:exception] = args[2]
+    
+    else
+      raise NRSER::ArgumentError.new \
+        "Too many args dude - max 3",
+        args: args
+      
     end
     
-  end
+    log_kwds
+    
+  end # .normalize_log_args
+  
+  
+  # Install a plugin, dynamically adding it's
+  # {NRSER::Log::Plugin.method_name} instance method.
+  # 
+  # @param [Class<NRSER::Log::Plugin>] plugin_class
+  #   The plugin class to add.
+  # 
+  # @return [nil]
+  # 
+  # @raise [NRSER::ConflictError]
+  #   If this class already has an instance method defined with the name
+  #   returned from `plugin_class.method_name`.
+  # 
+  def self.plugin plugin_class
+    method_name = plugin_class.method_name
+    
+    if instance_methods.include? method_name.to_sym
+      raise NRSER::ConflictError.new \
+        "Can not install", plugin_class.safe_name,
+        "Logger plugin: instance method", method_name, "already defined"
+    end
+    
+    define_method method_name do |*args, &block|
+      plugin_class.new self, *args, &block
+    end
+    
+    nil
+  end # .plugin
   
   
   # Attributes
@@ -184,6 +306,41 @@ class NRSER::Log::Logger < SemanticLogger::Logger
   
   # Instance Methods
   # ========================================================================
+  
+  # Log message at the specified level
+  def build_log level,
+                index,
+                message = nil,
+                payload = nil,
+                exception = nil,
+                &block
+    log        = SemanticLogger::Log.new name, level, index
+    should_log =
+      if payload.nil? && exception.nil? && message.is_a?( Hash )
+        # Check if someone just logged a hash payload instead of meaning to call semantic logger
+        if  message.key?( :message ) ||
+            message.key?( :payload ) ||
+            message.key?( :exception ) ||
+            message.key?( :metric )
+          log.assign message
+        else
+          log.assign_positional nil, message, nil, &block
+        end
+      else
+        log.assign_positional message, payload, exception, &block
+      end
+    
+    # Log level may change during assign due to :on_exception_level
+    [ log, should_log && should_log?( log ) ]
+  end
+  
+  
+  # Log message at the specified level
+  # def log_internal *args, &block
+  #   log, should_log = build_log *args
+  #   self.log( log ) if should_log
+  # end
+  
   
   # A sweet way to try something and just log any {Exception}.
   # 
