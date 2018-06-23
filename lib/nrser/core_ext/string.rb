@@ -56,6 +56,56 @@ class String
   end
   
   
+  # Alias the stdlib {#start_with?} 'cause we'll need to use it when
+  # redefining the method below.
+  # 
+  alias_method :stdlib_start_with?, :start_with?
+  
+  
+  # Augment {#start_with?} to accept {Regexp} prefixes.
+  # 
+  # I guess I always *just felt* like this should work... so now it does
+  # (kinda, at least).
+  # 
+  # Everything should work the exact same for {String} prefixes.
+  # 
+  # Use {Regexp} ones at your own pleasure and peril.
+  # 
+  # @param [String | Regexp] *prefixes
+  #   Strings behave as usual per the standard lib.
+  #   
+  #   Regexp sources are used to create a new Regexp with `\A` at the start -
+  #   unless their source already starts with `\A` or `^` - and those Regexp
+  #   are tested against the string.
+  #   
+  #   Regexp options are also copied over if a new Regexp is created. I can
+  #   def imagine things getting weird with some exotic regular expression
+  #   or another, but this feature is really indented for very simple patterns,
+  #   for which it should suffice.
+  #   
+  # @return [Boolean]
+  #   `true` if `self` starts with *any* of the `prefixes`.
+  # 
+  def start_with? *prefixes
+    unless prefixes.any? { |x| Regexp === x }
+      return stdlib_start_with? *prefixes
+    end
+  
+    prefixes.any? { |prefix|
+      case prefix
+      when Regexp
+        unless prefix.source.start_with? '\A', '^'
+          prefix = Regexp.new( "\\A#{ prefix.source }", prefix.options )
+        end
+        
+        prefix =~ self
+      else
+        stdlib_start_with? prefix
+      end
+    }
+  end
+  
+  
   # @!group Unicode Stylization
   # ==========================================================================
   
