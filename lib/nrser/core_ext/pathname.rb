@@ -11,7 +11,13 @@ class Pathname
   #   true if the Pathname starts with any of the prefixes.
   # 
   def start_with? *prefixes
-    to_s.start_with? *prefixes.map(&:to_s)
+    to_s.start_with? *prefixes.map { |prefix|
+      if Pathname === prefix
+        prefix.to_s
+      else
+        prefix
+      end
+    }
   end
   
   
@@ -49,29 +55,52 @@ class Pathname
   end
   
   
-  # @todo Document find_root method.
-  # 
-  # @param [type] arg_name
-  #   @todo Add name param description.
-  # 
-  # @return [return_type]
-  #   @todo Document return value.
+  # See {NRSER.find_up}.
   # 
   def find_up rel_path, **kwds
     NRSER.find_up rel_path, **kwds, from: self
   end # #find_root
   
   
-  # @todo Document find_root method.
-  # 
-  # @param [type] arg_name
-  #   @todo Add name param description.
-  # 
-  # @return [return_type]
-  #   @todo Document return value.
+  # See {NRSER.find_up!}.
   # 
   def find_up! rel_path, **kwds
     NRSER.find_up! rel_path, **kwds, from: self
   end # #find_root
+  
+  
+  # Shortcut to convert into a relative pathname, by default from the working
+  # directory, with option to `./` prefix.
+  # 
+  # @param [Pathname] base_dir:
+  #   Directory you want the result to be relative to.
+  # 
+  # @param [Boolean] dot_slash:
+  #   When `true` will prepend `./` to the resulting path, unless it already
+  #   starts with `../`.
+  # 
+  # @return [Pathname]
+  # 
+  def to_rel base_dir: Pathname.getwd, dot_slash: false
+    rel = relative_path_from base_dir
+    
+    if dot_slash && !rel.start_with?( /\.\.?\// )
+      File.join( '.', rel ).to_pn
+    else
+      rel
+    end
+  end
+  
+  
+  # Just a quick cut for `.to_rel.to_s`, since I seem to use that sort of form
+  # a lot.
+  # 
+  # @param (see #to_rel)
+  # 
+  # @return [String]
+  # 
+  def to_rel_s *args
+    to_rel( *args ).to_s
+  end
   
 end # class Pathname
