@@ -18,7 +18,7 @@ module NRSER
   # 
   # @return [String]
   # 
-  VERSION = '0.3.7'
+  VERSION = '0.3.8.dev'
   
   
   module Version
