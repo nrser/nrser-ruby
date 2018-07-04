@@ -92,6 +92,16 @@ class Pathname
   end
   
   
+  # Shortcut to call {#to_rel} with `dot_slash=true`.
+  # 
+  # @param base_dir: (see .to_rel)
+  # @return (see .to_rel)
+  # 
+  def to_dot_rel **kwds
+    to_rel **kwds, dot_slash: true
+  end # #to_dot_rel
+  
+  
   # Just a quick cut for `.to_rel.to_s`, since I seem to use that sort of form
   # a lot.
   # 
@@ -99,8 +109,18 @@ class Pathname
   # 
   # @return [String]
   # 
-  def to_rel_s *args
-    to_rel( *args ).to_s
+  def to_rel_s **kwds
+    to_rel( *kwds ).to_s
+  end
+  
+  
+  # Shortcut to call {#to_rel_s} with `dot_slash=true`.
+  # 
+  # @param base_dir: (see .to_rel_s)
+  # @return (see .to_rel_s)
+  # 
+  def to_dot_rel_s *kwds
+    to_rel_s( *kwds, dot_slash: true ).to_s
   end
   
 end # class Pathname
