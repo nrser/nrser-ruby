@@ -110,7 +110,7 @@ class Pathname
   # @return [String]
   # 
   def to_rel_s **kwds
-    to_rel( *kwds ).to_s
+    to_rel( **kwds ).to_s
   end
   
   
@@ -119,8 +119,8 @@ class Pathname
   # @param base_dir: (see .to_rel_s)
   # @return (see .to_rel_s)
   # 
-  def to_dot_rel_s *kwds
-    to_rel_s( *kwds, dot_slash: true ).to_s
+  def to_dot_rel_s **kwds
+    to_rel_s( **kwds, dot_slash: true ).to_s
   end
   
 end # class Pathname
