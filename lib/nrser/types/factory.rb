@@ -78,7 +78,9 @@ module NRSER::Types::Factory
         maybe_options = options.slice *maybe_option_keys
         factory_options = options.except *maybe_option_keys
         
-        maybe public_send( name, *args, **factory_options ), **maybe_options
+        NRSER::Types.maybe \
+          public_send( name, *args, **factory_options ),
+          **maybe_options
       end
       
       aliases.each do |alias_name|
