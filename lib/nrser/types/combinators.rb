@@ -119,7 +119,7 @@ module NRSER::Types
         if type.has_from_data?
           begin
             return check!( type.from_data data )
-          rescue Exception => error
+          rescue StandardError => error
             errors << error
           end
         end
