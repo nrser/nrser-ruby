@@ -696,6 +696,9 @@ module NRSER::Log
     old_appender = @appender
     
     @appender = case dest
+    when false
+      # Used to remove the appender and set {.appender} to `nil`.
+      nil
     when SemanticLogger::Subscriber, Hash
       # Can be handled directly
       SemanticLogger.add_appender dest
