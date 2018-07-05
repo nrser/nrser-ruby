@@ -1,10 +1,27 @@
-module NRSER::Ext; end
+# frozen_string_literal: true
+# encoding: UTF-8
+
+
+# Requirements
+# ========================================================================
+
+# Project / Package
+# ------------------------------------------------------------------------
+
+require 'nrser/functions/tree'
+
+
+# Namespace
+# ========================================================================
+
+module NRSER
+module Ext
 
 
 # Instance methods that are refined in to the Ruby built-ins that we consider
 # trees: {Array}, {Hash} and {OpenStruct}.
 # 
-module NRSER::Ext::Tree
+module Tree
   
   # Sends `self` to {NRSER.leaves}.
   def leaves
@@ -39,4 +56,11 @@ module NRSER::Ext::Tree
     NRSER.map_tree self, **options, &block
   end
   
-end # module NRSER::Ext::Tree
+end # module Tree
+
+
+# /Namespace
+# ========================================================================
+
+end # module Ext
+end # module NRSER
