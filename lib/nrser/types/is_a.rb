@@ -89,4 +89,10 @@ module NRSER::Types
   def_factory :is_a do |mod, **options|
     IsA.new mod, **options
   end
+  
+  
+  def_factory :type do |**options|
+    is_a NRSER::Types::Type
+  end
+  
 end # NRSER::Types
