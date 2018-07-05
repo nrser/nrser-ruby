@@ -19,6 +19,8 @@ require "concurrent/map"
 # Project / Package
 # -----------------------------------------------------------------------
 
+# Using {NRSER.truthy?} for ENV var values.
+require 'nrser/functions/object/truthy'
 
 # Definitions
 # =======================================================================
@@ -36,10 +38,6 @@ module NRSER::Log
   require_relative './log/logger'
   require_relative './log/formatters'
   require_relative './log/appender'
-  
-  
-  # Constants
-  # ========================================================================
   
   
   # Mixins
