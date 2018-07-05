@@ -44,11 +44,12 @@ module NRSER::Types
   end
   
   
-  # A path is a non-empty {String} or {Pathname}.
-  # 
-  # @param **options see NRSER::Types::Type#initialize
-  # 
-  # @return [NRSER::Types::Type]
+  # @!method
+  #   A path is a non-empty {String} or {Pathname}.
+  #   
+  #   @param **options see NRSER::Types::Type#initialize
+  #   
+  #   @return [NRSER::Types::Type]
   # 
   def_factory :path do |name: 'Path', **options|
     one_of \
