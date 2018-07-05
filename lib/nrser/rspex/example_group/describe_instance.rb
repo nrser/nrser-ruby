@@ -2,13 +2,13 @@
 
 module NRSER::RSpex::ExampleGroup
   
-  # @todo Document describe_instance method.
+  # Describe an instance of the described class by providing arguments for
+  # it's construction.
   # 
-  # @param [type] arg_name
-  #   @todo Add name param description.
+  # @param [Array] *constructor_args
+  #   Arguments to pass to `.new` on {#described_class} to create instances.
   # 
-  # @return [return_type]
-  #   @todo Document return value.
+  # @return [void]
   # 
   def describe_instance *constructor_args, &body
     describe_x ".new", Args(*constructor_args),
