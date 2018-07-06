@@ -57,7 +57,7 @@ describe NRSER::Props::Immutable::Vector do
         # defined classes.
         def self.name; 'Point2DInt'; end
         
-        # It's vital that we include the `key:` keyword argument, and that the
+        # It's vital that we include the `index:` keyword argument, and that the
         # values are non-negative integer indexes for the vector.
         prop :x, type: t.int, index: 0
         prop :y, type: t.int, index: 1
