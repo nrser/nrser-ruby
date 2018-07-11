@@ -25,8 +25,11 @@ module NRSER::RSpex::ExampleGroup
   end
   
   # Old name (used to be different method)
-  
   alias_method :context_where, :describe_when
+
+  # Short names (need `_` pre 'cause of `when` Ruby keyword, and suffix fucks
+  # up auto-indent in Atom/VSCode)
+  alias_method :_when, :describe_when
   
   
 end # module NRSER::RSpex::ExampleGroup
