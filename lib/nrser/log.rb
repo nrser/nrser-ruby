@@ -697,18 +697,32 @@ module NRSER::Log
     when false
       # Used to remove the appender and set {.appender} to `nil`.
       nil
-    when SemanticLogger::Subscriber, Hash
+
+    when SemanticLogger::Subscriber
       # Can be handled directly
+      SemanticLogger.add_appender dest
+    
+    when Hash
+      # Override color formatter with our own implementation
+      if dest[:formatter] == :color
+        dest = dest.merge formatter: NRSER::Log::Formatters::Color.new
+      end
+
       SemanticLogger.add_appender dest
       
     when String, Pathname
       # Assume these are file paths
       SemanticLogger.add_appender file_name: dest.to_s
       
-    else
+    when IO
       SemanticLogger.add_appender \
         io: dest,
         formatter: NRSER::Log::Formatters::Color.new
+      
+    else
+      # I guess just try and add it...?
+      SemanticLogger.add_appender dest
+
     end
     
     # Remove the old appender (if there was one). This is done after adding
