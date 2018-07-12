@@ -1,6 +1,7 @@
 require 'pathname'
 require 'active_support/core_ext/string/filters'
 require 'active_support/core_ext/string/inflections'
+require 'nrser/sys/env'
 
 # Extension methods for {String}
 # 
@@ -133,5 +134,21 @@ class String
   end
   
   # @!endgroup Unicode Stylization
+
+
+  # @!group Inflection Instance Methods
+  # ==========================================================================
+  
+  # Attempt to convert `self` into an ENV var name.
+  # 
+  # @see NRSER::Sys::Env.varize
+  # 
+  # @return (see NRSER::Sys::Env.varize)
+  # 
+  def env_varize
+    NRSER::Sys::Env.varize self
+  end
+
+  # @!endgroup Inflection Instance Methods # *********************************
   
 end # class String

@@ -101,10 +101,8 @@ module NRSER::Log
   singleton_class.send :alias_method, :[], :logger_for
   
   
-  
   # @!group Utility Class Methods
   # ------------------------------------------------------------------------
-  
   
   # @todo Document logger_name_and_type method.
   # 
@@ -244,9 +242,82 @@ module NRSER::Log
   def self.level= level
     SemanticLogger.default_level = level_sym_for level
   end
+
+
+  # Get the current ENV var prefix to use looking for config (when values
+  # are not explictly provided).
+  # 
+  # @return [nil]
+  #   A prefix has not been sucessfully set, and we couldn't figure one out
+  #   from {.application}.
+  # 
+  # @return [false]
+  #   Looking for config in ENV has been explicitly disabled.
+  # 
+  # @return [String]
+  #   The ENV var name prefix we'll use looking for logging config.
+  #   
+  def self.env_var_prefix
+    return @env_var_prefix unless @env_var_prefix.nil?
+
+    return application.to_s.env_varize unless application.nil?
+    
+    return nil
+  end
+
+
+  # Set the {.env_var_prefix}.
+  # 
+  # @param [String | false] prefix
+  #   Value to set the prefix to. `false` disables looking up config in the
+  #   ENV.
+  #   
+  #   If anything other than `false` or a {String} that satisfies 
+  #   {NRSER::Sys::Env.var_name?} is passed a warning will be logged,
+  #   the value will be ignored, and `nil` will be returned.
+  #   
+  # @return [nil]
+  #   `prefix` was a bad value and the internal variable was not set. A
+  #   warning was also logged.
+  # 
+  # @return [String | false]
+  #   The value was set to `prefix`.
+  # 
+  def self.env_var_prefix= prefix
+    unless prefix == false || NRSER::Sys::Env.var_name?( prefix )
+      logger.warn \
+        "Bad NRSER::Log.env_var_prefix; must `false` or a String matching" +
+        "#{ NRSER::Sys::Env::VAR_NAME_RE }. Ignoring...",
+        value: prefix
+      
+      return nil
+    end
+
+    @env_var_prefix = prefix
+  end
   
   
-  def self.level_from_ENV prefix:
+  # Try to find a log level in the ENV.
+  # 
+  # @param [String | false | nil] prefix:
+  #   The prefix to look under.
+  # 
+  # @return [nil]
+  #   We either didn't look or we didn't find.
+  # 
+  # @return [Symbol]
+  #   One of {SemanticLogger::LEVELS}, returned because we found a
+  #   {NRSER.truthy?} `<prefix>_DEBUG` or `<prefix>_TRACE`.
+  # 
+  # @return [String]
+  #   Value found at `<prefix>_LOG_LEVEL`. **Note that this may not be
+  #   a valid level - this method does NOT check!**.
+  # 
+  def self.level_from_env prefix: self.env_var_prefix
+    # Bail with a `nil` if we can't figure out a prefix (it's `nil`) or
+    # looking in the ENV has been disabled (it's `false`).
+    return nil unless prefix
+
     if NRSER.truthy? ENV["#{ prefix }_TRACE"]
       return :trace
     elsif NRSER.truthy? ENV["#{ prefix }_DEBUG"]
@@ -270,8 +341,14 @@ module NRSER::Log
   
   # Setup logging.
   # 
-  # @param [type] arg_name
-  #   @todo Add name param description.
+  # @param [String | false | nil] env_var_prefix:
+  #   Prefix to ENV var names to look for logging setup config under,
+  #   like `<prefix>_LOG_LEVEL`, `<prefix>_DEBUG` and `<prefix>_TRACE`.
+  #   
+  #   If `nil` (the default), we'll try to use `application` to guess a
+  #   prefix.
+  #   
+  #   You can disable any ENV lookups by passing `false`.
   # 
   # @return [nil]
   # 
@@ -295,26 +372,27 @@ module NRSER::Log
     
     # Wrap around everything to make sure we release the mutex
     begin
-      # Setup main appender if needed
+      # Setup main appender if needed so that any logging *in here* hopefully
+      # has somewhere to go
       setup_appender! dest
+
+      # Set the application, which we may use for the ENV var prefix
+      self.application = application unless application.nil?
+
+      # Set the ENV var prefix, if we received one
+      self.env_var_prefix = env_var_prefix unless env_var_prefix.nil?
       
       # Set sync/async processor state
       setup_sync! sync
       
       # If we didn't receive a level, check the ENV
       if level.nil?
-        if env_var_prefix.nil? && !application.nil?
-          env_var_prefix = application.gsub( /[^a-zA-Z0-0_]+/, '_' ).upcase
-        end
-        
-        level = level_from_ENV prefix: env_var_prefix
+        level = level_from_env
       end
       
       # If we ended up with a level, try to set it (will only log a warning
       # if it fails, not raise, which could crash things on boot)
       setup_level! level unless level.nil?
-      
-      self.application = application unless application.nil?
       
       # Setup formatter header and body tokens, if needed
       setup_formatter_tokens! :header, header
@@ -370,18 +448,38 @@ module NRSER::Log
   # Call {.setup!} with some default keywords that are nice for interactive
   # session (console/REPL) usage.
   # 
-  # @param  (see .setup!)
+  # @param [Boolean] add_main_logger:
+  #   Define a `logger` method at the top level (global) that gets a logger
+  #   for the main object.
+  # 
+  # @param application: (see .setup!)
+  # @param dest: (see .setup!)
+  # @param header: (see .setup!)
+  # @param sync: (see .setup!)
+  # 
   # @return (see .setup!)
   # 
-  def self.setup_for_console! dest: $stderr,
-                              sync: true,
+  def self.setup_for_console! add_main_logger: true,
+                              application: $0,
+                              dest: $stderr,
                               header: { delete: :process_info },
+                              sync: true,
                               **kwds
     setup! \
       dest: dest,
       sync: sync,
       header: header,
+      application: application,
       **kwds
+    
+    if add_main_logger
+      TOPLEVEL_BINDING.eval <<~END
+        def logger
+          NRSER::Log[self]
+        end
+      END
+    end
+
   end # .setup_for_console!
   
   
