@@ -1,4 +1,4 @@
-require 'nrser/sys/env'
+require 'nrser/sys/env/path'
 
 describe_spec_file(
   spec_path:        __FILE__,
