@@ -144,9 +144,7 @@ module NRSER::Types
   def_factory :file_path do |name: 'FilePath', **options|
     intersection \
       path,
-      # TODO  How to change this from {.where}?
-      where( File.method :file? )
-      where { |path| File.file? path },
+      where( File.method :file? ),
       name: name,
       **options
   end

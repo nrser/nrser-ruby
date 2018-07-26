@@ -16,16 +16,7 @@ module NRSER::RSpex::ExampleGroup
   # 
   # @return (see #describe_x)
   # 
-  def describe_when *description, it:, **bindings, &body
-
-    if it
-      raise "Don't it and body bro" if body
-
-      body = -> {
-        self.it { is_expected.to }
-      }
-    end
-
+  def describe_when *description, **bindings, &body
     describe_x \
       *description,
       type: :when,
