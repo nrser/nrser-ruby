@@ -3,7 +3,7 @@ require 'nrser/labs/config'
 describe_spec_file(
   spec_path: __FILE__,
   class: NRSER::Config,
-  # labs: true, # run with `LABS=1 rspec ...` to include
+  labs: true, # run with `LABS=1 rspec ...` to include
 ) do
 
   

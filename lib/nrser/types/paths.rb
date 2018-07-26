@@ -112,7 +112,7 @@ module NRSER::Types
     intersection \
       path,
       # TODO  How to change this from {.where}?
-      where { |path| File.directory? path },
+      where( File.method :directory? ),
       name: name,
       **options
   end # #dir_path
