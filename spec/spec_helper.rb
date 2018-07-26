@@ -25,6 +25,9 @@ require 'nrser/rspex'
 require_relative './support/shared'
 
 
+NRSER::Log.setup_for_rspec!
+
+
 RSpec.configure do |config|
   unless ENV['LABS']
     config.filter_run_excluding labs: true
@@ -44,11 +47,7 @@ end
 
 # Dumping ground for classes and modules that we need to create for tests.
 # 
-module NRSER::TestFixtures
-  
-  # module definition...
-  
-end # module NRSER::TestFixtures
+module NRSER::TestFixtures; end
 
 
 # Was a part of old {NRSER::Logger} testing, keeping for a minute to see if

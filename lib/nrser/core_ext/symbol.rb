@@ -1,13 +1,12 @@
 class Symbol
+
+  # Proxy through to built-in {#to_proc} so symbols match the {Array#to_sender}
+  # API. I guess.
+  # 
+  # @return [Proc]
+  #   Accepts one argument and sends itself to that object, returning the
+  #   result.
+  # 
+  def to_sender; self.to_proc; end
   
-  # See {NRSER.retriever}.
-  def to_retriever
-    NRSER.retriever self
-  end
-  
-  
-  # Alias 'sender' methods to built-in {#to_proc} so symbols can behave like
-  # arrays in this way
-  alias_method :to_sender,  :to_proc
-  
-end # NRSER
+end # class Symbol

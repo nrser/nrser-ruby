@@ -128,7 +128,7 @@ module NRSER
   def self.ellipsis source, max, omission: UNICODE_ELLIPSIS
     return source unless source.length > max
     
-    trim_to = max - omission.length
+    trim_to = max - ( String === source ? omission.length : 1 )
     middle = trim_to / 2
     remainder = trim_to % 2
     

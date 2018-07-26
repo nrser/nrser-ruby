@@ -60,7 +60,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rspec", '~> 3.7'
   
   # Doc site generation with `yard`
-  spec.add_development_dependency 'yard', '~> 0.9.12'
+  spec.add_development_dependency 'yard', '~> 0.9.15'
   
   # GitHub-Flavored Markdown (GFM) for use with `yard`
   spec.add_development_dependency 'github-markup', '~> 1.6'
@@ -73,5 +73,8 @@ Gem::Specification.new do |spec|
   
   # My system commands lib
   spec.add_development_dependency "cmds", '~> 0.0', '>= 0.2.4'
+
+
+  spec.add_development_dependency "mongo", '~> 2.6.1'
   
 end

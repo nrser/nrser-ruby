@@ -9,6 +9,11 @@
 
 require 'semantic_logger'
 
+# Project / Package
+# ----------------------------------------------------------------------------
+
+require 'nrser/functions/text/format'
+
 
 # Definitions
 # =======================================================================
@@ -38,7 +43,7 @@ class NRSER::Log::Logger < SemanticLogger::Logger
     # @param [NRSER::Log::Logger] logger
     #   The logger to use if the block raises.
     # 
-    # @param [*] on_fail:
+    # @param [*] on_fail
     #   Value to return when `&block` raises.
     # 
     def initialize logger, on_fail: nil
@@ -416,6 +421,49 @@ class NRSER::Log::Logger < SemanticLogger::Logger
       self.level = prior_level
     end
   end
+
+
+  # Let 'em know they done wrong.
+  # 
+  # Which is funny, because only I use the library, and probably only I will
+  # ever use this library. So I'm basically nagging my-fucking-self. Sad.
+  # 
+  # @param [Array] *message
+  #   Message segments, formatted with {NRSER.fmt_msg}.
+  # 
+  # @param [String] method:
+  #   Something about what method it is.
+  # 
+  # @param [String?] alternative:
+  #   Optionally (hopefully) something about what I should be using.
+  # 
+  # @param [Integer] max_stack_lines:
+  #   How many lines of the stack to spew out (it can get real big real easy).
+  # 
+  # @return [nil]
+  # 
+  def depreciated *message, method:, alternative: nil, max_stack_lines: 16
+    kwds = { method: method }
+
+    kwds[:alternative] = alternative if alternative
+
+    if max_stack_lines > 0
+      kwds[:stack] =  NRSER::ellipsis \
+                        caller,
+                        max_stack_lines,
+                        omission: '[ ...omitted... ]'
+    end
+
+    if message.empty?
+      message = [ "Method", method, "has been DEPRECIATED" ]
+    else
+      message = [ 'DEPRECIATED:', *message ]
+    end
+
+    warn NRSER.fmt_msg( *message ), **kwds
+
+    nil
+  end # #depreciated
   
   
 end # class NRSER::Log::Logger

@@ -22,13 +22,27 @@ module NRSER::Types
   end # .array_like
   
   
-  def_factory :hash_like do |name: 'HashLike', **options|
+  def_factory(
+    :map,
+    aliases: [ :assoc, :hash_like ],
+   ) do |name: 'Map', **options|
     intersection \
       is_a( Enumerable ),
       respond_to( :each_pair ),
       name: name,
       **options
-  end # .hash_like
+  end # .map
+
+
+  def_factory(
+    :bag,
+  ) do |name: 'Bag', **options|
+    intersection \
+      is_a( Enumerable ),
+      self.not( respond_to( :each_pair ) ),
+      name: name,
+      **options
+  end
   
   
   def_factory :tree do |name: 'Tree', **options|

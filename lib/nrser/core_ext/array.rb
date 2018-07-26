@@ -93,28 +93,51 @@ class Array
   end # #to_chainer
   
   
-  # Returns a lambda that calls accepts a single arg and calls `#dig` on it
-  # with the elements of *this* array as arguments.
+  # Returns a lambda that calls accepts a single arg and calls either:
+  # 
+  # 1.  `#[self.first]` if this array has only one entry.
+  # 2.  `#dig( *self )` if this array has more than one entry.
   # 
   # @example
   #   list = [{id: 1, name: "Neil"}, {id: 2, name: "Mica"}]
-  #   list.assoc_by &[:id].to_digger
+  #   list.assoc_by &[:id]
   #   # =>  {
   #   #       1 => {id: 1, name: "Neil"},
   #   #       2 => {id: 2, name: "Mica"},
   #   #     }
   # 
-  # @todo
-  #   I wanted to use `#to_proc` so that you could use `&[:id]`, but unary
-  #   `&` doesn't invoke refinements, and I don't really want to monkey-patch
-  #   anything, especially something as core as `#to_proc` and `Array`.
-  # 
   # @return [Proc]
-  #   Lambda proc that accepts a single argument and calls `#dig` with this
-  #   array's contents as the `#dig` arguments.
+  #   Lambda proc that accepts a single argument and calls `#[]` or `#dig with 
+  #   this array's contents as the arguments.
+  # 
+  def to_proc
+    method_name = case count
+    when 0
+      raise NRSER::CountError.new \
+        "Can not create getter proc from empty array",
+        subject: self,
+        expected: '> 0',
+        count: count
+    when 1
+      :[]
+    else
+      :dig
+    end
+      
+    NRSER::Message.new( method_name, *self ).to_proc
+  end # #to_proc
+
+
+  # Old name for {#to_proc}.
+  # 
+  # @depreciated
   # 
   def to_digger
-    NRSER::Message.new( :dig, *self ).to_proc
-  end # #to_digger
+    NRSER.logger.depreciated \
+      method: "#{ self.class.name }##{ __method__ }",
+      alternative: "#{ self.class.name }#to_proc"
+
+    to_proc
+  end
 
 end # class Array

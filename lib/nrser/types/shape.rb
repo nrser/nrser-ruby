@@ -37,9 +37,7 @@ module NRSER::Types
     
     def test? value
       begin
-        @pairs.all? { |k, v|
-          v === value[k]
-        }
+        @pairs.all? { |k, v| v === value[k] }
       rescue
         false
       end

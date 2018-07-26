@@ -8,8 +8,8 @@ describe "NRSER.transform" do
       
       let( :tree ) {
         {
-          x: :y.to_retriever,
-          y: :x.to_retriever,
+          x: [ :y ].to_proc,
+          y: [ :x ].to_proc,
         }
       } # let :tree
       
@@ -30,8 +30,8 @@ describe "NRSER.transform" do
       let :tree do
         {
           users: {
-            { id: :id.to_retriever } => {
-              name: :name.to_retriever,
+            { id: [ :id ].to_proc } => {
+              name: [ :name ].to_proc,
             }
           }
         }
@@ -60,8 +60,8 @@ describe "NRSER.transform" do
       let :tree do
         {
           list: [
-            { name: :name.to_retriever },
-            { age: :age.to_retriever },
+            { name: [ :name ].to_proc },
+            { age: [ :age ].to_proc },
           ]
         }
       end
@@ -118,11 +118,11 @@ describe "NRSER.transform" do
               addresses: {
                 {
                   address_id: [ :id ].to_sender } => {
-                  district:   :address.to_retriever,
-                  line_1:     :street2.to_retriever,
-                  city:       :city.to_retriever,
-                  province:   :state.to_retriever,
-                  post_code:  :zip.to_retriever,
+                  district:   [:address ].to_proc,
+                  line_1:     [:street2 ].to_proc,
+                  city:       [:city ].to_proc,
+                  province:   [:state ].to_proc,
+                  post_code:  [:zip ].to_proc,
                 }
               }
             }

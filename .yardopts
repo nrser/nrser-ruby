@@ -9,4 +9,5 @@
 lib/**/*.rb
 -
 README.md
+LICENSE.txt
 doc/**/*.md
