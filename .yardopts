@@ -1,3 +1,4 @@
+--output-dir ./site
 --markup-provider commonmarker
 --markup markdown
 --tag pure:"Pure Function"
@@ -5,3 +6,7 @@
 --plugin yard-commonmarker
 --private
 --protected
+lib/**/*.rb
+-
+README.md
+doc/**/*.md

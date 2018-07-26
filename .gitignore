@@ -7,7 +7,12 @@ Gemfile.lock
 InstalledFiles
 _yardoc
 coverage
-doc/
+
+# Generated project site (yard). This is usually `/doc/` but I like to 
+# actually put docuemntation (Markdown) in there (which gets coverted to HTML 
+# and included in the site)
+/site/
+
 lib/bundler/man
 pkg
 rdoc
