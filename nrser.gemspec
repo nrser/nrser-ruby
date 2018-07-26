@@ -42,7 +42,7 @@ Gem::Specification.new do |spec|
   # 
   # Using it to parse strings and style them for the terminal
   # 
-  spec.add_dependency 'commonmarker', '~> 0.17.7'
+  spec.add_dependency 'commonmarker', '~> 0.17.9'
   
   # All sorts of goodies (and monkey business)
   spec.add_dependency 'activesupport', '~> 5.1'
@@ -63,16 +63,16 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'yard', '~> 0.9.15'
   
   # GitHub-Flavored Markdown (GFM) for use with `yard`
-  spec.add_development_dependency 'github-markup', '~> 1.6'
+  spec.add_development_dependency 'github-markup', '~> 2.0.1'
   
   # Provider for `commonmarker`, the new GFM lib
-  spec.add_development_dependency 'yard-commonmarker', '~> 0.3.0'
+  spec.add_development_dependency 'yard-commonmarker', '~> 0.5.0'
   
   # Nicer REPL experience
-  spec.add_development_dependency "pry", '~> 0.10.4'
+  spec.add_development_dependency "pry", '~> 0.11.3'
   
   # My system commands lib
-  spec.add_development_dependency "cmds", '~> 0.0', '>= 0.2.4'
+  spec.add_development_dependency "cmds", '~> 0.2.11'
 
 
   spec.add_development_dependency "mongo", '~> 2.6.1'
