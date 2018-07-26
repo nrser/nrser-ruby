@@ -11,18 +11,18 @@ module NRSER::RSpex::ExampleGroup
   # if you want the RSpex functionality but absolutely have to set some
   # metadata key that we use for something else.
   # 
-  # @param [Array] *description
+  # @param [Array] description
   #   Optional list of elements that compose the custom description.
   #   
   #   Will be passed to {NRSER::RSpex::Format.description} to produce the
   #   string value that is in turn passed to {RSpec.describe}.
   # 
-  # @param [Symbol] type:
+  # @param [Symbol] type
   #   The RSpex "type" of the example group, which is used to determine the
   #   prefix of the final description and is assigned to the `:type` metadata
   #   key.
   # 
-  # @param [Hash<Symbol, Object>] metadata:
+  # @param [Hash<Symbol, Object>] metadata
   #   [RSpec metadata][] to add to the new example group.
   #   
   #   In addition to the keys RSpec will reject, we prohibit `:type` *unless*
@@ -33,7 +33,7 @@ module NRSER::RSpex::ExampleGroup
   #   
   #   [RSpec metadata]: https://relishapp.com/rspec/rspec-core/docs/metadata/user-defined-metadata
   # 
-  # @param [Hash<Symbol, Object>] bindings:
+  # @param [Hash<Symbol, Object>] bindings
   #   Name to value pairs to bind in the new example group.
   #   
   #   All values will be bound at the example group and example levels -
@@ -41,7 +41,7 @@ module NRSER::RSpex::ExampleGroup
   #   group level, while they will be automatically unwrapped at the
   #   example level (as the requisite context is available there).
   # 
-  # @param [Boolean] bind_subject:
+  # @param [Boolean] bind_subject
   #   When `true` (and there is a `subject_block`) bind the `subject` inside
   #   the new example group.
   # 

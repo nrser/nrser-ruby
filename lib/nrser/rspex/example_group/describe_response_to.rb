@@ -8,7 +8,7 @@ module NRSER::RSpex::ExampleGroup
   # Pretty much a short-cut for nesting {#describe_method} /
   # {#describe_called_with}. Meh.
   # 
-  # @param [Array] *args
+  # @param [Array] args
   #   Passed to {NRSER::Message.from} to get or create the message instance.
   # 
   # @param &body          (see #describe_x)

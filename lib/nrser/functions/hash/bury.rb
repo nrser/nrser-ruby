@@ -22,7 +22,7 @@ module NRSER
   # @param [Object] value
   #   The value to set at the end of the path.
   # 
-  # @param [Class | :guess] parsed_key_type:
+  # @param [Class | :guess] parsed_key_type
   #   How to handle parsed key path segments:
   #   
   #   -   `String` - use the strings that naturally split from a parsed

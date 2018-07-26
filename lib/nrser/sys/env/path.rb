@@ -92,7 +92,7 @@ class NRSER::Sys::Env::Path
   # @param [String] path
   #   Path to test against.
   # 
-  # @param [Array<String | Proc<String=>Boolean> | Regexp>] *patterns
+  # @param [Array<String | Proc<String=>Boolean> | Regexp>] patterns
   #   Patterns to test:
   #   
   #   -   `String` - test if it and `path` are equal (`==`)
@@ -260,7 +260,7 @@ class NRSER::Sys::Env::Path
   # 
   # @see http://www.rubydoc.info/gems/hamster/Hamster/Vector#each-instance_method
   # 
-  # @param [nil | Proc<(String)=>*>] &block
+  # @param [nil | Proc<(String)=>*>] block
   #   When present, block will be called once for each string path in this
   #   object. First path is most prominent, down to least last.
   # 

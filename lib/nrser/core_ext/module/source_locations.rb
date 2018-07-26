@@ -108,27 +108,39 @@ class Module
   end
   
   
-  # Get *all* source locations for that module (or class) methods.
+  # Get *all* source locations for that module (or class) methods - class
+  # *and* instance methods.
   # 
-  # @param [type] arg_name
-  #   @todo Add name param description.
+  # @param [Boolean] only_valid
+  #   Filter results to only valid source locations.
   # 
   # @return [Hash<Method, Array<String, Fixnum>>]
-  #   @todo Document return value.
   # 
   def method_locations only_valid: false
     # Get all the src locs for own methods
-    own_class_method_locations( only_valid: only_valid ).
-      map { |name, location|
-        [".#{ name }", location]
-      }.
-      to_h.
-      merge! \
-        own_instance_method_locations(  only_valid: only_valid,
-                                        include_initialize: true ).
-          map { |name, location|
-            ["##{ name }", location]
-          }.to_h
+    # own_class_method_locations( only_valid: only_valid ).
+    #   map { |name, location|
+    #     [".#{ name }", location]
+    #   }.
+    #   to_h.
+    #   merge! \
+    #     own_instance_method_locations(  only_valid: only_valid,
+    #                                     include_initialize: true ).
+    #       map { |name, location|
+    #         ["##{ name }", location]
+    #       }.to_h
+    
+    [
+      [ '.', own_class_method_locations(    only_valid: only_valid ) ],
+
+      [ '#', own_instance_method_locations( only_valid: only_valid,
+                                            include_initialize: true ) ],
+      
+    ].each_with_object( {} ) do |(prefix, method_locations), result|
+      method_locations.each do |name, location|
+        result["#{ prefix }#{ name }"] = location
+      end
+    end
   end # .module_source_locations
   
   

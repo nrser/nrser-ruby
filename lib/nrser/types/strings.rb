@@ -27,7 +27,7 @@ module NRSER::Types
   
   # Get a {Type} only satisfied by empty strings.
   # 
-  # @param [String] name: (default 'EmptyString')
+  # @param [String] name (default 'EmptyString')
   # 
  def_factory(
    :EmptyString,
@@ -55,7 +55,7 @@ module NRSER::Types
   
   # A type satisfied by UTF-8 encoded strings.
   # 
-  # @param [String] name: (default 'UTF8String')
+  # @param [String] name (default 'UTF8String')
   # 
   def_factory :uft_8, aliases: [:utf8] do |name: 'UTF8String', **options|
     str encoding: Encoding::UTF_8, name: name, **options

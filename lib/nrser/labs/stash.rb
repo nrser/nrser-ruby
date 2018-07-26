@@ -46,7 +46,7 @@ class NRSER::Stash < ::Hash
   
   # Save {Hash#[]=} as {#_raw_put} for directly writing keys and values.
   # 
-  # @protected
+  # @!visibility protected
   # 
   alias_method :_raw_put, :[]=
   protected :_raw_put
@@ -55,7 +55,7 @@ class NRSER::Stash < ::Hash
   # Save {Hash#update} as {#_raw_update} for directly writing many key/value
   # pairs.
   # 
-  # @protected
+  # @!visibility protected
   # 
   # @note
   #   This is a hold-over from {HashWithIndifferentAccess}; not currently in
@@ -67,7 +67,7 @@ class NRSER::Stash < ::Hash
   
   # Save {Hash#key?} direct querying of key presence.
   # 
-  # @protected
+  # @!visibility protected
   # 
   alias_method :_raw_key?, :key?
   protected :_raw_key?
@@ -178,7 +178,7 @@ class NRSER::Stash < ::Hash
   #   hash_2['key'] = 12
   #   hash_1.update(hash_2) { |key, old, new| old + new } # => {"key"=>22}
   # 
-  # @param [Proc<(KEY, CURRENT, UPDATE) => VALUE>] &block
+  # @param [Proc<(KEY, CURRENT, UPDATE) => VALUE>] block
   #   Optional block to handle key conflicts.
   # 
   # @return [self]

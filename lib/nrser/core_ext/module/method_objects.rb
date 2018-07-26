@@ -46,7 +46,7 @@ class Module
   # @param include_super  (see NRSER.method_objects_for)
   # @param sort:          (see NRSER.method_objects_for)
   # 
-  # @param [Boolean] include_initialize:
+  # @param [Boolean] include_initialize
   #   When `true`, include `#initialize` method if it's defined, which is
   #   normally excluded from {Module#instance_methods}.
   #   

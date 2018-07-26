@@ -9,14 +9,23 @@ module NRSER::RSpex::ExampleGroup
   # 
   # @param *description (see #describe_x)
   # 
-  # @param [Hash<Symbol, Object>] **bindings
+  # @param [Hash<Symbol, Object>] bindings
   #   See the `bindings` keyword arg in {#describe_x}.
   # 
   # @param &body (see #describe_x)
   # 
   # @return (see #describe_x)
   # 
-  def describe_when *description, **bindings, &body
+  def describe_when *description, it:, **bindings, &body
+
+    if it
+      raise "Don't it and body bro" if body
+
+      body = -> {
+        self.it { is_expected.to }
+      }
+    end
+
     describe_x \
       *description,
       type: :when,

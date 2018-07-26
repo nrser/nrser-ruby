@@ -299,7 +299,7 @@ module NRSER::Log
   
   # Try to find a log level in the ENV.
   # 
-  # @param [String | false | nil] prefix:
+  # @param [String | false | nil] prefix
   #   The prefix to look under.
   # 
   # @return [nil]
@@ -341,7 +341,7 @@ module NRSER::Log
   
   # Setup logging.
   # 
-  # @param [String | false | nil] env_var_prefix:
+  # @param [String | false | nil] env_var_prefix
   #   Prefix to ENV var names to look for logging setup config under,
   #   like `<prefix>_LOG_LEVEL`, `<prefix>_DEBUG` and `<prefix>_TRACE`.
   #   
@@ -448,7 +448,7 @@ module NRSER::Log
   # Call {.setup!} with some default keywords that are nice for interactive
   # session (console/REPL) usage.
   # 
-  # @param [Boolean] add_main_logger:
+  # @param [Boolean] add_main_logger
   #   Define a `logger` method at the top level (global) that gets a logger
   #   for the main object.
   # 

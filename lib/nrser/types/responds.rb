@@ -62,21 +62,21 @@ class Respond < Type
   # 
   # See construction example in the class header: {Respond}.
   # 
-  # @param [String | Symbol | Array] to:
+  # @param [String | Symbol | Array] to
   #   Fed in to {NRSER::Message.from} to create the {#message}.
   #   
   #   Must be a lone string or symbol representing the method name to call,
   #   or an Array with the string or symbol methods name in the first entry
   #   (and whatever other parameters can follow it).
   # 
-  # @param [Type | Object] with:
+  # @param [Type | Object] with
   #   The type members must respond with. If `with:` is not a {Type} it will
   #   be made into on via {Types.make}.
   # 
-  # @param [Boolean] publicly:
+  # @param [Boolean] publicly
   #   Chooses between using `#public_send` and `#send` to send the {#message}.
   # 
-  # @param **options
+  # @param [Hash] options
   #   Additional options that will be passed up to {Type#initialize}.
   # 
   def initialize  to:,

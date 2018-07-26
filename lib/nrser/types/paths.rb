@@ -47,7 +47,7 @@ module NRSER::Types
   # @!method
   #   A path is a non-empty {String} or {Pathname}.
   #   
-  #   @param **options see NRSER::Types::Type#initialize
+  #   @param [Hash] options see NRSER::Types::Type#initialize
   #   
   #   @return [NRSER::Types::Type]
   # 
@@ -73,7 +73,7 @@ module NRSER::Types
   
   # An absolute {#path}.
   # 
-  # @param **options see NRSER::Types::Type#initialize
+  # @param [Hash] options see NRSER::Types::Type#initialize
   # 
   def_factory :abs_path do |name: 'AbsPath', **options|
     intersection \
@@ -103,7 +103,7 @@ module NRSER::Types
   
   # A {NRSER::Types.path} that is a directory.
   # 
-  # @param [Hash] **options
+  # @param [Hash] options
   #   Construction options passed to {NRSER::Types::Type#initialize}.
   # 
   # @return [NRSER::Types::Type]
@@ -122,7 +122,7 @@ module NRSER::Types
   # 
   # @param name: (see NRSER::Types::Type#initialize)
   # 
-  # @param **options
+  # @param [Hash] options
   #   See {NRSER::Types::Type#initialize}
   # 
   def_factory :abs_dir_path do |name: 'AbsDirPath', **options|
@@ -138,13 +138,14 @@ module NRSER::Types
   # 
   # @param name: (see NRSER::Types::Type#initialize)
   # 
-  # @param **options
+  # @param [Hash] options
   #   See {NRSER::Types::Type#initialize}
   # 
   def_factory :file_path do |name: 'FilePath', **options|
     intersection \
       path,
       # TODO  How to change this from {.where}?
+      where( File.method :file? )
       where { |path| File.file? path },
       name: name,
       **options

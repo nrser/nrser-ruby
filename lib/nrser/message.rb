@@ -76,10 +76,10 @@ module NRSER
     # @param [String | Symbol] symbol
     #   Name of target method.
     # 
-    # @param [Array] *args
+    # @param [Array] args
     #   Any arguments that should be sent.
     # 
-    # @param [nil | #call] &block
+    # @param [nil | #call] block
     #   Optional block that should be sent.
     # 
     def initialize symbol, *args, &block
@@ -146,7 +146,7 @@ module NRSER
     # @param [Object] receiver
     #   Object that the message will be sent to.
     # 
-    # @param [Boolean] publicly:
+    # @param [Boolean] publicly
     #   When `true`, the message will be sent via {Object#public_send}. This is
     #   the default behavior.
     #   

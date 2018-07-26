@@ -44,10 +44,7 @@ using NRSER
 
 # Merge "expectation" hashes by appending all clauses for each state.
 # 
-# @example
-#   
-# 
-# @param [Array<Hash>] *expectations
+# @param [Array<Hash>] expectations
 #   Splat of "expectation" hashes - see the examples.
 # 
 def merge_expectations *expectations

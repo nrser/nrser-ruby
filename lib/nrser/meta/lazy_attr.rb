@@ -63,10 +63,10 @@ class LazyAttr < MethodDecorators::Decorator
   #   
   #   It's just `target.receiver`, but the API is how it is.
   # 
-  # @param [Array] *args
+  # @param [Array] args
   #   Any arguments the decorated method was called with.
   # 
-  # @param [Proc?] &block
+  # @param [Proc?] block
   #   The block the decorated method was called with (if any).
   # 
   # @return

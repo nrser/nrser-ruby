@@ -8,11 +8,11 @@ module NRSER
   # @param [Array<Hash>] current
   #   Current (base) array of hashes to start with (lowest predominance).
   # 
-  # @param [Array<Hash>] *updates
+  # @param [Array<Hash>] updates
   #   One or more arrays of update hashes to merge over `current` (last is
   #   highest predominance).
   # 
-  # @param [Proc<(Hash)=>Object>] &merge_key
+  # @param [Proc<(Hash)=>Object>] merge_key
   #   Each hash is passed to `&merge_key` and the result is used to match
   #   hashes for merge. Must not return equal values for two different hashes
   #   in any of the arrays (`current` or any of `*updates`).

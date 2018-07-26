@@ -30,7 +30,7 @@ class NRSER::AttrError < NRSER::ValueError
   attr_reader :expected
   
   
-  # @param [Object] subject:
+  # @param [Object] subject
   #   The object that has the invalid attribute value.
   # 
   def initialize message = nil, symbol:, subject:, **options

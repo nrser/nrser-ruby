@@ -8,7 +8,7 @@ module NRSER::Types
   
   # A label is a non-empty {String} or {Symbol}.
   # 
-  # @param [Hash] **options
+  # @param [Hash] options
   #   Options to pass to {NRSER::Types::Type#initialize}.
   # 
   # @return [NRSER::Types::Type]

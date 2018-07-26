@@ -13,7 +13,7 @@ module NRSER::RSpex::ExampleGroup
   #   If it's a {Wrapper} it will be unwrapped in example contexts of the
   #   new example group.
   # 
-  # @param [Boolean] publicly:
+  # @param [Boolean] publicly
   #   Send message publicly via {Object#public_send} (default) or privately
   #   via {Object.send}.
   # 

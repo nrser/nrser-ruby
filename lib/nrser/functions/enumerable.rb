@@ -48,7 +48,7 @@ module NRSER
   #   Passed as only argument to {NRSER::Types.length} to create the length
   #   type the results are checked against.
   # 
-  # @param [Proc] &block
+  # @param [Proc] block
   #   `#find`/`#find_all`-style block that will be called with each entry
   #   from `enum`. Truthy responses mean the entry matched.
   # 
@@ -109,7 +109,7 @@ module NRSER
   #   Enumerable in question (really, anything that responds to `#first` and
   #   `#count`).
   # 
-  # @param [D] default:
+  # @param [D] default
   #   Value to return if `enum` does not have only one entry.
   # 
   # @return [E]
@@ -206,7 +206,7 @@ module NRSER
   #   {Enumerable} (or other object with compatible `#each_with_object` and
   #   `#to_enum` methods) you want to count.
   # 
-  # @param [Proc<(E)=>C>] &block
+  # @param [Proc<(E)=>C>] block
   #   Block mapping entries in `enum` to the group to count them in.
   # 
   # @return [Hash{C=>Integer}]
@@ -229,7 +229,7 @@ module NRSER
   # @param [Enumerable<E>] enum
   #   Values to call `&block` with.
   # 
-  # @param [Proc<E=>V>] &block
+  # @param [Proc<E=>V>] block
   #   Block to call, which is expected to raise an error if it fails.
   # 
   # @return [V]

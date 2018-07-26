@@ -98,23 +98,23 @@ class Plugin
   #   Though the logging methods don't use a block at this time, it's there
   #   for completeness and possible futures.
   # 
-  # @param [Symbol] level:
+  # @param [Symbol] level
   #   The log level of the call; one of {SemanticLogger::LEVELS}.
   # 
-  # @param [String?] message:
+  # @param [String?] message
   #   Log message.
   # 
-  # @param [Hash?] payload:
+  # @param [Hash?] payload
   #   Map of names to values to log.
   # 
-  # @param [Object?] exception:
+  # @param [Object?] exception
   #   An error to log. This will be an {Exception} in MRI, but *won't* be in
   #   JRuby and possibly other runtimes.
   # 
-  # @param [Object?] metric:
+  # @param [Object?] metric
   #   I don't know what this is. I found it in the SemLog code.
   # 
-  # @param [Proc] &block
+  # @param [Proc] block
   #   Block to pass to the {#logger}'s `level` method. Not currently used
   #   (see note above).
   # 

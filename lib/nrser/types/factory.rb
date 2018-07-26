@@ -32,7 +32,7 @@ module NRSER::Types::Factory
   # Define a type factory.
   # 
   # @!macro [attach] factory
-  #   @param [Hash] **options
+  #   @param [Hash] options
   #     Common type construction options, see {Type#initialize}.
   #   
   #   @return [NRSER::Types::Type]

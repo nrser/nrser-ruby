@@ -56,7 +56,7 @@ describe "Selector" do
           selector: t[ groups: 'b' ] do
       it { is_expected.to \
             eq %w(journal notebook).to_set }; end
-
+  
 
     # This *works*, but I don't think it's totally what I want...
     _when "querying for members of any of a list of groups",

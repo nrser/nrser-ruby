@@ -73,7 +73,7 @@ end # class Maybe
 #   @param [Type] type
 #     The type values must be if they are not `nil`.
 #   
-#   @param **options (see Type.initialize)
+#   @param [Hash] options (see Type.initialize)
 # 
 #   @return [Type]
 # 

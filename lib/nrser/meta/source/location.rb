@@ -56,7 +56,7 @@ class NRSER::Meta::Source::Location < Hamster::Vector
   # @param [Enumerable<Method>] methods
   #   Methods you want the source locations for.
   # 
-  # @param [Boolean] only_valid:
+  # @param [Boolean] only_valid
   #   When `true` filter the results to only those that are {#valid?}.
   # 
   # @return [Hash<Symbol, NRSER::Meta::Source::Location>]

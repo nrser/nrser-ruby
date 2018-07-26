@@ -23,7 +23,7 @@ module NRSER
   # 
   # @param tree (see NRSER.each_branch)
   # 
-  # @param [Boolean] prune:
+  # @param [Boolean] prune
   #   When `true`, prunes out values whose labels end with `?` and values are
   #   `nil`.
   # 

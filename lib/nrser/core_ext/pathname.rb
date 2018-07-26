@@ -4,7 +4,7 @@ class Pathname
   
   # override to accept Pathname instances.
   # 
-  # @param [String] *prefixes
+  # @param [String] prefixes
   #   the prefixes to see if the Pathname starts with.
   # 
   # @return [Boolean]
@@ -72,10 +72,10 @@ class Pathname
   # Shortcut to convert into a relative pathname, by default from the working
   # directory, with option to `./` prefix.
   # 
-  # @param [Pathname] base_dir:
+  # @param [Pathname] base_dir
   #   Directory you want the result to be relative to.
   # 
-  # @param [Boolean] dot_slash:
+  # @param [Boolean] dot_slash
   #   When `true` will prepend `./` to the resulting path, unless it already
   #   starts with `../`.
   # 

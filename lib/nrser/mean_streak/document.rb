@@ -166,7 +166,7 @@ class NRSER::MeanStreak::Document
   # Computes the *byte* index for a `line` and `column` in the source, both
   # of which *are in bytes*.
   # 
-  # @param [Integer] line:
+  # @param [Integer] line
   #   
   # 
   def source_byte_index line:, column:

@@ -90,17 +90,17 @@ class NRSER::Char::Special
   
   # Instantiate a new `Special`.
   # 
-  # @param [String] char:
+  # @param [String] char
   #   The actual character as a length 1 UTF-8 string.
   # 
-  # @param [nil | String] caret:
+  # @param [nil | String] caret
   #   Optional `^X` replacement for control characters, see {#caret} for
   #   details.
   # 
-  # @param [Array<#to_s>] names:
+  # @param [Array<#to_s>] names
   #   Optional names this character goes by.
   # 
-  # @param [nil | String] symbol:
+  # @param [nil | String] symbol
   #   Optional printable unicode character replacement, see {#symbol} for
   #   details.
   # 
@@ -177,7 +177,7 @@ class NRSER::Char::Special
   # @param [String] string
   #   String to replace this character in.
   # 
-  # @param [Symbol | #to_s] with:
+  # @param [Symbol | #to_s] with
   #   What to replace the character with:
   #   
   #   1.  {Symbol} - this method will be called on the instance and the

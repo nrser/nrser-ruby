@@ -24,7 +24,7 @@ module NRSER
   # @param [Enumerable<V>] enum
   #   Enumerable containing the values for the hash.
   # 
-  # @param [Proc<(V)=>K>] &block
+  # @param [Proc<(V)=>K>] block
   #   Block that maps `enum` values to their hash keys.
   # 
   # @return [Hash<K, V>]
@@ -53,12 +53,21 @@ module NRSER
   # Create a {Hash} mapping the entries in `enum` to the value returned by
   # passing them through `&block`, raising on conflicts.
   # 
+  # @param [Enumerable<ENTRY>] enum
   # 
-  # @param [type] arg_name
-  #   @todo Add name param description.
+  # @param [ :raise | :first_wins | :last_wins | Proc ] on_conflict
+  #   What to do when there's a conflict mapping the entries into the hash.
+  #   
+  #   The names are meant to make some sense.
   # 
-  # @return [return_type]
-  #   @todo Document return value.
+  # @param [Proc<(ENTRY)=>VALUE>] block
+  #   The star of the show! Maps `ENTRY` from `enum` to `VALUE` for the
+  #   resulting hash.
+  # 
+  # @return [Hash<ENTRY, VALUE>]
+  # 
+  # @raise [NRSER::ConflictError]
+  #   If a conflict occurs and `on_conflict` is set to `:raise`.
   # 
   def self.assoc_to enum, on_conflict: :raise, &block
     enum.each_with_object( {} ) { |entry, hash|

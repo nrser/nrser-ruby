@@ -16,10 +16,10 @@ module NRSER
   # @param [Boolean] include_super
   #   When `true`, includes inherited class methods.
   # 
-  # @param [:class | :instance] type:
+  # @param [:class | :instance] type
   #   Get class or instance methods.
   # 
-  # @param [Boolean] sort:
+  # @param [Boolean] sort
   #   If `true`, will sort the methods by name, which is usually
   #   the useful way to look at and use them.
   # 

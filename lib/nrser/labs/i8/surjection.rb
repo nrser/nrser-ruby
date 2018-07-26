@@ -1,12 +1,14 @@
 # encoding: UTF-8
 # frozen_string_literal: true
 
+
 # Requirements
 # =======================================================================
 
 # Project / Package
 # -----------------------------------------------------------------------
 require 'nrser/labs/i8'
+
 
 # HACK
 class Object
@@ -80,9 +82,9 @@ class Surjection
 
   # The Ruby hash-ish aliases (as methods for easy subclass overrides)
 
-  # @see {#call}
+  # @see #call
   def get key;  call key; end
-  # @see {#call}
+  # @see #call
   def []  key;  call key; end
 
 
@@ -140,11 +142,11 @@ class Surjection
 
   # The standard aliases (as methods for easy subclass overrides)
 
-  # @see {#key?}
+  # @see #key?
   def has_key?  key; key? key; end
-  # @see {#key?}
+  # @see #key?
   def include?  key; key? key; end
-  # @see {#key?}
+  # @see #key?
   def member?   key; key? key; end
 
 
@@ -158,7 +160,7 @@ class Surjection
 
   # The Ruby-Hash-y name (as a method for easy subclass overrides)
 
-  # @see {#codomain}
+  # @see #codomain
   def values; codomain; end
 
 

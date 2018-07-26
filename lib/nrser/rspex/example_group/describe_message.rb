@@ -13,7 +13,7 @@ module NRSER::RSpex::ExampleGroup
   # 
   # @see #describe_x
   #
-  # @param [Array] *args
+  # @param [Array] args
   #   Passed to {NRSER::Message.from} to get or create the message instance.
   # 
   # @param &body (see #describe_x)

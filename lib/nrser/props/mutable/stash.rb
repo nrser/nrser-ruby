@@ -106,13 +106,13 @@ module NRSER::Props::Mutable::Stash
     # Override {NRSER::Props::InstanceMethods#to_data} to handle non-prop
     # values in the {NRSER::Stash}.
     # 
-    # @param [Boolean] only_props:
+    # @param [Boolean] only_props
     #   When `true` only prop values will be added to the data hash.
     #   
     #   Otherwise, any non-prop keys and vales will be added as well
     #   (default behavior).
     # 
-    # @param **kwds
+    # @param [Hash] kwds
     #   See {NRSER::Props::InstanceMethods#to_data}.
     # 
     # @return (see NRSER::Props::InstanceMethods#to_data)

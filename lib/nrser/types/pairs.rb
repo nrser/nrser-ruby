@@ -56,10 +56,10 @@ module NRSER::Types
   
   # Type for key/value pairs encoded as {Hash} with a single entry.
   # 
-  # @param [String] name:
+  # @param [String] name
   #   Name to give the new type.
   # 
-  # @param [Hash] **options
+  # @param [Hash] options
   #   Other options to pass to
   # 
   def_factory(

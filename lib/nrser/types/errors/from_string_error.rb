@@ -50,13 +50,13 @@ class NRSER::Types::FromStringError < ::ArgumentError
   # 
   # @param *message (see NRSER::NicerError#initialize)
   # 
-  # @param [String] string:
+  # @param [String] string
   #   The string the type was trying to load a value from.
   # 
-  # @param [NRSER::Types::Type] type:
+  # @param [NRSER::Types::Type] type
   #   The type that was trying to load.
   # 
-  # @param **kwds
+  # @param [Hash] kwds
   #   See {NRSER::NicerError#initialize}
   # 
   def initialize *message, string:, type:, **kwds

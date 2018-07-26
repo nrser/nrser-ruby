@@ -120,13 +120,13 @@ class Prop
   # `.prop` "macro" defined at {NRSER::Props::Props::ClassMethods#prop}
   # that is extended in to classes including {NRSER::Props::Props}.
   # 
-  # @param [nil | Proc | Object] default:
+  # @param [nil | Proc | Object] default
   #   A default value or a {Proc} used to get default values for *primary*
   #   props. *Dervied* props (those that have a {#source}) may not
   # 
   #   At least one of `default:` and `source:` must be `nil`.
   # 
-  # @param [nil | Symbol | String | Proc] source:
+  # @param [nil | Symbol | String | Proc] source
   #   Source that provides the prop's value. See details for how each type is
   #   handled in {#source}. Strings are converted to symbols.
   #   
@@ -390,13 +390,9 @@ class Prop
   end # #full_name
   
   
-  # Test if this prop is configured to provide default values -
+  # Test if this prop is configured to provide default values.
   # 
-  # @param [type] arg_name
-  #   @todo Add name param description.
-  # 
-  # @return [return_type]
-  #   @todo Document return value.
+  # @return [Boolean]
   # 
   def has_default?
     @has_default
@@ -451,26 +447,21 @@ class Prop
   end # #source?
   
   
-  # @todo Document instance_variable_source? method.
+  # Is the value of this prop coming from an instance variable?
   # 
-  # @param [type] arg_name
-  #   @todo Add name param description.
-  # 
-  # @return [return_type]
-  #   @todo Document return value.
+  # @return [Boolean]
   # 
   def instance_variable_source?
     @instance_variable_source
   end # #instance_variable_source?
   
   
-  # @todo Document primary? method.
+  # Does this property represent and independent value (**not** sourced)?
   # 
-  # @param [type] arg_name
-  #   @todo Add name param description.
+  # Primary properties are important because they're the ones you need to
+  # store and transport to reconstruct the instance.
   # 
-  # @return [return_type]
-  #   @todo Document return value.
+  # @return [Boolean]
   # 
   def primary?
     !source?

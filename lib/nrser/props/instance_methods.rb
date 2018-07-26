@@ -69,7 +69,7 @@ module NRSER::Props::InstanceMethods
   # end # #initialize_props
   
   
-  # @param [Proc<(KEY, CURRENT, UPDATE) => VALUE>] &block
+  # @param [Proc<(KEY, CURRENT, UPDATE) => VALUE>] block
   #   Optional block to handle conflicts.
   # 
   def merge other, &block
@@ -87,10 +87,10 @@ module NRSER::Props::InstanceMethods
   
   # Create a new hash with property names mapped to values.
   # 
-  # @param [Boolean] only_own:
+  # @param [Boolean] only_own
   #   When `true`, don't include parent properties.
   # 
-  # @param [Boolean] only_primary:
+  # @param [Boolean] only_primary
   #   When `true`, don't include sourced properties.
   # 
   # @return [Hash<Symbol, Object>]
@@ -118,16 +118,16 @@ module NRSER::Props::InstanceMethods
   # supports symbol values, they have poor portability across languages,
   # and they mean the same thing in this situation.
   # 
-  # @param [Boolean] only_own:
+  # @param [Boolean] only_own
   #   When `true`, don't include parent properties.
   # 
-  # @param [Boolean] only_primary:
+  # @param [Boolean] only_primary
   #   When `true`, don't include sourced properties.
   # 
-  # @param [Boolean] add_class:
+  # @param [Boolean] add_class
   #   Add a special key with the class' name as the value.
   # 
-  # @param [String] class_key:
+  # @param [String] class_key
   #   Name for special class key.
   # 
   # @return [Hash<String, *>]
@@ -158,7 +158,7 @@ module NRSER::Props::InstanceMethods
   
   # Get a JSON {String} encoding the instance's data.
   # 
-  # @param [Array] *args
+  # @param [Array] args
   #   I really don't know. `#to_json` takes at last one argument, but I've
   #   had trouble finding a spec for it :/
   # 
@@ -171,7 +171,7 @@ module NRSER::Props::InstanceMethods
   
   # Get a YAML {String} encoding the instance's data.
   # 
-  # @param [Array] *args
+  # @param [Array] args
   #   I really don't know... whatever {YAML.dump} sends to it i guess.
   # 
   # @return [String]

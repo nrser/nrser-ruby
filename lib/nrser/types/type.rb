@@ -35,11 +35,11 @@ class Type
   
   # Instantiate a new `NRSER::Types::Type`.
   # 
-  # @param [nil | String] name:
+  # @param [nil | String] name
   #   Name that will be used when displaying the type, or `nil` to use a
   #   default generated name.
   # 
-  # @param [nil | #call] from_s:
+  # @param [nil | #call] from_s
   #   Callable that will be passed a {String} and should return an object
   #   that satisfies the type if it possible to create one.
   #   
@@ -47,7 +47,7 @@ class Type
   #   value that doesn't satisfy will result in a {TypeError} being raised
   #   by {#from_s}.
   # 
-  # @param [nil | #call | #to_proc] to_data:
+  # @param [nil | #call | #to_proc] to_data
   #   Optional callable (or object that responds to `#to_proc` so we can
   #   get a callable) to call to turn type members into "data".
   # 
@@ -105,6 +105,8 @@ class Type
   # 
   # Display ends up being pretty important with types, and also ends up 
   # complete mess very easily.
+  # 
+  # 
   # 
   
   # What this type likes to be called (and displayed as by default).
@@ -523,7 +525,7 @@ class Type
   # Return an *intersection* type satisfied by values that satisfy both
   # `self` *and* all of `others`.
   # 
-  # @param [Array] *others
+  # @param [Array] others
   #   Values passed through {NRSER::Types.make} to create the other types.
   # 
   # @return [NRSER::Types::Intersection]

@@ -114,7 +114,7 @@ class NRSER::Log::Logger < SemanticLogger::Logger
   # easier to work with than the standard logging methods' multiple valid
   # argument formats.
   # 
-  # @param [Array] *args
+  # @param [Array] args
   #   Valid arguments for {SemanticLogger::Logger#debug}, etc. - see notes
   #   above.
   # 
@@ -250,13 +250,13 @@ class NRSER::Log::Logger < SemanticLogger::Logger
   #   Name of the class, module, or other identifier for which the log messages
   #   are being logged
   #
-  # @param [nil | Symbol] level:
+  # @param [nil | Symbol] level
   #   Only allow log entries of this level or higher to be written to this
   #   appender For example if set to :warn, this appender would only log
   #   `:warn` and `:fatal` log messages when other appenders could be logging
   #   `:info` and lower.
   #
-  # @param [nil | Regexp | Proc<(SemanticLogger::Log) => Boolean>] filter:
+  # @param [nil | Regexp | Proc<(SemanticLogger::Log) => Boolean>] filter
   #   1.  {RegExp}: Only include log messages where the class name matches
   #       the supplied regular expression. All other messages will be
   #       ignored.
@@ -382,7 +382,7 @@ class NRSER::Log::Logger < SemanticLogger::Logger
   #     what_is_your_favorite_color?
   #   end
   # 
-  # @param **options
+  # @param [Hash] options
   #   Passed to {Catcher#initialize}.
   # 
   # @return [Catcher]
@@ -405,7 +405,7 @@ class NRSER::Log::Logger < SemanticLogger::Logger
   # @param [Symbol?] level
   #   One of {SemanticLogger::LEVELS} or `nil` to use the global default level.
   # 
-  # @param [Proc<() => RESULT] &block
+  # @param [Proc<() => RESULT>] block
   #   Block to execute with the `level`.
   # 
   # @return [RESULT]
@@ -428,16 +428,16 @@ class NRSER::Log::Logger < SemanticLogger::Logger
   # Which is funny, because only I use the library, and probably only I will
   # ever use this library. So I'm basically nagging my-fucking-self. Sad.
   # 
-  # @param [Array] *message
+  # @param [Array] message
   #   Message segments, formatted with {NRSER.fmt_msg}.
   # 
-  # @param [String] method:
+  # @param [String] method
   #   Something about what method it is.
   # 
-  # @param [String?] alternative:
+  # @param [String?] alternative
   #   Optionally (hopefully) something about what I should be using.
   # 
-  # @param [Integer] max_stack_lines:
+  # @param [Integer] max_stack_lines
   #   How many lines of the stack to spew out (it can get real big real easy).
   # 
   # @return [nil]

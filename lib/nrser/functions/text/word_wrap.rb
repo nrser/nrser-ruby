@@ -9,10 +9,10 @@ module NRSER
   # @param [String] text
   #   Text to word wrap.
   # 
-  # @param [Fixnum] line_width:
+  # @param [Fixnum] line_width
   #   Line with in number of character to wrap at.
   # 
-  # @param [String] break_sequence:
+  # @param [String] break_sequence
   #   String to join lines with.
   # 
   # @return [String]

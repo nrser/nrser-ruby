@@ -31,13 +31,13 @@ module NRSER::Types
     
     # Instantiate a new `TupleType`.
     # 
-    # @param [Array] *types
+    # @param [Array] types
     #   Tuple value types by their index in the tuples.
     #   
     #   Entries are passed through {NRSER::Types.make} to create the type
     #   if needed.
     # 
-    # @param [Hash<Symbol, *>] **options
+    # @param [Hash<Symbol, *>] options
     #   Type options; see {NRSER::Types::Type#initialize}.
     # 
     def initialize *types, **options
@@ -106,7 +106,7 @@ module NRSER::Types
   # Get a tuple type.
   # 
   # @param *types (see TupleType#initialize)
-  # @param **options (see TupleType#initialize)
+  # @param [Hash] options (see TupleType#initialize)
   # 
   # @return [NRSER::Types::Type]
   # 

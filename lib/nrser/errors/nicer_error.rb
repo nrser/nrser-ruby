@@ -108,14 +108,14 @@ module NRSER::NicerError
   
   # Construct a nicer error.
   # 
-  # @param [Array] *message
+  # @param [Array] message
   #   Main message segments.
   # 
-  # @param [Binding?] binding:
+  # @param [Binding?] binding
   #   When provided any details string will be rendered using it's
   #   {Binding#erb} method.
   # 
-  # @param [nil | String | Proc<()=>String> | #to_s] details:
+  # @param [nil | String | Proc<()=>String> | #to_s] details
   #   Additional text details to add to the extended message. When:
   #   
   #   1.  `nil` - no details will be added.
@@ -131,7 +131,7 @@ module NRSER::NicerError
   #       `#to_s` will be called on the value and the result will be used
   #       as in (2).
   # 
-  # @param [Hash<Symbol, VALUE>] **context
+  # @param [Hash<Symbol, VALUE>] context
   #   Any additional names and values to dump with an extended message.
   # 
   def initialize  *message,
@@ -171,7 +171,7 @@ module NRSER::NicerError
   
   # Format the main message by converting args to strings and joining them.
   # 
-  # @param [Array] *message
+  # @param [Array] message
   #   Message segments.
   # 
   # @return [String]
@@ -306,7 +306,7 @@ module NRSER::NicerError
   #   {Exception#message} just forwards here, so I overrode that with
   #   {#message} to just get the *summary/super-message* from this method.
   # 
-  # @param [Boolean?] extended:
+  # @param [Boolean?] extended
   #   Flag to explicitly control summary/super or extended message:
   #   
   #   1.  `nil` - call {#add_extended_message?} to decide (default).

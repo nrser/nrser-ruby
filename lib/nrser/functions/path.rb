@@ -61,10 +61,10 @@ module NRSER
   #   Relative path to search for. Can contains glob patterns; see the `glob`
   #   keyword.
   # 
-  # @param [String | Pathname] from:
+  # @param [String | Pathname] from
   #   Where to start the search. This is the first directory checked.
   # 
-  # @param [Boolean | :guess] glob:
+  # @param [Boolean | :guess] glob
   #   Controls file-glob behavior with respect to `rel_path`:
   #   
   #   -   `:guess` (default) - boolean value is computed by passing `rel_path`
@@ -89,12 +89,12 @@ module NRSER
   #   There should be a way to cut the search off early or detect `**` in
   #   the `rel_path` and error out or something to prevent full FS search.
   # 
-  # @param [Symbol] test:
+  # @param [Symbol] test
   #   The test to perform on pathnames to see if they match. Defaults to
   #   `:exist?` - which calls {Pathname#exist?} - but could be `:directory?`
   #   or anything else that makes sense.
   # 
-  # @param [Symbol] result:
+  # @param [Symbol] result
   #   What information to return:
   #   
   #   -   `:common_root` (default) - return the directory that the match was

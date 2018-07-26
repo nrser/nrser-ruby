@@ -45,15 +45,15 @@ class NRSER::Types::CheckError < ::TypeError
   
   # Construct a `NicerError`.
   # 
-  # @param [*] value:
+  # @param [*] value
   #   The {#value} that failed the check.
   # 
-  # @param [NRSER::Types::Type] type:
+  # @param [NRSER::Types::Type] type
   #   The type that was checked.
   # 
   # @param details: (see NRSER::NicerError#initialize)
   # 
-  # @param **kwds
+  # @param [Hash] kwds
   #   See {NRSER::NicerError#initialize}
   # 
   def initialize *message, value:, type:, details: nil, **kwds

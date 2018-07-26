@@ -17,7 +17,7 @@ module NRSER
   # @param [Enumerable<E>] enum
   #   Entries to search (in order).
   # 
-  # @param [Proc<(E)=>R>] &block
+  # @param [Proc<(E)=>R>] block
   #   Block mapping entires to results.
   # 
   # @return [nil]

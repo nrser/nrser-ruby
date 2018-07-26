@@ -72,7 +72,7 @@ class String
   # 
   # Use {Regexp} ones at your own pleasure and peril.
   # 
-  # @param [String | Regexp] *prefixes
+  # @param [String | Regexp] prefixes
   #   Strings behave as usual per the standard lib.
   #   
   #   Regexp sources are used to create a new Regexp with `\A` at the start -

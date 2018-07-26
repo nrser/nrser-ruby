@@ -97,7 +97,7 @@ class Where < Type
   #     Arity 1 bound method that will be used to decide membership (if it 
   #     responds truthy then the argument is a member of the type).
   #   
-  #   @param **options
+  #   @param [Hash] options
   #     Additional options that will be passed up to {Type#initialize}.
   # 
   # 
@@ -108,14 +108,14 @@ class Where < Type
   #   
   #   it exists mostly for legacy reasons, and for the 
   #   
-  #   @param [String] name:
+  #   @param [String] name
   #     In this form, a `name` is required because it is not usually possible 
   #     to extract any descriptive information from the `&block`.
   # 
-  #   @param **options
+  #   @param [Hash] options
   #     Additional options that will be passed up to {Type#initialize}.
   # 
-  #   @param [Proc<(Object)=>Boolean>] &block
+  #   @param [Proc<(Object)=>Boolean>] block
   #     Arity 1 {Proc} that will be used to decide membership (if it responds 
   #     truthy then the argument is a member of the type).
   #   

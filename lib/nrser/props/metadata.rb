@@ -119,10 +119,10 @@ class NRSER::Props::Metadata
   
   # Get a map of property names to property instances.
   # 
-  # @param [Boolean] only_own:
+  # @param [Boolean] only_own
   #   Don't include super-class properties.
   # 
-  # @param [Boolean] only_primary:
+  # @param [Boolean] only_primary
   #   Don't include properties that have a {NRSER::Props::Prop#source}.
   # 
   # @return [Hash{ Symbol => NRSER::Props::Prop }]
@@ -151,7 +151,7 @@ class NRSER::Props::Metadata
   # @param [Symbol] name
   #   The name of the property.
   # 
-  # @param [Hash{ Symbol => Object }] **opts
+  # @param [Hash{ Symbol => Object }] opts
   #   Constructor options for {NRSER::Props::Prop}.
   # 
   # @return [NRSER::Props::Prop]
@@ -203,7 +203,7 @@ class NRSER::Props::Metadata
   #   Collection of prop values iterable by key/value pairs or by indexed
   #   entries.
   # 
-  # @param [Proc<(NRSER::Props::Prop, VALUE)>] &block
+  # @param [Proc<(NRSER::Props::Prop, VALUE)>] block
   #   Block that will receive primary prop and value pairs.
   # 
   # @raise [TypeError]

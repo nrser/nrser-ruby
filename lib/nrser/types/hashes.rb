@@ -182,7 +182,7 @@ module NRSER::Types
   
   # Type satisfied by {Hash} instances.
   # 
-  # @param [Array] *args
+  # @param [Array] args
   #   Passed to {NRSER::Types::HashType#initialize} unless empty.
   # 
   # @return [NRSER::Types::HASH]

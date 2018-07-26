@@ -120,11 +120,11 @@ module NRSER
   # @param [String] text
   #   String text to indent tag.
   # 
-  # @param [String] marker:
+  # @param [String] marker
   #   Special string to mark the start of tagged lines. If interpolated text
   #   lines start with this string you're going to have a bad time.
   # 
-  # @param [String] separator:
+  # @param [String] separator
   #   Special string to separate the leading indent from the rest of the line.
   # 
   # @return [String]
@@ -151,10 +151,10 @@ module NRSER
   # @param [String] text
   #   Tagged text string.
   # 
-  # @param [String] marker:
+  # @param [String] marker
   #   Must be the marker used to tag the text.
   # 
-  # @param [String] separator:
+  # @param [String] separator
   #   Must be the separator used to tag the text.
   # 
   # @return [String]
@@ -182,11 +182,11 @@ module NRSER
   # Indent tag a some text via {NRSER.indent_tag}, call the block with it,
   # then pass the result through {NRSER.indent_untag} and return that.
   # 
-  # @param [String] marker:
+  # @param [String] marker
   #   Special string to mark the start of tagged lines. If interpolated text
   #   lines start with this string you're going to have a bad time.
   # 
-  # @param [String] separator:
+  # @param [String] separator
   #   Must be the separator used to tag the text.
   # 
   # @return [String]

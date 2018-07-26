@@ -22,7 +22,7 @@ module NRSER
   #   The {Enumerable} slice that we want to see if `enum` includes. Must
   #   support `#length` and `#slice` like {Array} does.
   # 
-  # @param [Proc<(E, S)=>Boolean>] &is_match
+  # @param [Proc<(E, S)=>Boolean>] is_match
   #   Optional {Proc} that accepts an entry from `enum` and an entry from
   #   `slice` and returns if they match.
   # 

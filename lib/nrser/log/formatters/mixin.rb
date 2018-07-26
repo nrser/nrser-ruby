@@ -160,7 +160,7 @@ module NRSER::Log::Formatters::Mixin
   #   # >
   #   # => true
   # 
-  # @param [Array<Symbol>] *tokens
+  # @param [Array<Symbol>] tokens
   #   Optional list of token symbols to set as the header format.
   #   
   #   When empty, the method works as a getter, returning the current header
@@ -184,7 +184,7 @@ module NRSER::Log::Formatters::Mixin
   # 
   # @see #header
   # 
-  # @param [Array<Symbol>] *tokens
+  # @param [Array<Symbol>] tokens
   #   Token symbols to set as the header format.
   # 
   # @return [HeaderTokens]
@@ -202,7 +202,7 @@ module NRSER::Log::Formatters::Mixin
   # 
   # @see #header
   # 
-  # @param [Array<Symbol>] *tokens
+  # @param [Array<Symbol>] tokens
   #   When not empty, sets the body to those tokens in that order.
   #   
   #   When empty, the current body is returned.
@@ -225,7 +225,7 @@ module NRSER::Log::Formatters::Mixin
   # 
   # @see #header
   # 
-  # @param [Array<Symbol>] *tokens
+  # @param [Array<Symbol>] tokens
   #   Token symbols to set as the body format.
   # 
   # @return [HeaderTokens]

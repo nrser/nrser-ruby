@@ -34,7 +34,7 @@ class Hash
   # @param *keys
   #   Hash keys to extract.
   # 
-  # @param [#<<] into:
+  # @param [#<<] into
   #   Object to extract values at `keys` into.
   # 
   # @return [into]

@@ -17,8 +17,8 @@ module  Types
 
 # Abstract base class for logically combining types to create new ones.
 # 
-# @see {Union}
-# @see {Intersection}
+# @see Union
+# @see Intersection
 # 
 class Combinator < Type
   

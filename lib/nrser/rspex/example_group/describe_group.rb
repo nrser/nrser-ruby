@@ -8,7 +8,7 @@ module NRSER::RSpex::ExampleGroup
   # 
   # @param *description (see #describe_x)
   # 
-  # @param [Hash<Symbol, Object>] **metadata
+  # @param [Hash<Symbol, Object>] metadata
   #   RSpec metadata to set for the example group.
   #   
   #   See the `metadata` keyword argument to {#describe_x}.

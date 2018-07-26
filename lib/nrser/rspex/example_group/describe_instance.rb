@@ -5,7 +5,7 @@ module NRSER::RSpex::ExampleGroup
   # Describe an instance of the described class by providing arguments for
   # it's construction.
   # 
-  # @param [Array] *constructor_args
+  # @param [Array] constructor_args
   #   Arguments to pass to `.new` on {#described_class} to create instances.
   # 
   # @return [void]

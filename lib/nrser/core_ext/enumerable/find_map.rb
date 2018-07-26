@@ -18,7 +18,7 @@ module Enumerable
   # @param [nil | Proc<()=>DEFAULT>] ifnone
   #   Optional lambda to call for the return value when no match is found.
   # 
-  # @param [Proc<(E)=>RESLUT>] &block
+  # @param [Proc<(E)=>RESLUT>] block
   #   Block mapping entires to results.
   # 
   # @return [nil]

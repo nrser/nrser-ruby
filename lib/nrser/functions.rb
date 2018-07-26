@@ -1,7 +1,5 @@
-##
 # Require everything in `//lib/nrser/functions` - the core functional
 # interfaces that underlie all the refinements.
-##
 
 require_relative './functions/proc'
 require_relative './functions/object'

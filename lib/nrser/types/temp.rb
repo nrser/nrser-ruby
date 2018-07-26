@@ -12,8 +12,8 @@ module NRSER::Types
   #   really. The idea of membership is pretty wide-spread and important,
   #   but it's a bit a vague and inconsistently implemented things.
   # 
-  # @param [#include?] group
-  #   `#include?` will be called on this value to determine type membership.
+  # @param [Object] member
+  #   The object that needs to be included for type satisfaction.
   # 
   # @return [NRSER::Types::Type]
   # 

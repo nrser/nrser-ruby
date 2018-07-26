@@ -112,7 +112,7 @@ module NRSER
   # @param [Fixnum] max
   #   Max length to allow for the output string.
   # 
-  # @param [String] omission:
+  # @param [String] omission
   #   The string to stick in the middle where original contents were
   #   removed. Defaults to the unicode ellipsis since I'm targeting the CLI
   #   at the moment and it saves precious characters.
@@ -175,12 +175,12 @@ module NRSER
   #   Max length to allow for the output string. Result will usually be
   #   *less* than this unless the fallback to {NRSER.ellipsis} kicks in.
   # 
-  # @param [String] omission:
+  # @param [String] omission
   #   The string to stick in the middle where original contents were
   #   removed. Defaults to the unicode ellipsis since I'm targeting the CLI
   #   at the moment and it saves precious characters.
   # 
-  # @param [String] split:
+  # @param [String] split
   #   The string to tokenize the `string` parameter by. If you pass a
   #   {Regexp} here it might work, it might loop out, maybe.
   # 

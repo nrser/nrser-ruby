@@ -14,7 +14,7 @@ class Object
   #   The name of the instance variable. Needs to have that `@` on the
   #   front, like `:@x`.
   # 
-  # @param [Proc<() => VALUE>] &block
+  # @param [Proc<() => VALUE>] block
   #   The block to call to get the value.
   # 
   # @return [VALUE]

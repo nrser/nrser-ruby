@@ -21,7 +21,7 @@ class NRSER::MethodMissingForwarder < BasicObject
   # Instantiate a new `NRSER::MethodMissingForwarder` holding the forwarding
   # block.
   # 
-  # @param [Proc<(symbol:Symbol, *args, &block)>] &forwarder
+  # @param [Proc<(symbol:Symbol, *args, &block)>] forwarder
   #   Block that will receive all calls to {#method_missing}.
   # 
   def initialize &forwarder
@@ -37,10 +37,10 @@ class NRSER::MethodMissingForwarder < BasicObject
   # @param [Symbol] symbol
   #   The name of the method that was called.
   # 
-  # @param [Array] *args
+  # @param [Array] args
   #   Any parameters the missing method was called with.
   # 
-  # @param [Proc?] &block
+  # @param [Proc?] block
   #   The block the method was called with, if any.
   # 
   def method_missing symbol, *args, &block

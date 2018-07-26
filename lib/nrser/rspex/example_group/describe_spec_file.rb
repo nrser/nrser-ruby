@@ -38,10 +38,10 @@ module NRSER::RSpex::ExampleGroup
   #   2.  Built description would need to be conditional on what metadata
   #       was found.
   # 
-  # @param [String] description:
+  # @param [String] description
   #   A description of the spec file to add to the RSpec description.
   # 
-  # @param [String] spec_path:
+  # @param [String] spec_path
   #   The path to the spec file (just feed it `__FILE__`).
   #   
   #   Probably possible to extract this somehow without having to provide it?

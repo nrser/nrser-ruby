@@ -76,7 +76,7 @@ class Array
   #   [:fetch, :x].sender.call x: 'ex'
   #   # => 'ex'
   # 
-  # @param [Boolean] publicly:
+  # @param [Boolean] publicly
   #   When `true`, uses `#public_send` in liu of `#send`.
   # 
   # @return [Proc]
@@ -130,7 +130,7 @@ class Array
 
   # Old name for {#to_proc}.
   # 
-  # @depreciated
+  # @deprecated
   # 
   def to_digger
     NRSER.logger.depreciated \

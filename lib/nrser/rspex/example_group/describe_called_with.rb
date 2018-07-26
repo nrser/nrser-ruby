@@ -15,10 +15,10 @@ module NRSER::RSpex::ExampleGroup
   #     end
   #   end
   # 
-  # @param [Array] *args
+  # @param [Array] args
   #   Arguments to call `subject` with to produce the new subject.
   # 
-  # @param [#call] &body
+  # @param [#call] body
   #   Block to execute in the context of the example group after refining
   #   the subject.
   # 
@@ -37,7 +37,7 @@ module NRSER::RSpex::ExampleGroup
   
   # Version of {#describe_called_with} for when you have no arguments.
   # 
-  # @param [#call] &body
+  # @param [#call] body
   #   Block to execute in the context of the example group after refining
   #   the subject.
   # 
