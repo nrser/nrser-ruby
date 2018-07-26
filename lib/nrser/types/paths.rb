@@ -111,7 +111,6 @@ module NRSER::Types
   def_factory :dir_path do |name: 'DirPath', **options|
     intersection \
       path,
-      # TODO  How to change this from {.where}?
       where( File.method :directory? ),
       name: name,
       **options
