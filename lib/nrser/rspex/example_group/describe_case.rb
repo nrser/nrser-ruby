@@ -16,6 +16,7 @@ module NRSER::RSpex::ExampleGroup
   end # #describe_case
 
   alias_method :use_case, :describe_case
+  alias_method :CASE, :describe_case
   
   # Older name
   alias_method :describe_use_case, :describe_case

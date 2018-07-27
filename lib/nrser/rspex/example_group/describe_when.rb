@@ -30,6 +30,7 @@ module NRSER::RSpex::ExampleGroup
   # Short names (need `_` pre 'cause of `when` Ruby keyword, and suffix fucks
   # up auto-indent in Atom/VSCode)
   alias_method :_when, :describe_when
+  alias_method :WHEN, :describe_when
   
   
 end # module NRSER::RSpex::ExampleGroup

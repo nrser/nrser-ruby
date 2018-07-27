@@ -18,5 +18,6 @@ module NRSER::RSpex::ExampleGroup
   end # #describe_setup
   
   alias_method :setup, :describe_setup
+  alias_method :SETUP, :describe_setup
   
 end # module NRSER::RSpex::ExampleGroup

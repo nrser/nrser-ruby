@@ -21,5 +21,7 @@ module NRSER::RSpex::ExampleGroup
       },
       &body
   end # #describe_instance
+
+  alias_method :INSTANCE, :describe_instance
   
 end # module NRSER::RSpex::ExampleGroup

@@ -29,4 +29,6 @@ module NRSER::RSpex::ExampleGroup
       &body
   end # #describe_class
   
+  alias_method :CLASS, :describe_class
+  
 end # module NRSER::RSpex::ExampleGroup

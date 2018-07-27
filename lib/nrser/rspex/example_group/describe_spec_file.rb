@@ -85,5 +85,7 @@ module NRSER::RSpex::ExampleGroup
       &describe_x_body
     
   end # #describe_spec_file
+
+  alias_method :SPEC_FILE, :describe_spec_file
   
 end # module NRSER::RSpex::ExampleGroup
