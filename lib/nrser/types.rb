@@ -197,26 +197,6 @@ module NRSER::Types
       },
     }
   end # .from_repr
-
-
-  def self.[] pairs
-    shape pairs.transform_values { |value|
-      if value.is_a?( Type )
-        value
-      else
-        # self.when( value ) | (bag & has( value ))
-        self.or(
-          self.when( value ),
-          (bag & has( value )),
-          name: "{#{ value.inspect  }}"
-        )
-      end
-    }
-  end
-
-  def self.Query pairs
-    self[pairs]
-  end
   
 end # NRSER::Types
 
@@ -255,3 +235,4 @@ require_relative './types/pairs'
 require_relative './types/collections'
 require_relative './types/shape'
 require_relative './types/has'
+require_relative './types/selector'

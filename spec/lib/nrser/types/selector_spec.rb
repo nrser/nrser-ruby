@@ -6,9 +6,9 @@ using NRSER::Types
 
 describe_spec_file \
   spec_path: __FILE__,
-  class: NRSER::Types::Type,
-  method: :to_proc,
-  description: "Using Type#to_proc in Enumerable#select" \
+  module: NRSER::Types,
+  method: :selector,
+  description: "Using selector types in Enumerable#select" \
 do
   
   data = [
@@ -117,7 +117,7 @@ do
 
   _when "trying out a more complicated selector",
         selector: \
-          ( t.Query(status: 'A') | t.Query(size: t.Query(w: 11)) ) do
+          ( t[ status: 'A' ] | t[ size: t[ w: 11 ] ] ) do
     it { is_expected.to \
           eq Set[ 'notebook', 'paper', 'journal', 'postcard' ] }; end
 
