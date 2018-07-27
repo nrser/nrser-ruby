@@ -4,7 +4,12 @@ require 'nrser/refinements/types'
 using NRSER::Types
 
 
-describe "Selector" do
+describe_spec_file \
+  spec_path: __FILE__,
+  class: NRSER::Types::Type,
+  method: :to_proc,
+  description: "Using Type#to_proc in Enumerable#select" \
+do
   
   data = [
     {
@@ -69,10 +74,33 @@ describe "Selector" do
     # Mongo style..? hard to find docs...
     # 
     # https://stackoverflow.com/a/34244908/
+    # https://docs.mongodb.com/manual/reference/operator/query/in/#use-the-in-operator-to-match-values-in-an-array
+    # 
+    # How it seems you would do it there:
+    # 
+    #     { groups: { $in: [ 'b', 'c', ] } }
+    # 
+    # but we already used "in" for the opposite thing.
+    # so for us how about:
+    # 
+    #     t[ groups: t.has_any( 'b', 'c' ) ]
+    # 
+    # Another possible name:
+    # 
+    #     t[ groups: t.intersects( 'b', 'c' ) ]
+    # 
+    # Variations:
+    # 
+    #     t[ groups: t.has_all( 'b', 'c' ) ]
+    #     
+    # To me right now this reads to me like you're asking if `groups` is "in"
+    # [ 'b', 'c' ] - which it's not.
+    # 
+    #     t[ groups: t.in( 'b', 'c' ) ]
     #
     _when "querying for members of any of a list of groups",
           selector: \
-            t[ groups: ( t.has( 'b' ) | t.has( 'c' ) ) ] do
+            t[ groups: t.has_any( 'b', 'c' ) ] do
       it { is_expected.to \
             eq %w(journal notebook paper).to_set }; end
 
@@ -94,4 +122,4 @@ describe "Selector" do
           eq Set[ 'notebook', 'paper', 'journal', 'postcard' ] }; end
 
 
-end # "Selector"
+end # SPEC FILE
