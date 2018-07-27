@@ -33,7 +33,12 @@ module NRSER::Types
     # Unless a `from_s` is provided, just use the identity
     options[:from_s] ||= ->( s ) { s }
     
-    where( **options ) { |value| group.include? value }
+    # TODO  This is a step in the right direction (from anon {Proc}) but I
+    #       now think what we really want is 
+    #       
+    #           where group, :include?
+    #       
+    where group.method( :include? )
   end # .in
   
 end # module NRSER::Types
