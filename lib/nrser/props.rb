@@ -1,12 +1,36 @@
+# encoding: UTF-8
+# frozen_string_literal: true
+
+# Requirements
+# ========================================================================
+
+# Project / Package
+# ------------------------------------------------------------------------
+
 require_relative './props/class_methods'
 require_relative './props/instance_methods'
 
+
+# Refinements
+# ========================================================================
 
 require 'nrser/refinements/types'
 using NRSER::Types
 
 
-module NRSER::Props
+# Namespace
+# ========================================================================
+
+module  NRSER
+
+
+# Definitions
+# ========================================================================
+
+# @todo
+#   This really needs a write-up... but it's not a very simple thing.
+# 
+module Props
   DEFAULT_CLASS_KEY = '__class__';
   
   def self.included base
@@ -84,4 +108,10 @@ module NRSER::Props
     klass.from_data data
     
   end # .UNSAFE_load_instance_from_data
-end
+end # module Props
+
+
+# /Namespace
+# ========================================================================
+
+end # module NRSER
