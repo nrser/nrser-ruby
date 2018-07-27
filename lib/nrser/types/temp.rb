@@ -17,10 +17,9 @@ module NRSER::Types
   # 
   # @return [NRSER::Types::Type]
   # 
-  def_factory(
-    :has,
-    aliases: [ :includes ],
-  ) do |member, **options|    
+  def_factory   :has,
+      aliases: [ :includes ] \
+    do |member, **options|    
     # Provide a some-what useful default name
     options[:name] ||= "Has<#{ NRSER.smart_ellipsis member.inspect, 64 }>"
     
@@ -29,5 +28,16 @@ module NRSER::Types
         value.include?( member )
     }
   end # .in
+
+
+  def_factory   :has_any,
+      aliases:  [ :intersects ] \
+  do |*members, **options|
+    options[:name] ||= "HasAny<#{ NRSER.smart_ellipsis members.inspect, 64 }>"
+
+    where( **options ) {
+      |group| members.any? { |member| group.include? member }
+    }
+  end
   
 end # module NRSER::Types
