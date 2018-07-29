@@ -48,6 +48,7 @@ module NRSER::Types
   RATIONALS = 'ℚ'
   UNION = '∪'
   AND = '&'
+  NOT = '!' # '¬'
   
   
   # Module Methods

@@ -17,10 +17,9 @@ module  NRSER
 module  Types
 
 
-# Type satisfied only by it's exact {#value} object (identity comparison
-# via `#equal?`).
+# Type satisfied only by anything `#==` it's {#value}.
 # 
-class Is < Type
+class Equivalent < Type
   
   # Attributes
   # ========================================================================
@@ -32,35 +31,48 @@ class Is < Type
     @value = value
   end
   
+
   def explain
-    "Is<#{ value.inspect }>"
+    "Equivalent<#{ value.inspect }>"
   end
   
+
   def test? value
     @value.equal? value
   end
   
+
   def == other
     equal?(other) ||
-    ( self.class.equal?( other.class ) &&
-      @value.equal?( other.value ) )
+    ( self.class == other.class &&
+      @value == other.value )
   end
 
 
   def default_symbolic
-    "{#{ value.inspect }}"
+    "{ x : #{ value.inspect }==x }"
   end
   
-end # Is
+end # class Equivalent
 
 
-# Satisfied by the exact value only (identity comparison via
-# `#equal?`).
+# @!method Equivalent value, **options
+#   Satisfied by values that `value` is `#==` to (`{ x : value == x }`).
+#   
+#   @param [Object] value
+#     Value that all members of the type will be equal to.
 # 
-# Useful for things like {Module}, {Class}, {Fixnum}, {Symbol}, `true`, etc.
+#   @param [Hash] **options
+#     Passed to {Type#initialize}.
+#   
+#   @return [Type]
+#     A type whose members are all instances of Ruby's {Numeric} class.
 # 
-def_factory :is do |value, **options|
-  Is.new value, **options
+def_type        :Equivalent,
+  aliases:    [ :eq ],
+  parameterize: :value,
+&->( value, **options|
+  Equivalent.new value, **options
 end
 
 

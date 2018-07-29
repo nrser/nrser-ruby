@@ -117,12 +117,12 @@ module NRSER::Types::Factory
   # @return [nil]
   # 
   def def_type  name,
-                maybe: true,
                 aliases: [],
                 from_s: nil,
-                to_data: nil,
-                symbolic: nil,
+                maybe: true,
                 parameterize: nil,
+                symbolic: nil,
+                to_data: nil,
                 &body
     # Normalize to strings
     name = name.to_s

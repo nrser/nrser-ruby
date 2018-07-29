@@ -33,28 +33,6 @@ end
 # @!group Number Type Factories
 # ----------------------------------------------------------------------------
 
-
-# @!method Zero **options
-#   Just zero.
-#   
-#   @todo
-#     Is this all zero? {Is} is not really is, than, is it? It's more 
-#     `Equal`...
-#   
-#   @param [Hash] **options
-#     Passed to {Type#initialize}.
-#   
-#   @return [Type]
-#   
-def_type      :Zero,
-  symbolic:   '{0}',
-  from_s:     method( :parse_number ),
-  aliases:  [ :zero ],
-&->( **options ) do
-  is 0, **options
-end
-
-
 # @!method Numeric **options
 #   The Ruby {Numeric} type, which is the super-class of all number classes:
 #   {Integer}, {Float}, {Rational}, {Complex}.
@@ -156,13 +134,15 @@ def_type      :NegativeInteger,
 end
 
 
-# Non-Negative Integer
-# --------------------
+# @!method NonNegativeInteger **options
+#   Positive integers and zero... but it seems more efficient to define these
+#   as bounded instead of a union.
 # 
-# Positive integers and zero... but it seems more efficient to define these
-# as bounded instead of a union.
-# 
-
+#   @param [Hash] **options
+#     Passed to {Type#initialize}.
+#   
+#   @return [Type]
+#
 def_type      :NonNegativeInteger,
   symbolic:   'ℕ⁰',
   aliases:  [ :non_neg_int,
@@ -177,12 +157,14 @@ def_type      :NonNegativeInteger,
 end
 
 
-# Non-Positive Integer
-# --------------------
+# @!method NonPositiveInteger **options
+#   Negative integers and zero.
 # 
-# negative integers and zero.
-# 
-
+#   @param [Hash] **options
+#     Passed to {Type#initialize}.
+#   
+#   @return [Type]
+#
 def_type      :NonPositiveInteger,
   symbolic:   '{0}∪ℤ⁻',
   aliases:  [ :non_pos_int,

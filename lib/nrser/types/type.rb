@@ -651,7 +651,8 @@ class Type
     
     NRSER::Types.not self
   end
-  
+
+  alias_method :!, :not
   alias_method :~, :not
   
   # @!endgroup Derivation Instance Methods # *******************************

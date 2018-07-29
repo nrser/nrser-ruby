@@ -28,7 +28,7 @@ module NRSER::Types
     
     
     def explain
-      "~#{ @type.name }"
+      "#{ NOT }#{ @type.name }"
     end
     
   end # class Not

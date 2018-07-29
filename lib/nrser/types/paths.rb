@@ -107,7 +107,7 @@ end
 def_type :RelPath do |**options|
   intersection \
     path,
-    ~abs_path,
+    !abs_path,
     **options
 end
 

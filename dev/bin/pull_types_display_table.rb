@@ -43,11 +43,15 @@ html_doc = Nokogiri::HTML quip_doc["html"]
 
 html_table = html_doc.at 'table'
 
-# save_tmp 'table.html', html_table.to_s
+save_tmp 'table.html', html_table.to_s
 
 # Remove funky unicode whitespace that Quip uses...
 def normalize text
-  text.gsub( "\u200B", "" ).gsub( "\u00A0", " " )
+  text.
+    gsub( "\u200B", "" ).
+    gsub( "\u00A0", " " ).
+    # Need to escape these so they don't break the table (?!)
+    gsub( '|', '\|')
 end
 
 all_rows = html_table.search( 'tr' ).map do |tr|
