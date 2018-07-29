@@ -57,5 +57,7 @@ module NRSER::RSpex::ExampleGroup
       subject_block: subject_block,
       &body
   end # #describe_method
+
+  alias_method :METHOD, :describe_method
   
 end # module NRSER::RSpex::ExampleGroup
