@@ -34,15 +34,18 @@ module NRSER::Types
   # 
   def_factory(
     :array_pair,
-  ) do |name: 'ArrayPair', key: any, value: any, **options|
+  ) do |name: 'ArrayPair', key: self.Top, value: self.Top, **options|
     unless options.key? :name
-      options[:name] = if key == any && value == any
-        'ArrayPair'
+      if key == self.Top && value == self.Top
+        # 'ArrayPair'
+        options[:name] = "Array<(*, *)>"
+        options[:symbolic] = "(*, *)"
       else
         key = NRSER::Types.make key
         value = NRSER::Types.make value
         
-        "ArrayPair<#{ key.name }, #{ value.name }>"
+        options[:name] = "Array<(#{ key.name }, #{ value.name })>"
+        options[:symbolic] = "(#{ key.symbolic }, #{ value.symbolic })"
       end
     end
     

@@ -39,7 +39,6 @@ do |pairs, **options|
       if value.is_a?( Type )
         value
       else
-        # self.when( value ) | (bag & has( value ))
         self.or(
           self.when( value ),
           (bag & has( value )),

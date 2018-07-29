@@ -40,6 +40,14 @@ module NRSER::Types
   R_PAREN = ')' # '❫'
   RESPONDS_WITH = '→'
   ASSOC = '=>'
+  LEQ = '≤'
+  GEQ = '≥'
+  COMPLEXES = 'ℂ'
+  REALS = 'ℝ'
+  INTEGERS = 'ℤ'
+  RATIONALS = 'ℚ'
+  UNION = '∪'
+
   
   
   # Module Methods
@@ -217,7 +225,7 @@ require_relative './types/attrs'
 require_relative './types/in'
 
 require_relative './types/when'
-require_relative './types/any'
+require_relative './types/top'
 require_relative './types/booleans'
 
 # Requires `booleans`

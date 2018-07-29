@@ -29,13 +29,36 @@ module  Types
 # =======================================================================
 
 class Type
+
+  # Attributes
+  # ========================================================================
+
+  
+  # What this type likes to be called (and displayed as by default).
+  # 
+  # Names are set from the `name:` keyword argument to {#initialize}, and 
+  # should be exposed by type factory functions, unless they have a good
+  # reason not to (and same goes for the constructors of {Type}'s subclasses,
+  # who should pass the value up the super-chain to {#initialize}.
+  # 
+  # Types should provide a name so we don't have to fall back to 
+  # `#<SomeType @var="value"...>` crap when displaying them (which happens
+  # quite a bit in important places like error messages).
+  # 
+  # @return [nil]
+  #   If this type has no name.
+  # 
+  # @return [String]
+  # 
+  # attr_reader :name
+
   
   # Constructor
   # =====================================================================
   
   # Instantiate a new `NRSER::Types::Type`.
   # 
-  # @param [nil | String] name
+  # @param [nil | #to_s] name
   #   Name that will be used when displaying the type, or `nil` to use a
   #   default generated name.
   # 
@@ -51,9 +74,14 @@ class Type
   #   Optional callable (or object that responds to `#to_proc` so we can
   #   get a callable) to call to turn type members into "data".
   # 
-  def initialize name: nil, from_s: nil, to_data: nil, from_data: nil
-    @name = name
+  def initialize  name: nil,
+                  symbolic: nil,
+                  from_s: nil,
+                  to_data: nil,
+                  from_data: nil
+    @name = name.nil? ? nil : name.to_s
     @from_s = from_s
+    @symbolic = symbolic
     
     @to_data = if to_data.nil?
       nil
@@ -106,61 +134,129 @@ class Type
   # Display ends up being pretty important with types, and also ends up 
   # complete mess very easily.
   # 
-  # 
-  # 
   
-  # What this type likes to be called (and displayed as by default).
+  # Optional support for generated names to use when no name is explicitly
+  # provided at initialization instead of falling back to {#explain}.
   # 
-  # Custom names can be provided when constructing most types via the
-  # `name:` keyword, which allows thinking about composite and complicated
-  # types in simpler and application-specific terms.
+  # Realizing subclasses *SHOULD* override this method *IF* they are able to
+  # generate meaningful names.
   # 
-  # Realizing subclasses **should not** override this method - they should
-  # pass a `name:` keyword up to {#initialize}, which sets the `@name`
-  # instance variable that is then used here.
+  # The {Type#default_name} implementation returns `nil` indicating it is not
+  # able to generate names.
   # 
-  # If no name is provided to {#initialize}, this method will fall back to
-  # {#explain}.
+  # @return [nil]
+  #   When a name can not be generated.
+  # 
+  # @return [String]
+  #   The generated name.
+  # 
+  def default_name
+    nil
+  end
+
+
+  # The name is the type as you would write it out in documentation.
+  # 
+  # Prefers an explicit `@name` set at initialization, falling back first
+  # to {#default_name}, then to {#explain}.
   # 
   # @return [String]
   # 
   def name
-    @name || explain
+    @name || default_name || explain
   end
+
+
+  # Optional support for generated symbolic names to use when no symbolic name
+  # is provided at initialization instead of falling back to {#name}.
+  # 
+  # Realizing subclasses *SHOULD* override this method *IF* they are able to
+  # generate meaningful symbolic names.
+  # 
+  # The {Type#default_symbolic} implementation returns `nil` indicating it is 
+  # not able to generate names.
+  # 
+  # @return [nil]
+  #   When a symbolic name can not be generated.
+  # 
+  # @return [String]
+  #   The generated symbolic name.
+  # 
+  def default_symbolic
+    nil
+  end
+
+
+  # A set theory-esque symbolic representation of the type, if available.
+  # 
+  # Prefers an explicit `@symbolic` set at initialization, falling back to an
+  # explicit `@name`, then to {#default_symbolic} and finally {#name}.
+  # 
+  # @return [String]
+  # 
+  def symbolic
+    @symbolic || @name || default_symbolic || name
+  end
+
   
-  
-  # A string that gives our best concise description of the type's logic,
-  # in particular exposing any composite types that it's made up of.
+  # A verbose breakdown of the implementation internals of the type.
   # 
-  # Used as the {#name} when a custom one is not provided.
+  # Realizing classes *SHOULD* override this method with a precise 
+  # implementation.
   # 
-  # Meant for inline display, so the result *should not* contain newlines.
-  # 
-  # Realizing subclasses **should** override this method, as this
-  # implementation only returns the class' name (and just the last segment,
-  # for brevity's sake).
-  # 
-  # @example Base implementation is not very interesting
-  #   MyType = Class.new NRSER::Types::Type
-  #   my_type = MyType.new
-  #   my_type.explain
-  #   # => "MyType"
+  # The {Type#explain} implementation dumps all instance variables that 
+  # appear to have accessor methods and whose names to not start with `_`.
   # 
   # @return [String]
   # 
   def explain
-    self.class.demod_name
-  end
+    @_explain ||= begin
+      s = "#{ self.class.demod_name }<"
+
+      ivars = instance_variables.
+        # each_with_object( {} ) { |var_name, hash|
+        each_with_object( [] ) { |var_name, array|
+          method_name = var_name.to_s[1..-1]
+
+          if  method_name.start_with?( '_' ) ||
+              !respond_to?( method_name )
+            next
+          end
+
+          value = instance_variable_get var_name
+
+          unless value.nil?
+            array << "#{ var_name }=#{ value.inspect }"
+          end
+        }.join( ', ' )
+      
+      s += " #{ ivars }" unless ivars.empty?
+      s += '>'
+      s
+    end
+  end # #explain
 
 
-  # Proxies to {#name}.
+  # How to display the type. Proxies to {#symbolic}.
   # 
   # @return [String]
   # 
-  def to_s; name; end
+  def to_s
+    symbolic
+  end
+  
+
+  # The built-in `#inspect` method, aliased before we override it so it's
+  # available here if you should want it.
+  # 
+  # See {#inspect} for rationale.
+  # 
+  # @return [String]
+  # 
+  alias_method :builtin_inspect, :inspect
 
 
-  ### Inspecting
+  # Overridden to point to {#to_s}.
   # 
   # Due to their combinatoric nature, types can quickly become large data
   # hierarchies, and the built-in {#inspect} will produce a massive dump
@@ -171,19 +267,12 @@ class Type
   # 
   # As a solution, we alias the built-in `#inspect` as {#builtin_inspect},
   # so it's available in situations where you really want all those gory
-  # details, and point {#inspect} to {#explain}.
+  # details, and point {#inspect} to {#to_s}.
   # 
-  
-  alias_method :builtin_inspect, :inspect
+  # @return [String]
+  # 
   def inspect
-    name = self.name
-    explain = self.explain
-    
-    if name == explain
-      explain
-    else
-      "#{ name } := #{ explain }"
-    end
+    to_s
   end
   
   # @!endgroup Display Instance Methods # **********************************
@@ -427,8 +516,6 @@ class Type
   
   # @!group Language Integration Instance Methods
   # ------------------------------------------------------------------------
-
-  
   
   # Hook into Ruby's *case subsumption* operator to allow usage in `case`
   # statements! Forwards to {#test?}.
@@ -477,9 +564,6 @@ class Type
   end # #respond_to?
   
   
-
-
-
   # This small method is extremely useful - it lets you easily use types to 
   # in {Enumerable#select} and similar by returning a {Proc} that runs 
   # {#test?} on the values it receives.

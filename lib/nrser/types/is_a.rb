@@ -85,14 +85,34 @@ module NRSER::Types
   end # IsA
   
   
-  # class membership
-  def_factory :is_a do |mod, **options|
+  # @!method .IsA module_, **options
+  #   Create a type
+  #   
+  #       { x : x.is_a?( mod ) == true }
+  #   
+  #   If `mod` is a {Class}, the returned {Type} will be satisfied by instances
+  #   of `mod`.
+  #   
+  #   If `mod` is a non-Class {Module}, the returned {Type} will be satisfied
+  #   by instances of classes that include `mod`.
+  #   
+  #   @param [Module] mod
+  #     The {Class} or {Module} that type members should be.
+  #   
+  #   @param [Hash] **options
+  #     Passed to {Type#initialize}.
+  #   
+  #   @return [Type]
+  # 
+  def_type        :IsA,
+    parameterize: :mod \
+  do |mod, **options|
     IsA.new mod, **options
   end
   
   
-  def_factory :type do |**options|
-    is_a NRSER::Types::Type
+  def_type :Type do |**options|
+    IsA NRSER::Types::Type, **options
   end
   
 end # NRSER::Types

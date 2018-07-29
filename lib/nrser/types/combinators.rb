@@ -34,18 +34,23 @@ class Combinator < Type
     @types = types.map { |type| NRSER::Types.make type }.freeze
   end
   
+
+  def string_format method
+    NRSER::Types::L_PAREN +
+    # ' ' + no spaces
+    @types.map { |type| type.send method }.join( self.class::JOIN_SYMBOL ) +
+    # ' ' + no spaces
+    NRSER::Types::R_PAREN
+  end
+
+
+  def default_symbolic
+    string_format( :to_s )
+  end
+
   
   def explain
-    if self.class::JOIN_SYMBOL
-      NRSER::Types::L_PAREN + # ' ' +
-      @types.map { |type| type.explain }.join( self.class::JOIN_SYMBOL ) +
-      # ' ' +
-      NRSER::Types::R_PAREN
-    else
-      "#{ self.class.demod_name }<" +
-        @types.map { |type| type.explain }.join( ',' ) +
-      ">"
-    end
+    return string_format( :explain )
   end
   
   

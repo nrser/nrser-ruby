@@ -19,7 +19,23 @@ Docs
 Structure & Design
 ------------------------------------------------------------------------
 
-API is basically a collection of module class methods attached to {NRSER::Types}, like {NRSER::Types.str} or {NRSER::Types.non_neg_int}.
+At the bottom of everything, there are *type classes*... which are Ruby classes
+that descend from {NRSER::Types::Type}. We call instances of these classes
+*types*.
+
+Types essentially do one thing: they have a {NRSER::Types::Type#test?} method
+that accepts a single arguments and returns a boolean. If the type returns
+`true` when `#test?` is called with an object, then that object is a member of
+that type. That's it.
+
+Some of those classes, like the universal type {NRSER::Types::Top}, of which
+every object is a member ({NRSER::Types::Top#test?} always returns `true`) are
+essentially singletons, but most type classes parameterize over values that
+instances
+
+
+API is basically a collection of module class methods attached to
+{NRSER::Types}, like {NRSER::Types.str} or {NRSER::Types.non_neg_int}.
 
 
 ### Type Maker Method Names

@@ -36,20 +36,21 @@ module NRSER::Types
     end
     
     def explain
-      case value
-      when Module
-        module_type = if value.is_a?( Class ) then 'Class' else 'Module' end
+      "Is<#{ value.inspect }>"
+      # case value
+      # when Module
+      #   module_type = if value.is_a?( Class ) then 'Class' else 'Module' end
         
-        name = if value.anonymous?
-          value.to_s.split( ':' ).last[0...-1]
-        else
-          value.name
-        end
+      #   name = if value.anonymous?
+      #     value.to_s.split( ':' ).last[0...-1]
+      #   else
+      #     value.name
+      #   end
         
-        "#{ module_type }<#{ name }>"
-      else
-        value.inspect
-      end
+      #   "#{ module_type }<#{ name }>"
+      # else
+      #   value.inspect
+      # end
     end
     
     def test? value
@@ -60,6 +61,11 @@ module NRSER::Types
       equal?(other) ||
       ( self.class == other.class &&
         @value == other.value )
+    end
+
+
+    def default_symbolic
+      "{#{ value.inspect }}"
     end
     
   end # Is

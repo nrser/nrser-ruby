@@ -1,10 +1,10 @@
-describe_spec_file(
+SPEC_FILE(
   spec_path: __FILE__,
   source_file: 'nrser/types/paths.rb',
   module: NRSER::Types,
 ) do
 
-  describe_method :dir_path do
+  METHOD :dir_path do
     include_examples 'make type',
       accepts: [
         '.',
@@ -20,10 +20,10 @@ describe_spec_file(
         Pathname.getwd => Pathname.getwd.to_s,
       }
       
-  end # method .dir_path
+  end # METHOD .dir_path
   
   
-  describe_method :file_path do
+  METHOD :file_path do
     
     include_examples 'make type',
       accepts: [
@@ -44,7 +44,7 @@ describe_spec_file(
         }
       }
     
-    context "custom name" do
+    WHEN "custom name" do
       include_examples 'make type',
         args: [ name: 'CustomType' ],
         
@@ -65,12 +65,12 @@ describe_spec_file(
             }
           }
         }
-    end # custom name
+    end # WHEN custom name
       
-  end # method .dir_path
+  end # METHOD .dir_path
   
   
-  describe_method :path_seg do
+  METHOD :path_seg do
     include_examples 'make type',
       accepts: [
         'hey',
@@ -89,6 +89,12 @@ describe_spec_file(
         }
       }
     
-  end # method .path_seg
+  end # METHOD .path_seg
+
   
-end
+  METHOD :tilde_path do
+    
+  end # METHOD .tilde_path Description
+
+  
+end # SPEC_FILE

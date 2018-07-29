@@ -31,6 +31,21 @@ module NRSER::Types
       return false if @max && value > @max
       true
     end
+
+    def symbolic
+      if min
+        if max
+          # has min and max
+          "{ x : #{ min } #{ NRSER::Types::LEQ } x #{ NRSER::Types::LEQ } #{ max } }"
+        else
+          # only has min
+          "{ x : x #{ NRSER::Types::GEQ } #{ min } }"
+        end
+      else
+        # only has max
+        "{ x : x #{ NRSER::Types::LEQ } #{ max } }"
+      end
+    end
     
     def explain
       attrs_str = ['min', 'max'].map {|name|
@@ -46,7 +61,10 @@ module NRSER::Types
     
   end # Bounded
   
-  def_factory :bounded do |**options|
+  
+  def_type :Bounded,
+    parameterize: [ :min, :max ] \
+  do |**options|
     Bounded.new **options
   end
    

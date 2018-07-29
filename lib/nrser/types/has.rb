@@ -36,8 +36,8 @@ module  Types
 # 
 # @return [NRSER::Types::Type]
 # 
-def_factory   :has,
-    aliases: [ :includes ] \
+def_factory   :Has,
+    aliases: [ :has, :includes ] \
   do |member, **options|    
   # Provide a some-what useful default name
   options[:name] ||= "Has<#{ NRSER.smart_ellipsis member.inspect, 64 }>"
