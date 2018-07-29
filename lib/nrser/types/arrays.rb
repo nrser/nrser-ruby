@@ -38,6 +38,9 @@ class ArrayType < IsA
   def item_type; NRSER::Types.Top; end
 
 
+  # @!group Display Instance Methods
+  # ------------------------------------------------------------------------
+
   def default_name
     if item_type == NRSER::Types.Top
       'Array'
@@ -50,6 +53,8 @@ class ArrayType < IsA
   def default_symbolic
     "[#{ item_type.symbolic }]"
   end
+
+  # @!endgroup Display Instance Methods # ************************************
   
   
   # Called on an array of string items that have been split
@@ -119,9 +124,14 @@ class ArrayOfType < ArrayType
   # Instance Methods
   # ======================================================================
   
+  # @!group Display Instance Methods
+  # ------------------------------------------------------------------------
+
   def explain
     "Array<#{ item_type.explain }>"
   end
+
+  # @!endgroup Display Instance Methods # ************************************
   
   
   def test? value
@@ -164,27 +174,36 @@ class ArrayOfType < ArrayType
 end # class ArrayOfType
 
 
-# {NRSER::Types::ArrayType} / {NRSER::Types::ArrayOfType} factory function.
-# 
-# @param [Type | Object] item_type
-#   Optional type of items.
-# 
-# @return [NRSER::Types::Type]
-# 
-# @todo
-#   Make `list` into it's own looser interface for "array-like" object API.
-# 
-def_type(
-  :Array,
+# @!group Array Type Factories
+# ----------------------------------------------------------------------------
+
+# @!method Array item_type = self.Top, **options
+#   {NRSER::Types::ArrayType} / {NRSER::Types::ArrayOfType} factory function.
+#   
+#   @param [Type | Object] item_type
+#     Optional type of items. If this is not a {Type}, one will be created from 
+#     it via {NRSER::Types.make}.
+#   
+#   @param [Hash] **options
+#     Passed to {Type#initialize}.
+#   
+#   @return [NRSER::Types::Type]
+#   
+#   @todo
+#     Make `list` into it's own looser interface for "array-like" object API.
+#   
+def_type        :Array,
   parameterize: :item_type,
-  aliases: [ :list ],
-) do |item_type = self.Top, **options|
+  aliases:    [ :list ],
+&->( item_type = self.Top, **options ) do
   if item_type == self.Top
     ArrayType.new **options
   else
     ArrayOfType.new item_type, **options
   end
-end # #array
+end # .Array
+
+# @!endgroup Array Type Factories # ******************************************
 
 
 # /Namespace

@@ -275,7 +275,7 @@ class Type
     to_s
   end
   
-  # @!endgroup Display Instance Methods # **********************************
+  # @!endgroup Display Instance Methods # ************************************
   
   
   # @!group Validation Instance Methods

@@ -30,22 +30,30 @@ def self.parse_number string
 end
 
 
-# Zero
-# =====================================================================
+# @!group Number Type Factories
+# ----------------------------------------------------------------------------
 
-def_type(
-  :Zero,
-  aliases: [ :zero ],
-) do |from_s: method( :parse_number ), **options|
-  is \
-    0,
-    from_s: from_s,
-    **options
+
+# @!method Zero **options
+#   Just zero.
+#   
+#   @todo
+#     Is this all zero? {Is} is not really is, than, is it? It's more 
+#     `Equal`...
+#   
+#   @param [Hash] **options
+#     Passed to {Type#initialize}.
+#   
+#   @return [Type]
+#   
+def_type      :Zero,
+  symbolic:   '{0}',
+  from_s:     method( :parse_number ),
+  aliases:  [ :zero ],
+&->( **options ) do
+  is 0, **options
 end
 
-
-# Numeric
-# =====================================================================
 
 # @!method Numeric **options
 #   The Ruby {Numeric} type, which is the super-class of all number classes:
@@ -65,6 +73,9 @@ end
 #   {Type#symbolic} is easier to read than (1), so this type does not provide
 #   a `symbolic:` keyword argument.
 #   
+#   @param [Hash] **options
+#     Passed to {Type#initialize}.
+#   
 #   @return [Type]
 #     A type whose members are all instances of Ruby's {Numeric} class.
 # 
@@ -74,8 +85,8 @@ def_type    :Numeric,
   #             RATIONALS,
   #             REALS,
   #             COMPLEXES ].join( " #{ UNION } " ),
-  from_s:   method( :parse_number ) \
-do |**options|
+  from_s:   method( :parse_number ),
+&->( **options ) do
   IsA.new Numeric, **options
 end
 
@@ -91,12 +102,13 @@ end
 #   
 #   @return [Type]
 # 
-def_type(
-  :Integer,
-  symbolic: 'ℤ',
-  from_s: method( :parse_number ),
-  aliases: [ :int, :integer, :signed ],
-) do |**options|
+def_type      :Integer,
+  symbolic:   'ℤ',
+  from_s:     method( :parse_number ),
+  aliases:  [ :int,
+              :integer,
+              :signed ],
+&->( **options ) do
   IsA.new Integer, **options
 end
 
@@ -104,50 +116,39 @@ end
 # Bounded Integers
 # ---------------------------------------------------------------------
 
-# Positive Integer
-# ----------------
+# @!method PositiveInteger **options
+#   Integers greater than zero.
+#   
+#   @param [Hash] **options
+#     Passed to {Type#initialize}.
+#   
+#   @return [Type]
 # 
-# Integer greater than zero.
-# 
-
-def_type(
-  :PositiveInteger,
+def_type      :PositiveInteger,
   symbolic: 'ℤ⁺',
-  aliases: [ :pos_int, :positive_int ]
-) do |**options|
+  aliases:  [ :pos_int,
+              :positive_int ],
+&->( **options ) do
   intersection \
     self.Integer,
     bounded( min: 1 ),
     **options
 end
 
-# Ugh sometimes the naturals have 0, so omit it...
-# singleton_class.send :alias_method, :natural, :pos_int
 
-
-# Negative Integer
-# ----------------
-# 
-# Integer less than zero.
-# 
-
+# @!method NegativeInteger **options
+#   Integer less than zero.
+#   
+#   @param [Hash] **options
+#     Passed to {Type#initialize}.
+#   
+#   @return [Type]
+#   
 def_type      :NegativeInteger,
   symbolic:   'ℤ⁻',
   aliases:  [ :neg_int,
-              :negative_int ] \
-do |**options|
-  intersection \
-    self.Integer,
-    self.Bounded( max: -1 ),
-    **options
-end
-
-
-def_type      :NegativeInteger,
-  symbolic:   'ℤ⁻',
-  aliases:  [ :neg_int,
-              :negative_int ] \
-do |**options|
+              :negative_int ],
+&->( **options ) do
   intersection \
     self.Integer,
     self.Bounded( max: -1 ),
@@ -167,8 +168,8 @@ def_type      :NonNegativeInteger,
   aliases:  [ :non_neg_int,
               :unsigned,
               :index,
-              :non_negative_int, ] \
-do |**options|
+              :non_negative_int, ],
+&->( **options ) do
   intersection \
     self.Integer,
     self.Bounded( min: 0 ),
@@ -195,6 +196,9 @@ def_type      :NonPositiveInteger,
 end
 
 
+# Etc...
+# ----------------------------------------------------------------------------
+
 def_type      :Unsigned16BitInteger,
   symbolic:   'uint16',
   aliases:  [ :uint16,
@@ -216,6 +220,8 @@ def_type      :UNIXPort,
     self.Bounded( min: 1, max: (2**16 - 1) ),
     **options
 end
+
+# @!endgroup Number Type Factories # *****************************************
 
 
 # /Namespace

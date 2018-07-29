@@ -4,6 +4,7 @@ NRSER::Types Display Table
 | `source`                                    | `#name`                      | `#symbolic`            | `#explain`                            |
 | ------------------------------------------- | ---------------------------- | ---------------------- | ------------------------------------- |
 | `t.Zero`                                    | `Zero`                       | `{0}`                  | `Is<0>`                               |
+| `t.Numeric`                                 | `Numeric`                    | `Numeric`              | `Numeric`                             |
 | `t.Integer`                                 | `Integer`                    | `ℤ`                    | `Integer`                             |
 | `t.PositiveInteger`                         | `PositiveInteger`            | `ℤ⁺`                   | `(Integer & Bounded<min=1>)`          |
 | `t.NegativeInteger`                         | `NegativeInteger`            | `ℤ⁻`                   | `(Integer & Bounded<max=-1>)`         |

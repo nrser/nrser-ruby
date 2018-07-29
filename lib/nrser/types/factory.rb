@@ -107,8 +107,12 @@ module NRSER::Types::Factory
   #   Aliases to add for the type factory method. Normalized to a {Set} of
   #   strings before use.
   # 
-  # @param [Boolean] parameterize
+  # @param [nil | Symbol | Array<Symbol>] parameterize
+  #   Indicates if the type is parameterized, and, if so, what arguments
+  #   it's parameterized over.
   #   
+  #   Right now, just prevents the `name:` being assigned as the type's name
+  #   when one isn't specified, but we have high hopes for the future :)
   # 
   # @return [nil]
   # 
@@ -118,7 +122,7 @@ module NRSER::Types::Factory
                 from_s: nil,
                 to_data: nil,
                 symbolic: nil,
-                parameterize: false,
+                parameterize: nil,
                 &body
     # Normalize to strings
     name = name.to_s
@@ -146,6 +150,12 @@ module NRSER::Types::Factory
         args = args[0..-2]
       else
         options = {}
+      end
+
+      if args.length < num_req_params
+        raise ArgumentError,
+          "wrong number of arguments (given #{ args.length }, " +
+          "expected #{ num_req_params })"
       end
 
       options[:name] ||= name unless parameterize

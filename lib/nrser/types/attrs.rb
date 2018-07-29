@@ -27,22 +27,21 @@ module  Types
 
 # Specify types for value attributes.
 # 
-class AttrsType < Type
+class Attributes < Type
 
   # Attributes
   # ========================================================================
 
-  
-  # TODO document `types` attribute.
+  # Attribute types by name.
   # 
-  # @return [attr_type]
+  # @return [Hash<Symbol, Type>]
   #     
   attr_reader :types
 
   
   # Construct an `AttrsType`.
   # 
-  # @param [Hash<Symbol, TYPE>] attrs
+  # @param [Hash<#to_sym, TYPE>] attrs
   #   Map of attribute names to their types (`TYPE` values will be passed
   #   through {NRSER::Types.make} to get a type instance).
   #   
@@ -56,7 +55,41 @@ class AttrsType < Type
         "Must provide at least one attribute name/type pair"
     end
     
-    @types = attrs.transform_values &NRSER::Types.maker
+    @types = attrs.map { |k, v|
+      [ k.to_sym, NRSER::Types.make( v ) ]
+    }.to_h.freeze
+  end
+
+
+  # @!group Display Instance Methods
+  # --------------------------------------------------------------------------
+
+  def type_strings method:
+    types.map { |name, type|
+      "##{ name }#{ RESPONDS_WITH }#{ type.public_send method }"
+    }
+  end
+
+
+  def default_name
+    type_strings = self.type_strings method: :name
+
+    if type_strings.length == 1
+      type_strings[0]
+    else
+      L_PAREN + type_strings.join( " #{ AND } " ) + R_PAREN
+    end
+  end
+
+
+  def default_symbolic
+    type_strings = self.type_strings method: :symbolic
+
+    if type_strings.length == 1
+      type_strings[0]
+    else
+      L_PAREN + type_strings.join( " #{ AND } " ) + R_PAREN
+    end
   end
   
   
@@ -65,15 +98,9 @@ class AttrsType < Type
   # @return [String]
   # 
   def explain
-    attrs_str = types.map { |name, type|
-      "(##{ name }#{ RESPONDS_WITH }#{ type.explain })"
-    }.join(', ')
-    
-    if types.length < 2
-      attrs_str
-    else
-      L_PAREN + attrs_str + R_PAREN
-    end
+    "#{ self.class.demod_name }<" +
+    type_strings( method: :explain ).join( ', ' ) +
+    ">"
   end
   
   
@@ -88,30 +115,25 @@ class AttrsType < Type
     }
   end
   
-end # AttrsType
+end # Attributes
 
 
-# @!group Type Factory Functions
+# @!group Attrs Type Factories
 
-# Get a {Type} that checks the types of one or more attributes on values.
+# @!method Attrs attrs, **options
+#   Get a {Type} that checks the types of one or more attributes on values.
+#   
+#   @example Type where first element of an Enumerable is a String
+#     string_first = intersection Enumerable, attrs(first: String)
+#   
+#   @param [Hash<#to_sym, (Type | Object)>] attrs
+#     
 # 
-# @example Type where first element of an Enumerable is a String
-#   string_first = intersection Enumerable, attrs(first: String)
-# 
-def_factory :attrs do |*args|
-  case args.length
-  when 0
-    raise NRSER::ArgumentError.new \
-      "requires at least one argument"
-  when 1
-    attrs = args[0]
-    options = {}
-  when 2
-    attrs = args[0]
-    options = args[1]
-  end
-  
-  AttrsType.new attrs, **options
+def_type          :Attributes,
+  parameterize:   :attributes,
+  aliases:      [ :attrs, ],
+&->( attributes, **options ) do
+  Attributes.new attributes, **options
 end
 
 

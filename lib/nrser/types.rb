@@ -47,7 +47,7 @@ module NRSER::Types
   INTEGERS = 'ℤ'
   RATIONALS = 'ℚ'
   UNION = '∪'
-
+  AND = '&'
   
   
   # Module Methods
