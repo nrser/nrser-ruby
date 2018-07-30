@@ -29,29 +29,6 @@ module  Types
 # =======================================================================
 
 class Type
-
-  # Attributes
-  # ========================================================================
-
-  
-  # What this type likes to be called (and displayed as by default).
-  # 
-  # Names are set from the `name:` keyword argument to {#initialize}, and 
-  # should be exposed by type factory functions, unless they have a good
-  # reason not to (and same goes for the constructors of {Type}'s subclasses,
-  # who should pass the value up the super-chain to {#initialize}.
-  # 
-  # Types should provide a name so we don't have to fall back to 
-  # `#<SomeType @var="value"...>` crap when displaying them (which happens
-  # quite a bit in important places like error messages).
-  # 
-  # @return [nil]
-  #   If this type has no name.
-  # 
-  # @return [String]
-  # 
-  # attr_reader :name
-
   
   # Constructor
   # =====================================================================
@@ -206,6 +183,9 @@ class Type
   # 
   # The {Type#explain} implementation dumps all instance variables that 
   # appear to have accessor methods and whose names to not start with `_`.
+  # 
+  # Check out the {file:lib/nrser/types/doc/display_table.md display table}
+  # for examples.
   # 
   # @return [String]
   # 

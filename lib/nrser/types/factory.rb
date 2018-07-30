@@ -9,26 +9,21 @@
 
 require 'set'
 
-# Deps
-# -----------------------------------------------------------------------
-
 # Project / Package
 # -----------------------------------------------------------------------
 
 
-# Refinements
+# Namespace
 # =======================================================================
 
-
-# Declarations
-# =======================================================================
-
+module  NRSER
+module  Types
 
 # Definitions
 # =======================================================================
 
 # @todo document NRSER::Types::Factory module.
-module NRSER::Types::Factory
+module Factory
   
   # Define a type factory.
   # 
@@ -226,4 +221,12 @@ module NRSER::Types::Factory
   end
 
   
-end # module NRSER::Types::Factory
+end # module Factory
+
+
+# /Namespace
+# =======================================================================
+
+end # module Types
+end # module NRSER
+

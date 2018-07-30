@@ -56,7 +56,10 @@ class Equivalent < Type
 end # class Equivalent
 
 
-# @!method Equivalent value, **options
+# @!group Equivalent Type Factories
+# ----------------------------------------------------------------------------
+
+# @!method self.Equivalent value, **options
 #   Satisfied by values that `value` is `#==` to (`{ x : value == x }`).
 #   
 #   @param [Object] value
@@ -74,6 +77,8 @@ def_type        :Equivalent,
 &->( value, **options|
   Equivalent.new value, **options
 end
+
+# @!endgroup Equivalent Type Factories # *************************************
 
 
 # /Namespace

@@ -21,7 +21,17 @@ module  Types
 # Definitions
 # =======================================================================
 
-
+# Create a {Shape} type that parameterizes {#pairs} of object keys and {Type}
+# values.
+# 
+# Members of the type are values `v` for which for all keys `k` and 
+# paired value types `t_k` `v[k]` is a member of `t_k`:
+# 
+#     shape.pairs.all? { |k, t_k| t_k.test? v[k] }
+# 
+# @note
+#   Construct shape types using the {.Shape} factory.
+# 
 class Shape < Type  
   
   # Attributes
@@ -104,12 +114,34 @@ class Shape < Type
 end # class Shape
 
 
+# @!group Shape Type Factories
+# ----------------------------------------------------------------------------
+
+#@!method self.Shape **options
+#   Create a {Shape} type that parameterizes `pairs` of object keys and {Type}
+#   values.
+#   
+#   Members of the type are values `v` for which for all keys `k` and 
+#   paired value types `t_k` `v[k]` is a member of `t_k`:
+#   
+#       shape.pairs.all? { |k, t_k| t_k.test? v[k] }
+#   
+#   @param [Hash<Object, TYPE>] pairs
+#     See {Shape#initialize}.
+# 
+#   @param [Hash] **options
+#     Passed to {Type#initialize}.
+#   
+#   @return [Shape]
+#   
 def_type          :Shape,
   parameterize:   true,
 &->( pairs, **options ) do
   Shape.new pairs, **options
-end
-  
+end # .Shape
+
+# @!endgroup Shape Type Factories # ******************************************
+
 
 # /Namespace
 # ========================================================================

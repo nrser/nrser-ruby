@@ -85,7 +85,7 @@ module NRSER::Types
   end # IsA
   
   
-  # @!method .IsA module_, **options
+  # @!method self.IsA module_, **options
   #   Create a type
   #   
   #       { x : x.is_a?( mod ) == true }

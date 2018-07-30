@@ -120,7 +120,7 @@ end # Attributes
 
 # @!group Attrs Type Factories
 
-# @!method Attrs attrs, **options
+# @!method self.Attrs attrs, **options
 #   Get a {Type} that checks the types of one or more attributes on values.
 #   
 #   @example Type where first element of an Enumerable is a String

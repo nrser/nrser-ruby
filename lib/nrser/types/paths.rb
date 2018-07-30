@@ -53,7 +53,7 @@ def_factory :non_empty_pathname do |name: 'NonEmptyPathname', **options|
 end
 
 
-# @!method .Path **options
+# @!method self.Path **options
 #   A path is a non-empty {String} or {Pathname}.
 #   
 #   @param [Hash] options
@@ -80,7 +80,7 @@ do |name: 'POSIXPathSegment', **options|
 end
 
 
-# @!method .AbsPath **options
+# @!method self.AbsPath **options
 #   An absolute {.path}.
 #   
 #   @param [Hash] options

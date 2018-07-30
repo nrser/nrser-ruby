@@ -137,7 +137,7 @@ end # #responds
 def_factory(
   :respond_to
 ) do |method_name, **options|
-  respond to: [:respond_to?, method_name], with: NRSER::Types.true
+  respond to: [:respond_to?, method_name], with: NRSER::Types.True
 end # #respond_to
 
 

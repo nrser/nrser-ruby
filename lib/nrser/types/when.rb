@@ -117,8 +117,18 @@ module NRSER::Types
   end # class When
   
   
-  def_factory :when do |value, **options|
+  #@!method self.When **options
+  #   @todo Document When type factory.
+  #   
+  #   @param [Hash] **options
+  #     Passed to {Type#initialize}.
+  #   
+  #   @return [Type]
+  #   
+  def_type        :When,
+    parameterize: :value,
+  &->( value, **options ) do
     When.new value, **options
-  end
+  end # .When
   
 end # module NRSER::Types

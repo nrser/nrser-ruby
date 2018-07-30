@@ -12,17 +12,18 @@ module  NRSER
 module  Types
 
 
-# Abstract Base Class
-# ============================================================================
+# Definitions
+# ========================================================================
 
 # Abstract base class for logically combining types to create new ones.
 # 
 # @see Union
 # @see Intersection
+# @see XOR
 # 
 class Combinator < Type
   
-  # The parametrized types, in the order they will be tested.
+  # The parameterized types, in the order they will be tested.
   # 
   # @return [Array<NRSER::Types::Type>]
   # 
@@ -191,12 +192,11 @@ end # class Combinator *****************************************************
 
 
 # Concrete Implementation Classes
-# ==========================================================================
-
-
-# Union (`union`, `one_of`, `or`, `|`)
 # ----------------------------------------------------------------------------
 
+
+# Union combinator. (`union`, `one_of`, `or`, `|`).
+# 
 class Union < Combinator
   JOIN_SYMBOL = ' | ' # ' ⋁ '
   
@@ -206,18 +206,8 @@ class Union < Combinator
 end # class Union
 
 
-# match any of the types
-def_factory(
-  :union,
-  aliases: [:one_of, :or],
-) do |*types, **options|
-  Union.new *types, **options
-end
-
-
-# Intersection (`intersection`, `all_of`, `and`, `&)
-# ----------------------------------------------------------------------------
-
+# Intersection combinator (`intersection`, `all_of`, `and`, `&).
+# 
 class Intersection < Combinator
   JOIN_SYMBOL = ' & ' # ' ⋀ '
   
@@ -227,19 +217,8 @@ class Intersection < Combinator
 end # class Intersection
 
 
-# match all of the types
-def_factory(
-  :intersection,
-  aliases: [:all_of, :and],
-) do |*types, **options|
-  Intersection.new *types, **options
-end
-
-
-
-# XOR - Exclusive Or (`xor`)
-# ----------------------------------------------------------------------------
-
+# XOR combinator - Exclusive Or (`xor`).
+# 
 class XOR < Combinator
   JOIN_SYMBOL = ' ⊕ '
   
@@ -249,13 +228,71 @@ class XOR < Combinator
 end
 
 
-def_factory(
-  :xor,
-  aliases: [ :exclusive_or, :only_one_of ],
-) do |*types, **options|
+# @!group Combinator Type Factories
+# ----------------------------------------------------------------------------
+
+
+#@!method self.Union **options
+#   Match any of the types.
+#   
+#   @param [Type | Object] types
+#     Types to combine over. Objects that are not {Type} instances will me
+#     made into them via {.make}.
+#   
+#   @param [Hash] **options
+#     Passed to {Type#initialize}.
+#   
+#   @return [Type]
+#   
+def_type        :Union,
+  aliases:      [ :one_of, :or ],
+  parameterize: [ :types ],
+&->( *types, **options ) do
+  Union.new *types, **options
+end # .Union
+
+
+#@!method self.Intersection **options
+#   Match all of the types
+#   
+#   @param [Type | Object] types
+#     Types to combine over. Objects that are not {Type} instances will me
+#     made into them via {.make}.
+#   
+#   @param [Hash] **options
+#     Passed to {Type#initialize}.
+#   
+#   @return [Type]
+#   
+def_type        :Intersection,
+  aliases:      [ :all_of, :and ],
+  parameterize: [ :types ],
+&->( *types, **options ) do
+  Intersection.new *types, **options
+end # .Intersection
+
+
+#@!method self.XOR **options
+#   Match one of the types only.
+#   
+#   @param [Type | Object] types
+#     Types to combine over. Objects that are not {Type} instances will me
+#     made into them via {.make}.
+#   
+#   @param [Hash] **options
+#     Passed to {Type#initialize}.
+#   
+#   @return [Type]
+#   
+def_type        :XOR,
+  aliases:      [ :exclusive_or, :only_one_of ],
+  parameterize: [ :types ],
+&->( *types, **options ) do
   XOR.new *types, **options
-end
-  
+end # .XOR
+
+# @!endgroup Combinator Type Factories # *************************************
+
 
 # /Namespace
 # ========================================================================

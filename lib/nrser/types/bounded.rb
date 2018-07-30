@@ -54,15 +54,17 @@ class Bounded < NRSER::Types::Type
   def symbolic
     if min
       if max
-        # has min and max
-        "{ x : #{ min } #{ NRSER::Types::LEQ } x #{ NRSER::Types::LEQ } #{ max } }"
+        # has min and max, use range notation
+        "(#{ min.inspect }..#{ max.inspect })"
       else
         # only has min
-        "{ x : x #{ NRSER::Types::GEQ } #{ min } }"
+        "(#{ min.inspect }..)"
+        # "{ x : x #{ NRSER::Types::GEQ } #{ min } }"
       end
     else
       # only has max
-      "{ x : x #{ NRSER::Types::LEQ } #{ max } }"
+      "(..#{ max.inspect })"
+      # "{ x : x #{ NRSER::Types::LEQ } #{ max } }"
     end
   end
   
@@ -84,8 +86,9 @@ end # Bounded
 # @!group Bounded Type Factories
 # ----------------------------------------------------------------------------
 
-#@!method Bounded **options
-#   @todo Document Bounded type factory.
+#@!method self.Bounded **options
+#   Create a {Bounded} type instance that matches values between `min` and
+#   `max` (inclusive).
 #   
 #   @param [Hash] **options
 #     Passed to {Type#initialize}.

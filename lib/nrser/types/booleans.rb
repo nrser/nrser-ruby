@@ -105,7 +105,7 @@ class False < Boolean
 end # class FalseType
 
 
-#@!method True **options
+#@!method self.True **options
 #   A type whose only member is `true` and loads from common CLI and ENV 
 #   var string representations (see {True} and {True::STRINGS}).
 #   
@@ -120,7 +120,7 @@ def_type  :True,
 end
 
 
-#@!method False **options
+#@!method self.False **options
 #   A type whose only member is `false` and loads from common CLI and ENV 
 #   var string representations (see {False} and {False::STRINGS}).
 #   
@@ -135,7 +135,7 @@ def_type        :False,
 end # .False
 
 
-#@!method Boolean **options
+#@!method self.Boolean **options
 #   {.True} or {.False}.
 #   
 #   @param [Hash] **options

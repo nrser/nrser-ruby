@@ -177,7 +177,7 @@ end # class ArrayOfType
 # @!group Array Type Factories
 # ----------------------------------------------------------------------------
 
-# @!method Array item_type = self.Top, **options
+# @!method self.Array item_type = self.Top, **options
 #   {NRSER::Types::ArrayType} / {NRSER::Types::ArrayOfType} factory function.
 #   
 #   @param [Type | Object] item_type

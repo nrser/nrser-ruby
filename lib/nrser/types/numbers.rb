@@ -33,7 +33,7 @@ end
 # @!group Number Type Factories
 # ----------------------------------------------------------------------------
 
-# @!method Numeric **options
+# @!method self.Numeric **options
 #   The Ruby {Numeric} type, which is the super-class of all number classes:
 #   {Integer}, {Float}, {Rational}, {Complex}.
 #   
@@ -72,7 +72,7 @@ end
 # Integers
 # =====================================================================
 
-# @!method Integer **options
+# @!method self.Integer **options
 #   Instances of the built-in {Integer} class.
 #   
 #   @param [Hash] **options
@@ -94,7 +94,7 @@ end
 # Bounded Integers
 # ---------------------------------------------------------------------
 
-# @!method PositiveInteger **options
+# @!method self.PositiveInteger **options
 #   Integers greater than zero.
 #   
 #   @param [Hash] **options
@@ -114,7 +114,7 @@ def_type      :PositiveInteger,
 end
 
 
-# @!method NegativeInteger **options
+# @!method self.NegativeInteger **options
 #   Integer less than zero.
 #   
 #   @param [Hash] **options
@@ -134,7 +134,7 @@ def_type      :NegativeInteger,
 end
 
 
-# @!method NonNegativeInteger **options
+# @!method self.NonNegativeInteger **options
 #   Positive integers and zero... but it seems more efficient to define these
 #   as bounded instead of a union.
 # 
@@ -157,7 +157,7 @@ def_type      :NonNegativeInteger,
 end
 
 
-# @!method NonPositiveInteger **options
+# @!method self.NonPositiveInteger **options
 #   Negative integers and zero.
 # 
 #   @param [Hash] **options
@@ -181,6 +181,14 @@ end
 # Etc...
 # ----------------------------------------------------------------------------
 
+#@!method self.Unsigned16BitInteger **options
+#   Unsigned 16-bit {Integer} type.
+#   
+#   @param [Hash] **options
+#     Passed to {Type#initialize}.
+#   
+#   @return [Type]
+#   
 def_type      :Unsigned16BitInteger,
   symbolic:   'uint16',
   aliases:  [ :uint16,
@@ -193,7 +201,15 @@ def_type      :Unsigned16BitInteger,
 end
 
 
-# TODO  Move?
+#@!method self.UNIXPort **options
+#   A valid UNIX port number {Integer}, which is a 16-bit unsigned integer
+#   that can ot be `0`.
+#   
+#   @param [Hash] **options
+#     Passed to {Type#initialize}.
+#   
+#   @return [Type]
+#   
 def_type      :UNIXPort,
   aliases:  [ :port, ],
 &->( **options ) do
