@@ -11,6 +11,12 @@ using NRSER::Sugar
 
 NRSER::Log.setup_for_console!
 
+Pathname.
+  glob( NRSER::ROOT / 'dev' / 'scratch' / 'console' / '**' / '*.rb' ).
+  each { |path|
+    puts "[Loading #{ path }]"
+    load path.to_s
+  }
 
 # You can add fixtures and/or initialization code here to make experimenting
 # with your gem easier. You can also use a different console, if you like.
