@@ -1,8 +1,9 @@
 {
   "NRSER::Types.def_type": {
+    "description": "Define NRSER::Types factory",
     "prefix": "def_type",
     "body": [
-      "#@!method ${1:Name} **options",
+      "#@!method self.${1:Name} **options",
       "#   @todo Document ${1:Name} type factory.",
       "#   ",
       "#   @param [Hash] **options",
@@ -25,12 +26,22 @@
   },
 
   "Type Factories Group": {
+    "description": "Yard group for NRSER::Types factories",
     "prefix": "group_type_factories",
     "body": [
       "# @!group ${1:<Group Name>} Type Factories",
       "# -----------------------------------------------------------------------------",
       "",
       "# @!endgroup ${1:<Group Name>} Type Factories # **********************************************************"
+    ]
+  },
+
+  "Yard @status: Experimental": {
+    "description": "Tag a docstring as \"experiemntal\" in Yard",
+    "prefix": "experimental",
+    "body": [
+      "# @status",
+      "#   Experimental"
     ]
   }
 }
