@@ -11,3 +11,4 @@ lib/**/*.rb
 README.md
 LICENSE.txt
 doc/**/*.md
+lib/nrser/types/doc/display_table.md
