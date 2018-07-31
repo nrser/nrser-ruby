@@ -6,7 +6,7 @@
       "#@!method self.${1:Name} **options",
       "#   @todo Document ${1:Name} type factory.",
       "#   ",
-      "#   @param [Hash] **options",
+      "#   @param [Hash] options",
       "#     Passed to {Type#initialize}.",
       "#   ",
       "#   @return [Type]",
