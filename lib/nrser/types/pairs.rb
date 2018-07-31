@@ -1,112 +1,133 @@
+# encoding: UTF-8
+# frozen_string_literal: true
+
 # Requirements
-# =======================================================================
-
-# Stdlib
-# -----------------------------------------------------------------------
-
-# Deps
-# -----------------------------------------------------------------------
+# ========================================================================
 
 # Project / Package
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------
+
 require 'nrser/core_ext/hash'
 
 require_relative './combinators'
+require_relative './attributes'
 require_relative './tuples'
 
 
-# Refinements
-# =======================================================================
+# Namespace
+# ========================================================================
 
-
-# Declarations
-# =======================================================================
-
-module NRSER; end
+module  NRSER
+module  Types
 
 
 # Definitions
 # =======================================================================
 
-module NRSER::Types
-  
-  # Type for key/value pairs encoded as a {.tuple} (Array) of length 2.
-  # 
-  def_factory(
-    :array_pair,
-  ) do |name: 'ArrayPair', key: self.Top, value: self.Top, **options|
-    unless options.key? :name
-      if key == self.Top && value == self.Top
-        # 'ArrayPair'
-        options[:name] = "Array<(*, *)>"
-        options[:symbolic] = "(*, *)"
-      else
-        key = NRSER::Types.make key
-        value = NRSER::Types.make value
-        
-        options[:name] = "Array<(#{ key.name }, #{ value.name })>"
-        options[:symbolic] = "(#{ key.symbolic }, #{ value.symbolic })"
-      end
-    end
-    
-    tuple \
-      key,
-      value,
-      # name: name,
-      **options
-  end # .array_pair
-  
-  
-  # Type for key/value pairs encoded as {Hash} with a single entry.
-  # 
-  # @param [String] name
-  #   Name to give the new type.
-  # 
-  # @param [Hash] options
-  #   Other options to pass to
-  # 
-  def_factory(
-    :hash_pair,
-  ) do |key: any, value: any, **options|
-    unless options.key? :name
-      options[:name] = if key == any && value == any
-        'HashPair'
-      else
-        key = NRSER::Types.make key
-        value = NRSER::Types.make value
-        
-        "HashPair<#{ key.name }, #{ value.name }>"
-      end
-    end
-    
-    intersection \
-      hash_type( keys: key, values: value ),
-      length( 1 ),
-      # name: name,
-      **options
-  end # .hash_pair
-  
+# @!group Pairs Type Factories
+# ----------------------------------------------------------------------------
 
-  # A key/value pair, which can be encoded as an Array of length 2 or a
-  # Hash of length 1.
-  # 
-  # 
-  def_factory :pair do |key: any, value: any, **options|
-    unless options.key? :name
-      options[:name] = if key == any && value == any
-        'Pair'
-      else
-        key = NRSER::Types.make key
-        value = NRSER::Types.make value
-        
-        "Pair<#{ key.name }, #{ value.name }>"
-      end
-    end
-    
-    union \
-      array_pair( key: key, value: value ),
-      hash_pair( key: key, value: value ),
-      **options
-  end # #pair
+
+#@!method self.ArrayPair key: self.Top, value: self.Top, **options
+#   Type for key/value pairs encoded as a {.Tuple} ({::Array}) of length 2.
+#   
+#   @param [TYPE] key
+#     Key type. Made into a type by {NRSER::Types.make} if it's not already.
+#   
+#   @param [TYPE] value
+#     Value type. Made into a type by {NRSER::Types.make} if it's not already.
+#   
+#   @param [Hash] options
+#     Passed to {Type#initialize}.
+#   
+#   @return [Type]
+#   
+def_type        :ArrayPair,
+  default_name: false,
+  parameterize: [ :key, :value ],
+&->( key: self.Top, value: self.Top, **options ) do
+  tuple \
+    key,
+    value,
+    **options
+end # .ArrayPair
+
+
+# @!method self.HashPair key: self.Top, value: self.Top, **options
+# 
+#   Type whose members are single a key/value pairs encoded as {::Hash} instances 
+#   with a single entry (`::Hash#length==1`).
+#   
+#   @param [TYPE] key
+#     Key type. Made into a type by {NRSER::Types.make} if it's not already.
+#   
+#   @param [TYPE] value
+#     Value type. Made into a type by {NRSER::Types.make} if it's not already.
+#   
+#   @param [Hash] options
+#     Passed to {Type#initialize}.
+#   
+#   @return [Type]
+# 
+def_type        :HashPair,
+  default_name: false,
+  parameterize: [ :key, :value ],
+&->( key: self.Top, value: self.Top, **options ) do
+  key = self.make key
+  value = self.make value
+
+  options[:name] ||= "Hash<(#{ key.name }, #{ value.name })>"
   
-end # module NRSER::Types
+  options[:symbolic] ||= "(#{ key.symbolic }=>#{ value.symbolic })"
+  
+  intersection \
+    self.Hash( keys: key, values: value ),
+    self.Length( 1 ),
+    **options
+end # .HashPair
+
+
+#@!method self.Pair key: self.Top, value: self.Top, **options
+#   A key/value pair, which can be encoded as an Array of length 2 or a
+#   Hash of length 1.
+#   
+#   @param [TYPE] key
+#     Key type. Made into a type by {NRSER::Types.make} if it's not already.
+#   
+#   @param [TYPE] value
+#     Value type. Made into a type by {NRSER::Types.make} if it's not already.
+# 
+#   @param [Hash] options
+#     Passed to {Type#initialize}.
+#   
+#   @return [Type]
+#   
+def_type        :Pair,
+  default_name: false,
+  parameterize: [ :key, :value ],
+&->( key: self.Top, value: self.Top, **options ) do
+  key = self.make key
+  value = self.make value
+
+  options[:name] ||= if key == self.Top && value == self.Top
+    "Pair"
+  else
+    "Pair<#{ key.name }, #{ value.name }>"
+  end
+
+  options[:symbolic] ||= "(#{ key.symbolic }, #{ value.symbolic })"
+  
+  union \
+    self.ArrayPair( key: key, value: value ),
+    self.HashPair(  key: key, value: value ),
+    **options
+end # .Pair
+
+# @!endgroup Pairs Type Factories # ******************************************
+
+
+# /Namespace
+# ========================================================================
+
+end # module  NRSER
+end #module  Types

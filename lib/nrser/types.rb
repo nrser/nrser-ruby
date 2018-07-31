@@ -41,8 +41,8 @@ module NRSER::Types
   
   L_PAREN = '(' # '❪'
   R_PAREN = ')' # '❫'
-  RESPONDS_WITH = '→'
-  ASSOC = '=>'
+  RESPONDS_WITH = '→' # '->'
+  ASSOC = '=>' # terrible, don't use: '⇒'
   LEQ = '≤'
   GEQ = '≥'
   COMPLEXES = 'ℂ'

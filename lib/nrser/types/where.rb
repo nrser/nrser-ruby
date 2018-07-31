@@ -186,7 +186,7 @@ end # class Where ************************************************************
 
 # Get a type based on a predicate.
 # 
-def_factory :where do |*args, &block|
+def_type :Where, &->( *args, &block ) do
   Where.new *args, &block
 end
 

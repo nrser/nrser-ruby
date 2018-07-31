@@ -46,17 +46,21 @@ to access it via the API.
 > provides. Due to how refinements bind, you may need to set `t` up as a global
 > in certain testing, REPL or other funky situations.
 
-| `source`                                    | `#name`                      | `#symbolic`            | `#explain`                            |
-| ------------------------------------------- | ---------------------------- | ---------------------- | ------------------------------------- |
-| `t.Numeric`                                 | `Numeric`                    | `Numeric`              | `Numeric`                             |
-| `t.Integer`                                 | `Integer`                    | `ℤ`                    | `Integer`                             |
-| `t.PositiveInteger`                         | `PositiveInteger`            | `ℤ⁺`                   | `(Integer & Bounded<min=1>)`          |
-| `t.NegativeInteger`                         | `NegativeInteger`            | `ℤ⁻`                   | `(Integer & Bounded<max=-1>)`         |
-| `t.NonNegativeInteger`                      | `NonNegativeInteger`         | `ℕ⁰`                   | `(Integer & Bounded<min=0>)`          |
-| `t.Boolean`                                 | `Boolean`                    | `Boolean`              | `(Is<true> \| Is<false>)`             |
-| `t.Bounded( min: 1, max: 2 )`               | `Bounded<min=1, max=2>`      | `(1..2)`               | `Bounded<min=1, max=2>`               |
-| `t.Bounded( min: 1 )`                       | `Bounded<min=1>`             | `(1..)`                | `Bounded<min=1>`                      |
-| `t.Array`                                   | `Array`                      | `[*]`                  | `Array`                               |
-| `t.Array( t.Integer )`                      | `Array<Integer>`             | `[ℤ]`                  | `Array<Integer>`                      |
-| `t.Attributes(x: t.Integer, y: t.String)`   | `(#x→Integer & #y→String)`   | `(#x→ℤ & #y→String)`   | `Attributes<#x→Integer, #y→String>`   |
-| `! t.Integer`                               | `!Integer`                   | `*∖ℤ`                  | `Not<Integer>`                        |
+| `source`                                     | `#name`                      | `#symbolic`            | `#explain`                                                    |
+| -------------------------------------------- | ---------------------------- | ---------------------- | ------------------------------------------------------------- |
+| `t.Numeric`                                  | `Numeric`                    | `Numeric`              | `Numeric`                                                     |
+| `t.Integer`                                  | `Integer`                    | `ℤ`                    | `Integer`                                                     |
+| `t.PositiveInteger`                          | `PositiveInteger`            | `ℤ⁺`                   | `(Integer & Bounded<min=1>)`                                  |
+| `t.NegativeInteger`                          | `NegativeInteger`            | `ℤ⁻`                   | `(Integer & Bounded<max=-1>)`                                 |
+| `t.NonNegativeInteger`                       | `NonNegativeInteger`         | `ℕ⁰`                   | `(Integer & Bounded<min=0>)`                                  |
+| `t.Boolean`                                  | `Boolean`                    | `Boolean`              | `(Is<true> \| Is<false>)`                                     |
+| `t.Bounded( min: 1, max: 2 )`                | `Bounded<min=1, max=2>`      | `(1..2)`               | `Bounded<min=1, max=2>`                                       |
+| `t.Bounded( min: 1 )`                        | `Bounded<min=1>`             | `(1..)`                | `Bounded<min=1>`                                              |
+| `t.Array`                                    | `Array`                      | `[*]`                  | `Array`                                                       |
+| `t.Array( t.Integer )`                       | `Array<Integer>`             | `[ℤ]`                  | `Array<Integer>`                                              |
+| `t.Attributes(x: t.Integer, y: t.String)`    | `(#x→Integer & #y→String)`   | `(#x→ℤ & #y→String)`   | `Attributes<#x→Integer, #y→String>`                           |
+| `! t.Integer`                                | `!Integer`                   | `*∖ℤ`                  | `Not<Integer>`                                                |
+| `t.ArrayPair`                                | `Array<(*, *)>`              | `[*, *]`               | `Array<(Top, Top)>`                                           |
+| `t.HashPair`                                 | `Hash<(*, *)>`               | `(*=>*)`               | `(Hash & Attributes<#length→Is<1>>)`                          |
+| `t.Pair`                                     | `Pair`                       | `(*, *)`               | `(Array<(Top, Top)> \| (Hash & Attributes<#length→Is<1>>))`   |
+| `t.Hash keys: t.String, values: t.Integer`   | `Hash<String, Integer>`      | `{String=>ℤ}`          | `Hash<String, Integer>`                                       |

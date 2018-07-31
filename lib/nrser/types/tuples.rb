@@ -44,13 +44,23 @@ module NRSER::Types
       super **options
       @types = types.map( &NRSER::Types.method(:make) ).freeze
     end # #initialize
+
+
+    def default_name
+      'Array<(' + types.map( &:name ).join( ', ' ) + ')>'
+    end
+
+
+    def default_symbolic
+      '[' + types.map( &:symbolic ).join( ', ' ) + ']'
+    end
     
     
     # @return [String]
     #   See {NRSER::Types::Type#explain}
     # 
     def explain
-      'Array<(' + @types.map( &:explain ).join( ', ' ) + ')>'
+      'Array<(' + types.map( &:explain ).join( ', ' ) + ')>'
     end
     
     
@@ -68,10 +78,10 @@ module NRSER::Types
       return false unless super( value )
       
       # If it's not the right length then it doesn't pass
-      return false unless value.length == @types.length
+      return false unless value.length == types.length
       
       # Test each item type
-      @types.each_with_index.all? { |type, index|
+      types.each_with_index.all? { |type, index|
         type.test value[index]
       }
     end # #test?
@@ -82,7 +92,7 @@ module NRSER::Types
     #   *all* it's types can load values from strings.
     # 
     def has_from_s?
-      @from_s || @types.all?( &:has_from_s? )
+      @from_s || types.all?( &:has_from_s? )
     end # #has_from_s?
     
     
@@ -95,7 +105,7 @@ module NRSER::Types
     # @return [Array]
     # 
     def items_from_strings strings
-      @types.each_with_index.map { |type, index|
+      types.each_with_index.map { |type, index|
         type.from_s strings[index]
       }
     end

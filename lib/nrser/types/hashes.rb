@@ -57,6 +57,11 @@ class HashType < IsA
   # 
   def values; NRSER::Types.Top; end
   
+
+  def default_symbolic
+    "{#{ keys.symbolic }#{ ASSOC }#{ values.symbolic }}"
+  end
+
   
   protected
   # ========================================================================

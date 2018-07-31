@@ -34,6 +34,14 @@ TILDE_PATH_RE = /\A\~(?:\/|\z)/
 # @!group Path Type Factories
 # ----------------------------------------------------------------------------
 
+#@!method self.Pathname **options
+#   Just a type for instances of {Pathname}.
+#   
+#   @param [Hash] options
+#     Passed to {Type#initialize}.
+#   
+#   @return [Type]
+#   
 def_type    :Pathname,
   to_data:  :to_s,
   from_s:   ->( string ) { Pathname.new string } \
@@ -42,131 +50,167 @@ do |**options|
 end
 
 
-# A type satisfied by a {Pathname} instance that's not empty (meaning it's
-# string representation is not empty).
-def_factory :non_empty_pathname do |name: 'NonEmptyPathname', **options|
-  all_of \
-    pathname,
-    attrs( to_s: non_empty_str ),
-    name: name,
+#@!method self.NonEmptyPathname **options
+#   A {.Pathname} that isn't empty. Because not emptiness is often important.
+#   
+#   @param [Hash] options
+#     Passed to {Type#initialize}.
+#   
+#   @return [Type]
+#   
+def_type        :NonEmptyPathname,
+&->( **options ) do
+  self.Intersection \
+    self.Pathname,
+    self.Attributes( to_s: self.NonEmptyString ),
     **options
-end
+end # .NonEmptyPathname
 
 
 # @!method self.Path **options
-#   A path is a non-empty {String} or {Pathname}.
+#   A path is a {.NonEmptyString} or {.NonEmptyPathname}.
 #   
 #   @param [Hash] options
 #     See {Type#initialize}.
 #   
 #   @return [Type]
 # 
-def_type :Path do |**options|
-  one_of \
-    non_empty_str,
-    non_empty_pathname,
+def_type        :Path,
+&->( **options ) do
+  self.Union \
+    self.NonEmptyString,
+    self.NonEmptyPathname,
     **options
-end # #path
+end # #Path
 
 
-def_factory :posix_path_segment,
-            aliases: [:path_segment, :path_seg] \
-do |name: 'POSIXPathSegment', **options|
-  all_of \
-    non_empty_str,
-    respond( to: [:include?, '/'], with: false ),
-    name: name,
+#@!method self.POSIXPathSegment **options
+#   A POSIX path segment (directory, file name) - any {.NonEmptyString} that
+#   doesn't have `/` in it.
+#   
+#   @param [Hash] options
+#     Passed to {Type#initialize}.
+#   
+#   @return [Type]
+#   
+def_type        :POSIXPathSegment,
+  aliases:      [ :path_segment, :path_seg ],
+&->( **options ) do
+  self.Intersection \
+    self.NonEmptyString,
+    self.Respond( to: [:include?, '/'], with: false ),
     **options
-end
+end # .POSIXPathSegment
 
 
 # @!method self.AbsPath **options
-#   An absolute {.path}.
+#   An absolute {.Path}.
 #   
 #   @param [Hash] options
-#     See {Type#initialize}.
+#     Passed to {Type#initialize}.
 #   
 #   @return [Type]
 #   
-def_type :AbsPath do |**options|
-  intersection \
+def_type        :AbsPath,
+  # TODO  IDK how I feel about this...
+  from_s:       ->( s ) { File.expand_path s },
+&->( **options ) do
+  self.Intersection \
     self.Path,
     # Weirdly, there is no {File.absolute?}..
-    attrs( to_pn: attrs( absolute?: true ) ),
-    from_s: ->( s ) { File.expand_path s },
+    self.Attributes( to_pn: attrs( absolute?: true ) ),
     **options
 end
 
 
-# A relative path.
-# 
-# @todo
-#   Quick addition, not sure if it's totally right with regard to tilde
-#   paths and such.
-# 
-def_type :RelPath do |**options|
-  intersection \
-    path,
-    !abs_path,
+#@!method self.TildePath **options
+#   "Home-relative" paths that start with `~`.
+#   
+#   From my take, these are not relative *and* are not absolute.
+#   
+#   @param [Hash] options
+#     Passed to {Type#initialize}.
+#   
+#   @return [Type]
+#   
+def_type        :TildePath,
+&->( **options ) do
+  self.Intersection \
+    self.Path,
+    self.Attributes( to_s: TILDE_PATH_RE ),
+    **options
+end # .TildePath
+
+
+# @!method self.AbsPath **options
+#   A relative {.Path}, which is just a {.Path} that's not {.AbsPath} or
+#   {.TildePath}.
+#   
+#   @param [Hash] options
+#     Passed to {Type#initialize}.
+#   
+#   @return [Type]
+#   
+def_type :RelPath,
+&->( **options ) do
+  self.Intersection \
+    self.Path,
+    !self.AbsPath,
+    !self.TildePath,
     **options
 end
 
 
-# A {NRSER::Types.path} that is a directory.
+# @method self.DirPath **options
+#   A {.Path} that is a directory. Requires checking the file system.
+#   
+#   @param [Hash] options
+#     Passed to {Type#initialize}.
+#   
+#   @return [Type]
 # 
-# @param [Hash] options
-#   Construction options passed to {NRSER::Types::Type#initialize}.
-# 
-# @return [NRSER::Types::Type]
-# 
-def_factory :dir_path do |name: 'DirPath', **options|
-  intersection \
-    path,
-    where( File.method :directory? ),
-    name: name,
+def_type :DirPath,
+&->( **options ) do
+  self.Intersection \
+    self.Path,
+    self.Where( File.method :directory? ),
     **options
-end # #dir_path
+end # .DirPath
 
 
-# Absolute {.path} to a directory (both an {.abs_path} and an {.dir_path}).
+# @!method self.AbsDirPath **options
+#   Absolute {.Path} to a directory (both an {.AbsPath} and an {.DirPath}).
+#   
+#   @param [Hash] options
+#     Passed to {Type#initialize}.
+#   
+#   @return [Type]
 # 
-# @param name: (see NRSER::Types::Type#initialize)
-# 
-# @param [Hash] options
-#   See {NRSER::Types::Type#initialize}
-# 
-def_factory :abs_dir_path do |name: 'AbsDirPath', **options|
-  intersection \
-    abs_path,
-    dir_path,
-    name: name,
+def_type :AbsDirPath,
+&->( **options ) do
+  self.Intersection \
+    self.AbsPath,
+    self.DirPath,
     **options
-end # .abs_dir_path
+end # .AbsDirPath
 
 
 # @!method self.FilePath **options
-# 
-# A {.path} that is a file (using {File.file?} to test).
+#   A {.Path} that is a file (using {File.file?} to test).
 # 
 # @param name: (see NRSER::Types::Type#initialize)
 # 
 # @param [Hash] options
 #   See {NRSER::Types::Type#initialize}
 # 
-def_type :FilePath do |**options|
-  intersection \
-    path,
-    where( File.method :file? ),
+def_type :FilePath,
+&->( **options ) do
+  self.Intersection \
+    self.Path,
+    self.Where( File.method :file? ),
     **options
-end
+end # .FilePath
 
-
-def_type :TildePath do |**options|
-  intersection \
-    path,
-    attrs( to_s: TILDE_PATH_RE ),
-    **options
-end
 
 # @!endgroup Path Type Factories # *******************************************
 

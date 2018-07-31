@@ -127,10 +127,10 @@ end # class Responds
 # Factories
 # ----------------------------------------------------------------------------
 
-def_factory(
-  :respond,
-) do |*args|
-  Respond.new *args
+def_type :Respond,
+  default_name: false,
+&->( **options ) do
+  Respond.new **options
 end # #responds
 
 
