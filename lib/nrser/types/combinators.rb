@@ -239,7 +239,7 @@ end
 #     Types to combine over. Objects that are not {Type} instances will me
 #     made into them via {.make}.
 #   
-#   @param [Hash] **options
+#   @param [Hash] options
 #     Passed to {Type#initialize}.
 #   
 #   @return [Type]
@@ -259,7 +259,7 @@ end # .Union
 #     Types to combine over. Objects that are not {Type} instances will me
 #     made into them via {.make}.
 #   
-#   @param [Hash] **options
+#   @param [Hash] options
 #     Passed to {Type#initialize}.
 #   
 #   @return [Type]
@@ -279,7 +279,7 @@ end # .Intersection
 #     Types to combine over. Objects that are not {Type} instances will me
 #     made into them via {.make}.
 #   
-#   @param [Hash] **options
+#   @param [Hash] options
 #     Passed to {Type#initialize}.
 #   
 #   @return [Type]

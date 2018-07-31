@@ -1,6 +1,6 @@
 require_relative './is'
 require_relative './is_a'
-require_relative './attrs'
+require_relative './attributes'
 require_relative './not'
 
   

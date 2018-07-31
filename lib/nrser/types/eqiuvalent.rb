@@ -17,6 +17,9 @@ module  NRSER
 module  Types
 
 
+# Definitions
+# ========================================================================
+
 # Type satisfied only by anything `#==` it's {#value}.
 # 
 class Equivalent < Type
@@ -65,7 +68,7 @@ end # class Equivalent
 #   @param [Object] value
 #     Value that all members of the type will be equal to.
 # 
-#   @param [Hash] **options
+#   @param [Hash] options
 #     Passed to {Type#initialize}.
 #   
 #   @return [Type]

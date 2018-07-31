@@ -20,7 +20,12 @@ module  Types
 # Definitions
 # ========================================================================
 
-class Bounded < NRSER::Types::Type
+# Types whose members satisfy a {#min}, {#max} or both (inclusive).
+# 
+# @note
+#   Construct {Bounded} types using the {.Bounded} factory.
+# 
+class Bounded < Type
   
   # Minimum value.
   # 
@@ -90,7 +95,7 @@ end # Bounded
 #   Create a {Bounded} type instance that matches values between `min` and
 #   `max` (inclusive).
 #   
-#   @param [Hash] **options
+#   @param [Hash] options
 #     Passed to {Type#initialize}.
 #   
 #   @return [Type]

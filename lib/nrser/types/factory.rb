@@ -12,6 +12,7 @@ require 'set'
 # Project / Package
 # -----------------------------------------------------------------------
 
+require 'nrser/errors/type_error'
 
 # Namespace
 # =======================================================================
@@ -19,13 +20,20 @@ require 'set'
 module  NRSER
 module  Types
 
+
 # Definitions
 # =======================================================================
 
-# @todo document NRSER::Types::Factory module.
+# Mixin that provides {#def_type} to create type factory class methods.
+# 
+# Mixed in to {NRSER::Types}, but can also be mixed in by libraries using
+# the types system to define their own types.
+# 
 module Factory
   
   # Define a type factory.
+  # 
+  # @deprecated Use {#def_type}
   # 
   # @!macro [attach] factory
   #   
@@ -102,19 +110,91 @@ module Factory
   #   Aliases to add for the type factory method. Normalized to a {Set} of
   #   strings before use.
   # 
+  # @param [nil | Proc<(s:String)->MEMBER>] from_s
+  #   Optional function to load type members from strings.
+  # 
+  # @param [Boolean] maybe
+  #   When `true` will add `?`-suffixed versions of the factory that 
+  #   create {.Maybe} versions of the type.
+  # 
+  # @param [nil | false | Proc<(*args, &block)->String>] default_name
+  #   
+  #   Controls what - if anything - is done with the `name:` value in 
+  #   `options` when the factory method is called.
+  #   
+  #   Everything here is done *before* the `options` are passed to the 
+  #   factory method's `&body`, so the body will see any `name:` option that
+  #   is filled in.
+  #   
+  #   When...
+  #   
+  #   -   `nil` - when...
+  #       -   `parameterize:` is `nil` - `name` will be used as the created
+  #           type's {Type#name} unless a `name:` option is explicitly 
+  #           provided by the factory caller.
+  #           
+  #           This situation covers "static" types that will only differ by
+  #           their `options` - things like custom {Type#from_s},
+  #           {Type#to_data}, etc.. Really, these are more like aliases since 
+  #           their member sets are identical.
+  #           
+  #       -   `parameterize:` is *not* `nil` - the `name:` option will be left
+  #           as `nil` if none is provided by the factory caller.
+  #           
+  #   -   `false` - the `name:` option will not be touched - it will stay `nil`
+  #       unless the factory caller provides a value.
+  #       
+  #   -   `Proc<(*args, &block)->String>` - when the factory caller does not
+  #       provide a `name:` option this function will be called with the
+  #       arguments (including `options`) and block (if any) that the 
+  #       factory method was called with, and is expected to return a {String}
+  #       that will be set as the `name:` option.
+  # 
   # @param [nil | Symbol | Array<Symbol>] parameterize
   #   Indicates if the type is parameterized, and, if so, what arguments
   #   it's parameterized over.
   #   
   #   Right now, just prevents the `name:` being assigned as the type's name
-  #   when one isn't specified, but we have high hopes for the future :)
+  #   when one isn't specified (see the `default_name:` parameter a 
+  #   complete(-ly confusing) explanation.
+  #   
+  #   The hope was to use this for something useful in the future, but who the
+  #   hell knows to be honest.
+  #   
+  # @param [nil | String | Proc<(*args, &block)->String>] symbolic
+  #   Controls what's done with the `symbolic:` option - which affects what
+  #   the new type's {Type#symbolic} will return - when the factory methods
+  #   are called with the `symbolic:` option `nil` or missing:
+  #   
+  #   -   `nil` - nothing changes. `nil` goes in to the type initialization
+  #       method, and should end up as a `symbolic: nil` option in 
+  #       {Type#initialize}.
+  #       
+  #   -   `String` - This value is used. Makes sense for `static` types
+  #       who only accept options that don't affect the members of the types
+  #       they produce.
+  #       
+  #   -   `Proc<(*args, &block)->String>` - Gets called with the arguments 
+  #       (including `options`) and block (if any) the factory method is called
+  #       with and is expected to return the symbolic string representation.
+  # 
+  # @param [nil | Proc<(MEMBER)->DATA>] to_data
+  #   I'm getting tired of writing this shit so I'm going to be brief here -
+  #   provides a value that will get set as the `to_data:` option and become
+  #   responsible for turning type member values into "data" (think things
+  #   you can JSON encode).
+  # 
+  # @param [Proc] body
+  #   The type factory method body. **MUST** return a {Type} instance.
   # 
   # @return [nil]
+  #   Just creates class methods on whatever it's mixed in to.
   # 
   def def_type  name,
                 aliases: [],
                 from_s: nil,
                 maybe: true,
+                default_name: nil,
                 parameterize: nil,
                 symbolic: nil,
                 to_data: nil,
@@ -122,6 +202,16 @@ module Factory
     # Normalize to strings
     name = name.to_s
     aliases = aliases.map( &:to_s ).to_set
+
+    unless  default_name.nil? ||
+            default_name == false ||
+            default_name.is_a?( Proc )
+      raise NRSER::TypeError,
+        "`default_name:` keyword argument must be {nil}, {false} or a {Proc},",
+        "found", default_name,
+        expected: [ nil, false, Proc ],
+        received: default_name
+    end
 
     # Count the required params so we know if we can take the last one as 
     # options or not.
@@ -153,12 +243,51 @@ module Factory
           "expected #{ num_req_params })"
       end
 
-      options[:name] ||= name unless parameterize
+      # If `default_name` is {false} it means we don't fuck with the name at
+      # all, and if it's not `nil` it's been user-set.
+      if options[:name].nil? && default_name != false
+        if default_name.is_a? Proc
+          options[:name] = default_name.call *args, &block
+        
+        # The "old" (like, two days ago) way of signalling not to write `name`
+        # in (before we had `default_name=false`) was to tell {#def_type} that
+        # you were parameterizing, in which case it wouldn't make any sense 
+        # to write `name` in for all the types coming out.
+        # 
+        # And it still doesn't, though - despite high hopes for a future of 
+        # parameterized enlightenment - that's all we've been using 
+        # `parameterize` for at the time, and there will def be some argument
+        # structure kinks to work out in order to actually do something useful
+        # with the information, though I'm sure that is solvable.
+        # 
+        # So I'm saying I wouldn't be surprised if `parameterize` ended up 
+        # never really going anywhere except away.
+        elsif parameterize.nil?
+          options[:name] = name
+
+        end
+      end # if options[:name].nil? && default_name != false
+
       options[:from_s] ||= from_s
-      options[:symbolic] ||= symbolic
+
+      options[:symbolic] ||= case symbolic
+      when Proc
+        symbolic.call *args, &block
+      else
+        symbolic
+      end
+
       options[:to_data] ||= to_data
       
-      body.call *args, **options, &block
+      body.call( *args, **options, &block ).tap { |type|
+        unless type.is_a? Type
+          raise NRSER::TypeError.new \
+            "Type factory method #{ self.safe_name }.#{ __method__ } did",
+            "not return a {NRSER::Types::Type}! All type factory methods",
+            "**MUST** always return type instances. This method needs to be",
+            "fixed."
+        end
+      }
     end
 
     underscored = name.underscore
@@ -218,7 +347,7 @@ module Factory
     end
 
     nil
-  end
+  end # #def_type
 
   
 end # module Factory

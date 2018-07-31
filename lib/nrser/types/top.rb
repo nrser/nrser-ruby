@@ -37,11 +37,11 @@ class Top < NRSER::Types::Type
   end
   
   def explain
-    '⊤' # '*'
+    'Top'
   end
 
   def symbolic
-    '*'
+    '*' # '⊤'
   end
 
   def has_from_s?

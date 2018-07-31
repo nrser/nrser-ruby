@@ -59,3 +59,4 @@ to access it via the API.
 | `t.Array`                                   | `Array`                      | `[*]`                  | `Array`                               |
 | `t.Array( t.Integer )`                      | `Array<Integer>`             | `[ℤ]`                  | `Array<Integer>`                      |
 | `t.Attributes(x: t.Integer, y: t.String)`   | `(#x→Integer & #y→String)`   | `(#x→ℤ & #y→String)`   | `Attributes<#x→Integer, #y→String>`   |
+| `! t.Integer`                               | `!Integer`                   | `*∖ℤ`                  | `Not<Integer>`                        |

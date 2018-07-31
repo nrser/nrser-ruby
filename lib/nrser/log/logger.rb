@@ -442,7 +442,7 @@ class NRSER::Log::Logger < SemanticLogger::Logger
   # 
   # @return [nil]
   # 
-  def depreciated *message, method:, alternative: nil, max_stack_lines: 16
+  def deprecated *message, method:, alternative: nil, max_stack_lines: 16
     kwds = { method: method }
 
     kwds[:alternative] = alternative if alternative
@@ -463,7 +463,7 @@ class NRSER::Log::Logger < SemanticLogger::Logger
     warn NRSER.fmt_msg( *message ), **kwds
 
     nil
-  end # #depreciated
+  end # #deprecated
   
   
 end # class NRSER::Log::Logger

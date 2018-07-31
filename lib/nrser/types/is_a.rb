@@ -99,7 +99,7 @@ module NRSER::Types
   #   @param [Module] mod
   #     The {Class} or {Module} that type members should be.
   #   
-  #   @param [Hash] **options
+  #   @param [Hash] options
   #     Passed to {Type#initialize}.
   #   
   #   @return [Type]

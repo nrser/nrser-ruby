@@ -133,7 +133,7 @@ class Array
   # @deprecated
   # 
   def to_digger
-    NRSER.logger.depreciated \
+    NRSER.logger.deprecated \
       method: "#{ self.class.name }##{ __method__ }",
       alternative: "#{ self.class.name }#to_proc"
 

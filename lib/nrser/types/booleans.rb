@@ -109,7 +109,7 @@ end # class FalseType
 #   A type whose only member is `true` and loads from common CLI and ENV 
 #   var string representations (see {True} and {True::STRINGS}).
 #   
-#   @param [Hash] **options
+#   @param [Hash] options
 #     Passed to {Type#initialize}.
 #   
 #   @return [Type]
@@ -124,7 +124,7 @@ end
 #   A type whose only member is `false` and loads from common CLI and ENV 
 #   var string representations (see {False} and {False::STRINGS}).
 #   
-#   @param [Hash] **options
+#   @param [Hash] options
 #     Passed to {Type#initialize}.
 #   
 #   @return [Type]
@@ -138,7 +138,7 @@ end # .False
 #@!method self.Boolean **options
 #   {.True} or {.False}.
 #   
-#   @param [Hash] **options
+#   @param [Hash] options
 #     Passed to {Type#initialize}.
 #   
 #   @return [Type]

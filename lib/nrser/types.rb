@@ -29,7 +29,10 @@ module NRSER::Types
   # Mixins
   # ========================================================================
   
+  # Add `.def_type` to define type factories
   extend Factory
+
+  # Add `.logger` and `#logger`.
   include NRSER::Log::Mixin
   
   
@@ -49,6 +52,7 @@ module NRSER::Types
   UNION = '∪'
   AND = '&'
   NOT = '!' # '¬'
+  COMPLEMENT = '∖'
   
   
   # Module Methods
@@ -76,11 +80,11 @@ module NRSER::Types
   # 
   def self.make value
     if value.nil?
-      self.nil
+      self.Nil
     elsif value.is_a? NRSER::Types::Type
       value
     else
-      self.when value
+      self.When value
     end
   end
   
@@ -113,12 +117,33 @@ module NRSER::Types
     make( type ).check! value
   end
   
-  # Old name
-  singleton_class.send :alias_method, :check, :check!
+
+  # Old bang-less name for {.check!}. We like out bangs around here.
+  # 
+  # @deprecated
+  # 
+  # @param    (see .check!)
+  # @return   (see .check!)
+  # @raise    (see .check!)
+  # 
+  def self.check value, type
+    logger.deprecated \
+      method: __method__,
+      alternative: "NRSER::Types.check!"
+    
+    check! value, type
+  end
   
   
   # Create a {NRSER::Types::Type} from `type` with {.make} and test if
   # `value` satisfies it.
+  # 
+  # @param [Object] value
+  #   Value to test for membership.
+  # 
+  # @param [TYPE] type
+  #   Type to see if value satisfies. Passed through {.make} to make sure it's
+  #   a {Type} first.
   # 
   # @return [Boolean]
   #   `true` if `value` satisfies `type`.
@@ -127,13 +152,29 @@ module NRSER::Types
     make(type).test value
   end
   
+  
+  # Old question-less name for {.test?}. We like our marks around here.
+  # 
+  # @param  (see .test?)
+  # @return (see .test?)
+  # @raise  (see .test?)
+  # 
+  def self.test value, type
+    logger.deprecated \
+      method: __method__,
+      alternative: "NRSER::Types.test?"
+    
+    test? value, type
+  end # .test
+
   # Old name
   singleton_class.send :alias_method, :test, :test?
   
   
+  # My own shitty version of pattern matching!
+  # 
   # @todo
-  #   Switch {NRSER::Types.match} to use `===`! Should allow us to avoid
-  #   making types for everything?
+  #   Doc this crap.
   #   
   def self.match value, *clauses
     if clauses.empty?
@@ -222,7 +263,7 @@ require_relative './types/is_a'
 require_relative './types/where'
 require_relative './types/combinators'
 require_relative './types/maybe'
-require_relative './types/attrs'
+require_relative './types/attributes'
 require_relative './types/in'
 
 require_relative './types/when'

@@ -67,7 +67,7 @@ end # class Maybe
 # @!group Type Factory Functions
 # ----------------------------------------------------------------------------
 
-# @!method
+# @!method self.Maybe type, **options
 #   Type satisfied by `nil` or the parametrized type.
 #   
 #   @param [Type] type
@@ -77,7 +77,10 @@ end # class Maybe
 # 
 #   @return [Type]
 # 
-def_factory :maybe do |type, **options|
+def_type        :Maybe,
+  parameterize: :type,
+  default_name: false,
+&->( type, **options ) do
   Maybe.new type, **options
 end
 

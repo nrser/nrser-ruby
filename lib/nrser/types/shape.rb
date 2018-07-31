@@ -129,7 +129,7 @@ end # class Shape
 #   @param [Hash<Object, TYPE>] pairs
 #     See {Shape#initialize}.
 # 
-#   @param [Hash] **options
+#   @param [Hash] options
 #     Passed to {Type#initialize}.
 #   
 #   @return [Shape]

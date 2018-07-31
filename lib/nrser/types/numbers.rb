@@ -51,7 +51,7 @@ end
 #   {Type#symbolic} is easier to read than (1), so this type does not provide
 #   a `symbolic:` keyword argument.
 #   
-#   @param [Hash] **options
+#   @param [Hash] options
 #     Passed to {Type#initialize}.
 #   
 #   @return [Type]
@@ -75,7 +75,7 @@ end
 # @!method self.Integer **options
 #   Instances of the built-in {Integer} class.
 #   
-#   @param [Hash] **options
+#   @param [Hash] options
 #     Passed to {Type#initialize}.
 #   
 #   @return [Type]
@@ -97,7 +97,7 @@ end
 # @!method self.PositiveInteger **options
 #   Integers greater than zero.
 #   
-#   @param [Hash] **options
+#   @param [Hash] options
 #     Passed to {Type#initialize}.
 #   
 #   @return [Type]
@@ -117,7 +117,7 @@ end
 # @!method self.NegativeInteger **options
 #   Integer less than zero.
 #   
-#   @param [Hash] **options
+#   @param [Hash] options
 #     Passed to {Type#initialize}.
 #   
 #   @return [Type]
@@ -138,7 +138,7 @@ end
 #   Positive integers and zero... but it seems more efficient to define these
 #   as bounded instead of a union.
 # 
-#   @param [Hash] **options
+#   @param [Hash] options
 #     Passed to {Type#initialize}.
 #   
 #   @return [Type]
@@ -160,7 +160,7 @@ end
 # @!method self.NonPositiveInteger **options
 #   Negative integers and zero.
 # 
-#   @param [Hash] **options
+#   @param [Hash] options
 #     Passed to {Type#initialize}.
 #   
 #   @return [Type]
@@ -184,7 +184,7 @@ end
 #@!method self.Unsigned16BitInteger **options
 #   Unsigned 16-bit {Integer} type.
 #   
-#   @param [Hash] **options
+#   @param [Hash] options
 #     Passed to {Type#initialize}.
 #   
 #   @return [Type]
@@ -205,7 +205,7 @@ end
 #   A valid UNIX port number {Integer}, which is a 16-bit unsigned integer
 #   that can ot be `0`.
 #   
-#   @param [Hash] **options
+#   @param [Hash] options
 #     Passed to {Type#initialize}.
 #   
 #   @return [Type]

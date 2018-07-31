@@ -22,9 +22,10 @@ module  Types
 # 
 class Is < Type
   
-  # Attributes
-  # ========================================================================
-  
+  # The exact value for this type.
+  # 
+  # @return [Object]
+  # 
   attr_reader :value
   
   def initialize value, **options
@@ -54,14 +55,26 @@ class Is < Type
 end # Is
 
 
-# Satisfied by the exact value only (identity comparison via
-# `#equal?`).
-# 
-# Useful for things like {Module}, {Class}, {Fixnum}, {Symbol}, `true`, etc.
-# 
-def_factory :is do |value, **options|
+# @!group Identity Equality Type Factories
+# ----------------------------------------------------------------------------
+
+#@!method self.Is **options
+#   Satisfied by the exact value only (identity comparison via `#equal?`).
+#   
+#   Useful for things like {Module}, {Class}, {Fixnum}, {Symbol}, `true`, etc.
+#   
+#   @param [Hash] options
+#     Passed to {Type#initialize}.
+#   
+#   @return [Type]
+#   
+def_type        :Is,
+  parameterize: :value,
+&->( value, **options ) do
   Is.new value, **options
-end
+end # .Is
+
+# @!endgroup Identity Equality Type Factories # ******************************
 
 
 # /Namespace

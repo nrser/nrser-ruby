@@ -12,7 +12,7 @@ require_relative './arrays'
 module NRSER::Types
   
   # Tuple type - array of fixed length and types (though those could be
-  # {NRSER::Types.any}).
+  # {Top}).
   # 
   class TupleType < NRSER::Types::ArrayType
     

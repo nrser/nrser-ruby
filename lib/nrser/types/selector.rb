@@ -111,7 +111,7 @@ module  Types
 #     Values that are {Type} instances are used as is for the {Shape} value 
 #     type. Everything else gets run through 
 # 
-#   @param [Hash] **options
+#   @param [Hash] options
 #     Passed to {Type#initialize}.
 #   
 #   @return [Shape]
@@ -164,7 +164,7 @@ end # .Selector
 #   @param [Object] member
 #     The object that needs to be included for type satisfaction.
 #   
-#   @param [Hash] **options
+#   @param [Hash] options
 #     Passed to {Type#initialize}.
 #   
 #   @return [Type]
@@ -205,7 +205,7 @@ end # .Has
 #     entry that any of `members` is satisfied by. `members` entries that are
 #     not {Type} instances will be made into them via {.make}.
 #   
-#   @param [Hash] **options
+#   @param [Hash] options
 #     Passed to {Type#initialize}.
 #   
 #   @return [Type]

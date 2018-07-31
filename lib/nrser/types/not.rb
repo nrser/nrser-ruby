@@ -1,43 +1,95 @@
 # encoding: UTF-8
 # frozen_string_literal: true
 
+# Requirements
+# ========================================================================
+
+# Project / Package
+# ------------------------------------------------------------------------
+
+require_relative './type'
+
+
+# Namespace
+# ========================================================================
+
+module  NRSER
+module  Types
+
 
 # Definitions
 # =======================================================================
 
-module NRSER::Types
+class Not < Type
+
+  # The type this one isn't.
+  # 
+  # @return [Type]
+  #     
+  attr_reader :type
+
   
-  class Not < Type
-    
-    # Constructor
-    # ======================================================================
-    
-    # Instantiate a new `NRSER::Types::Not`.
-    def initialize type, **options
-      super **options
-      @type = type
-    end # #initialize
-    
-    
-    # Instance Methods
-    # ======================================================================
-    
-    def test? value
-      ! @type.test( value )
-    end
-    
-    
-    def explain
-      "#{ NOT }#{ @type.name }"
-    end
-    
-  end # class Not
+  # Constructor
+  # ======================================================================
+  
+  # Instantiate a new `NRSER::Types::Not`.
+  def initialize type, **options
+    super **options
+    @type = NRSER::Types.make type
+  end # #initialize
   
   
-  def_factory(
-    :not,
-  ) do |type, **options|
-    Not.new type, **options
+  # Instance Methods
+  # ======================================================================
+  
+  def test? value
+    ! type.test( value )
   end
   
-end # module NRSER::Types
+
+  def default_symbolic
+    "#{ NRSER::Types.Top.symbolic }#{ COMPLEMENT }#{ type.symbolic }"
+  end
+
+
+  def default_name
+    "#{ NOT }#{ type.name }"
+  end
+
+  
+  def explain
+    "#{ self.class.demod_name }<#{ type.explain }>"
+  end
+  
+end # class Not
+
+
+# @!group Negation Type Factories
+# ----------------------------------------------------------------------------
+
+#@!method self.Not **options
+#   Negates another type.
+#   
+#   @param [TYPE] type
+#     The type to negate, made into one via {.make} if it's not already.
+#   
+#   @param [Hash] options
+#     Passed to {Type#initialize}.
+#   
+#   @return [Not]
+#   
+def_type        :Not,
+  default_name: false,
+  parameterize: :type,
+&->( type, **options ) do
+  Not.new type, **options
+end # .Not
+
+# @!endgroup Negation Type Factories # ***************************************
+
+
+# /Namespace
+# ========================================================================
+
+end # module  NRSER
+end #module  Types

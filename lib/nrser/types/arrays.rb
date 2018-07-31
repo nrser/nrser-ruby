@@ -184,7 +184,7 @@ end # class ArrayOfType
 #     Optional type of items. If this is not a {Type}, one will be created from 
 #     it via {NRSER::Types.make}.
 #   
-#   @param [Hash] **options
+#   @param [Hash] options
 #     Passed to {Type#initialize}.
 #   
 #   @return [NRSER::Types::Type]

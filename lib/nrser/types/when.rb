@@ -120,7 +120,7 @@ module NRSER::Types
   #@!method self.When **options
   #   @todo Document When type factory.
   #   
-  #   @param [Hash] **options
+  #   @param [Hash] options
   #     Passed to {Type#initialize}.
   #   
   #   @return [Type]

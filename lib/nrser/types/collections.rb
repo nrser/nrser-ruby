@@ -29,7 +29,7 @@ module  Types
 #   An "array-like" {Enumerable} that responds to `#each_index` and 
 #   `#slice` / `#[]`.
 #   
-#   @param [Hash] **options
+#   @param [Hash] options
 #     Passed to {Type#initialize}.
 #   
 #   @return [Type]
@@ -50,7 +50,7 @@ end # .Vector
 #@!method self.Map **options
 #   A "hash-like" {Enumerable} that responds to `#each_pair` and `#[]`.
 #   
-#   @param [Hash] **options
+#   @param [Hash] options
 #     Passed to {Type#initialize}.
 #   
 #   @return [Type]
@@ -75,7 +75,7 @@ end # .Map
 #   
 #   Elements may or may not be indexed.
 #   
-#   @param [Hash] **options
+#   @param [Hash] options
 #     Passed to {Type#initialize}.
 #   
 #   @return [Type]
@@ -94,7 +94,7 @@ end # .Bag
 #   Either a {.Vector} or {.Map} - {Enumerable} collections with indexed
 #   elements that work with the {NRSER} "tree" functions.
 #   
-#   @param [Hash] **options
+#   @param [Hash] options
 #     Passed to {Type#initialize}.
 #   
 #   @return [Type]

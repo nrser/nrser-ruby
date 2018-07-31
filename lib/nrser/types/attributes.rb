@@ -27,6 +27,9 @@ module  Types
 
 # Specify types for value attributes.
 # 
+# @note
+#   Construct {Attributes} types using the {.Attributes} factory.
+# 
 class Attributes < Type
 
   # Attributes
@@ -118,9 +121,10 @@ class Attributes < Type
 end # Attributes
 
 
-# @!group Attrs Type Factories
+# @!group Attributes Type Factories
+# ----------------------------------------------------------------------------
 
-# @!method self.Attrs attrs, **options
+# @!method self.Attributes attrs, **options
 #   Get a {Type} that checks the types of one or more attributes on values.
 #   
 #   @example Type where first element of an Enumerable is a String
@@ -137,63 +141,69 @@ def_type          :Attributes,
 end
 
 
-# @overload length exact, options = {}
-#   Get a length attribute type that specifies an `exact` value.
+# @!method self.Length **options
 #   
-#   @example
-#     only_type = NRSER::Types.length 1
+#   @overload length exact, options = {}
+#     Get a length attribute type that specifies an `exact` value.
 #     
-#     only_type.test []
-#     # => false
+#     @example
+#       only_type = NRSER::Types.length 1
+#       
+#       only_type.test []
+#       # => false
+#       
+#       only_type.test [:x]
+#       # => true
+#       
+#       only_type.test [:x, :y]
+#       # => false
 #     
-#     only_type.test [:x]
-#     # => true
+#     @param [Integer] exact
+#       Exact non-negative integer that the length must be to satisfy the
+#       type created.
 #     
-#     only_type.test [:x, :y]
-#     # => false
+#     @param [Hash] options
+#       Options hash passed up to {NRSER::Types::Type} constructor.
+#     
+#     @return [NRSER::Types::Attributes]
+#       Type satisfied by a `#length` attribute that is exactly `exact`.
 #   
-#   @param [Integer] exact
-#     Exact non-negative integer that the length must be to satisfy the
-#     type created.
 #   
-#   @param [Hash] options
-#     Options hash passed up to {NRSER::Types::Type} constructor.
+#   @overload length bounds, options = {}
+#     Get a length attribute type satisfied by values within a `:min` and
+#     `:max` (inclusive).
+#     
+#     @example
+#       three_to_five = NRSER::Types.length( {min: 3, max: 5}, name: '3-5' )
+#       three_to_five.test [1, 2]               # => false
+#       three_to_five.test [1, 2, 3]            # => true
+#       three_to_five.test [1, 2, 3, 4]         # => true
+#       three_to_five.test [1, 2, 3, 4, 5]      # => true
+#       three_to_five.test [1, 2, 3, 4, 5, 6]   # => false
 #   
-#   @return [NRSER::Types::Attrs]
-#     Type satisfied by a `#length` attribute that is exactly `exact`.
+#     @param [Hash] bounds
+#     
+#     @option bounds [Integer] :min
+#       An optional minimum value that the `#length` should not be less than.
+#     
+#     @option bounds [Integer] :max
+#       An optional maximum value that the `#length` should not be more than.
+#     
+#     @option bounds [Integer] :length
+#       An optional value for both the minimum and maximum.
+#     
+#     @param [Hash] options
+#       Options hash passed up to {NRSER::Types::Type} constructor.
+#     
+#     @return [NRSER::Types::Attributes]
+#       Type satisfied by a `#length` attribute between the `:min` and `:max`
+#       (inclusive).
 # 
-# 
-# @overload length bounds, options = {}
-#   Get a length attribute type satisfied by values within a `:min` and
-#   `:max` (inclusive).
-#   
-#   @example
-#     three_to_five = NRSER::Types.length( {min: 3, max: 5}, name: '3-5' )
-#     three_to_five.test [1, 2]               # => false
-#     three_to_five.test [1, 2, 3]            # => true
-#     three_to_five.test [1, 2, 3, 4]         # => true
-#     three_to_five.test [1, 2, 3, 4, 5]      # => true
-#     three_to_five.test [1, 2, 3, 4, 5, 6]   # => false
-# 
-#   @param [Hash] bounds
-#   
-#   @option bounds [Integer] :min
-#     An optional minimum value that the `#length` should not be less than.
-#   
-#   @option bounds [Integer] :max
-#     An optional maximum value that the `#length` should not be more than.
-#   
-#   @option bounds [Integer] :length
-#     An optional value for both the minimum and maximum.
-#   
-#   @param [Hash] options
-#     Options hash passed up to {NRSER::Types::Type} constructor.
-#   
-#   @return [NRSER::Types::Attrs]
-#     Type satisfied by a `#length` attribute between the `:min` and `:max`
-#     (inclusive).
-# 
-def self.length *args
+def_type        :Length,
+  # TODO  This would need special attention if we ever started using the
+  #       `parameterize` data for anything...
+  parameterize: :args,
+&->( *args ) do
   bounds = {}
   options = if args[1].is_a?( Hash ) then args[1] else {} end
   
@@ -245,8 +255,10 @@ def self.length *args
   
   options[:name] ||= "Length<#{ bounded_type.name }>"
   
-  attrs({ length: length_type }, options)
-end # #length
+  self.Attributes({ length: length_type }, options)
+end # .Length
+
+# @!endgroup Attributes Type Factories # *************************************
 
 
 # /Namespace
