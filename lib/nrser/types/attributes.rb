@@ -13,6 +13,7 @@ require 'nrser/core_ext/hash'
 require_relative './type'
 require_relative './combinators'
 require_relative './is'
+require_relative './bounded'
 
 
 # Namespace
@@ -243,7 +244,7 @@ def_type        :Length,
     
   end
   
-  bounded_type = bounded bounds
+  bounded_type = self.Bounded bounds
   
   length_type = if !bounded_type.min.nil? && bounded_type.min >= 0
     # We don't need the non-neg check

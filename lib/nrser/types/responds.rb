@@ -127,18 +127,48 @@ end # class Responds
 # Factories
 # ----------------------------------------------------------------------------
 
-def_type :Respond,
+# @!group Method Response Type Factories
+# ----------------------------------------------------------------------------
+
+#@!method self.Respond to:, with:, publicly: true, **options
+#   Create a {Respond} type.
+#   
+#   @param (see Respond#initialize)
+#   
+#   @return [Respond]
+#   
+def_type        :Respond,
   default_name: false,
-&->( **options ) do
-  Respond.new **options
-end # #responds
+  parameterize: [ :to, :with, :publicly ],
+&->( to:, with:, publicly: true, **options ) do
+  Respond.new to: to, with: with, publicly: publicly, **options
+end # .Respond
 
 
-def_factory(
-  :respond_to
-) do |method_name, **options|
-  respond to: [:respond_to?, method_name], with: NRSER::Types.True
-end # #respond_to
+#@!method self.RespondTo method_name, **options
+#   Gets a {Respond} that admits values that `#respond_to?` a `method_name`.
+#   
+#   @param [Symbol | String] method_name
+#     The name of the method that type members must `#respond_to?`.
+#   
+#   @param [Hash] options
+#     Passed to {Type#initialize}.
+#   
+#   @return [Respond]
+#   
+def_type        :RespondTo,
+  default_name: ->( method_name, **options ) {
+                  "RespondTo<#{ method_name }>"
+                },
+  parameterize: :method_name,
+  # TODO  I'm not sure how this worked before, but defining `.respond_to?` 
+  #       def fucks things up...
+  # maybe:        false,
+&->( method_name, **options ) do
+  respond to: [:respond_to?, method_name], with: self.True
+end # .RespondTo
+
+# @!endgroup Method Response Type Factories # ********************************
 
 
 # /Namespace

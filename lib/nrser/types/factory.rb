@@ -45,10 +45,10 @@ module Factory
   # 
   def def_factory name, maybe: true, aliases: [], &body
     define_singleton_method name, &body
-    
+
     aliases.each do |alias_name|
       if self.respond_to? alias_name
-        alias_name = alias_name + '_'
+        alias_name = alias_name.to_s + '_'
       end
       
       singleton_class.send :alias_method, alias_name, name
@@ -89,7 +89,13 @@ module Factory
       end
       
       aliases.each do |alias_name|
-        singleton_class.send :alias_method, "#{ alias_name }?", maybe_name
+        maybe_alias_name = "#{ alias_name }?"
+
+        if self.respond_to? maybe_alias_name
+          maybe_alias_name = "#{ alias_name }_?"
+        end
+
+        singleton_class.send :alias_method, maybe_alias_name, maybe_name
       end
       
     end
@@ -300,7 +306,7 @@ module Factory
     
     aliases.each do |alias_name|
       if self.respond_to? alias_name
-        alias_name = alias_name + '_'
+        alias_name = alias_name.to_s + '_'
       end
       
       singleton_class.send :alias_method, alias_name, name
@@ -341,7 +347,13 @@ module Factory
       end
       
       aliases.each do |alias_name|
-        singleton_class.send :alias_method, "#{ alias_name }?", maybe_name
+        maybe_alias_name = "#{ alias_name }?"
+
+        if self.respond_to? maybe_alias_name
+          maybe_alias_name = "#{ alias_name }_?"
+        end
+
+        singleton_class.send :alias_method, maybe_alias_name, maybe_name
       end
       
     end

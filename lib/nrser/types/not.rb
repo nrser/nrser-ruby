@@ -20,6 +20,12 @@ module  Types
 # Definitions
 # =======================================================================
 
+# Negation {Type} - A {Type} that parameterizes another {#type} by admitting
+# values that the {#type} does not.
+# 
+# @note
+#   Construct {Not} types using the {.Not} factory.
+#
 class Not < Type
 
   # The type this one isn't.
