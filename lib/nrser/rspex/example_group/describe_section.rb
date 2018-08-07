@@ -34,5 +34,8 @@ module NRSER::RSpex::ExampleGroup
   
   # Old name
   alias_method :describe_topic, :describe_section
+
+  # BOLD NAME!
+  alias_method :SECTION, :describe_section
   
 end # module NRSER::RSpex::ExampleGroup

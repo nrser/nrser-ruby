@@ -77,6 +77,7 @@ def_type(
   :Top,
   aliases: [ :everything, :all, :any ],
 ) do
+  # Top type gets used as a default a lot, so cache it...
   @_top_type_instance ||= Top.new
 end
 

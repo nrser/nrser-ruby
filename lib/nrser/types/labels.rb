@@ -34,7 +34,10 @@ module  Types
 #   
 def_type        :Label,
 &->( **options ) do
-  union non_empty_str, non_empty_sym, name: name, **options
+  self.Union \
+    self.NonEmptyString,
+    self.NonEmptySymbol,
+    **options
 end # .Label
 
 # @!endgroup Label Type Factories # ******************************************

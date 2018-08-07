@@ -20,7 +20,17 @@ module  Types
 
 # Definitions
 # =======================================================================
-  
+
+# Arrays!
+# 
+# @note
+#   Construct {ArrayType} types using the {.Array} factory.
+# 
+# @todo
+#   Just call this Array?!
+#   
+#   Combine with arrays of a type?!
+# 
 class ArrayType < IsA
   # Default value to split strings with in {#from_s} if the string provided
   # does is not recognized as an encoding format (as of writing, JSON is

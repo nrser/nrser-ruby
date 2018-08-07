@@ -4,7 +4,7 @@ require 'nrser/refinements/types'
 using NRSER::Types
 
 
-describe_spec_file \
+SPEC_FILE \
   spec_path: __FILE__,
   module: NRSER::Types,
   method: :selector,
@@ -55,16 +55,16 @@ do
 
   subject { data.select( &selector ).map( &[:item] ).to_set }
 
-  use_case "querying for group membership" do
+  CASE "querying for group membership" do
 
-    _when "querying a single group",
+    WHEN "querying a single group",
           selector: t[ groups: 'b' ] do
       it { is_expected.to \
             eq %w(journal notebook).to_set }; end
   
 
     # This *works*, but I don't think it's totally what I want...
-    _when "querying for members of any of a list of groups",
+    WHEN "querying for members of any of a list of groups",
           selector: \
             t[ groups: ( t.has( 'b' ) | t.has( 'c' ) ) ] do
       it { is_expected.to \
@@ -98,7 +98,7 @@ do
     # 
     #     t[ groups: t.in( 'b', 'c' ) ]
     #
-    _when "querying for members of any of a list of groups",
+    WHEN "querying for members of any of a list of groups",
           selector: \
             t[ groups: t.has_any( 'b', 'c' ) ] do
       it { is_expected.to \
@@ -107,15 +107,15 @@ do
   end # USE CASE *************************************************************
 
 
-  _when selector: t[ status: 'D' ] do
+  WHEN selector: t[ status: 'D' ] do
     it { is_expected.to eq %w(paper planner).to_set }; end
 
 
-  _when selector: t[ item: /^p/ ] do
+  WHEN selector: t[ item: /^p/ ] do
     it { is_expected.to eq Set[ 'paper', 'planner', 'postcard' ] }; end
 
 
-  _when "trying out a more complicated selector",
+  WHEN "trying out a more complicated selector",
         selector: \
           ( t[ status: 'A' ] | t[ size: t[ w: 11 ] ] ) do
     it { is_expected.to \

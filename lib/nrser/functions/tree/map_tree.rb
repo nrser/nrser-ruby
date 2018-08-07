@@ -57,7 +57,7 @@ module NRSER
         pruned = {}
         
         mapped.each { |key, value|
-          if  Types.label.test( key ) &&
+          if  Types.Label.test( key ) &&
               key.to_s.end_with?( '?' )
             unless value.nil?
               new_key = key.to_s[0..-2]

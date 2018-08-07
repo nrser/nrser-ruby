@@ -40,38 +40,55 @@ module  Log
 #   it when loading up.
 #   
 module Types
-  extend NRSER::Types::Factory
+  extend t::Factory
   
-  def_factory :level do |
-    name: 'LogLevel',
-    from_s: ->( string ) { string.to_sym },
-    **options
-  |
-    t.in SemanticLogger::LEVELS, from_s: from_s, name: name, **options
-  end
+  #@!method self.LogLevel **options
+  #   A member of {SemanticLogger::LEVELS}.
+  #   
+  #   @param [Hash] options
+  #     Passed to {Type#initialize}.
+  #   
+  #   @return [Type]
+  #   
+  def_type        :LogLevel,
+    aliases:      [ :level ],
+    from_s:       ->( string ) { string.to_sym },
+  &->( **options ) do
+    t.In SemanticLogger::LEVELS, **options
+  end # .LogLevel
   
   
-  def_factory :stdio do |
-    name: 'StdIO',
-    
-    from_s: ->( string ) {
-      case string
-      when '$stdout'
-        $stdout
-      when '$stderr'
-        $stderr
-      when 'STDOUT'
-        STDOUT
-      when 'STDERR'
-        STDERR
-      end
-    },
-    
-    **options
-  |
-    t.is_a IO, name: name, from_s: from_s, **options
-  end
-  
+  #@!method self.StdIO **options
+  #   An {IO} instance with {Type#from_s} mapping:
+  #   
+  #       '$stdio'  -> $stdio
+  #       '$stderr' -> $stderr
+  #       'STDOUT'  -> STDOUT
+  #       'STDERR'  -> STDERR
+  #   
+  #   @param [Hash] options
+  #     Passed to {Type#initialize}.
+  #   
+  #   @return [Type]
+  #   
+  def_type        :StdIO,
+    aliases:      [ :stdio ],
+    from_s:       ->( string ) {
+                    case string
+                    when '$stdout'
+                      $stdout
+                    when '$stderr'
+                      $stderr
+                    when 'STDOUT'
+                      STDOUT
+                    when 'STDERR'
+                      STDERR
+                    end
+                  },
+  &->( **options ) do
+    t.IsA IO, **options
+  end # .StdIO
+
 end # module Types
 
 
