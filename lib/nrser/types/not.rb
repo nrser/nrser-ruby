@@ -73,7 +73,7 @@ end # class Not
 # @!group Negation Type Factories
 # ----------------------------------------------------------------------------
 
-#@!method self.Not **options
+#@!method self.Not type, **options
 #   Negates another type.
 #   
 #   @param [TYPE] type

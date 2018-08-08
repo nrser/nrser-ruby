@@ -68,17 +68,7 @@ module NRSER
       create_arrays_for_unsigned_keys: create_arrays_for_unsigned_keys
   end # .bury!
   
-
-  # @todo Document _internal_bury! method.
-  # 
-  # @private
-  # 
-  # @param [type] arg_name
-  #   @todo Add name param description.
-  # 
-  # @return [return_type]
-  #   @todo Document return value.
-  # 
+  
   def self._internal_bury! tree,
                       key_path,
                       value,

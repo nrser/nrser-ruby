@@ -45,15 +45,6 @@ class Config
   # Class Methods
   # ========================================================================
   
-  
-  # @todo Document trie_merge method.
-  # 
-  # @param [type] arg_name
-  #   @todo Add name param description.
-  # 
-  # @return [return_type]
-  #   @todo Document return value.
-  # 
   def self.deep_trie_merge trie, source, &block
     to_put = {}
 
@@ -110,8 +101,10 @@ class Config
   #   h.get("B")         # => 2
   #   h.get("Elephant")  # => 8
   #
-  # @param key [Object] The key to look up
+  # @param [Array<Object>] key_path
+  #   The key to look up
   # @return [Object]
+  # 
   def get *key_path, type: nil, default: nil
     first, *rest = key_path
     entry = @trie.get first

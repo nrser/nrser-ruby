@@ -77,7 +77,7 @@ end # class Equivalent
 def_type        :Equivalent,
   aliases:    [ :eq ],
   parameterize: :value,
-&->( value, **options|
+&->( value, **options ) do
   Equivalent.new value, **options
 end
 

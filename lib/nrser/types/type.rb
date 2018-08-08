@@ -432,7 +432,7 @@ class Type
   # Try to load a value from "data" - basic values and
   # collections like {Array} and {Hash} forming tree-like structures.
   # 
-  # @param [*] data
+  # @param [Object] data
   #   Data to try to load from.
   # 
   # @raise [NoMethodError]
@@ -571,10 +571,10 @@ class Type
   # Return a *union* type satisfied by values that satisfy either `self`
   # *or* and of `others`.
   # 
-  # @param [*] other
-  #   Values passed through {NRSER::Types.make} to create the other types.
+  # @param [Array<TYPE>] others
+  #   Values passed through {.make} to create the other types.
   # 
-  # @return [NRSER::Types::Union]
+  # @return [Union]
   # 
   def union *others
     require_relative './combinators'
@@ -607,7 +607,7 @@ class Type
   # Return an *exclusive or* type satisfied by values that satisfy either
   # `self` *or* `other` *but not both*.
   # 
-  # @param [*] other
+  # @param [Array<TYPE>] others
   #   Value passed through {NRSER::Types.make} to create the other type.
   # 
   # @return [NRSER::Types::Intersection]

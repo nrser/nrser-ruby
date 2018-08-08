@@ -145,7 +145,6 @@ module Struct
   private_class_method :check_new_args!
   
   
-  # @param [Array<Symbol>]
   def self.new *vector_prop_defs, **hash_prop_defs, &class_body
     check_new_args! vector_prop_defs, hash_prop_defs
     

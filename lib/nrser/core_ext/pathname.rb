@@ -1,5 +1,26 @@
+# frozen_string_literal: true
+# encoding: UTF-8
+
+# Requirements
+# ========================================================================
+
+# Stdlib
+# ------------------------------------------------------------------------
+
 require 'pathname'
 
+# Project / Package
+# ------------------------------------------------------------------------
+
+
+# Definitions
+# ========================================================================
+
+# NRSER's extensions to the stdlib's `Pathname` class.
+# 
+# @see  https://ruby-doc.org/stdlib/libdoc/pathname/rdoc/Pathname.html
+#       Pathname
+# 
 class Pathname
   
   # override to accept Pathname instances.
@@ -21,26 +42,50 @@ class Pathname
   end
   
   
-  alias_method :_original_sub, :sub
+  # @!method _core_sub *args, &block
+  #   An `alias_method` reference to the `#sub` method as we found it, which
+  #   we'll use inside our override of {#sub}... and now you can too!
+  #   
+  #   Arguments are the same as [String#sub][].
+  #   
+  #   [String#sub]: https://ruby-doc.org/core/String.html#method-i-sub
+  #   
+  #   @see  https://ruby-doc.org/stdlib/libdoc/pathname/rdoc/Pathname.html#method-i-sub
+  #         Ruby Stdlib Pathname#sub
+  #   
+  #   @return [Pathname]
+  # 
+  alias_method :_core_sub, :sub
   
   
-  # override sub to support Pathname instances as patterns.
+  # Our override of `#sub` to support {Pathname} instances as patterns.
+  # 
+  # Just calls `#to_s` on `pattern` if it's a {Pathname} before passing down
+  # to {#_core_sub}.
   # 
   # @param [String | Regexp | Pathname] pattern
-  #   thing to replace.
+  #   Thing to replace.
   # 
-  # @param [String | Hash] replacement
-  #   thing to replace it with.
+  # @param args
+  #   See Ruby core's [String#sub][], which [Pathname#sub][] calls between 
+  #   stringifying and re-wrapping in a {Pathname} (core's [String#sub][] is 
+  #   overloaded).
+  #   
+  #   [String#sub]: https://ruby-doc.org/core/String.html#method-i-sub
+  #   [Pathname#sub]: https://ruby-doc.org/stdlib/libdoc/pathname/rdoc/Pathname.html#method-i-sub
+  # 
+  # @param [Proc] block
+  #   See [String#sub][].
   # 
   # @return [Pathname]
-  #   new Pathname.
+  #   A brand new Pathname boys and girls!
   # 
-  def sub pattern, replacement
+  def sub pattern, *args, &block
     case pattern
     when Pathname
-      _original_sub pattern.to_s, replacement
+      _core_sub pattern.to_s, *args, &block
     else
-      _original_sub pattern, replacement
+      _core_sub pattern, *args, &block
     end
   end
 
@@ -121,6 +166,16 @@ class Pathname
   # 
   def to_dot_rel_s **kwds
     to_rel_s( **kwds, dot_slash: true ).to_s
+  end
+
+
+  # The "closest" directory - which is `self` if the instance is a
+  # {#directory?}, otherwise it's {#dirname}.
+  # 
+  # @return [Pathname]
+  # 
+  def closest_dir
+    directory? ? self : dirname
   end
   
 end # class Pathname

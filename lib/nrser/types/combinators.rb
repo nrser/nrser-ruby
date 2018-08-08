@@ -232,7 +232,7 @@ end
 # ----------------------------------------------------------------------------
 
 
-#@!method self.Union **options
+#@!method self.Union *types, **options
 #   Match any of the types.
 #   
 #   @param [Type | Object] types
@@ -252,7 +252,7 @@ def_type        :Union,
 end # .Union
 
 
-#@!method self.Intersection **options
+#@!method self.Intersection *types, **options
 #   Match all of the types
 #   
 #   @param [Type | Object] types
@@ -272,7 +272,7 @@ def_type        :Intersection,
 end # .Intersection
 
 
-#@!method self.XOR **options
+#@!method self.XOR *types, **options
 #   Match one of the types only.
 #   
 #   @param [Type | Object] types

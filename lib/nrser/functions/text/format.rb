@@ -39,7 +39,7 @@ module NRSER
   # 
   # This methods joins the results together 
   # 
-  # @param [Array] message
+  # @param [Array] segments
   #   Message segments.
   # 
   # @return [String]

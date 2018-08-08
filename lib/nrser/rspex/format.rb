@@ -114,14 +114,6 @@ module NRSER::RSpex::Format
   end
   
   
-  # @todo Document format_type method.
-  # 
-  # @param [type] arg_name
-  #   @todo Add name param description.
-  # 
-  # @return [return_type]
-  #   @todo Document return value.
-  # 
   def self.prepend_type type, description
     return description if type.nil?
     
@@ -160,13 +152,6 @@ module NRSER::RSpex::Format
   end
   
   
-  # @todo Document format method.
-  # 
-  # @param [type] arg_name
-  #   @todo Add name param description.
-  # 
-  # @return [String]
-  # 
   def self.description *parts, type: nil
     parts.
       flat_map { |part|

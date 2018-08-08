@@ -117,7 +117,7 @@ end # class Shape
 # @!group Shape Type Factories
 # ----------------------------------------------------------------------------
 
-#@!method self.Shape **options
+#@!method self.Shape pairs, **options
 #   Create a {Shape} type that parameterizes `pairs` of object keys and {Type}
 #   values.
 #   

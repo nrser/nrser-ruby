@@ -26,7 +26,7 @@ module  Types
 # @!group Selector Type Factories
 # ----------------------------------------------------------------------------
 
-#@!method self.Selector **options
+#@!method self.Selector pairs, **options
 #   Factory to create {Shape} type instances that function as MongoDB-esque
 #   document query against lists of Ruby objects using the standard 
 #   {Enumerable#select} and related methods.

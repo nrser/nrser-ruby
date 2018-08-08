@@ -51,9 +51,6 @@ class NRSER::Log::Formatters::Color < ::SemanticLogger::Formatters::Color
   
   # @todo Document default_color_map method.
   # 
-  # @param [type] arg_name
-  #   @todo Add name param description.
-  # 
   # @return [SemanticLogger::Formatters::Color::ColorMap]
   # 
   def self.default_color_map

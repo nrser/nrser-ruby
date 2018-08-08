@@ -14,11 +14,11 @@ module NRSER
   # @param [#each_pair | (#each_index & #each_with_index)] tree
   #   Tree to walk.
   # 
-  # @param [Array] path
+  # @param [Array] key_path
   #   Key path down to `tree`.
   # 
-  # @param [Hash<Array, Object>] results
-  #   New hash to stick results in.
+  # @param [Proc] block
+  #   Called with each `(key_path, value)` pair.
   # 
   # @return [nil]
   # 

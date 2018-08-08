@@ -47,14 +47,6 @@ class NRSER::Props::Metadata
   # Class Methods
   # ======================================================================
   
-  # @todo Document has_metadata? method.
-  # 
-  # @param [type] arg_name
-  #   @todo Add name param description.
-  # 
-  # @return [return_type]
-  #   @todo Document return value.
-  # 
   def self.has_metadata? klass
     klass.instance_variable_defined? VARIABLE_NAME
   end # .has_metadata?

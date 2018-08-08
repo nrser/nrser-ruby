@@ -90,14 +90,6 @@ class NRSER::MeanStreak
   end
   
   
-  # @todo Document parse method.
-  # 
-  # @param [type] arg_name
-  #   @todo Add name param description.
-  # 
-  # @return [return_type]
-  #   @todo Document return value.
-  # 
   def parse source, **options
     NRSER::MeanStreak::Document.parse \
       source,

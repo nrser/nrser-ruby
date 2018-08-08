@@ -149,27 +149,11 @@ module NRSER::RSpex
   # =====================================================================
   
   
-  # @todo Document short_s method.
-  # 
-  # @param [type] arg_name
-  #   @todo Add name param description.
-  # 
-  # @return [return_type]
-  #   @todo Document return value.
-  # 
   def self.short_s value, max = 64
     NRSER.smart_ellipsis value.inspect, max
   end # .short_s
   
   
-  # @todo Document format method.
-  # 
-  # @param [type] arg_name
-  #   @todo Add name param description.
-  # 
-  # @return [return_type]
-  #   @todo Document return value.
-  # 
   def self.format *args
     NRSER::RSpex::Format.description *args
   end # .format

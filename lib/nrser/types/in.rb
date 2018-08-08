@@ -22,7 +22,7 @@ module  Types
 # @!group In Type Factories
 # ----------------------------------------------------------------------------
 
-#@!method self.In **options
+#@!method self.In group, **options
 #   Type that tests value for membership in a group object via that object's
 #   `#include?` method.
 #   

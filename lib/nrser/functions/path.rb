@@ -35,14 +35,6 @@ module NRSER
   end # .dir_from
   
   
-  # @todo Document glob? method.
-  # 
-  # @param [type] arg_name
-  #   @todo Add name param description.
-  # 
-  # @return [return_type]
-  #   @todo Document return value.
-  # 
   def self.looks_globish? path
     %w|* ? [ {|.any? &path.to_s.method( :include? )
   end # .glob?

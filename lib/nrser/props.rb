@@ -49,7 +49,8 @@ module Props
   # @param [Hash<String, Object>] data
   #   Data hash to load from.
   # 
-  # @param
+  # @param [String] class_key
+  #   The key name to look for the class name in.
   # 
   # @return [NRSER::Props::Props]
   #   Instance of a propertied class.

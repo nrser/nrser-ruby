@@ -35,14 +35,6 @@ module Factory
   # 
   # @deprecated Use {#def_type}
   # 
-  # @!macro [attach] factory
-  #   
-  #   @param [Hash] options
-  #     Common type construction options, see {Type#initialize}.
-  #   
-  #   @return [NRSER::Types::Type]
-  #     The type.
-  # 
   def def_factory name, maybe: true, aliases: [], &body
     define_singleton_method name, &body
 
@@ -108,22 +100,18 @@ module Factory
   #   The name of the type. Will be normalized to a string via it's `#to_s`
   #   method. 
   # 
-  # @param [Boolean] maybe
-  #   When `true`, adds `?`-suffixed versions of the method names that 
-  #   wrap the type in a {Maybe}.
-  # 
   # @param [Enumerable<#to_s>] aliases
   #   Aliases to add for the type factory method. Normalized to a {Set} of
   #   strings before use.
   # 
-  # @param [nil | Proc<(s:String)->MEMBER>] from_s
+  # @param [nil | Proc<(s:String): MEMBER>] from_s
   #   Optional function to load type members from strings.
   # 
   # @param [Boolean] maybe
   #   When `true` will add `?`-suffixed versions of the factory that 
   #   create {.Maybe} versions of the type.
   # 
-  # @param [nil | false | Proc<(*args, &block)->String>] default_name
+  # @param [nil | false | Proc<(*args, &block): String>] default_name
   #   
   #   Controls what - if anything - is done with the `name:` value in 
   #   `options` when the factory method is called.
@@ -167,7 +155,7 @@ module Factory
   #   The hope was to use this for something useful in the future, but who the
   #   hell knows to be honest.
   #   
-  # @param [nil | String | Proc<(*args, &block)->String>] symbolic
+  # @param [nil | String | Proc<(*args, &block): String>] symbolic
   #   Controls what's done with the `symbolic:` option - which affects what
   #   the new type's {Type#symbolic} will return - when the factory methods
   #   are called with the `symbolic:` option `nil` or missing:
@@ -184,7 +172,7 @@ module Factory
   #       (including `options`) and block (if any) the factory method is called
   #       with and is expected to return the symbolic string representation.
   # 
-  # @param [nil | Proc<(MEMBER)->DATA>] to_data
+  # @param [nil | Proc<(MEMBER): DATA>] to_data
   #   I'm getting tired of writing this shit so I'm going to be brief here -
   #   provides a value that will get set as the `to_data:` option and become
   #   responsible for turning type member values into "data" (think things

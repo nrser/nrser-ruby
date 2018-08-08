@@ -31,7 +31,7 @@ class Hash
   #   hash
   #   # => {:c=>3, :d=>4}
   #   
-  # @param *keys
+  # @param keys
   #   Hash keys to extract.
   # 
   # @param [#<<] into

@@ -127,6 +127,18 @@ end
 #   "Home-relative" paths that start with `~`.
 #   
 #   From my take, these are not relative *and* are not absolute.
+# 
+#   @todo
+#     This is NOT RIGHT! Ruby seems to *always* treat paths that start with 
+#     `~` as user paths, since you can do `~some_user` for a *different* user
+#     than the current one to start a path at *their* home directory.
+#     
+#     However - Bash 4's `cd` - on MacOSX, at least - treats `~some_user` as 
+#     being a home directory *only if* `some_user` exists... and you may have
+#     a file or directory in the working dir named `~some_user` that it will 
+#     correctly fall back on if `some_user` does not exist.
+#     
+#     Paths are complicated, man.
 #   
 #   @param [Hash] options
 #     Passed to {Type#initialize}.

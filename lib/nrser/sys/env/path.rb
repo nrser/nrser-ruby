@@ -126,14 +126,6 @@ class NRSER::Sys::Env::Path
   end # .matches_pattern?
   
   
-  # @todo Document from_env method.
-  # 
-  # @param [type] arg_name
-  #   @todo Add name param description.
-  # 
-  # @return [return_type]
-  #   @todo Document return value.
-  # 
   def self.from_ENV env_key
     new ENV[env_key.to_s], env_key: env_key
   end # .from_env
@@ -301,24 +293,6 @@ class NRSER::Sys::Env::Path
   def to_a
     @value.to_a
   end
-  
-  protected
-  # ========================================================================
-    
-    # Internal method to remove paths that have already been normalized.
-    # 
-    # @param [type] arg_name
-    #   @todo Add name param description.
-    # 
-    # @return [return_type]
-    #   @todo Document return value.
-    # 
-    def remove_paths paths
-      # method body...
-    end # #remove_paths
-    
-    
-  # end protected
   
   
 end # class NRSER::Env::Path

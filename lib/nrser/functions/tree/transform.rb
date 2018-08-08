@@ -1,13 +1,6 @@
 module NRSER
   
-  # @todo Document transform method.
-  # 
-  # @param [type] arg_name
-  #   @todo Add name param description.
-  # 
-  # @return [return_type]
-  #   @todo Document return value.
-  # 
+
   def self.transform tree, source
     map_tree( tree, prune: true ) { |value|
       if value.is_a? Proc
@@ -39,15 +32,6 @@ module NRSER
   end
   
   
-  
-  # @todo Document transformer method.
-  # 
-  # @param [type] arg_name
-  #   @todo Add name param description.
-  # 
-  # @return [return_type]
-  #   @todo Document return value.
-  # 
   def self.transformer &block
     map_tree( block.call SendSerializer.new ) { |value|
       if value.is_a? SendSerializer
@@ -57,7 +41,6 @@ module NRSER
       end
     }
   end # .transformer
-  
   
   
 end # module NRSER

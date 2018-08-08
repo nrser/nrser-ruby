@@ -69,17 +69,21 @@ class NRSER::Log::Appender::Sync
 
   # Construct a sync appender.
   #
-  # @param [SemanticLogger]
-  #   name: [String]
-  #     Name to use for the log thread and the log name when logging any errors from this appender.
-  #
-  #   lag_threshold_s [Float]
-  #     Log a warning when a log message has been on the queue for longer than this period in seconds.
-  #     Default: 30
-  #
-  #   lag_check_interval: [Integer]
-  #     Number of messages to process before checking for slow logging.
-  #     Default: 1,000
+  # @param [SemanticLogger::Subscriber] appender
+  #   The appender this appender will attempt to append to when there are  
+  #   pending appendables to append. Apparently.
+  #   
+  #   Sorry, I just ended up here trying to clear out Yard warnings so I can 
+  #   maybe figure out why it's all of sudden shitting the bed. Guess I needed
+  #   a break.
+  #   
+  #   In truth I don't even think it needs to be a Subscriber, but that's 
+  #   probably the easiest way to think about it.
+  # 
+  # @param [String] name
+  #   Name to use for the log thread and the log name when logging any errors 
+  #   from this appender.
+  # 
   def initialize  appender:, name: appender.class.safe_name
     @appender = appender
   end

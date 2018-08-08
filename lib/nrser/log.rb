@@ -104,14 +104,6 @@ module NRSER::Log
   # @!group Utility Class Methods
   # ------------------------------------------------------------------------
   
-  # @todo Document logger_name_and_type method.
-  # 
-  # @param [type] arg_name
-  #   @todo Add name param description.
-  # 
-  # @return [return_type]
-  #   @todo Document return value.
-  # 
   def self.logger_type_and_name_from subject
     case subject
     when String
@@ -184,7 +176,7 @@ module NRSER::Log
   # 
   # @see https://github.com/rocketjob/semantic_logger/blob/97247126de32e6ecbf74cbccaa3b3732768d52c5/lib/semantic_logger/semantic_logger.rb#L454
   # 
-  # @param [Symbol | String | Integer]
+  # @param [Symbol | String | Integer] level
   #   Representation of a level in one of the following formats:
   #   
   #   1.  {Symbol} - verified as member of {SemanticLogger::LEVELS} and

@@ -141,21 +141,19 @@ class NRSER::Char::AlphaNumericSub
   # Constructor
   # ======================================================================
   
-  # Instantiate a new `Special`.
+  # Instantiate a new `AlphaNumericSub`.
   # 
-  # @param [String] char
-  #   The actual character as a length 1 UTF-8 string.
+  # @param [String] sub_a
+  #   Character the lower-case `a` ASCII character gets replaced with.
   # 
-  # @param [nil | String] caret
-  #   Optional `^X` replacement for control characters, see {#caret} for
-  #   details.
+  # @param [String] sub_A
+  #   Character the upper-case `A` ASCII character gets replaced with.
   # 
-  # @param [Array<#to_s>] names
-  #   Optional names this character goes by.
+  # @param [String] sub_0
+  #   Character the `0` gets subbed out for.
   # 
-  # @param [nil | String] symbol
-  #   Optional printable unicode character replacement, see {#symbol} for
-  #   details.
+  # @param [Hash?] exceptions
+  #   I don't know just read the source.
   # 
   def initialize  sub_a: nil,
                   sub_A: nil,

@@ -126,7 +126,8 @@ module NRSER::Props::ClassMethods
   
   # Get an instance from a source.
   # 
-  # @experimental
+  # @status
+  #   Experimental
   # 
   # @param [self | String | Hash] source
   # @return [self]

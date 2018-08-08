@@ -57,14 +57,6 @@ class IsA < NRSER::Types::Type
   end
   
   
-  # @todo Document init_from_data? method.
-  # 
-  # @param [type] arg_name
-  #   @todo Add name param description.
-  # 
-  # @return [return_type]
-  #   @todo Document return value.
-  # 
   def init_from_data?
     @init_from_data
   end # #init_from_data?
@@ -121,7 +113,7 @@ end # class IsA
 #   If `mod` is a non-Class {Module}, the returned {Type} will be satisfied
 #   by instances of classes that include `mod`.
 #   
-#   @param [Module] mod
+#   @param [Module] module_
 #     The {Class} or {Module} that type members should be.
 #   
 #   @param [Hash] options
@@ -131,8 +123,8 @@ end # class IsA
 # 
 def_type        :IsA,
   parameterize: :mod \
-do |mod, **options|
-  IsA.new mod, **options
+&->( module_, **options ) do
+  IsA.new module_, **options
 end
 
 

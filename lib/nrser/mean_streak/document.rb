@@ -47,9 +47,6 @@ class NRSER::MeanStreak::Document
   
   # @todo Document from method.
   # 
-  # @param [type] arg_name
-  #   @todo Add name param description.
-  # 
   # @return [NRSER::MeanStreak::Document]
   #   @todo Document return value.
   # 
