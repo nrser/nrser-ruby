@@ -25,7 +25,7 @@ module  Types
 # ----------------------------------------------------------------------------
 
 #@!method self.Symbol **options
-#   {Symbol} instances. Load from strings as you would expect {String#to_sym}.
+#   {Symbol} instances. Load from strings as you would expect {::String#to_sym}.
 #   
 #   @param [Hash] options
 #     Passed to {Type#initialize}.

@@ -28,8 +28,8 @@ module  Types
 # ----------------------------------------------------------------------------
 
 #@!method self.String length: nil, encoding: nil, **options
-#   Get a {Type} whose members {.IsA} {String}, along with some other optional
-#   common attribute checks ({String#length} and {String#encoding}).
+#   Get a {Type} whose members {.IsA} {::String}, along with some other optional
+#   common attribute checks ({::String#length} and {::String#encoding}).
 #   
 #   If `encoding:` is specified and no `from_s:` is provided, will add a
 #   {Type#form_s} that attempts to transcode strings that are not already in the
@@ -47,7 +47,7 @@ module  Types
 #     any default `from_s` - loaded strings must already be the specific length.
 #   
 #   @param [String] encoding
-#     Optional {String#encoding} check. See notes above regarding default
+#     Optional {::String#encoding} check. See notes above regarding default
 #     `from_s` that may be added.
 #   
 #   @param [Hash] options
