@@ -122,7 +122,7 @@ end # class IsA
 #   @return [Type]
 # 
 def_type        :IsA,
-  parameterize: :mod \
+  parameterize: :mod,
 &->( module_, **options ) do
   IsA.new module_, **options
 end
