@@ -183,14 +183,6 @@ class NRSER::Char::AlphaNumericSub
   # Instance Methods
   # ======================================================================
   
-  # The first of {#names} (if any).
-  # 
-  # @return [nil]
-  #   When {#names} is empty.
-  # 
-  # @return [String]
-  #   When {#names} is not empty.
-  # 
   def sub src
     dest = src.dup
     
