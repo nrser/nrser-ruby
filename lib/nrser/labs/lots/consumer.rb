@@ -1,6 +1,18 @@
 # encoding: UTF-8
 # frozen_string_literal: true
 
+
+# Namespace
+# ========================================================================
+
+module  NRSER
+module  Labs
+module  LOTS
+
+
+# Definitions
+# ========================================================================
+
 class Consumer
   def initialize
     @consumed = []
@@ -102,3 +114,10 @@ class BoolOptConsumer < Consumer
 
 end # class BoolOptConsumer
 
+
+# /Namespace
+# ========================================================================
+
+end # module LOTS
+end # module Labs
+end # module NRSER
