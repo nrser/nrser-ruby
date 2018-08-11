@@ -83,29 +83,36 @@ class Combinator < Type
   # @raise [TypeError]
   #   See write up above.
   # 
-  def custom_from_s s
+  def custom_from_s string
+    # If we have an explicit `@from_s` then use that and that only.
     unless @from_s.nil?
-      return check @from_s.call( s )
+      return check! @from_s.call( string )
     end
+
+    errors_by_type = {}
     
-    @types.each { |type|
+    types.each { |type|
       if type.has_from_s?
         begin
-          return check type.from_s(s)
-        # We want to catch the built-in {::TypeError}, as 
-        # {NRSER::Types::CatchError}, which {#check} throws, us a subclass, as
-        # well as {NRSER::TypeError}.
-        # 
-        # Be careful that due to {NRSER::TypeError} this **needs** the `::`!
-        # 
-        rescue ::TypeError => e
-          # pass
+          return check! type.from_s( string )
+        
+        # We want to catch any standard error here so `from_s` implementations
+        # can kinda "code without care" and if one fails we will move on to
+        # try the next.
+        rescue StandardError => error
+          errors_by_type[type] = error
         end
+      else
+        errors_by_type[type] = "Does not {#has_from_s?}"
       end
     }
     
-    raise NRSER::TypeError.new \
-      "none of combinator", self.to_s, "types could convert", s
+    # TODO  This should be "nicer"... teach {NRSER::MultipleErrors} about 
+    #       {NRSER::NicerError}?
+    raise TypeError.new \
+      "none of combinator", self.to_s, "types could convert", string.inspect,
+      string: string,
+      errors_by_type: errors_by_type
   end
   
   
