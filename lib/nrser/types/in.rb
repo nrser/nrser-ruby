@@ -62,7 +62,7 @@ def_type        :In,
   #       
   #           where group, :include?
   #       
-  self.Where group.method( :include? )
+  self.Where group.method( :include? ), **options
 end # .In
 
 # @!endgroup In Type Factories # *********************************************
