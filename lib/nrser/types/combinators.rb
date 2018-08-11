@@ -92,14 +92,20 @@ class Combinator < Type
       if type.has_from_s?
         begin
           return check type.from_s(s)
-        rescue TypeError => e
+        # We want to catch the built-in {::TypeError}, as 
+        # {NRSER::Types::CatchError}, which {#check} throws, us a subclass, as
+        # well as {NRSER::TypeError}.
+        # 
+        # Be careful that due to {NRSER::TypeError} this **needs** the `::`!
+        # 
+        rescue ::TypeError => e
           # pass
         end
       end
     }
     
-    raise TypeError,
-      "none of combinator #{ self.to_s } types could convert #{ s.inspect }"
+    raise NRSER::TypeError.new \
+      "none of combinator", self.to_s, "types could convert", s
   end
   
   
