@@ -1,3 +1,4 @@
+require 'nrser/functions/enumerable/associate'
 require_relative './enumerable/find_map'
 
 
