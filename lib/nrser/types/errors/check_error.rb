@@ -6,7 +6,7 @@
 
 # Project / Package
 # -----------------------------------------------------------------------
-require 'nrser/errors/nicer_error'
+require 'nrser/errors/type_error'
 
 
 # Definitions
@@ -15,13 +15,7 @@ require 'nrser/errors/nicer_error'
 # This error (or a subclass) is thrown when types fail to
 # {NRSER::Types::Type.check!}.
 # 
-class NRSER::Types::CheckError < ::TypeError
-  
-  # Mixins
-  # ==========================================================================
-  
-  include NRSER::NicerError
-  
+class NRSER::Types::CheckError < NRSER::TypeError
   
   # Attributes
   # ========================================================================
