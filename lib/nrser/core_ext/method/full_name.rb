@@ -3,7 +3,7 @@ require_relative '../module/names'
 
 class Method
   
-  # Returns the method's {#receiver} and {#name} in the common
+  # Returns the method's {::Method#receiver} and {::Method#name} in the common
   # `A.cls_meth` / `A#inst_meth` format.
   # 
   def full_name
