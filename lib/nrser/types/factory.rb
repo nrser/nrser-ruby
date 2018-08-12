@@ -258,7 +258,6 @@ module Factory
         # never really going anywhere except away.
         elsif parameterize.nil?
           options[:name] = name
-
         end
       end # if options[:name].nil? && default_name != false
 
