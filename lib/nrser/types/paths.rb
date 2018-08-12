@@ -5,6 +5,7 @@
 # -----------------------------------------------------------------------
 
 require 'nrser/core_ext/pathname'
+require 'nrser/functions/path/normalized'
 
 require_relative './is_a'
 require_relative './where'
@@ -103,7 +104,7 @@ def_type        :POSIXPathSegment,
 end # .POSIXPathSegment
 
 
-# @!method self.AbsPath **options
+# @!method self.AbsolutePath **options
 #   An absolute {.Path}.
 #   
 #   @param [Hash] options
@@ -111,47 +112,59 @@ end # .POSIXPathSegment
 #   
 #   @return [Type]
 #   
-def_type        :AbsPath,
+def_type        :AbsolutePath,
+  aliases:      [ :AbsPath, :abs_path ],
   # TODO  IDK how I feel about this...
-  from_s:       ->( s ) { File.expand_path s },
+  # from_s:       ->( s ) { File.expand_path s },
 &->( **options ) do
   self.Intersection \
     self.Path,
     # Weirdly, there is no {File.absolute?}..
     self.Attributes( to_pn: attrs( absolute?: true ) ),
     **options
-end
+end # .AbsolutePath
 
 
-#@!method self.TildePath **options
-#   "Home-relative" paths that start with `~`.
-#   
-#   From my take, these are not relative *and* are not absolute.
+#@!method self.HomePath **options
+#   A path that starts with `~`, meaning it's relative to a user's home 
+#   directory (to Ruby, see note below).
 # 
-#   @todo
-#     This is NOT RIGHT! Ruby seems to *always* treat paths that start with 
-#     `~` as user paths, since you can do `~some_user` for a *different* user
-#     than the current one to start a path at *their* home directory.
-#     
-#     However - Bash 4's `cd` - on MacOSX, at least - treats `~some_user` as 
-#     being a home directory *only if* `some_user` exists... and you may have
-#     a file or directory in the working dir named `~some_user` that it will 
-#     correctly fall back on if `some_user` does not exist.
-#     
-#     Paths are complicated, man.
+#   > ### Note: How Bash and Ruby Think Differently About Home Paths ###
+#   > 
+#   > #### Ruby Always Tries to Go Home ####
+#   > 
+#   > From my understanding and fiddling around Ruby considers *any* path that
+#   > starts with `~` a "home path" for the purpose of expanding, such as in
+#   > {::File.expand_path} and {::Pathname#expand_path}.
+#   > 
+#   > You can see this clearly in the [rb_file_expand_path_internal][] C
+#   > function, which is where those expand methods end up.
+#   > 
+#   > [rb_file_expand_path_internal]: https://github.com/ruby/ruby/blob/61bef8612afae25b912627e69699ddbef81adf93/file.c#L3486
+#   > 
+#   > #### Bash  ####
+#   > 
+#   > However
+#   > 
+#   > However - Bash 4's `cd` - on MacOSX, at least - treats `~some_user` as 
+#   > being a home directory *only if* `some_user` exists... and you may have
+#   > a file or directory in the working dir named `~some_user` that it will 
+#   > correctly fall back on if `some_user` does not exist.
+#   > 
+#   > Paths are complicated, man.
 #   
 #   @param [Hash] options
 #     Passed to {Type#initialize}.
 #   
 #   @return [Type]
 #   
-def_type        :TildePath,
+def_type        :HomePath,
 &->( **options ) do
   self.Intersection \
     self.Path,
-    self.Attributes( to_s: TILDE_PATH_RE ),
+    self.Respond( to: [ :start_with?, '~' ], with: self.True ),
     **options
-end # .TildePath
+end # .HomePath
 
 
 # @!method self.AbsPath **options
@@ -222,6 +235,25 @@ def_type :FilePath,
     self.Where( File.method :file? ),
     **options
 end # .FilePath
+
+
+#@!method self.NormalizedPath **options
+#   @todo Document NormalizedPath type factory.
+#   
+#   @param [Hash] options
+#     Passed to {Type#initialize}.
+#   
+#   @return [Type]
+#   
+def_type        :NormalizedPath,
+  aliases:      [ :NormPath, :norm_path ],
+&->( **options ) do
+  self.Intersection \
+    self.Path,
+    self.Where( NRSER.method :normalized_path? ),
+    **options
+end # .NormalizedPath
+
 
 
 # @!endgroup Path Type Factories # *******************************************
