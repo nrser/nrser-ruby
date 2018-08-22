@@ -6,6 +6,33 @@ require 'nrser/sys/env'
 # Extension methods for {String}
 # 
 class String
+
+  # The method I alias as unary `~`, with a full-name so I can find it and
+  # such, I guess.
+  # 
+  # It's a string formatter. Right now, it just calls {#squish}, but I would
+  # like to make it a bit smarter soon so it can be used on 
+  # paragraph-structured text too.
+  # 
+  # It's meant to be used with the `%{}` string quote form, because that allows
+  # multi-line strings, but nothing stopping it from being used elsewhere too.
+  # 
+  # @example
+  # 
+  #     ~%{
+  #       Hey there, here's some "stuff",
+  #       and here's some MORE!
+  #     }
+  #     # => "Hey there, here's some \"stuff\", and here's some MORE!"
+  # 
+  # @return [String]
+  # 
+  def squiggle
+    squish
+  end
+
+  alias_method :~@, :squiggle
+
   
   def unblock
     NRSER.unblock self
