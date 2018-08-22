@@ -1,6 +1,9 @@
 # encoding: UTF-8
 # frozen_string_literal: true
 
+# TODO  I don't know if this ever worked...? Looks like it was supposed to be 
+#       mutable prop'd object support backed by an {NRSER::Stash} instance.
+
 # Requirements
 # =======================================================================
 
