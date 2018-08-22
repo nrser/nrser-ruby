@@ -10,12 +10,6 @@ Anyways I needed this because I needed some re-usable way for things to make sur
 [tcomb]: https://github.com/gcanti/tcomb
 
 
-Docs
-------------------------------------------------------------------------
-
-<http://www.rubydoc.info/gems/nrser/NRSER/Types>
-
-
 Structure & Design
 ------------------------------------------------------------------------
 
@@ -28,11 +22,16 @@ that accepts a single arguments and returns a boolean. If the type returns
 `true` when `#test?` is called with an object, then that object is a member of
 that type. That's it.
 
-Some of those classes, like the universal type {NRSER::Types::Top}, of which
-every object is a member ({NRSER::Types::Top#test?} always returns `true`) are
-essentially singletons, but most type classes parameterize over values that
-instances
+Some of those classes, like the universal type {NRSER::Types::Top} - of which
+every object is a member ({NRSER::Types::Top#test?} always returns `true`) - are
+essentially singletons, but many type classes parameterize over values that
+instances hold as variables.
 
+Types are designed to fundamentally immutable once constructed, through the 
+standard practice of storing state in instance variables without write 
+functions (of course, use of methods like `#instance_variable_set` will still
+mutate types - please don't do this, since any future caching will likely 
+reuse instances).
 
 API is basically a collection of module class methods attached to
 {NRSER::Types}, like {NRSER::Types.str} or {NRSER::Types.non_neg_int}.
