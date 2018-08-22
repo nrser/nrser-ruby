@@ -19,13 +19,20 @@ module  NRSER
 # 
 class AttrError < ValueError
 
+  # @!method name?
+  #   Is there an `:name` key in {#context}?
+  #   
+  #   @return [Boolean]
+  # 
   # @!method name
-  #   Name of attribute that has invalid value.
+  #   Name of attribute that has invalid value, which can be provided via
+  #   the `:name` key in the {#context}.
   #   
   #   @return [Symbol]
   # 
   def_context_delegator keys: :name
 
+  
   # @!method expected?
   #   Is there an `:expected` key in {#context}?
   #   
@@ -40,6 +47,10 @@ class AttrError < ValueError
   def_context_delegator keys: :expected
 
 
+  # Tests if an 'actual' value was provided in the {#context}.
+  # 
+  # @return [Boolean]
+  # 
   def actual?
     context.key?( :actual ) || ( value? && name? && value.respond_to?( name ) )
   rescue StandardError => error
@@ -69,6 +80,11 @@ class AttrError < ValueError
   end
 
   
+  # Create a default message if none was provided.
+  # 
+  # Uses whatever recognized {#context} values are present, falling back
+  # to {NicerError#default_message} if none are.
+  # 
   # @return [String]
   # 
   def default_message
