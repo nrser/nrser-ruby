@@ -1,0 +1,12 @@
+# TODO  Support needs to be added to Loc'd for variables (or make Lit work)
+$defaults:
+  domain: test
+
+sites:
+
+  - label: yard.nrser.${domain}
+    cmd_template: >-
+      bundle exec yard server --reload --port {port} --bind {bind}
+    keep_alive: false
+    run_at_load: false
+
