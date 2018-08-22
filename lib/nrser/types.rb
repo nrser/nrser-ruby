@@ -15,7 +15,7 @@ require 'nrser/log'
 
 # Stuff to help you define, test, check and match types in Ruby.
 # 
-# {include:file:lib/nrser/types/README.md}
+# Read the documentation {file:lib/nrser/types/README.md here}.
 # 
 module NRSER::Types
   
