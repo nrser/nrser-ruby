@@ -332,18 +332,30 @@ module NRSER::Log
   # --------------------------------------------------------------------------
   
   # Setup logging.
-  # 
-  # @param [String | false | nil] env_var_prefix
-  #   Prefix to ENV var names to look for logging setup config under,
-  #   like `<prefix>_LOG_LEVEL`, `<prefix>_DEBUG` and `<prefix>_TRACE`.
-  #   
-  #   If `nil` (the default), we'll try to use `application` to guess a
-  #   prefix.
-  #   
+  #
+  # @param [String | false | nil] env_var_prefix Prefix to ENV var names to look
+  #   for logging setup config under, like `<prefix>_LOG_LEVEL`,
+  #   `<prefix>_DEBUG` and `<prefix>_TRACE`.
+  #
+  #   If `nil` (the default), we'll try to use `application` to guess a prefix.
+  #
   #   You can disable any ENV lookups by passing `false`.
-  # 
+  #
+  # @param [Boolean] sync Enables or disables synchronous logging, where the log
+  #   message is processed entirely in the logging thread before the log call
+  #   returns.
+  #
+  #   {SemanticLogger} offloads log formating and writing to a separate thread
+  #   in it's standard configuration, an approach presumably aimed at
+  #   performance, but one that can be problematic when logging mutable values
+  #   that may change between the log call and the log serialization.
+  #   
+  #   See
+  #   {file:doc/known_issues_and_gotchas/semantic_logger_and_mutable_values.md 
+  #     SemanticLogger and Mutable Values}.
+  #
   # @return [nil]
-  # 
+  #
   def self.setup! level: nil,
                   dest: nil,
                   sync: nil,
