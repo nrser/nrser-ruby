@@ -1,6 +1,7 @@
 # encoding: UTF-8
 # frozen_string_literal: true
 
+
 # Definitions
 # =======================================================================
 
@@ -53,7 +54,7 @@ module NRSER::Log::Mixin
   # Instance Methods
   # ========================================================================
   
-  # Gets the {NRSER::Log:Logger} for use in the instance. This will be the
+  # Gets the {NRSER::Log::Logger} for use in the instance. This will be the
   # class logger from {ClassMethods#logger} unless the instance has a
   # `#create_logger` method.
   # 
