@@ -20,5 +20,8 @@ module NRSER::RSpex::ExampleGroup
 
   # Shorter name
   alias_method :describe_attr, :describe_attribute
+
+  # BOLDER name
+  alias_method :ATTRIBUTE, :describe_attribute
   
 end # module NRSER::RSpex::ExampleGroup

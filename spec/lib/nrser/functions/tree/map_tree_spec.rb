@@ -90,6 +90,7 @@ do
               fav_color: 'red',
               age: '32',
               likes: [:cats, :cookies],
-            }; end; end; end; end
+            }
+          end; end; end; end
   
 end # SPEC_FILE

@@ -19,67 +19,8 @@ require 'nrser/core_ext/object/lazy_var'
 
 # A mixin for {Exception} and utilities to make life better... even when things
 # go wrong.
-# 
-# "Nicer" errors do a few things:
-# 
-# 1.  **`message` is a splat/`Array`**
-#     
-#     Accept an {Array} `message` instead of just a string, dumping non-string
-#     values and joining everything together.
-#     
-#     This lets you deal with printing/dumping all in one place instead of
-#     ad-hoc'ing `#to_s`, `#inspect`, `#pretty_inspect`, etc. all over the
-#     place (though you can still dump values yourself of course since string
-#     pass right through).
-#     
-#     Write things like:
-# 
-#         MyError.new "The value", value, "sucks, it should be", expected
-# 
-#     This should cut down the amount of typing when raising as well, which
-#     is always welcome.
-#     
-#     It also allows for a future where we get smarter about dumping things,
-#     offer configuration options, switch on environments (slow, rich dev
-#     versus fast, concise prod), etc.
-# 
-# 2.  **"Extended" Messages**
-#     
-#     The normal message that we talked about in (1) - that we call the
-#     *summary message* or *super-message* (since it gets passed up to the
-#     built-in Exception's `#initialize`) - is intended to be:
-#     
-#     1.  Very concise
-#         -   A single line well under 80 characters if possible.
-#             
-#         -   This just seems like how Ruby exception messages were meant to
-#             be, I guess, and in many situations it's all you would want or
-#             need (production, when it just gets rescued anyways,
-#             there's no one there to read it, etc.).
-#             
-#     2.  Cheap to render.
-#         -   We may be trying to do lot very quickly on a production system.
-#     
-#     However - especially when developing - it can be really nice to add
-#     considerably more detail and feedback to errors.
-#     
-#     To support this important use case as well, `NicerError` introduces the
-#     idea of an *extended message* that does not need to be rendered and
-#     output along with the *summary/super-message*.
-#     
-#     It's rendering is done on-demand, so systems that are not configured to
-#     use it will pay a minimal cost for it's existence.
-#     
-#     > See {#extended_message}.
-#     
-#     The extended message is composed of:
-#     
-#     1.  Text *details*, optionally rendered via {Binding.erb} when a
-#         binding is provided.
-#     
-#     2.  A *context* of name and value pairs to dump.
-#         
-#     Both are provided as optional keyword parameters to {#initialize}.
+#
+# Check the docs at the {file:lib/nrser/errors/README.md nrser/errors README}.
 # 
 module NRSER::NicerError
   
@@ -103,6 +44,31 @@ module NRSER::NicerError
   # 
   def self.column_width
     DEFAULT_COLUMN_WIDTH
+  end
+
+
+  module ClassMethods
+    def def_context_delegator keys:, presence_predicate: true
+      keys = Array keys
+
+      keys.each do |key|
+        define_method key do
+          if (found_key = keys.find { |k| context.key? k })
+            context[found_key]
+          end
+        end
+
+        if presence_predicate
+          define_method "#{ key }?" do
+            !!keys.find { |k| context.key? k }
+          end
+        end
+      end
+    end
+  end
+
+  def self.included base
+    base.extend ClassMethods
   end
   
   
@@ -138,9 +104,9 @@ module NRSER::NicerError
                   binding: nil,
                   details: nil,
                   **context
-    @binding = binding
-    @context = context
-    @details = details
+    @binding = binding.freeze
+    @context = context.freeze
+    @details = details.freeze
     
     message = default_message if message.empty?
     super_message = format_message *message
@@ -158,6 +124,10 @@ module NRSER::NicerError
   # 
   # @return [String]
   #   The formatted string for the segment.
+  # 
+  # @todo
+  #   This should talk to config when that comes about to find out how to
+  #   dump things.
   # 
   def format_message_segment segment
     return segment.to_summary if segment.respond_to?( :to_summary )

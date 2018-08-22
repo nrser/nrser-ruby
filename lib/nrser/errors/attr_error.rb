@@ -1,73 +1,103 @@
 # frozen_string_literal: true
+# encoding: UTF-8
+
+# Requirements
+# ========================================================================
+
+require_relative './value_error'
+
+
+# Namespace
+# ========================================================================
+
+module  NRSER
+
 
 # Raised when we expected `#count` to be something it's not.
 # 
 # Extends {NRSER::ValueError}, and the {#value} must be the instance that
 # 
-class NRSER::AttrError < NRSER::ValueError
-  
-  # Name of attribute that has invalid value.
+class AttrError < ValueError
+
+  # @!method name
+  #   Name of attribute that has invalid value.
+  #   
+  #   @return [Symbol]
   # 
-  # @return [Symbol]
-  #     
-  attr_reader :symbol
-  
-  
-  # Actual invalid value of the subject's attribute.
+  def_context_delegator keys: :name
+
+  # @!method expected?
+  #   Is there an `:expected` key in {#context}?
+  #   
+  #   @return [Boolean]
+  #   
+  # @!method expected
+  #   Optional information about what the attribute value was expected to be,
+  #   which can be provided via the `:expected` key in {#context}.
+  #   
+  #   @return [Object]
   # 
-  # If not provided at construction, will be retrieved by sending {#symbol}
-  # to {#subject} in {#initialize}.
+  def_context_delegator keys: :expected
+
+
+  def actual?
+    context.key?( :actual ) || ( value? && name? && value.respond_to?( name ) )
+  rescue StandardError => error
+    false
+  end
+
+
+  # Get an optional actual value for the attribute, from `context[:actual]`
+  # if it exists or by sending {#name} to {#value} if it works.
+  # 
+  # @return [nil]
+  #   If {#context} does not have an `:actual` value and {#value} raises
+  #   a {StandardError}.
   # 
   # @return [Object]
-  #     
-  attr_reader :actual
-  
-  
-  # An optional expected value to use in {#build_message}.
+  #   The value of {#context}'s `:actual` key, if any, otherwise {#value}'s
+  #   response to {#name}.
   # 
-  # @return [Object]
-  #     
-  attr_reader :expected
+  def actual
+    if context.key? :actual
+      context[ :actual ]
+    elsif value? && name?
+      value.public_send name
+    end
+  rescue StandardError => error
+    nil
+  end
+
   
-  
-  # @param [Object] subject
-  #   The object that has the invalid attribute value.
+  # @return [String]
   # 
-  def initialize message = nil, symbol:, subject:, **options
-    @symbol = symbol.to_sym
-    
-    @actual = if options.key?( :actual )
-      options[:actual]
-    else
-      value.send @symbol
+  def default_message
+    message = []
+
+    if value? && name?
+      message << format_message(  value.class, "object", value.inspect,
+                                  "has invalid ##{ name } attribute" )
     end
-    
-    @has_expected = options.key? :expected
-    @expected = options[:expected]
-    
-    super message, subject: subject
-  end
-  
-  def has_expected?
-    @has_expected
-  end
-  
-  def build_message
-    headline = if has_expected?
-      "#{ subject.class } object has invalid ##{ symbol }: " +
-        "expected #{ expected }, found #{ actual }"
-    else
-      "#{ subject.class } object has invalid ##{ symbol } (found #{ actual })"
+
+    if expected?
+      message << format_message( "expected", expected )
     end
-    
-    binding.erb <<-END
-      <%= headline  %>
-      
-      Subject:
-      
-          <%= subject.pretty_inspect %>
-      
-    END
+
+    if actual?
+      message << format_message( "found", actual )
+    end
+
+    if message.empty?
+      super
+    else
+      message.join ', '
+    end
   end
   
-end # class NRSER::CountError
+end # class AttrError
+
+
+# /Namespace
+# ========================================================================
+
+end # module NRSER
