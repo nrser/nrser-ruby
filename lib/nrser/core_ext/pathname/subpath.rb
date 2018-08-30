@@ -15,9 +15,6 @@ require 'pathname'
 # Need {ValueError}
 require 'nrser/errors/value_error'
 
-# Need {Object#thru}
-require_relative './object'
-
 
 # Definitions
 # ========================================================================
@@ -67,14 +64,14 @@ class Pathname
       raise NRSER::ValueError.new \
         "Receiver {Pathname}", self, "must be a {#directory} in order to test",
         "for subpaths",
-        self: self
+        value: self
     end
 
     unless absolute?
       raise NRSER::ValueError.new \
         "Receiver {Pathname}", self, "must be {#absolute?} in order to test",
         "for subpaths",
-        self: self
+        value: self
     end
 
     abs_other = other.to_pn.expand_path root
