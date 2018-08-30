@@ -28,11 +28,11 @@ class AttrError < ValueError
   #   Name of attribute that has invalid value, which can be provided via
   #   the `:name` key in the {#context}.
   #   
-  #   @return [Symbol]
+  #   @return [Symbol | String]
   # 
   def_context_delegator keys: :name
 
-  
+
   # @!method expected?
   #   Is there an `:expected` key in {#context}?
   #   
@@ -45,6 +45,53 @@ class AttrError < ValueError
   #   @return [Object]
   # 
   def_context_delegator keys: :expected
+
+
+  # @!method initialize *message, **kwds
+  #   Create a new {AttrError}.
+  #   
+  #   This method does nothing but call `super`. It's here only for doc's sake.
+  #   
+  #   @note
+  #     If you provide the `:name` and `:value` keyword arguments, but *not* 
+  #     `:actual` then {#actual} will attempt to retrieve the attribute's value
+  #     by
+  #     
+  #         value.public_send name
+  #     
+  #     This really *shouldn't* be problematic - if attempting to access a public
+  #     attribute can cause serious side-effects, you may want to re-think your
+  #     design. However, I still felt like I should note it here.
+  #     
+  #     The call is wrapped in a `rescue StandardError`, so you **don't** need
+  #     to worry about anything mundane like an error being raised.
+  #   
+  #   @param [Array] message
+  #     See {NicerError#initialize}.
+  #   
+  #   @param [Hash<Symbol, Object>] kwds
+  #     Except as called out below, other keywords are passed up to 
+  #     {NicerError#initialize}.
+  #   
+  #   @option kwds [Symbol | String] :name
+  #     The name of the attribute in question.
+  #   
+  #   @option kwds [Object] :value
+  #     The value that has the bad attribute.
+  #   
+  #   @option kwds [Object | NRSER::Types::Type | String] :expected
+  #     Encouraged to be one of:
+  #     
+  #     1.  The {Object} you wanted the attribute to respond with.
+  #         
+  #     2.  A {NRSER::Types::Type} satisfied by what you would have been satisfied
+  #         with.
+  #         
+  #     3.  A {String} explanation of the condition.
+  #   
+  #   @option kwds [Object] :actual
+  #     The actual attribute value.
+  #     
 
 
   # Tests if an 'actual' value was provided in the {#context}.

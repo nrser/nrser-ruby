@@ -75,7 +75,8 @@ module NRSER::NicerError
   # Construct a nicer error.
   # 
   # @param [Array] message
-  #   Main message segments.
+  #   Main message segments. See {#format_message} and {#format_message_segment}
+  #   for an understanding of how they are, well, formatted.
   # 
   # @param [Binding?] binding
   #   When provided any details string will be rendered using it's
