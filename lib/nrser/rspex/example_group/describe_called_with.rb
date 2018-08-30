@@ -33,6 +33,9 @@ module NRSER::RSpex::ExampleGroup
   
   # Short / old name
   alias_method :called_with, :describe_called_with
+
+  # New / bold name
+  alias_method :CALLED_WITH, :describe_called_with
   
   
   # Version of {#describe_called_with} for when you have no arguments.
@@ -52,7 +55,9 @@ module NRSER::RSpex::ExampleGroup
   
   alias_method :called, :describe_called
   alias_method :when_called, :describe_called
-  
+
+  # new / bold name
+  alias_method :CALLED, :describe_called
   
   
 end # module NRSER::RSpex::ExampleGroup
