@@ -1,3 +1,10 @@
+class String
+  def to_re
+    # Regexp.new Regexp.escape( self )
+    /#{ Regexp.escape( self ) }/
+  end
+end
+
 SPEC_FILE(
   spec_path:        __FILE__,
   class:            NRSER::CountError,
@@ -37,6 +44,26 @@ SPEC_FILE(
     end # SETUP
     
   end # METHOD '#default_message' ********************************************
+  
+
+  SECTION ~%{ in action } do
+  # ==========================================================================
+    
+    METHOD [].method( :to_proc ) do
+      CALLED do
+        it do
+          expect { subject }.to raise_error NRSER::CountError,
+            /Can not create getter proc from empty array/; end; end; end
+    
+
+    METHOD [].method( :only! ) do
+      CALLED do
+        it do
+          expect { subject }.to raise_error NRSER::CountError, (~%{
+            Array object [] has invalid #count attribute, expected 1, found 0
+          }).to_re; end; end; end
+    
+  end # SECTION in action ************************************************
   
 
 end # SPEC_FILE
