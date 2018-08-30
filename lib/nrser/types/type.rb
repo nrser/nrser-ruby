@@ -632,11 +632,19 @@ class Type
     NRSER::Types.not self
   end
 
-  alias_method :!, :not
   alias_method :~, :not
+
+  # NO NO NOOOOO, we don't want this shit... I for some incredibly stupid idea
+  # thought using unary ! to negate types was reasonable. And then at some 
+  # point I suddenly realized it's *terrible* idea.
+  # 
+  # I should **not** fuck with boolean negation. I don't think anyone ever 
+  # should. It's *way* to built-in of an assumption that `!x -> true` if and
+  # **only if** `x` is `nil` or `false`. And it should stay that way.
+  # 
+  # alias_method :!, :not
   
   # @!endgroup Derivation Instance Methods # *******************************
-  
   
 end # class Type
 
