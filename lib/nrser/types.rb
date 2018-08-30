@@ -51,7 +51,7 @@ module NRSER::Types
   RATIONALS = 'ℚ'
   UNION = '∪'
   AND = '&'
-  NOT = '!' # '¬'
+  NOT = '¬' # '~'
   COMPLEMENT = '∖'
   
   

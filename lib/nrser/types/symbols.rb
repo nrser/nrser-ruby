@@ -72,7 +72,7 @@ def_type        :NonEmptySymbol,
 &->( **options ) do
   self.Intersection \
     self.Symbol,
-    !self.EmptySymbol,
+    ~self.EmptySymbol,
     **options
 end # .NonEmptySymbol
 
