@@ -142,19 +142,7 @@ module NRSER
     count = enum.count
     
     unless count == 1
-      message = binding.erb <<-END
-        Expected enumerable to have #count == 1 but it has
-        
-        #count = <%= enum.count %>
-        
-        Enumerable (class: <%= enum.class %>):
-        
-            <%= enum.pretty_inspect %>
-        
-      END
-      
-      raise NRSER::CountError.new message,
-                                  subject: enum,
+      raise NRSER::CountError.new value: enum,
                                   count: count,
                                   expected: 1
     end
