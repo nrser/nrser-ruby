@@ -115,7 +115,7 @@ class Array
     when 0
       raise NRSER::CountError.new \
         "Can not create getter proc from empty array",
-        subject: self,
+        value: self,
         expected: '> 0',
         count: count
     when 1
