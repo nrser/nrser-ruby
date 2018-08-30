@@ -49,6 +49,7 @@ class NRSER::CountError < NRSER::AttrError
   #   The actual count.
   # 
   def initialize *message, **kwds
+    kwds[:actual] = kwds.delete( :count ) if kwds.key?( :count )
     super *message, **kwds, name: :count
   end
 
