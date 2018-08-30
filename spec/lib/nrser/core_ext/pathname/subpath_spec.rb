@@ -1,3 +1,4 @@
+require 'nrser/core_ext/string'
 require 'nrser/core_ext/pathname/subpath'
 
 SPEC_FILE(
@@ -13,7 +14,7 @@ SPEC_FILE(
     
     it_behaves_like "a function",
       mapping: {
-        [ '.', './tmp' ] => true
+        [ Pathname.getwd, './tmp' ] => true
       }
   
   end # SETUP
