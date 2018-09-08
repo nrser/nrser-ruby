@@ -4,6 +4,7 @@
 --tag pure:"Pure Function"
 --tag status:"Status"
 --plugin yard-commonmarker
+--plugin yard-link_stdlib
 --private
 --protected
 lib/**/*.rb
