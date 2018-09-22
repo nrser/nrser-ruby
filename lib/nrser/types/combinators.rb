@@ -74,7 +74,7 @@ class Combinator < Type
   # combined types' `#from_s` succeed (or if there are none) a {TypeError}
   # is raised.
   # 
-  # @param [String] s
+  # @param [String] string
   #   String to parse.
   # 
   # @return [Object]
