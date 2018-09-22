@@ -1,0 +1,3 @@
+[submodule "dev/packages/gems/yard-link_stdlib"]
+	path = dev/packages/gems/yard-link_stdlib
+	url = git@github.com:nrser/yard-link_stdlib.git
