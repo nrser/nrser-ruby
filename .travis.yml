@@ -1,7 +1,13 @@
+# Disable the default submodule logic, since we need to transform the paths
+# from SSH -> HTTPS first.
+# 
+# See notes in `//test/ci/travis/before_install.inc.bash`
+# 
+git:
+  submodules: false
+
 before_install:
-  # Install gem
-  - gem update --system
-  - gem install bundler
+  - source ./test/ci/travis/before_install.inc.bash
   
 language: ruby
 
