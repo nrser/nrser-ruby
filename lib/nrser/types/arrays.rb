@@ -150,7 +150,7 @@ class ArrayOfType < ArrayType
     return false unless super( value )
     
     # Otherwise test all the items
-    value.all? &@item_type.method( :test )
+    value.all? &@item_type.method( :test? )
   end
   
   
