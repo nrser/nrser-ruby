@@ -72,6 +72,8 @@ Gem::Specification.new do |spec|
   
   # Provider for `commonmarker`, the new GFM lib
   spec.add_development_dependency 'yard-commonmarker', '~> 0.5.0'
+
+  spec.add_development_dependency 'yard-link_stdlib', '~> 0.1.0'
   
   # Nicer REPL experience
   spec.add_development_dependency "pry", '~> 0.11.3'
