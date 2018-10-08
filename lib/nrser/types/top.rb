@@ -30,6 +30,11 @@ class Top < NRSER::Types::Type
 
   def initialize
     super name: NAME
+
+    # All types maybe *should* be frozen so they can be used as prop defaults,
+    # but this is the first one I ran into in practice, so it's the first one
+    # to freeze.
+    freeze
   end
 
   def test? value
