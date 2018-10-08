@@ -17,6 +17,18 @@ module Enumerable
   def find_only &block
     NRSER.find_only self, &block
   end
+
+  
+  # Right now, *exactly* the same as {#find_only}... though I wished I had
+  # called it this and had {#find_only} return `nil` if it failed, as is 
+  # kind-of a some-what established practice, because now I get confused.
+  # 
+  # Maybe some day I will make that change. For now, this is here so when I
+  # forget and add the `!` it works.
+  # 
+  def find_only! &block
+    NRSER.find_only self, &block
+  end
   
   
   # See {NRSER.assoc_by}
