@@ -103,7 +103,13 @@ class Wrapper
 end
 
 def wrap description = nil, &block
-  Wrapper.new description: description, &block
+  if block
+    Wrapper.new description: description, &block
+  else
+    Wrapper.new description: description.to_s do
+      send description
+    end
+  end
 end
 
 def unwrap obj, context: nil
@@ -112,6 +118,10 @@ def unwrap obj, context: nil
   else
     obj
   end
+end
+
+def msg *args, &block
+  NRSER::Message.from *args, &block
 end
 
 
