@@ -6,8 +6,9 @@
 #     qb setup
 # 
 - name: Local dev setup for nrser/qb project
-
   hosts: localhost
+  vars:
+    locd_domain: test
 
   roles:
   
@@ -33,7 +34,20 @@
   
   tasks:
   
-  - name: >-
-      Install gems
-    bundler:
-      gem_path: ./.bundle
+    - name: >-
+        Install gems
+      bundler:
+        gem_path: ./.bundle
+    
+    - name: Setup Loc'd sites
+      # Since Loc'd doesn't support Lit yet like I want...
+      stream:
+        chdir: "{{ playbook_dir | dirname }}"
+        cmd: |
+          locd site add
+            --name=yard.nrser.{{ locd_domain }}
+            --force
+            -- bundle exec yard server
+              --reload
+              --port {port}
+              --bind {bind}
