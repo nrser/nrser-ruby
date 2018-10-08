@@ -1,5 +1,6 @@
 require 'nrser/functions/enumerable/associate'
 require_relative './enumerable/find_map'
+require_relative './enumerable/slash_map'
 
 
 # Instance methods to extend {Enumerable}.
@@ -64,6 +65,5 @@ module Enumerable
   def slice? *args, &block
     NRSER.slice? self, *args, &block
   end
-  
   
 end # module Enumerable
