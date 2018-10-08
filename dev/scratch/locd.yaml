@@ -4,7 +4,9 @@ $defaults:
 
 sites:
 
-  - label: yard.nrser.${domain}
+  - label:
+      $format: yard.nrser.${domain}
+
     cmd_template: >-
       bundle exec yard server --reload --port {port} --bind {bind}
     keep_alive: false
