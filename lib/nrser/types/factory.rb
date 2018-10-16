@@ -113,36 +113,44 @@ module Factory
   # 
   # @param [nil | false | Proc<(*args, &block): String>] default_name
   #   
-  #   Controls what - if anything - is done with the `name:` value in 
-  #   `options` when the factory method is called.
+  #   Controls the default value assigned to the `name:` keyword argument (only
+  #   relevant when a `name:` value is *not* explicitly passed when building the
+  #   type).
   #   
   #   Everything here is done *before* the `options` are passed to the 
-  #   factory method's `&body`, so the body will see any `name:` option that
-  #   is filled in.
+  #   factory method's `&body`, so the body will see the default `name:` value
+  #   in the factory method body.
   #   
   #   When...
   #   
-  #   -   `nil` - when...
-  #       -   `parameterize:` is `nil` - `name` will be used as the created
-  #           type's {Type#name} unless a `name:` option is explicitly 
-  #           provided by the factory caller.
+  #   -   `default_name == nil`
+  #       
+  #       Behavior depends on the value of the `parameterize:` keyword:
+  #       
+  #       -   `parameterize == nil`
+  #           
+  #           The `name` parameter will be used as the default value.
   #           
   #           This situation covers "static" types that will only differ by
-  #           their `options` - things like custom {Type#from_s},
-  #           {Type#to_data}, etc.. Really, these are more like aliases since 
-  #           their member sets are identical.
+  #           their `options` (custom {Type#from_s}, {Type#to_data}, etc.).
+  #           Really, these are more like aliases since the types' member sets
+  #           are identical.
   #           
-  #       -   `parameterize:` is *not* `nil` - the `name:` option will be left
-  #           as `nil` if none is provided by the factory caller.
+  #       -   `parameterize != nil`
   #           
-  #   -   `false` - the `name:` option will not be touched - it will stay `nil`
-  #       unless the factory caller provides a value.
+  #           The default `name:` value will be left as `nil`.
+  #           
+  #   -   `default_name == false`
   #       
-  #   -   `Proc<(*args, &block)->String>` - when the factory caller does not
-  #       provide a `name:` option this function will be called with the
-  #       arguments (including `options`) and block (if any) that the 
-  #       factory method was called with, and is expected to return a {String}
-  #       that will be set as the `name:` option.
+  #       The `name:` option will not be touched - it will stay `nil` unless the
+  #       factory caller provides a value.
+  #       
+  #   -   `default_name is a Proc<(*args, &block)->String>`
+  #
+  #       When the factory caller does not provide a `name:` option this
+  #       function will be called with the arguments (including `options`) and
+  #       block (if any) that the factory method was called with, and is
+  #       expected to return a {String} that will be set as the `name:` option.
   # 
   # @param [nil | Symbol | Array<Symbol>] parameterize
   #   Indicates if the type is parameterized, and, if so, what arguments
@@ -200,9 +208,9 @@ module Factory
     unless  default_name.nil? ||
             default_name == false ||
             default_name.is_a?( Proc )
-      raise NRSER::TypeError,
+      raise NRSER::TypeError.new \
         "`default_name:` keyword argument must be {nil}, {false} or a {Proc},",
-        "found", default_name,
+        "found", default_name.inspect,
         expected: [ nil, false, Proc ],
         received: default_name
     end
