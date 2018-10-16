@@ -22,14 +22,22 @@ describe NRSER::Types do
         fail: [{}],
       },
       
-      t.true => {
+      t.True => {
         pass: [true],
         fail: [1, 'true'],
+        from_s: {
+          pass: [ 'true', 'True', '1', 'T', 't'],
+          fail: [ 'f', '100' ],
+        }
       },
       
-      t.false => {
+      t.False => {
         pass: [false],
         fail: [true, 0, nil, 'false'],
+        from_s: {
+          pass: [ 'false', 'f', 'F', '0' ],
+          fail: [ 't', '-1' ],
+        }
       },
       
       t.bool => {

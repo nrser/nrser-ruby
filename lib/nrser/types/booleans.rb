@@ -46,7 +46,7 @@ class Boolean < Is
   # ========================================================================
     
     def custom_from_s string
-      return value if self::STRINGS.include?( string.downcase )
+      return value if self.class::STRINGS.include?( string.downcase )
       
       raise NRSER::Types::FromStringError.new \
         type: self,
@@ -74,7 +74,7 @@ end # class Boolean
 # Provides a {#custom_from_s} to load from CLI options and ENV var-like
 # string values.
 # 
-class True < Boolean
+class TrueType < Boolean
   
   STRINGS = NRSER::TRUTHY_STRINGS
   
@@ -92,7 +92,7 @@ end # class True
 # Provides a {#custom_from_s} to load from CLI options and ENV var-like
 # string values.
 # 
-class False < Boolean
+class FalseType < Boolean
   
   STRINGS = NRSER::FALSY_STRINGS
   
@@ -116,7 +116,7 @@ end # class FalseType
 #   
 def_type  :True,
 &->( **options ) do
-  True.new **options
+  TrueType.new **options
 end
 
 
@@ -131,7 +131,7 @@ end
 #   
 def_type        :False,
 &->( **options ) do
-  False.new **options
+  FalseType.new **options
 end # .False
 
 
@@ -145,6 +145,8 @@ end # .False
 #   
 def_type        :Boolean,
   aliases:    [ :bool ],
+  default_name: ->( *args, &block ) { 'Boolean' },
+  symbolic:     '𝔹',
 &->( **options ) do
   union self.True, self.False, **options
 end # .Boolean

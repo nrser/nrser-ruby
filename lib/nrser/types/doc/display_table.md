@@ -53,7 +53,7 @@ to access it via the API.
 | `t.PositiveInteger`                          | `PositiveInteger`            | `ℤ⁺`                   | `(Integer & Bounded<min=1>)`                                  |
 | `t.NegativeInteger`                          | `NegativeInteger`            | `ℤ⁻`                   | `(Integer & Bounded<max=-1>)`                                 |
 | `t.NonNegativeInteger`                       | `NonNegativeInteger`         | `ℕ⁰`                   | `(Integer & Bounded<min=0>)`                                  |
-| `t.Boolean`                                  | `Boolean`                    | `Boolean`              | `(Is<true> \| Is<false>)`                                     |
+| `t.Boolean`                                  | `Boolean`                    | `𝔹`                    | `(Is<true> \| Is<false>)`                                     |
 | `t.Bounded( min: 1, max: 2 )`                | `Bounded<min=1, max=2>`      | `(1..2)`               | `Bounded<min=1, max=2>`                                       |
 | `t.Bounded( min: 1 )`                        | `Bounded<min=1>`             | `(1..)`                | `Bounded<min=1>`                                              |
 | `t.Array`                                    | `Array`                      | `[*]`                  | `Array`                                                       |
