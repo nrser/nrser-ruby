@@ -10,6 +10,12 @@
 require_relative './nicer_error'
 
 
+# Namespace
+# ========================================================================
+
+module  NRSER
+
+
 # Definitions
 # =======================================================================
 
@@ -17,7 +23,12 @@ require_relative './nicer_error'
 # it's not the type or an argument, but something about the data or
 # configuration just isn't ok.
 # 
-module NRSER
 class ConflictError < ::StandardError
   include NRSER::NicerError
-end; end # class NRSER::ConflictError
+end # class ConflictError
+
+
+# /Namespace
+# ========================================================================
+
+end # module NRSER
