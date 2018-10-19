@@ -17,6 +17,7 @@ require_relative './errors/argument_error'
 require_relative './errors/type_error'
 require_relative './errors/abstract_method_error'
 require_relative './errors/conflict_error'
+require_relative './errors/unreachable_error'
 
 
 module NRSER
