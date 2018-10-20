@@ -11,11 +11,11 @@
 require 'tsort'
 
 
-# Declarations
-# =======================================================================
+# Namespace
+# ========================================================================
 
-module NRSER; end
-module NRSER::Graph; end
+module  NRSER
+module  Graph
 
 
 # Definitions
@@ -23,7 +23,7 @@ module NRSER::Graph; end
 
 # Topologically sorts an {Enumerable} by a user-provided `child_node` block.
 # 
-class NRSER::Graph::TSorter
+class TSorter
   include TSort
   
   def initialize entries, &each_child
@@ -38,4 +38,11 @@ class NRSER::Graph::TSorter
   def tsort_each_child node, &block
     @each_child.call node, &block
   end
-end # class NRSER::Graph::TSorter
+end # class TSorter
+
+
+# /Namespace
+# ========================================================================
+
+end # module Graph
+end # module NRSER
