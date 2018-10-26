@@ -1,21 +1,8 @@
-require_relative '../module/names'
+# encoding: UTF-8
+# frozen_string_literal: true
 
+require 'nrser/ext/method/full_name'
 
-class Method
-  
-  # Returns the method's {::Method#receiver} and {::Method#name} in the common
-  # `A.cls_meth` / `A#inst_meth` format.
-  # 
-  def full_name
-    case receiver
-    when Module
-      "#{ receiver.safe_name }.#{ name }"
-    else
-      "#{ receiver.class.safe_name }##{ name }"
-    end
-  end
-  
-  # Use full name as a {Method}'s "summary"
-  alias_method :to_summary, :full_name
-  
-end # class Method
+module Method
+  prepend NRSER::Ext::Method
+end # module NRSER

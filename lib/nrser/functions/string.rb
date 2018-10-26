@@ -1,45 +1,11 @@
 # frozen_string_literal: true
 
 require_relative './string/looks_like'
-require_relative './string/style'
 
 module NRSER
   
-  # Constants
-  # ==========================================================================
-  
-  # Regular expression used to match whitespace.
-  # 
-  # @return [Regexp]
-  # 
-  WHITESPACE_RE = /\A[[:space:]]*\z/
-  
-  
-  # Unicode ellipsis character.
-  # 
-  # @return [String]
-  # 
-  UNICODE_ELLIPSIS = '…'
-  
-  
   # @!group String Functions
   # ==========================================================================
-  
-  def self.whitespace? string
-    string =~ WHITESPACE_RE
-  end
-  
-  
-  # turn a multi-line string into a single line, collapsing whitespace
-  # to a single space.
-  # 
-  # same as ActiveSupport's String.squish, adapted from there.
-  def self.squish str
-    str.gsub(/[[:space:]]+/, ' ').strip
-  end # squish
-  
-  singleton_class.send :alias_method, :unblock, :squish
-  
   
   def self.common_prefix strings
     raise ArgumentError.new("argument can't be empty") if strings.empty?

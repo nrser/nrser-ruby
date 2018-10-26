@@ -24,6 +24,11 @@ module NRSER::RSpex::Example
   def described_class
     self.class.metadata[:class] || super
   end
+
+
+  def described_module
+    self.class.described_module
+  end
   
   
   def described_constructor_args

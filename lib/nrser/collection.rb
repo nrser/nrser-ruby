@@ -60,9 +60,8 @@ module NRSER
         elsif object.respond_to? :each
           object.each &block
         else
-          raise TypeError.squished <<-END
-            Object #{ obj.inpsect } does not respond to #each or #each_pair
-          END
+          raise NRSER::TypeError.new \
+            "Object", obj, "does not respond to #each or #each_pair"
         end
       else
         block.call object

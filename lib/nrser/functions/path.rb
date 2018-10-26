@@ -14,7 +14,10 @@ require 'pathname'
 # Project / Package
 # -----------------------------------------------------------------------
 
+require 'nrser/ext/enumerable/find'
+
 require_relative './path/normalized'
+
 
 # Namespace
 # =======================================================================
@@ -150,7 +153,7 @@ def self.find_up(
   # 
   glob = looks_globish?( rel_path ) if glob == :guess
   
-  found = pn_from( from ).ascend.find_map { |dir|
+  found = pn_from( from ).ascend.n_x.find_map { |dir|
     path = dir / rel_path
     
     found_path = if glob

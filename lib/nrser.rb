@@ -57,23 +57,29 @@ require 'active_support/json'
 # Load up version, which has {NRSER::ROOT} in it and depends on nothing else
 require_relative './nrser/version'
 
+# Base core ext used to sugar up dynamic method binding for `nrser/ext` modules
+require_relative './nrser/core_ext/object/nrser_ext'
+
 # {Module.safe_name} is really useful all around, including in logging
+# TODO  Switch to `n_x`?
 require_relative './nrser/core_ext/module/names'
 
 # Then logging can come in...
 require_relative './nrser/log'
 
 # Tons need this for error messages
+# TODO  Switch to `n_x`?
 require_relative './nrser/core_ext/binding'
 
 # Then everything else...
 require_relative './nrser/char'
 require_relative './nrser/errors'
-require 'nrser/gem_ext/hamster'
+require_relative './nrser/gem_ext/hamster'
 
 require_relative './nrser/no_arg'
 require_relative './nrser/message'
 require_relative './nrser/collection'
+require_relative './nrser/shortcuts'
 require_relative './nrser/functions'
 require_relative './nrser/types'
 require_relative './nrser/meta'

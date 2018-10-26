@@ -1,4 +1,23 @@
+# encoding: UTF-8
+# frozen_string_literal: true
+
+
+# Requirements
+# ========================================================================
+
+# Stdlib
+# ------------------------------------------------------------------------
+
+# Deps
+# ------------------------------------------------------------------------
+
 require 'pastel'
+
+# Project / Package
+# ------------------------------------------------------------------------
+
+# Using {Object#thru}
+require 'nrser/ext/object'
 
 
 # Definitions
@@ -200,6 +219,7 @@ module NRSER::RSpex::Format
       }.
       join( ' ' ).
       squish.
+      n_x.
       thru { |description|
         prepend_type type, mean_streak.render( description )
       }

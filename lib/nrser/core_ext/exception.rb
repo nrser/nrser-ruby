@@ -1,30 +1,8 @@
-class Exception
-  def format
-    NRSER.format_exception self
-  end
+# encoding: UTF-8
+# frozen_string_literal: true
 
-  # Create a new instance from the squished message.
-  # 
-  # See {NRSER.squish}.
-  # 
-  # @param [String] message
-  # 
-  # @return [Exception]
-  # 
-  def self.squished message
-    new NRSER.squish( message )
-  end
-  
-  # Create a new instance from the dedented message.
-  # 
-  # See {NRSER.dedent}.
-  # 
-  # @param [String] message
-  # 
-  # @return [Exception]
-  # 
-  def self.dedented message
-    new NRSER.dedent( message )
-  end
-  
-end # NRSER
+require 'nrser/ext/exception'
+
+class Exception
+  include NRSER::Ext::Exception
+end # class Exception

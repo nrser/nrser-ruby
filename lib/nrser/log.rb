@@ -19,8 +19,12 @@ require "concurrent/map"
 # Project / Package
 # -----------------------------------------------------------------------
 
-# Using {NRSER.truthy?} for ENV var values.
-require 'nrser/functions/object/truthy'
+# Using {NRSER::Ext::Object::Booly.truthy?} for ENV var values.
+require 'nrser/ext/object/booly'
+
+
+# Need {String#env_varize}
+require 'nrser/core_ext/string/sys/env'
 
 # Definitions
 # =======================================================================
@@ -310,9 +314,9 @@ module NRSER::Log
     # looking in the ENV has been disabled (it's `false`).
     return nil unless prefix
 
-    if NRSER.truthy? ENV["#{ prefix }_TRACE"]
+    if NRSER::Ext::Object::Booly.truthy? ENV["#{ prefix }_TRACE"]
       return :trace
-    elsif NRSER.truthy? ENV["#{ prefix }_DEBUG"]
+    elsif NRSER::Ext::Object::Booly.truthy? ENV["#{ prefix }_DEBUG"]
       return :debug
     end
     

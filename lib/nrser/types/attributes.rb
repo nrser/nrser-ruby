@@ -8,7 +8,7 @@
 # Project / Package
 # ------------------------------------------------------------------------
 
-require 'nrser/core_ext/hash'
+require 'nrser/core_ext/hash/keys'
 
 require_relative './type'
 require_relative './combinators'

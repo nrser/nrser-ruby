@@ -4,7 +4,9 @@
 # Project / Package
 # -----------------------------------------------------------------------
 
-require 'nrser/core_ext/pathname'
+# Using {NRSER::Ext::Pathname.absolute?}
+require 'nrser/ext/pathname'
+
 require 'nrser/functions/path/normalized'
 
 require_relative './is_a'
@@ -119,7 +121,8 @@ def_type        :AbsolutePath,
 &->( **options ) do
   self.Intersection \
     self.Path,
-    # Weirdly, there is no {File.absolute?}..
+    # Weirdly, there is no {File.absolute?}...
+    self.Where( NRSER::Ext::Pathname.method :absolute? ),
     self.Attributes( to_pn: attrs( absolute?: true ) ),
     **options
 end # .AbsolutePath

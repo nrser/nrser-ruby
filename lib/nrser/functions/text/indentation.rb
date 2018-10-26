@@ -1,6 +1,9 @@
+# Using {NRSER::Ext::String#whitespace?}
+require 'nrser/ext/string/format'
+
 module NRSER
-  # @!group Text Functions
-  
+
+  # @!group Text Functions  
   
   # Constants
   # =====================================================================
@@ -64,7 +67,7 @@ module NRSER
     end
     
     indent_significant_lines = if ignore_whitespace_lines
-      all_lines.reject { |line| whitespace? line }
+      all_lines.reject { |line| lines.n_x.whitespace? }
     else
       all_lines
     end
@@ -96,7 +99,7 @@ module NRSER
   
   # Tag each line of `text` with special marker characters around it's leading
   # indent so that the resulting text string can be fed through an
-  # interpolation process like ERB that may inject multiline strings and the
+  # interpolation process like ERB that may inject multi-line strings and the
   # result can then be fed through {NRSER.indent_untag} to apply the correct
   # indentation to the interpolated lines.
   # 
@@ -176,7 +179,6 @@ module NRSER
     }.join
     
   end # .indent_untag
-  
   
   
   # Indent tag a some text via {NRSER.indent_tag}, call the block with it,

@@ -60,6 +60,11 @@ module NRSER::RSpex::ExampleGroup
     def described_class
       metadata[:class] || super()
     end
+
+
+    def described_module
+      metadata[:module] || described_class
+    end
     
   end # module Overrides
   

@@ -32,7 +32,7 @@ describe "NRSER.common_prefix" do
     str = %|
       hey
       there
-    |.lines.reject( &NRSER.method( :whitespace? ) ).join
+    |.lines.reject { |s| s.n_x.whitespace? }.join
     
     expect( NRSER.common_prefix str.lines ).to eq '      '
   end

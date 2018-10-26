@@ -7,14 +7,17 @@
 # Deps
 # -----------------------------------------------------------------------
 
+# Need {Object#try}
+require 'active_support/core_ext/object/try'
+
 # Project / Package
 # -----------------------------------------------------------------------
-require 'nrser/refinements/types'
 
 
 # Refinements
 # =======================================================================
 
+require 'nrser/refinements/types'
 using NRSER::Types
 
 
@@ -632,9 +635,8 @@ class Prop
     when Proc
       @to_data.call value
     else
-      raise TypeError.squished <<-END
-        Expected `@to_data` to be Symbol, String or Proc;
-        found #{ @to_data.inspect }
+      raise NRSER::TypeError.new \
+        "Expected `@to_data` to be Symbol, String or Proc; found", @to_data
       END
     end
   end # #to_data

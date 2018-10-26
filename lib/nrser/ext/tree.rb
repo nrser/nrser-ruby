@@ -10,6 +10,8 @@
 
 require 'nrser/functions/tree'
 
+require_relative './tree/bury'
+
 
 # Namespace
 # ========================================================================
@@ -22,6 +24,8 @@ module Ext
 # trees: {Array}, {Hash} and {OpenStruct}.
 # 
 module Tree
+
+  include Bury
   
   # Sends `self` to {NRSER.leaves}.
   def leaves
@@ -55,7 +59,7 @@ module Tree
   def map_tree **options, &block
     NRSER.map_tree self, **options, &block
   end
-  
+
 end # module Tree
 
 
