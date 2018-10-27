@@ -30,7 +30,6 @@ module  Ext
 module Hash
 
   include Tree
-  include Transform
   
 end # module Hash
 

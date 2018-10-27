@@ -40,7 +40,7 @@ module String
   #   Convert self into a {Pathname}
   # 
   def to_pn
-    Pathname.new self
+    ::Pathname.new self
   end
   
   
@@ -70,7 +70,7 @@ module String
   # 
   def start_with? *prefixes
     unless prefixes.any? { |x| Regexp === x }
-      return stdlib_start_with? *prefixes
+      return super( *prefixes )
     end
   
     prefixes.any? { |prefix|

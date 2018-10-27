@@ -3,7 +3,7 @@
 
 require 'nrser/ext/string'
 
-require './string/squiggle'
+require_relative './string/squiggle'
 
 class String
   prepend NRSER::Ext::String

@@ -25,9 +25,6 @@ module  Ext
 # Extensions for {::Method}.
 # 
 module Method
-
-  include Names
-  
 end # module Method
 
 

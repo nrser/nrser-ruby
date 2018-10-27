@@ -76,7 +76,7 @@ end # class Boolean
 # 
 class TrueType < Boolean
   
-  STRINGS = NRSER::Ext::Object::Booly::TRUTHY_STRINGS
+  STRINGS = NRSER::Ext::Object::TRUTHY_STRINGS
   
   # Instantiate a new `True` type.
   # 
@@ -94,7 +94,7 @@ end # class True
 # 
 class FalseType < Boolean
   
-  STRINGS = NRSER::Ext::Object::Booly::FALSY_STRINGS
+  STRINGS = NRSER::Ext::Object::FALSY_STRINGS
   
   # Instantiate a new `True` type.
   # 

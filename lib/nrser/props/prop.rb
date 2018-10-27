@@ -637,7 +637,6 @@ class Prop
     else
       raise NRSER::TypeError.new \
         "Expected `@to_data` to be Symbol, String or Proc; found", @to_data
-      END
     end
   end # #to_data
   

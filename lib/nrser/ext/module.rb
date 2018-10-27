@@ -27,11 +27,6 @@ module  Ext
 # Extensions for {::Module}.
 # 
 module Module
-
-  include MethodObjects
-  include Names
-  include SourceLocations
-  
 end # module Module
 
 

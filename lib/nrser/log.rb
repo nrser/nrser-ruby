@@ -314,9 +314,9 @@ module NRSER::Log
     # looking in the ENV has been disabled (it's `false`).
     return nil unless prefix
 
-    if NRSER::Ext::Object::Booly.truthy? ENV["#{ prefix }_TRACE"]
+    if NRSER::Ext::Object.truthy? ENV["#{ prefix }_TRACE"]
       return :trace
-    elsif NRSER::Ext::Object::Booly.truthy? ENV["#{ prefix }_DEBUG"]
+    elsif NRSER::Ext::Object.truthy? ENV["#{ prefix }_DEBUG"]
       return :debug
     end
     

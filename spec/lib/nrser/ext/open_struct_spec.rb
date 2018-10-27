@@ -1,7 +1,11 @@
-require 'spec_helper'
+require 'nrser/ext/open_struct'
 
-describe NRSER.method(:to_open_struct) do
-  
+SPEC_FILE(
+  spec_path:        __FILE__,
+  module:           NRSER::Ext::OpenStruct,
+  method:           :from,
+) do
+    
   context "shallow Hash" do
     let(:hash) { {a: 1, b: 2} }
     let(:result) { subject.call hash }
@@ -91,4 +95,4 @@ describe NRSER.method(:to_open_struct) do
     end
   end # not a Hash
   
-end # NRSER.to_open_struct
+end # SPEC_FILE

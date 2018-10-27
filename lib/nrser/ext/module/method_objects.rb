@@ -98,7 +98,7 @@ module Module
   #   List of method objects (all bound to `self`).
   # 
   def class_method_objects include_super = true, sort: true
-    MethodObjects.method_objects_for \
+    NRSER::Ext::Module.method_objects_for \
       self,
       include_super,
       type: :class,
@@ -143,7 +143,7 @@ module Module
   def instance_method_objects include_super = true,
                               sort: true,
                               include_initialize: false
-    MethodObjects.method_objects_for \
+    Ext::Module.method_objects_for \
       self,
       include_super,
       type: :instance,

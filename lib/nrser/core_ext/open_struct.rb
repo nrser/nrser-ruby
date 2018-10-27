@@ -1,6 +1,8 @@
+# encoding: UTF-8
+# frozen_string_literal: true
+
+require 'nrser/ext/open_struct'
+
 class OpenStruct
-  # See {NRSER.to_open_struct}.
-  def self.from_h hash, freeze: false
-    NRSER.to_open_struct hash, freeze: freeze
-  end # .from
+  include NRSER::Ext::OpenStruct
 end # class OpenStruct

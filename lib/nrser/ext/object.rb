@@ -28,12 +28,6 @@ module  Ext
 # Extensions for {::Object}.
 # 
 module Object
-
-  include As
-  include Booly
-  include Etc
-  include LazyVar
-  
 end # module Module
 
 
