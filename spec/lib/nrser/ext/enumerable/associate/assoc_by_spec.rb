@@ -1,6 +1,6 @@
 require 'nrser/core_ext/enumerable/associate'
 
-describe_spec_file(
+SPEC_FILE(
   spec_path: __FILE__,
   module: Enumerable,
   instance_method: :assoc_by,
@@ -27,4 +27,4 @@ describe_spec_file(
     end
   end # Duplicate keys
   
-end # spec file
+end # SPEC_FILE
