@@ -24,13 +24,12 @@ require 'nrser/functions/path'
 
 module  NRSER
 module  Ext
-module  Pathname
 
 
 # Definitions
 # ========================================================================
 
-module Subpath
+module Pathname
 
   # Is `other` a subpath of `self`?
   # 
@@ -94,12 +93,11 @@ module Subpath
     abs_other.start_with? self
   end # #subpath?
   
-end # module Subpath
+end # module Pathname
 
 
 # /Namespace
 # ========================================================================
 
-end # module Pathname
 end # module Ext
 end # module NRSER

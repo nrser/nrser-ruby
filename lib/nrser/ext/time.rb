@@ -1,23 +1,18 @@
 # encoding: UTF-8
 # frozen_string_literal: true
 
-# Requirements
-# =======================================================================
 
-# Stdlib
-# -----------------------------------------------------------------------
-require 'time'
+# Namespace
+# ========================================================================
 
-# Deps
-# ------------------------------------------------------------------------
-
-require 'active_support/core_ext/time'
+module NRSER
+module Ext
 
 
 # Definitions
 # =======================================================================
 
-class Time
+module Time
   
   # `#iso8601` with the `-` and `:` characters removed. Intended to be more
   # agreeable to a wider range of file systems and programs than the standard
@@ -43,4 +38,11 @@ class Time
     iso8601.gsub /\-\:/, ''
   end # #iso8601_for_idiots
   
-end
+end # module Time
+
+
+# Namespace
+# ========================================================================
+
+end # module Ext
+end # module NRSER

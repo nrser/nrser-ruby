@@ -24,8 +24,6 @@ module Ext
 # trees: {Array}, {Hash} and {OpenStruct}.
 # 
 module Tree
-
-  include Bury
   
   # Sends `self` to {NRSER.leaves}.
   def leaves

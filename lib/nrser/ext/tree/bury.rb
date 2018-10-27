@@ -27,17 +27,12 @@ require 'active_support/core_ext/object/deep_dup'
 
 module  NRSER
 module  Ext
-module  Tree
 
 
 # Definitions
 # ========================================================================
 
-# Provides {#bury!} and {#bury} methods that do the opposite of {Hash#dig!},
-# {Array#dig!}, etc. For inclusion in "tree" - {Array}-like and {Hash}-like
-# collections.
-# 
-module Bury
+module Tree
 
   # Class Methods
   # ========================================================================
@@ -258,12 +253,11 @@ module Bury
   end
 
 
-end # module Bury
+end # module Tree
 
 
 # /Namespace
 # ========================================================================
 
-end # module Tree
 end # module Ext
 end # module NRSER

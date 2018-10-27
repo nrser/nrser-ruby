@@ -116,7 +116,7 @@ module Array
   # 
   # @example
   #   
-  #   [:fetch, :x].sender.call x: 'ex'
+  #   [:fetch, :x].n_x.to_sender.call x: 'ex'
   #   # => 'ex'
   # 
   # @param [Boolean] publicly
