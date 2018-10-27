@@ -1,10 +1,17 @@
-require 'nrser/core_ext/enumerable/find_map'
+require 'nrser/ext/enumerable/find'
 
-describe_spec_file(
+SPEC_FILE(
   spec_path: __FILE__,
-  module: Enumerable,
+  module: NRSER::Ext::Enumerable,
   instance_method: :find_map,
 ) do
+
+  # TODO  Shim to adapt how spec was originally written
+  subject do
+    ->( receiver, *args, &block ) {
+      receiver.n_x.find_map *args, &block
+    }
+  end
   
   describe "when a result is found" do
     it "should return the block result" do
@@ -37,4 +44,4 @@ describe_spec_file(
   end # "when none found and `ifnone` provided"
   
   
-end # spec_file
+end # SPEC_FILE

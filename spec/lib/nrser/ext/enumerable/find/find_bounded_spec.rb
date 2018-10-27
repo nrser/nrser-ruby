@@ -6,6 +6,7 @@ SPEC_FILE(
   instance_method: :find_bounded,
 ) do
 
+  # TODO  Shim to adapt how spec was originally written
   subject do
     ->( enum, *args, &block ) {
       enum.n_x.find_bounded *args, &block

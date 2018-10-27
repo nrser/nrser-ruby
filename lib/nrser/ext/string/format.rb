@@ -43,15 +43,6 @@ module String
   # @return [Regexp]
   # 
   WHITESPACE_RE = /\A[[:space:]]*\z/
-  
-  
-  # Unicode ellipsis character.
-  # 
-  # @todo Move to `//lib/nrser/char/...`?
-  # 
-  # @return [String]
-  # 
-  UNICODE_ELLIPSIS = '…'
 
   # @!endgroup Format Constants # ********************************************
 

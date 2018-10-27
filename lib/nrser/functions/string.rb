@@ -3,6 +3,22 @@
 require_relative './string/looks_like'
 
 module NRSER
+  # Constants
+  # ==========================================================================
+  
+  # @!group String Constants
+  # --------------------------------------------------------------------------
+  
+  # Unicode ellipsis character.
+  # 
+  # @todo Move to `//lib/nrser/char/...`?
+  # 
+  # @return [String]
+  # 
+  UNICODE_ELLIPSIS = '…'
+
+  # @!endgroup String Constants # ********************************************
+
   
   # @!group String Functions
   # ==========================================================================
