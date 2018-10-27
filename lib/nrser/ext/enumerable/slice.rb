@@ -65,7 +65,7 @@ module Enumerable
   # 
   def slice? slice, &is_match
     # Check that both args are {Enumerable}
-    unless  Enumerable === slice
+    unless  ::Enumerable === slice
       raise TypeError.new binding.erb <<-END
         `slice` must be {Enumerable}
         

@@ -67,7 +67,7 @@ module NRSER
     end
     
     indent_significant_lines = if ignore_whitespace_lines
-      all_lines.reject { |line| lines.n_x.whitespace? }
+      all_lines.reject { |line| line.n_x.whitespace? }
     else
       all_lines
     end
