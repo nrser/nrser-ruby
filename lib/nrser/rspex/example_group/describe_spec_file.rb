@@ -48,12 +48,24 @@ module NRSER::RSpex::ExampleGroup
   # 
   # @return (see #describe_x)
   # 
-  def describe_spec_file  description: nil,
+  def describe_spec_file  *description,
                           spec_path:,
                           bind_subject: true,
                           **metadata,
                           &body
     
+    if metadata[:description]
+      unless description.empty?
+        raise NRSER::ArgumentError.new \
+          "Can't pass `*description` and `description:` (keyword arg form is",
+          "depreciated!)",
+          description_splat: description,
+          description_kwd: metadata[ :description ]
+      end
+
+      description = metadata.delete :description
+    end
+
     chain = []
     
     [
