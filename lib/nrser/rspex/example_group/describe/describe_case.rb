@@ -27,7 +27,7 @@ def describe_case *description, where: {}, **metadata, &body
 end # #describe_case
 
 alias_method :CASE, :describe_case
-  
+
 
 # /Namespace
 # ========================================================================

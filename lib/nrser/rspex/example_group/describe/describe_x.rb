@@ -105,11 +105,15 @@ def describe_x  *description,
       description << "(" + bindings_desc + ")"
     end
   end
+
+  x_description = RSpex::Format::Description.new *description, type: type
   
   # Call up to RSpec's `#describe` method
   describe(
-    NRSER::RSpex::Format.description( *description, type: type ),
+    # NRSER::RSpex::Format.description( *description, type: type ),
+    x_description,
     **metadata,
+    x_description: x_description,
     type: type,
   ) do
     if subject_block && bind_subject

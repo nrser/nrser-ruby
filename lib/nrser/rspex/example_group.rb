@@ -33,9 +33,11 @@ module  RSpex
 # Extension methods that are mixed in to {RSpec::Core::ExampleGroup}.
 # 
 module ExampleGroup
-
+  
   # Mix in the describe methods
   include Describe
+
+  include Logger
 
 end # module ExampleGroup
 

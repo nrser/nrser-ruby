@@ -14,21 +14,19 @@ require 'semantic_logger'
 
 require_relative './mixin'
 
-# Refinements
-# =======================================================================
 
+# Namespace
+# ========================================================================
 
-# Declarations
-# =======================================================================
-
-module NRSER::Log; end
-module NRSER::Log::Formatters; end
+module  NRSER
+module  Log
+module  Formatters
 
 
 # Definitions
 # =======================================================================
 
-class NRSER::Log::Formatters::Color < ::SemanticLogger::Formatters::Color
+class Color < ::SemanticLogger::Formatters::Color
   
   # Constants
   # ======================================================================
@@ -43,7 +41,7 @@ class NRSER::Log::Formatters::Color < ::SemanticLogger::Formatters::Color
   # Mixins
   # ========================================================================
   
-  include NRSER::Log::Formatters::Mixin
+  include Mixin
   
   
   # Class Methods
@@ -87,10 +85,6 @@ class NRSER::Log::Formatters::Color < ::SemanticLogger::Formatters::Color
   end
   
   
-  # Attributes
-  # ======================================================================
-  
-  
   # Constructor
   # ======================================================================
   
@@ -127,6 +121,23 @@ class NRSER::Log::Formatters::Color < ::SemanticLogger::Formatters::Color
   
   def time
     "#{ color }#{ super() }#{ color_map.clear }"
+  end
+
+
+  def named_tags
+    named_tags = log.named_tags
+    return nil if named_tags.nil? || named_tags.empty?
+
+    max_key_length = named_tags.
+      keys.
+      map { |key| key.to_s.length }.
+      max
+    
+    lines = named_tags.map { |key, value|
+      "  #{ key.to_s.ljust max_key_length }  #{ value }"
+    }
+
+    "\n" + lines.join( "\n" )
   end
   
   
@@ -187,3 +198,11 @@ class NRSER::Log::Formatters::Color < ::SemanticLogger::Formatters::Color
   
   
 end # class Color
+
+
+# /Namespace
+# ========================================================================
+
+end # module Formatters
+end # module Log
+end # module NRSER

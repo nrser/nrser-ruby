@@ -20,8 +20,9 @@ require 'pastel'
 require 'nrser/ext/object'
 
 # Submodule
-require_relative './format/list'
 require_relative './format/args'
+require_relative './format/description'
+require_relative './format/list'
 require_relative './format/kwds'
 
 

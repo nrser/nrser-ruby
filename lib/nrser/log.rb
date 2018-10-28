@@ -90,7 +90,7 @@ module NRSER::Log
   # Class Methods
   # ========================================================================
   
-  def self.logger_for subject
+  def self.logger_for subject, **kwds
     # key = logger_type_and_name_from subject
     # 
     # if @__loggers__.key? key
@@ -99,7 +99,7 @@ module NRSER::Log
     #   if ref.weakref_alive?
     #     return
     # 
-    instance = NRSER::Log::Logger.new subject
+    instance = NRSER::Log::Logger.new subject, **kwds
   end
   
   singleton_class.send :alias_method, :[], :logger_for

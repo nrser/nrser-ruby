@@ -1,28 +1,12 @@
 # encoding: UTF-8
 # frozen_string_literal: true
 
-# Requirements
-# =======================================================================
+# Namespace
+# ========================================================================
 
-# Stdlib
-# -----------------------------------------------------------------------
-
-# Deps
-# -----------------------------------------------------------------------
-
-# Project / Package
-# -----------------------------------------------------------------------
-
-
-# Refinements
-# =======================================================================
-
-
-# Declarations
-# =======================================================================
-
-module NRSER::Log; end
-module NRSER::Log::Formatters; end
+module  NRSER
+module  Log
+module  Formatters
 
 
 # Definitions
@@ -31,7 +15,7 @@ module NRSER::Log::Formatters; end
 # A mix-in to include in {SemanticLogger::Formatter::Default} and subclasses
 # to improve configurability.
 # 
-module NRSER::Log::Formatters::Mixin
+module Mixin
   
   # Inner Classes
   # ==========================================================================
@@ -39,22 +23,22 @@ module NRSER::Log::Formatters::Mixin
   # Small helper classes only created via the mix-in.
   # 
   
-  # Abstract base class for {HeaderTokens} and {BodyTokens}, instances of which are used
-  # by formatters that include {NRSER::Log::Formatters::Mixin} to
-  # configure what pieces of information make up the header and body sections
-  # of log messages that it formats.
-  # 
+  # Abstract base class for {HeaderTokens} and {BodyTokens}, instances of which
+  # are used by formatters that include {NRSER::Log::Formatters::Mixin} to
+  # configure what pieces of information make up the header and body sections of
+  # log messages that it formats.
+  #
   # Entries are {SemanticLogger::Formatter::Default} method names, which I've
   # called "tokens", and the order of the "tokens" dictates the order the
-  # results of those method calls will be joined to form the formatted
-  # message section.
-  # 
+  # results of those method calls will be joined to form the formatted message
+  # section.
+  #
   # Adding, removing and reordering tokens is used to control what elements
   # appear and where in the formatted result.
-  # 
+  #
   # Token arrays are mutable and meant to changed in place via {Array#delete}
   # and friends.
-  # 
+  #
   class Tokens < ::Array
     # Create a new token array.
     # 
@@ -98,9 +82,9 @@ module NRSER::Log::Formatters::Mixin
       :level,
       :process_info,
       :tags,
-      :named_tags,
       :duration,
       :name,
+      :named_tags,
     ].freeze
   end
   
@@ -267,4 +251,12 @@ module NRSER::Log::Formatters::Mixin
     
   public # end protected ***************************************************
   
-end # module NRSER::Log::Formatter::Mixin
+end # Mixin
+
+
+# /Namespace
+# ========================================================================
+
+end # module Formatters
+end # module Log
+end # module NRSER

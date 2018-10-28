@@ -27,6 +27,9 @@ def describe_module mod, bind_subject: true, **metadata, &body
     &body
 end # #describe_module
 
+# Short name
+alias_method :MODULE, :describe_module
+
 
 # /Namespace
 # ========================================================================

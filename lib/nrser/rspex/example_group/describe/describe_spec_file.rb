@@ -98,12 +98,18 @@ def describe_spec_file  *description,
   else
     -> { dive_x *chain, bind_subject: bind_subject, &body }
   end
+
+  rel_path = NRSER::RSpex.dot_rel_path( spec_path )
   
   describe_x \
-    NRSER::RSpex.dot_rel_path( spec_path ),
+    rel_path,
     *description,
     type: :spec_file,
-    metadata: metadata,
+    metadata: {
+      **metadata,
+      spec_path: spec_path,
+      spec_rel_path: rel_path,
+    },
     &describe_x_body
   
 end # #describe_spec_file

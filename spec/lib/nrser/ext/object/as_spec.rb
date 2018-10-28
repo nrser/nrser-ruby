@@ -12,7 +12,10 @@ do
       subject do
         unbound_method = super()
 
-        logger.warn "In `subject` block..."
+        logger.warn "In `subject` block..." do {
+          blah: 'blue',
+          blow: 'me',
+        } end
 
         ->( *args, &block ) do
           unbound_method.bind( receiver ).call *args, &block

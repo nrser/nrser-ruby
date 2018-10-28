@@ -26,6 +26,7 @@ module  RSpex
 # Extensions available in examples themselves via RSpec's `config.include`.
 # 
 module Example
+  include Logger
   
   def described_class
     self.class.metadata[:class] || super

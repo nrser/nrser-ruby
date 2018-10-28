@@ -234,6 +234,24 @@ class NRSER::Log::Logger < SemanticLogger::Logger
   # @return [String]
   #     
   attr_reader :awesome_name
+
+
+  # Additional Semantic Logger *tags* specific to this instance. These will be
+  # prepended to {SemanticLogger::Log#tags} for all log messages logged by this
+  # logger.
+  #
+  # @return [Array<String>]
+  #
+  attr_reader :instance_tags
+
+
+  # Additional Semantic Logger *named tags* specific to this instance. These
+  # will be merged into {SemanticLogger::Log#named_tags} for all log messages
+  # logged by this logger.
+  #
+  # @return [Hash<#to_s, #to_s>]
+  #
+  attr_reader :instance_named_tags
   
   
   # Constructor
@@ -263,11 +281,24 @@ class NRSER::Log::Logger < SemanticLogger::Logger
   #       
   #   2.  {Proc}: Only include log messages where the supplied Proc returns
   #       `true`.
+  # 
+  # @param [Array<#to_s>] tags
+  #   *Instance-specific* tags to add to all {SemanticLogger::Log} messages
+  #   created by this logger instance.
+  #   
+  #   Semantic Logger (SM) indicates that tags should be {::String} instances,
+  #   though it's unclear how it handles being provided with other types.
+  #   
+  #   I chose to simply map any values through `#to_s` to meet this expectation.
+  # 
+  # @param [Hash<#to_s, #to_s>]
+  #   *Instance-specific* key/value tags to add to all {SemanticLogger::Log}
+  #   messages created by this logger instance.
   #       
   # @raise [NRSER::TypeError]
   #   If `filter:` is not an acceptable type.
   # 
-  def initialize subject, level: nil, filter: nil
+  def initialize subject, level: nil, filter: nil, tags: [], named_tags: {}
     # Support filtering all messages to this logger using a Regular Expression
     # or Proc
     unless filter.nil? || filter.is_a?( Regexp ) || filter.is_a?( Proc )
@@ -277,6 +308,9 @@ class NRSER::Log::Logger < SemanticLogger::Logger
         subject: subject,
         level: level
     end
+
+    @instance_tags = tags.map &:to_s
+    @instance_named_tags = named_tags
 
     @filter = filter.is_a?(Regexp) ? filter.freeze : filter
     
@@ -312,40 +346,27 @@ class NRSER::Log::Logger < SemanticLogger::Logger
   # Instance Methods
   # ========================================================================
   
-  # Log message at the specified level
-  def build_log level,
-                index,
-                message = nil,
-                payload = nil,
-                exception = nil,
-                &block
-    log        = SemanticLogger::Log.new name, level, index
-    should_log =
-      if payload.nil? && exception.nil? && message.is_a?( Hash )
-        # Check if someone just logged a hash payload instead of meaning to call semantic logger
-        if  message.key?( :message ) ||
-            message.key?( :payload ) ||
-            message.key?( :exception ) ||
-            message.key?( :metric )
-          log.assign message
-        else
-          log.assign_positional nil, message, nil, &block
-        end
-      else
-        log.assign_positional message, payload, exception, &block
-      end
-    
-    # Log level may change during assign due to :on_exception_level
-    [ log, should_log && should_log?( log ) ]
+  # Place log request on the queue for the Appender thread to write to each
+  # appender in the order that they were registered.
+  # 
+  # Overridden to add 
+  # 
+  def log log, message = nil, progname = nil, &block
+    # Compatibility with ::Logger
+    unless log.is_a? SemanticLogger::Log
+      return add( log, message, progname, &block )
+    end
+
+    unless instance_tags.empty?
+      log.tags = ( instance_tags + ( log.tags || [] ) ).uniq
+    end
+
+    unless instance_named_tags.empty?
+      log.named_tags = ( log.named_tags || {} ).merge! instance_named_tags
+    end
+
+    SemanticLogger::Processor << log
   end
-  
-  
-  # Log message at the specified level
-  # def log_internal *args, &block
-  #   log, should_log = build_log *args
-  #   self.log( log ) if should_log
-  # end
-  
   
   # A sweet way to try something and just log any {Exception}.
   # 
