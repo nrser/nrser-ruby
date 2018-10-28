@@ -47,6 +47,9 @@ def describe_sent_to  receiver,
     receiver,
     "(#{ mode })",
     type: :sent_to,
+    metadata: {
+      receiver: receiver,
+    },
     bind_subject: bind_subject,
     subject_block: -> {
       super().send_to \

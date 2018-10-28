@@ -22,7 +22,8 @@ module  Describe
 # @return [void]
 # 
 def describe_instance *constructor_args, &body
-  describe_x ".new", Args(*constructor_args),
+  constructor_args = Args *constructor_args
+  describe_x ".new", constructor_args,
     type: :instance,
     metadata: {
       constructor_args: constructor_args,

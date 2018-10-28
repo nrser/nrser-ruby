@@ -33,6 +33,9 @@ def describe_response_to *args, &body
   describe_x \
     msg,
     type: :response_to,
+    metadata: {
+      message: msg,
+    },
     subject_block: -> { msg.send_to super() },
     &body
 end # #describe_response_to

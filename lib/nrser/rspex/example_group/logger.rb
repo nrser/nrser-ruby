@@ -53,24 +53,39 @@ module Logger
     value = case metadata[ :type ]
     when :attribute
       "##{ metadata[ :attribute_name ] }"
+
     when :called_with
       metadata[ :called_with_args ].to_desc
-    when :module
-      metadata[ :module ].n_x.safe_name
-    when :class
-      metadata[ :class ].n_x.safe_name
+
+    when :class, :module
+      metadata[ metadata[ :type ] ].n_x.safe_name
+
     when :instance_method
       "##{ metadata[ :method_name ] }"
+
+    when :instance
+      metadata[ :constructor_args ].to_desc
+
+    when :message, :response_to
+      RSpex::Format::Description.string_for metadata[ :message ]
+    
+    when :method
+      ".#{ metadata[ :method_name ] }"
+    
+    when :sent_to
+      RSpex::Format::Description.string_for metadata[ :receiver ]
+
     when :spec_file
       metadata[ :spec_rel_path ]
+
     else
-      # binding.pry
       if metadata[ :x_description ]
         metadata[ :x_description ].joined
       else
         description
       end
-    end
+
+    end # case metadata[ :type ]
 
     { key => value }
   end
