@@ -102,7 +102,7 @@ module NRSER::RSpex::SharedExamples
     }
     
     raising.each { |args, error|
-      args = NRSER.as_array args
+      args = args.n_x.as_array
       
       context "called with #{ args.map( &NRSER::RSpex.method( :short_s ) ).join ', ' }" do
       # it "rejects #{ args.map( &:inspect ).join ', ' }" do

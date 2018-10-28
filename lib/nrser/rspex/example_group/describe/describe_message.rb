@@ -2,11 +2,12 @@
 # frozen_string_literal: true
 
 # Namespace
-# ========================================================================
+# =======================================================================
 
 module  NRSER
 module  RSpex
 module  ExampleGroup
+module  Describe
 
 
 # Definitions
@@ -48,6 +49,7 @@ alias_method :MESSAGE, :describe_message
 # /Namespace
 # ========================================================================
 
+end # module Describe
 end # module ExampleGroup
 end # module RSpex
 end # module NRSER

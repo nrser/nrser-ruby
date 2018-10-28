@@ -126,11 +126,11 @@ end
 
 
 def List *args
-  NRSER::RSpex::List.new args
+  NRSER::RSpex::Format::List.new args
 end
 
 def Args *args
-  NRSER::RSpex::Args.new args
+  NRSER::RSpex::Format::Args.new args
 end
 
 
@@ -179,48 +179,7 @@ module NRSER::RSpex
   def self.dot_rel_path dest
     File.join '.', dest.to_pn.relative_path_from( Pathname.getwd )
   end # .dot_rel_path
-  
-  
-  class List < Array
-    def to_desc max = nil
-      return '' if empty?
-      max = [16, 64 / self.length].max if max.nil?
-      map { |entry| NRSER::RSpex.short_s entry, max }.join ", "
-    end
-  end
-  
-  
-  class Opts < Hash
-    def to_desc max = nil
-      return '' if empty?
-      
-      max = [16, ( 64 / self.count )].max if max.nil?
-      
-      map { |key, value|
-        if key.is_a? Symbol
-          "#{ key }: #{ NRSER::RSpex.short_s value, max }"
-        else
-          "#{ NRSER::RSpex.short_s key, max } => #{ NRSER::RSpex.short_s value, max }"
-        end
-      }.join( ", " )
-    end
-  end
-  
-  
-  class Args < List
-    def to_desc max = nil
-      return '()' if empty?
-      
-      if last.is_a?( Hash )
-        [
-          List.new( self[0..-2] ).to_desc,
-          Opts[ last ].to_desc,
-        ].reject( &:empty? ).join( ", " )
-      else
-        super
-      end
-    end
-  end
+
   
 end # module NRSER:RSpex
 
@@ -236,5 +195,5 @@ RSpec.configure do |config|
   config.add_setting :x_style, default: :esc_seq
 end
 
-# Make available at the top-level
-include NRSER::RSpex::ExampleGroup
+# Make "describe" methods available at the top-level
+include NRSER::RSpex::ExampleGroup::Describe

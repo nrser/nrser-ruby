@@ -2,7 +2,7 @@ require 'nrser/ext/method/names'
 
 SPEC_FILE(
   spec_path:        __FILE__,
-  module:            NRSER::Ext::Method::Names,
+  module:            NRSER::Ext::Method,
   instance_method:  :full_name,
 ) do
   

@@ -2,7 +2,7 @@ require 'nrser/ext/tree/bury'
 
 SPEC_FILE(
   spec_path:        __FILE__,
-  module:           NRSER::Ext::Tree::Bury,
+  module:           NRSER::Ext::Tree,
   method:           :bury_in!,
 ) do
   

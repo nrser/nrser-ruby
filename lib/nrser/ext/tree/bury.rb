@@ -68,7 +68,7 @@ module Tree
     name_types = keyed.
       keys.
       map( &:class ).
-      select { |klass| klass == String || klass == Symbol }.
+      select { |klass| klass == ::String || klass == ::Symbol }.
       uniq
     
     return name_types[0] if name_types.length == 1
@@ -118,7 +118,7 @@ module Tree
     # 
     if  parsed_key_type == :guess &&
         tree.respond_to?( :keys ) &&
-        Bury.guess_label_key_type( tree ) == Symbol
+        guess_label_key_type( tree ) == Symbol
       key = key.to_sym
     end
     

@@ -6,8 +6,6 @@ SPEC_FILE(
   method:           :guess_label_key_type,
 ) do
   
-  # subject { NRSER.method :guess_label_key_type }
-  
   it "can't guess about an empty hash" do
     expect( subject.call( {} ) ).to be nil
   end

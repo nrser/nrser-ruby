@@ -19,6 +19,11 @@ require 'pastel'
 # Using {Object#thru}
 require 'nrser/ext/object'
 
+# Submodule
+require_relative './format/list'
+require_relative './format/args'
+require_relative './format/kwds'
+
 
 # Definitions
 # =======================================================================

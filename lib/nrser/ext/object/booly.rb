@@ -74,7 +74,7 @@ module Object
     when nil
       false
       
-    when String
+    when ::String
       downcased = object.downcase
       
       if TRUTHY_STRINGS.include? downcased
@@ -122,13 +122,13 @@ module Object
 
   # Calls {.truthy?} on `self`.
   def truthy?
-    Booly.truthy? self
+    Ext::Object.truthy? self
   end
   
   
   # Calls {.falsy?} on `self`.
   def falsy?
-    Booly.falsy? self
+    Ext::Object.falsy? self
   end
   
 end # module Object

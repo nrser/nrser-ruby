@@ -1,16 +1,15 @@
 require 'nrser/ext/enumerable/find'
 
-describe_spec_file(
+SPEC_FILE(
   spec_path: __FILE__,
   module: NRSER::Ext::Enumerable,
   instance_method: :find_only,
 ) do
 
   subject do
-    ->( enum, *args, &block ) {
+    ->( enum, *args, &block ) do
       enum.n_x.find_only *args, &block
-    }
-  end
+        end end
   
   it "returns the element when only one is found" do
     expect(
@@ -30,4 +29,4 @@ describe_spec_file(
     }.to raise_error TypeError
   end
   
-end # spec file
+end # SPEC_FILE

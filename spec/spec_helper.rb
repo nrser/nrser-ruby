@@ -14,6 +14,9 @@ $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 # -----------------------------------------------------------------------
 require 'cmds'
 
+# So I can use `binding.pry` to drop into debugging
+require 'pry'
+
 # Project / Package
 # -----------------------------------------------------------------------
 require 'nrser'

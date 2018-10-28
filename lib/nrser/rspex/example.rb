@@ -2,16 +2,22 @@
 # frozen_string_literal: true
 
 
-# Refinements
-# =======================================================================
+# Requirements
+# ========================================================================
 
-using NRSER
+# Project / Package
+# ------------------------------------------------------------------------
+
+# Submodules
+require_relative './example/logger'
 
 
-# Declarations
-# =======================================================================
 
-module NRSER::RSpex; end
+# Namespace
+# ========================================================================
+
+module  NRSER
+module  RSpex
 
 
 # Definitions
@@ -19,7 +25,7 @@ module NRSER::RSpex; end
 
 # Extensions available in examples themselves via RSpec's `config.include`.
 # 
-module NRSER::RSpex::Example
+module Example
   
   def described_class
     self.class.metadata[:class] || super
@@ -51,4 +57,11 @@ module NRSER::RSpex::Example
     base.extend NRSER::RSpex::ExampleGroup::Overrides
   end
   
-end # module NRSER::RSpex::Example
+end # module Example
+
+
+# /Namespace
+# ========================================================================
+
+end # module RSpex
+end # module NRSER

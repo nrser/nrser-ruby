@@ -80,7 +80,7 @@ module Object
   #   If it comes to constructing a new Hash with `self` as a value and no
   #   argument was provided
   # 
-  def self.as_hash key = nil
+  def as_hash key = nil
     return self if is_a? Hash
     return {} if nil?
     
@@ -100,7 +100,7 @@ module Object
     end
     
     { key => self }
-  end # .as_hash
+  end # #as_hash
   
   
   # Return an array in the way that makes most sense:

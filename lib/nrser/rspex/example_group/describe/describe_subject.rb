@@ -3,11 +3,12 @@
 
 
 # Namespace
-# ========================================================================
+# =======================================================================
 
 module  NRSER
 module  RSpex
 module  ExampleGroup
+module  Describe
 
 
 # Definitions
@@ -47,7 +48,7 @@ alias_method :SUBJECT, :describe_subject
 # /Namespace
 # ========================================================================
 
+end # module Describe
 end # module ExampleGroup
 end # module RSpex
 end # module NRSER
-
