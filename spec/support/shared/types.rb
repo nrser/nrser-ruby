@@ -78,7 +78,7 @@ shared_examples "make type" do |  args: [],
                 it "raises an error" do
                   expect {
                     subject.from_s s
-                  }.to raise_error *NRSER.as_array( error )
+                  }.to raise_error *error.n_x.as_array
                 end # raises an error
               end #
             }

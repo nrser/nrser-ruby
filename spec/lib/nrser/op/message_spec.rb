@@ -9,7 +9,7 @@ describe NRSER::Message, type: :class do
     describe_section "mapping an Enumerable using &message" do
       subject { ->( message ) { enum.map &message } }
       
-      context_where enum: [ [], [1], [1, 2] ] do
+      WHEN enum: [ [], [1], [1, 2] ] do
         
         describe_called_with NRSER::Message.new( :length ) do
           it { is_expected.to eq [0, 1, 2] }
@@ -33,7 +33,7 @@ describe NRSER::Message, type: :class do
       
       subject { array.to_message }
       
-      context_where array: [:fetch, :x] do
+      WHEN array: [:fetch, :x] do
         it {
           is_expected.to be_a( NRSER::Message ).and have_attributes \
               symbol: :fetch,

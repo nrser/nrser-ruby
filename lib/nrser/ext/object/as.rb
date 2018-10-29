@@ -117,7 +117,7 @@ module Object
   # @return [Array]
   # 
   def as_array
-    return self if is_a? Array
+    return self if is_a? ::Array
     return [] if nil?
     
     if respond_to? :to_a

@@ -71,7 +71,7 @@ describe_spec_file(
   describe_class Hamster::Hash do
     describe_instance x: 1, y: 2, z: 3 do
       describe_method :to_mutable do
-        when_called do
+        CALLED do
           it { is_expected.to be_a( ::Hash ).and eq( {x: 1, y: 2, z: 3} ) }
         end
       end
@@ -82,7 +82,7 @@ describe_spec_file(
   describe_class Hamster::Vector do
     describe_instance [1, 2, 3] do
       describe_method :to_mutable do
-      when_called do
+      CALLED do
           it { is_expected.to be_a( ::Array ).and eq [1, 2, 3] }
         end
       end
@@ -93,9 +93,9 @@ describe_spec_file(
   describe_class Hamster::Set do
     describe_instance [1, 2, 3] do
       describe_instance_method :to_mutable do
-        when_called {
+        CALLED do
           it { is_expected.to be_a( ::Set ).and eq ::Set[1, 2, 3] }
-        }
+        end
       end
     end
   end
@@ -104,9 +104,9 @@ describe_spec_file(
   describe_class Hamster::SortedSet do
     describe_instance [1, 2, 3] do
       describe_instance_method :to_mutable do
-        when_called {
+        CALLED do
           it { is_expected.to be_a( ::SortedSet ).and eq ::SortedSet[1, 2, 3] }
-        }
+        end
       end
     end
   end

@@ -20,7 +20,7 @@ describe "NRSER.map_branches" do
     context "called with arrays" do
     # ========================================================================
       
-      context_where tree: [1, 2, 3] do
+      WHEN tree: [1, 2, 3] do
         context "square values" do
           subject {
             super().call( [1, 2, 3] ) { |index, value| [index, value * value] }
@@ -31,7 +31,7 @@ describe "NRSER.map_branches" do
       end # tree: [1, 2, 3]
       
       
-      context_where tree: [:a, :b] do
+      WHEN tree: [:a, :b] do
         context "swap values (totally contrived example)" do
           # Don't actually swap like this, but tests how I think it works
           
@@ -53,7 +53,7 @@ describe "NRSER.map_branches" do
     context "called with hashes" do
     # ========================================================================
       
-      context_where tree: {x: 'ex', y: 'why?'} do
+      WHEN tree: {x: 'ex', y: 'why?'} do
         
         describe "map keys to string #ord" do
           subject {

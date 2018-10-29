@@ -1,12 +1,12 @@
 require 'nrser/sys/env/path'
 
-describe_spec_file(
+SPEC_FILE(
   spec_path:        __FILE__,
   class:            NRSER::Sys::Env::Path,
   instance_method:  :insert,
 ) do
   
-  describe_setup %{
+  SETUP ~%{
     Create a new instance from `source`, call `#insert` on `args` and compare
     to the string result from `#to_s`
   } do
@@ -14,14 +14,14 @@ describe_spec_file(
     let( :path ) { NRSER::Sys::Env::Path.new source }
     subject { path.insert( *args ).to_s }
     
-    describe_use_case(
+    CASE(
       "insert `./test/bin` into PATH before any workdir paths",
       where: {
         args: ['./test/bin', before: %r{^./}],
       }
     ) do
       
-      describe_when(
+      WHEN(
         "`./bin` is the first path in source",
         source: './bin:/Users/nrser/bin:/usr/local/bin',
       ) do
@@ -31,7 +31,7 @@ describe_spec_file(
         end
       end
       
-      describe_when(
+      WHEN(
         "`./bin` is in the middle of the source",
         source: '/some/path:./bin:/Users/nrser/bin:/usr/local/bin',
       ) do
@@ -41,7 +41,7 @@ describe_spec_file(
         end
       end
       
-      describe_when(
+      WHEN(
         "`./bin` is at the end of the source",
         source: '/some/path:/Users/nrser/bin:/usr/local/bin:./bin',
       ) do
@@ -51,7 +51,7 @@ describe_spec_file(
         end
       end
       
-      describe_when(
+      WHEN(
         "no `./` paths in source",
         source: '/some/path:/Users/nrser/bin:/usr/local/bin',
       ) do
@@ -62,6 +62,6 @@ describe_spec_file(
       end
     end # insert `./test/bin` into PATH before any workdir paths
     
-  end # setup
+  end # SETUP
   
-end # spec
+end # SPEC_FILE
