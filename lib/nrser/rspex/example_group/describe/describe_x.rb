@@ -58,8 +58,8 @@ module  Describe
 #   the new example group.
 # 
 # 
-# 
-# @return [void]
+# @return [Class<RSpec::Core::ExampleGroup>]
+#   The newly created {::Class}.
 # 
 def describe_x  *description,
                 type:,

@@ -75,8 +75,12 @@ module Logger
     when :sent_to
       RSpex::Format::Description.string_for metadata[ :receiver ]
 
+    when :source_file
+      ( metadata[ :source_file_rel_path ] ||
+        metadata[ :source_file_path ] ).to_s
+
     when :spec_file
-      metadata[ :spec_rel_path ]
+      metadata[ :spec_rel_path ].to_s
 
     else
       if metadata[ :x_description ]
