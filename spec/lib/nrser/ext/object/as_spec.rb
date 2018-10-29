@@ -4,70 +4,80 @@ SPEC_FILE \
   spec_path:        __FILE__,
   module:           NRSER::Ext::Object \
 do
-
-  logger.warn "Here I am at ExampleGroup level!"
   
   INSTANCE_METHOD :as_hash do
-    SETUP "bind method" do
+    SETUP ~%{ bind method to `receiver` } do
+
       subject do
         unbound_method = super()
 
-        ->( *args, &block ) do
+        ->( *args, &block ) {
           unbound_method.bind( receiver ).call *args, &block
-            end end
+        }
+      end # subject
 
-      WHEN ~%{ `receiver` is a {Hash} }, receiver: { a: 1 } do
-        CALLED do it do is_expected.to be receiver
-          end end end end
-      
-      #   expect(h.as_hash).to be h
-      #   # key doesn't matter
-      #   expect(h.as_hash(:x)).to be h
-      # end # returns itself when self is a hash
-    # end # WHEN `receiver` is a {Hash}
-    
-    # context "self is nil" do
-    #   it "returns {}" do
-    #     expect(nil.as_hash).to eq({})
-    #   end # returns {}
-    # end # self is nil
-    
-    # context "self responds to #to_h" do
-      
-    #   context "#to_h succeeds" do
-    #     it "returns result of #to_h" do
-    #       expect([[:a, 1], [:b, 2]].as_hash).to eq({a: 1, b: 2})
-    #     end # returns result of #to_h
-    #   end # #to_h succeeds
-      
-    #   context "#to_h fails" do
-    #     it "returns hash with self keyed as `key`" do
-    #       expect([1, 2, 3].as_hash(:a)).to eq({a: [1, 2, 3]})
-    #     end # returns hash with self keyed as `key`
-        
-    #     context "no key provided" do
-    #       it "raises ArgumentError" do
-    #         expect { [1, 2, 3].as_hash }.to raise_error ArgumentError
-    #       end # raises ArgumentErrpr
-    #     end # no key provided
-    #     it "raises ArgumentError" do
-          
-    #     end # raises ArgumentErrpr
-    #   end # #to_h failsexpect { [1, 2, 3].as_hash }.to raise_error ArgumentError
-      
-    # end # self responds to #to_h
-    
+      CASE ~%{ `receiver` is a {Hash} } do
+        WHEN receiver: { a: 1 } do
+          CALLED do it ~%{ returns itself } do
+            is_expected.to be receiver
+          end end
+
+          CALLED_WITH :x do it ~%{ does not effect the result } do
+            is_expected.to be receiver
+          end end
+        end#WHEN
+      end#CASE
+
+      CASE ~%{ `receiver` is `nil` }, where: { receiver: nil } do
+        CALLED do it do is_expected.to eq( {} ) end end
+
+        CALLED_WITH :x do it ~%{ does not effect the result } do
+          is_expected.to eq( {} )
+        end end
+      end#CASE
+
+      CASE ~%{ `receiver` responds to `#to_h` } do
+        CASE ~%{ `#to_h` succeeds } do
+          WHEN receiver: [ [:a, 1], [:b, 2] ] do
+            CALLED do it do is_expected.to eq( a: 1, b: 2 ) end end
+          end#WHEN
+        end#CASE
+
+        CASE ~%{ `#to_h` fails } do
+          WHEN receiver: [ 1, 2, 3 ] do
+            CALLED_WITH :a do
+              it ~%{ returns a {Hash} with `receiver` keyed as `:a` } do
+                is_expected.to eq a: receiver
+              end
+            end
+
+            CALLED do it do
+              expect { subject }.to raise_error ArgumentError
+            end end
+          end#WHEN
+        end#CASE
+      end#CASE
+
+    end#SETUP
   end # #as_hash
   
-  
-  # describe '#as_array' do
-  #   context "self is nil" do
-  #     it "returns {}" do
-  #       expect(nil.as_array).to eq([])
-  #     end # returns {}
-  #   end # self is nil
+
+  INSTANCE_METHOD :as_array do
+    SETUP ~%{ bind method to `receiver` } do
+
+      subject do
+        unbound_method = super()
+
+        ->( *args, &block ) {
+          unbound_method.bind( receiver ).call *args, &block
+        }
+      end # subject
+
+      CASE ~%{ `receiver` is `nil` }, where: { receiver: nil } do
+        CALLED do it do is_expected.to eq [] end end
+      end#CASE
+
+    end#SETUP
+  end#INSTANCE_METHOD
     
-  # end # #as_array
-  
-  
 end # SPEC_FILE

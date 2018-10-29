@@ -44,11 +44,11 @@ class Description < ::String
           Format.md_code_quote mod.name
         end
         
-        "#{ name_desc } (#{ string_for mod.n_x.source_location } )"
+        "#{ name_desc } (#{ string_for mod.n_x.source_location })"
         
       when NRSER::Meta::Source::Location
         if element.valid?
-          "(#{ NRSER::RSpex.dot_rel_path( element.file ) }:#{ element.line })"
+          "#{ NRSER::RSpex.dot_rel_path( element.file ) }:#{ element.line }"
         else
           ''
         end
