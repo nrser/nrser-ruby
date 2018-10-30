@@ -75,5 +75,25 @@ SPEC_FILE(
       }.to raise_error TypeError
     end
   end # when :min and :max bounds args are both provided
+
+  CLASS ::Hash do
+    SUBJECT a: 1, b: 2, c: 3 do
+      SETUP ~%{ call `subject.n_x.find_bounded` with `length` and `&block` } do
+        subject do
+          super().n_x.find_bounded length: length, &block
+        end
+
+        WHEN length: 2 do
+          WHEN 'value >= 2', block: ->(k, v) { v >= 2 } do
+            it do is_expected.to eq [ [:b, 2], [:c, 3] ] end
+          end
+
+          WHEN 'value == 2', block: ->(k, v) { v == 2 } do
+            it do expect { subject }.to raise_error TypeError end
+          end
+        end
+      end
+    end # SUBJECT
+  end # CLASS
   
 end # SPEC_FILE

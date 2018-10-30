@@ -71,7 +71,11 @@ class Description < ::String
         [element.symbol, element.args].
           map( &NRSER::RSpex.method( :short_s ) ).
           join( ', ' )
-        
+      
+      when Proc
+        # src_loc = value.source_location
+        "Proc"
+
       else
         NRSER::RSpex.short_s element
         

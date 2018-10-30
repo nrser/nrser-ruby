@@ -96,7 +96,7 @@ def describe_x  *description,
   unless bindings.empty? || add_binding_desc == false
     bindings_desc =  NRSER::RSpex::Format.md_code_quote \
       bindings.map { |name, value|
-        "#{ name } = #{ value.inspect }"
+        "#{ name } = #{ RSpex::Format::Description.string_for value }"
       }.join( '; ' )
     
     if description.empty?
