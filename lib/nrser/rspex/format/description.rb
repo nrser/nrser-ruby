@@ -44,10 +44,18 @@ class Description < ::String
           Format.md_code_quote mod.name
         end
         
-        "#{ name_desc } (#{ string_for mod.n_x.source_location })"
+        source_location_string = string_for mod.n_x.source_location
+
+        if source_location_string.empty?
+          name_desc
+        else
+          "#{ name_desc } (#{ source_location_string })"
+        end
         
       when NRSER::Meta::Source::Location
-        if element.valid?
+        if  element.valid? && 
+            Pathname.getwd.n_x.subpath?( element.file ) &&
+            !Pathname.getwd.join( '.bundle' ).n_x.subpath?( element.file )
           "#{ NRSER::RSpex.dot_rel_path( element.file ) }:#{ element.line }"
         else
           ''
