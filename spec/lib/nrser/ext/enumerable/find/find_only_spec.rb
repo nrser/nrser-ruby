@@ -34,10 +34,10 @@ SPEC_FILE(
       SETUP ~%{ call `subject.n_x.find_only &block` } do
         subject do super().n_x.find_only &block end
 
-        WHEN "value == 2", block: ->( k, v) { v == 2} do
+        WHEN "value == 2", block: ->(( k, v)) { v == 2} do
           it do is_expected.to eq [ :b, 2 ] end end
 
-        WHEN "value >= 2", block: ->( k, v ) { v >= 2 } do
+        WHEN "value >= 2", block: ->(( k, v )) { v >= 2 } do
           it do expect { subject }.to raise_error TypeError end end
         
       end # SETUP

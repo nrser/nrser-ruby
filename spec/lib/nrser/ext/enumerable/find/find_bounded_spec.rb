@@ -84,11 +84,13 @@ SPEC_FILE(
         end
 
         WHEN length: 2 do
-          WHEN 'value >= 2', block: ->(k, v) { v >= 2 } do
-            it do is_expected.to eq [ [:b, 2], [:c, 3] ] end
+          WHEN 'value >= 2', block: ->((k, v)) { v >= 2 } do
+            it do
+              is_expected.to eq [ [:b, 2], [:c, 3] ]
+            end
           end
 
-          WHEN 'value == 2', block: ->(k, v) { v == 2 } do
+          WHEN 'value == 2', block: ->((k, v)) { v == 2 } do
             it do expect { subject }.to raise_error TypeError end
           end
         end
