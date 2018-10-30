@@ -123,7 +123,7 @@ def_type        :AbsolutePath,
     self.Path,
     # Weirdly, there is no {File.absolute?}...
     self.Where( NRSER::Ext::Pathname.method :absolute? ),
-    self.Attributes( to_pn: attrs( absolute?: true ) ),
+    # self.Attributes( to_pn: attrs( absolute?: true ) ),
     **options
 end # .AbsolutePath
 
