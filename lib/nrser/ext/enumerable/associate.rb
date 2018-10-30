@@ -39,19 +39,19 @@ module Enumerable
   #   If two values map to the same key.
   # 
   def assoc_by &block
-    each_with_object( {} ) { |element, result|
-      key = block.call element
+    each_with_object( {} ) { |entry, result|
+      key = block.call entry
       
       if result.key? key
-        raise NRSER::ConflictError.new binding.erb <<-END
-          Key <%= key.inspect %> is already in results with value:
-          
-              <%= result[key].pretty_inspect %>
-          
-        END
+        raise NRSER::ConflictError.new \
+          "Key", key, "for entry", entry,
+          "is already in results pointing to value", result[key],
+          entry: entry,
+          key: key,
+          existing_value: result[ key ]
       end
       
-      result[key] = element
+      result[key] = entry
     }
   end # .assoc_by
   
@@ -78,16 +78,12 @@ module Enumerable
       value = if hash.key? entry
         case on_conflict
         when :raise
-          raise NRSER::ConflictError.new binding.erb <<-END
-            Entry <%= entry %> appears more than once in {Enumerable}
-            
-            This would cause conflict in the resulting {Hash}.
-            
-            Entry:
-            
-                <%= entry.pretty_inspect %>
-            
-          END
+          raise NRSER::ConflictError.new \
+            "Entry", entry, "appears more than once in {Enumerable}",
+            details: "This would cause conflict in the resulting {Hash}.",
+            entry: entry,
+            hash: hash
+
         when :first_wins
           # do nothing
         when :last_wins
