@@ -1,7 +1,7 @@
 # encoding: UTF-8
 # frozen_string_literal: true
 
-describe_spec_file(
+SPEC_FILE(
   spec_path: __FILE__,
   class: NRSER::MeanStreak,
 ) do

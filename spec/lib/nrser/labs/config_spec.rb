@@ -1,6 +1,6 @@
 require 'nrser/labs/config'
 
-describe_spec_file(
+SPEC_FILE(
   spec_path: __FILE__,
   class: NRSER::Config,
   labs: true, # run with `LABS=1 rspec ...` to include

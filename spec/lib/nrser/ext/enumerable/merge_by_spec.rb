@@ -1,6 +1,6 @@
 require 'nrser/core_ext/enumerable/merge_by'
 
-describe_spec_file(
+SPEC_FILE(
   spec_path: __FILE__,
   module: Enumerable,
   instance_method: :merge_by,

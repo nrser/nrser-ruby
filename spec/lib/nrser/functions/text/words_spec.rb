@@ -1,4 +1,4 @@
-describe_spec_file(
+SPEC_FILE(
   spec_path: __FILE__,
   module: NRSER,
   method: :words,

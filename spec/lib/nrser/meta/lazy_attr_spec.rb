@@ -1,11 +1,11 @@
 require 'nrser/meta/lazy_attr'
 
-describe_spec_file(
+SPEC_FILE(
   spec_path:        __FILE__,
   class:            NRSER::LazyAttr,
 ) do
   
-  describe_setup %{ Decorate a class instance method } do
+  SETUP %{ Decorate a class instance method } do
     my_class = Class.new do
       extend ::MethodDecorators
       
@@ -60,7 +60,7 @@ describe_spec_file(
   end # instance method
   
   
-  describe_setup %{ Decorate a class method } do
+  SETUP %{ Decorate a class method } do
     my_class = Class.new do
       extend ::MethodDecorators
       

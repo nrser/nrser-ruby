@@ -1,6 +1,6 @@
 require 'nrser/sys/env'
 
-describe_spec_file(
+SPEC_FILE(
   spec_path: __FILE__,
   class: NRSER::Sys::Env::Path,
 ) do

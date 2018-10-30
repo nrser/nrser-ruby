@@ -36,7 +36,7 @@ describe NRSER::Props::Immutable::Vector do
 
 # TODO  Fix this shit!
 # 
-# describe_spec_file(
+# SPEC_FILE(
 #   spec_path: __FILE__,
 # ) do
   

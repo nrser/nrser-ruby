@@ -1,11 +1,11 @@
 require 'nrser/labs/i8'
 
-describe_spec_file(
+SPEC_FILE(
   spec_path:        __FILE__,
   module:           Hamster,
 ) do
   
-  describe_setup %{
+  SETUP %{
     Converting Hamsters to regular structures with their `#to_mutable`
   }.squish do
     
@@ -68,7 +68,7 @@ describe_spec_file(
   end # setup
   
   
-  describe_class Hamster::Hash do
+  CLASS Hamster::Hash do
     describe_instance x: 1, y: 2, z: 3 do
       describe_method :to_mutable do
         CALLED do
@@ -79,7 +79,7 @@ describe_spec_file(
   end
   
   
-  describe_class Hamster::Vector do
+  CLASS Hamster::Vector do
     describe_instance [1, 2, 3] do
       describe_method :to_mutable do
       CALLED do
@@ -90,9 +90,9 @@ describe_spec_file(
   end
   
   
-  describe_class Hamster::Set do
+  CLASS Hamster::Set do
     describe_instance [1, 2, 3] do
-      describe_instance_method :to_mutable do
+      INSTANCE_METHOD :to_mutable do
         CALLED do
           it { is_expected.to be_a( ::Set ).and eq ::Set[1, 2, 3] }
         end
@@ -101,9 +101,9 @@ describe_spec_file(
   end
   
   
-  describe_class Hamster::SortedSet do
+  CLASS Hamster::SortedSet do
     describe_instance [1, 2, 3] do
-      describe_instance_method :to_mutable do
+      INSTANCE_METHOD :to_mutable do
         CALLED do
           it { is_expected.to be_a( ::SortedSet ).and eq ::SortedSet[1, 2, 3] }
         end

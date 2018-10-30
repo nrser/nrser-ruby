@@ -12,7 +12,7 @@ module NRSER::TestFixtures::AbstractMethodError
 end # module NRSER::TestFixtures::AbstractMethodError
 
 
-describe_class NRSER::AbstractMethodError do
+CLASS NRSER::AbstractMethodError do
   
   context(
     "when raising method is invoked through instance of defining class"

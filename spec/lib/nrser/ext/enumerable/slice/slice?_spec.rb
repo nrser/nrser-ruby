@@ -1,6 +1,6 @@
 require 'nrser/ext/enumerable/slice'
 
-describe_spec_file(
+SPEC_FILE(
   spec_path: __FILE__,
   module: NRSER::Ext::Enumerable,
   instance_method: :slice?,
@@ -33,4 +33,4 @@ describe_spec_file(
       # [(1..5), (2..3)] => true,
     }
   
-end # spec file
+end # SPEC_FILE

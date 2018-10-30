@@ -34,12 +34,12 @@ using NRSER::Types
 # ----------------------------------------------------------------------------
 # 
 
-describe_spec_file(
+SPEC_FILE(
   spec_path: __FILE__,
   module: NRSER::Props::Immutable::Hash,
 ) do
   
-  describe_setup "Simple 2D Integer Point" do
+  SETUP "Simple 2D Integer Point" do
   # ==========================================================================
   
     # Complete Fixture Class
@@ -128,7 +128,7 @@ describe_spec_file(
     end
     
     
-    describe_setup "Creating a Point from `source`" do
+    SETUP "Creating a Point from `source`" do
     # ========================================================================
       
       # Our subject will be a Point2dInt created from a `source` value that we

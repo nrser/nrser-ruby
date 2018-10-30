@@ -8,7 +8,7 @@ using NRSER::Types
 # NRSER::Types.array
 # ========================================================================
 # 
-describe_spec_file(
+SPEC_FILE(
   spec_path: __FILE__,
   module: NRSER::Types,
   method: :array,

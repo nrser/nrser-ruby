@@ -1,7 +1,7 @@
 # encoding: UTF-8
 # frozen_string_literal: true
 
-describe_spec_file(
+SPEC_FILE(
   description: %{
     {NRSER::MeanStreak} constructed with no `#render_type` handlers
     
@@ -11,7 +11,7 @@ describe_spec_file(
   spec_path: __FILE__,
   class: NRSER::MeanStreak,
 ) do
-  describe_class NRSER::MeanStreak do
+  CLASS NRSER::MeanStreak do
     describe_instance do
       describe_method :render do
         describe_called_with "hey" do
@@ -20,4 +20,4 @@ describe_spec_file(
       end
     end
   end
-end # describe_spec_file
+end # SPEC_FILE

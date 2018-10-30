@@ -1,4 +1,4 @@
-describe_spec_file(
+SPEC_FILE(
   description: "Gotchas",
   spec_path: __FILE__,
   module: NRSER,
@@ -57,5 +57,5 @@ describe_spec_file(
   end # section Newline literals in HEREDOCs
   # ************************************************************************
   
-end # describe_spec_file
+end # SPEC_FILE
   

@@ -1,6 +1,6 @@
 require 'nrser/meta/source/location'
 
-describe_spec_file(
+SPEC_FILE(
   spec_path: __FILE__,
   class: NRSER::Meta::Source::Location,
 ) do
@@ -83,4 +83,4 @@ describe_spec_file(
   end # `nil` source location
   
   
-end # spec file
+end # SPEC_FILE
