@@ -124,7 +124,7 @@ module Enumerable
   #   If `&block` matched more or less than one entry.
   # 
   def find_only &block
-    find_bounded( 1, &block ).first
+    n_x.find_bounded( 1, &block ).first
   end # .find_only
   
   
