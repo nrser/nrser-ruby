@@ -69,8 +69,9 @@ module Enumerable
 
   # Find all entries in an {Enumerable} for which `&block` returns a truthy
   # value, then check the amount of results found against the
-  # {NRSER::Types.length} created from `bounds`, raising a {TypeError} if
-  # the results' length doesn't satisfy the bounds type.
+  # {NRSER::Types.length} created from `bounds`, raising a
+  # {NRSER::Types::CheckError} if the results' length doesn't satisfy the bounds
+  # type.
   # 
   # @param [Integer | Hash] bounds
   #   Passed as only argument to {NRSER::Types.length} to create the length
@@ -78,18 +79,18 @@ module Enumerable
   # 
   # @param [Proc] block
   #   `#find`/`#find_all`-style block that will be called with each entry
-  #   from `enum`. Truthy responses mean the entry matched.
+  #   from `self`. Truthy responses mean the entry matched.
   # 
-  # @return [Array<E>]
-  #   Found entries from `enum`.
+  # @return [Array]
+  #   Found entries from `self`.
   # 
-  # @raise [TypeError]
-  #   If the results of `enum.find_all &block` don't satisfy `bounds`.
+  # @raise [NRSER::Types::CheckError]
+  #   If the results of `#find_all &block` don't satisfy `bounds`.
   # 
-  def find_bounded bounds, &block
+  def find_bounded! bounds, &block
     NRSER::Types.
       length(bounds).
-      check( find_all &block ) { |type:, value:|
+      check!( find_all &block ) { |type:, value:|
         binding.erb <<-END
           
           Length of found elements (<%= value.length %>) FAILED to
@@ -101,11 +102,27 @@ module Enumerable
           
           from enumerable:
           
-              <%= enum.pretty_inspect %>
+              <%= self.pretty_inspect %>
           
         END
       }
-  end # .find_bounded
+  end # #find_bounded!
+
+
+  # Version of {#find_bounded!} that returns `nil` if the find results don't 
+  # meet the `bounds` conditions.
+  # 
+  # @param (see #find_bounded!)
+  # @return (see #find_bounded!)
+  # 
+  # @return [nil]
+  #   If `bounds` are not met by find results.
+  # 
+  def find_bounded bound, &block
+    n_x.find_bounded! bound, &block
+  rescue NRSER::Types::CheckError => error
+    nil
+  end # #find_bounded
   
   
   # Find the only entry for which `&block` responds truthy, raising
@@ -123,9 +140,34 @@ module Enumerable
   # @raise [TypeError]
   #   If `&block` matched more or less than one entry.
   # 
-  def find_only &block
-    n_x.find_bounded( 1, &block ).first
+  def find_only! &block
+    n_x.find_bounded!( 1, &block ).first
   end # .find_only
+
+
+  # Version of {#find_only!} that returns `nil` if more or less than one entry
+  # is found.
+  # 
+  # @note
+  #   If `self` contains a single `nil` and `nil` may be matched by by `&block`
+  #   then it will not be possible to distinguish between that `nil` being the
+  #   single found result and more or less than one result being found.
+  #   
+  #   Hope that sort of makes some sense.
+  # 
+  # @param (see #find_only!)
+  # 
+  # @return [Object]
+  #   When `&block` matches exactly one entry.
+  # 
+  # @return [nil]
+  #   When `&block` matches more or less than one entry.
+  #   
+  def find_only &block
+    n_x.find_only! &block
+  rescue NRSER::Types::CheckError => error
+    nil
+  end
   
   
   # Return the first entry if `#count` is one.

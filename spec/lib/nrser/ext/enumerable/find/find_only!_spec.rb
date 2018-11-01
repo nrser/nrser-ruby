@@ -3,12 +3,12 @@ require 'nrser/ext/enumerable/find'
 SPEC_FILE(
   spec_path: __FILE__,
   module: NRSER::Ext::Enumerable,
-  instance_method: :find_only,
+  instance_method: :find_only!,
 ) do
 
   subject do
     ->( enum, *args, &block ) do
-      enum.n_x.find_only *args, &block
+      enum.n_x.find_only! *args, &block
         end end
   
   it "returns the element when only one is found" do
@@ -31,8 +31,8 @@ SPEC_FILE(
 
   CLASS ::Hash do
     SUBJECT a: 1, b: 2, c: 3 do
-      SETUP ~%{ call `subject.n_x.find_only &block` } do
-        subject do super().n_x.find_only &block end
+      SETUP ~%{ call `subject.n_x.find_only! &block` } do
+        subject do super().n_x.find_only! &block end
 
         WHEN "value == 2", block: ->(( k, v)) { v == 2} do
           it do is_expected.to eq [ :b, 2 ] end end
@@ -40,6 +40,22 @@ SPEC_FILE(
         WHEN "value >= 2", block: ->(( k, v )) { v >= 2 } do
           it do expect { subject }.to raise_error TypeError end end
         
+      end # SETUP
+    end # SUBJECT
+  end # CLASS
+
+
+  CLASS ::Set do
+    SUBJECT Set[ 1, 2, 3 ] do
+      SETUP ~%{ call `subject.n_x.find_only! &block` } do
+        subject do super().n_x.find_only! &block end
+
+        WHEN "value == 2", block: ->( v ) { v == 2} do
+          it do is_expected.to be 2 end end
+
+        WHEN "value >= 2", block: ->( v ) { v >= 2 } do
+          it do expect { subject }.to raise_error TypeError end end
+
       end # SETUP
     end # SUBJECT
   end # CLASS
