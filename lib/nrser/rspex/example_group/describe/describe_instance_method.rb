@@ -37,7 +37,7 @@ def describe_instance_method name,
     subject_block: subject_block,
     metadata: {
       **metadata,
-      method_name: name,
+      instance_method_name: name,
     },
     &body
 end # #describe_method

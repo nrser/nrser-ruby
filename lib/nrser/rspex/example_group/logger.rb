@@ -61,7 +61,7 @@ module Logger
       metadata[ metadata[ :type ] ].n_x.safe_name
 
     when :instance_method
-      "##{ metadata[ :method_name ] }"
+      "##{ metadata[ :instance_method_name ] }"
 
     when :instance
       metadata[ :constructor_args ].to_desc

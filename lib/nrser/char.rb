@@ -2,17 +2,25 @@
 # frozen_string_literal: true
 
 
-# Declarations
-# ============================================================================
+# Requirements
+# ========================================================================
 
-module NRSER::Char; end
+# Project / Package
+# ------------------------------------------------------------------------
 
+# Using {NRSER::ArgumentError}
+require 'nrser/errors/argument_error'
 
-# Namespace Requires
-# ============================================================================
-
+# Sub-tree
 require_relative './char/special'
 require_relative './char/alpha_numeric_sub'
+
+
+
+# Namespace
+# ========================================================================
+
+module  NRSER
 
 
 # Definitions
@@ -22,7 +30,7 @@ require_relative './char/alpha_numeric_sub'
 # 
 # **_This is ALL based around UTF-8 by default_**
 # 
-module NRSER::Char
+module Char
   
   # Constants
   # ============================================================================
@@ -135,14 +143,17 @@ module NRSER::Char
     when Integer
       from_i source
     else
-      raise ArgumentError.new binding.erb <<-END
-        Expected hex String like '12AB' or Integer, got <%= source.class %>:
-        
-            <%= source.pretty_inspect %>
-        
-      END
+      raise NRSER::ArgumentError.new \
+        "Expected `source` to be a hex String like `'12AB'` or {Integer},",
+        "received", source.class,
+        source: source
     end
   end # .from_hex
   
-  
-end # module NRSER::Char
+end # module Char
+
+
+# /Namespace
+# ========================================================================
+
+end # module NRSER

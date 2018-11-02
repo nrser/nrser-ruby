@@ -1,6 +1,9 @@
 # Using {NRSER::Ext::String#whitespace?}
 require 'nrser/ext/string/format'
 
+# Using {NRSER::Ext::Array#rest}
+require 'nrser/ext/array'
+
 module NRSER
 
   # @!group Text Functions  
@@ -40,7 +43,7 @@ module NRSER
       lines = self.lines text
       
       lines.first + indent(
-        rest( lines ).join,
+        lines.n_x.rest.join,
         amount,
         indent_string: indent_string,
         skip_first_line: false

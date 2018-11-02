@@ -37,13 +37,15 @@ module  Describe
 # 
 def describe_called_with *args, &body
   args = RSpex::Format::Args.new args
+
+  subject_block = -> { super().call *args }
   
   describe_x Args(*args),
     type: :called_with,
     metadata: {
       called_with_args: args,
     },
-    subject_block: -> { super().call *args },
+    subject_block: subject_block,
     &body
 end # #describe_called_with
 
@@ -61,13 +63,7 @@ alias_method :CALLED_WITH, :describe_called_with
 # @return [void]
 # 
 def describe_called &body
-  describe_x Args(),
-    type: :called_with,
-    metadata: {
-      called_with_args: RSpex::Format::Args.new,
-    },
-    subject_block: -> { super().call },
-    &body
+  describe_called_with &body
 end
 
 

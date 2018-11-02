@@ -39,7 +39,7 @@ module Example
   
   
   def described_constructor_args
-    self.class.metadata[:constructor_args]
+    self.class.described_constructor_args
   end
   
   

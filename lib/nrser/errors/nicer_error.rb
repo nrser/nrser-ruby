@@ -11,7 +11,19 @@
 # Using {PP.pp} as default dumper.
 require 'pp'
 
+# Project / Package
+# ------------------------------------------------------------------------
+
 require 'nrser/core_ext/object/lazy_var'
+
+# Using {NRSER::Ext::Binding#erb}
+require 'nrser/ext/binding'
+
+
+# Namespace
+# ========================================================================
+
+module  NRSER
 
 
 # Definitions
@@ -22,31 +34,20 @@ require 'nrser/core_ext/object/lazy_var'
 #
 # Check the docs at the {file:lib/nrser/errors/README.md nrser/errors README}.
 # 
-module NRSER::NicerError
+module NicerError
   
   # Constants
   # ========================================================================
   
   # Default column width
   DEFAULT_COLUMN_WIDTH = 78
-  
-  
-  # Module Methods
-  # ==========================================================================
-  
-  # Column width to format for (just summary/super-message at the moment).
-  # 
-  # @todo
-  #   Implement terminal width detection like Thor?
-  # 
-  # @return [Fixnum]
-  #   Positive integer.
-  # 
-  def self.column_width
-    DEFAULT_COLUMN_WIDTH
-  end
 
 
+  # Modules
+  # ============================================================================
+  
+  # Class methods added to modules that include {NicerError}.
+  # 
   module ClassMethods
     def def_context_delegator keys:, presence_predicate: true
       keys = Array keys
@@ -65,8 +66,32 @@ module NRSER::NicerError
         end
       end
     end
+  end # module ClassMethods
+
+  
+  # Module Methods
+  # ==========================================================================
+  
+  # Column width to format for (just summary/super-message at the moment).
+  # 
+  # @todo
+  #   Implement terminal width detection like Thor?
+  # 
+  # @return [Fixnum]
+  #   Positive integer.
+  # 
+  def self.column_width
+    DEFAULT_COLUMN_WIDTH
   end
 
+
+  # Extend `base` with {ClassMethods}.
+  # 
+  # @param [Module] base
+  #   Module including {NicerError}.
+  # 
+  # @return [void]
+  # 
   def self.included base
     base.extend ClassMethods
   end
@@ -161,6 +186,11 @@ module NRSER::NicerError
   def default_message
     "(no message)"
   end
+
+
+  def default_details
+    nil
+  end
   
   
   # Any additional context values to add to extended messages provided to
@@ -190,7 +220,7 @@ module NRSER::NicerError
       else
         contents = case details
         when Proc
-          details.call
+          details.call.to_s
         when String
           details
         else
@@ -201,7 +231,7 @@ module NRSER::NicerError
           nil
         else
           if @binding
-            contents = binding.erb contents
+            contents = binding.n_x.erb contents
           end
           
           "# Details\n\n" + contents
@@ -306,4 +336,10 @@ module NRSER::NicerError
     end
   end
   
-end # module NRSER::NicerError
+end # module NicerError
+
+
+# /Namespace
+# ========================================================================
+
+end # module NRSER

@@ -2,12 +2,19 @@
 # frozen_string_literal: true
 
 
+# Namespace
+# ========================================================================
+
+module  NRSER
+module  Char
+
+
 # Definitions
 # =======================================================================
 
 # Lil' structure with useful info and methods for special characters.
 # 
-class NRSER::Char::Special
+class Special
 
   # Attributes
   # ======================================================================
@@ -193,4 +200,11 @@ class NRSER::Char::Special
     string.gsub char, with.to_s
   end
   
-end # class NRSER::Char::Special
+end # class Special
+
+
+# /Namespace
+# ========================================================================
+
+end # module Char
+end # module NRSER

@@ -39,6 +39,11 @@ module ExampleGroup
 
   include Logger
 
+
+  def described_constructor_args
+    metadata[ :constructor_args ]
+  end
+
 end # module ExampleGroup
 
 

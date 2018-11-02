@@ -75,7 +75,7 @@ module Enumerable
   #   Hash mapping groups to positive integer counts.
   # 
   def count_by &block
-    each_with_object( Hash.new 0 ) do |entry, hash|
+    each_with_object( ::Hash.new 0 ) do |entry, hash|
       hash[ block.call entry ] += 1
     end
   end # #count_by
