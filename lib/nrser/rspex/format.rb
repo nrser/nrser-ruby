@@ -174,6 +174,8 @@ module NRSER::RSpex::Format
         end
       end
     end
+  rescue
+    pn.inspect
   end
   
   
