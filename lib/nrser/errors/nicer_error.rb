@@ -248,7 +248,7 @@ module NicerError
       if context.empty?
         nil
       else
-        "# Context:\n\n" + context.map { |name, value|
+        "# Context\n\n" + context.map { |name, value|
           name_str = name.to_s
           value_str = PP.pp \
             value,
