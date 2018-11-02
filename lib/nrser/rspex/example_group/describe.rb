@@ -10,6 +10,7 @@
 
 # Sub-tree
 require_relative './describe/describe_attribute'
+require_relative './describe/describe_bound_to'
 require_relative './describe/describe_called_with'
 require_relative './describe/describe_case'
 require_relative './describe/describe_class'
