@@ -22,10 +22,13 @@ module  Ext
 # 
 module Binding
   
-  # Calls {NRSER.template} with `self` prepended to `*args`
+  # Render `source` {String} with {ERB} against `self` and return results.
   # 
-  # @param (see NRSER.erb)
-  # @return (see NRSER.erb)
+  # @param [String] source
+  #   ERB template.
+  # 
+  # @return [String]
+  #   Rendered string.
   # 
   def erb source
     require 'erb'

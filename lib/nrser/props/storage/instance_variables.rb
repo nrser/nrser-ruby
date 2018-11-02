@@ -4,31 +4,25 @@
 # Requirements
 # =======================================================================
 
-# Stdlib
-# -----------------------------------------------------------------------
-
-# Deps
-# -----------------------------------------------------------------------
-
 # Project / Package
 # -----------------------------------------------------------------------
 
-
-# Refinements
-# =======================================================================
+require 'nrser/errors/runtime_error'
 
 
-# Declarations
-# =======================================================================
+# Namespace
+# ========================================================================
 
-module NRSER::Props::Storage; end
+module  NRSER
+module  Props
+module  Storage
 
 
 # Definitions
 # =======================================================================
 
 # @todo document NRSER::Props::Storage::Key module.
-class NRSER::Props::Storage::InstanceVariables
+class InstanceVariables
   
   def initialize immutable:
     @immutable = !!immutable
@@ -47,21 +41,23 @@ class NRSER::Props::Storage::InstanceVariables
   
   def put instance, prop, value
     if immutable?
-      raise RuntimeError.new binding.erb <<~END
-        Properties of #{ instance.class.safe_name } are immutable.
-        
-        Tried to set prop #{ prop.name } to value
-        
-            <%= value.pretty_inspect %>
-        
-        in instance
-        
-            <%= instance.pretty_inspect %>
-        
-      END
+      raise NRSER::RuntimeError.new \
+        "Properties of", instance.class,  "are immutable.",
+        prop_name: prop.full_name,
+        value: value,
+        instance: instance
     end
     
     instance.instance_variable_set "@#{ prop.name }", value
   end
   
-end
+end # class InstanceVariables
+
+
+# /Namespace
+# ========================================================================
+
+end # module  Storage
+end # module  Props
+end # module  NRSER
+

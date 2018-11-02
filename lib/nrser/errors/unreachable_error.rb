@@ -7,7 +7,7 @@
 # Project / Package
 # -----------------------------------------------------------------------
 
-require_relative './nicer_error'
+require_relative './runtime_error'
 
 
 # Namespace
@@ -21,9 +21,7 @@ module  NRSER
 
 # Raised in places where execution should *never* reach.
 # 
-class UnreachableError < ::RuntimeError
-  include NRSER::NicerError
-
+class UnreachableError < RuntimeError
   # The default message 
   # 
   # @return [String]

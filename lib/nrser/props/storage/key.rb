@@ -4,31 +4,25 @@
 # Requirements
 # =======================================================================
 
-# Stdlib
-# -----------------------------------------------------------------------
-
-# Deps
-# -----------------------------------------------------------------------
-
 # Project / Package
 # -----------------------------------------------------------------------
 
-
-# Refinements
-# =======================================================================
+require 'nrser/errors/runtime_error'
 
 
-# Declarations
-# =======================================================================
+# Namespace
+# ========================================================================
 
-module NRSER::Props::Storage; end
+module  NRSER
+module  Props
+module  Storage
 
 
 # Definitions
 # =======================================================================
 
 # @todo document NRSER::Props::Storage::Key module.
-class NRSER::Props::Storage::Key
+class Key
   
   def initialize immutable:, key_type:, get: :[], put: :[]=
     @immutable = !!immutable
@@ -64,25 +58,23 @@ class NRSER::Props::Storage::Key
     key = key_for prop
     
     if immutable?
-      raise RuntimeError.new binding.erb <<~END
-        Properties of #{ instance.class.safe_name } are immutable.
-        
-        Tried to set key
-        
-            <%= key.pretty_inspect %>
-        
-        to value
-        
-            <%= value.pretty_inspect %>
-        
-        in instance
-        
-            <%= instance.pretty_inspect %>
-        
-      END
+      raise NRSER::RuntimeError.new \
+        "Properties of", instance.class,  "are immutable.",
+        prop_name: prop.full_name,
+        key: key,
+        value: value,
+        instance: instance
     end
     
     instance.send @put_method_name, key, value
   end
   
-end # class NRSER::Props::Storage::Key
+end # class Key
+
+
+# /Namespace
+# ========================================================================
+
+end # module  Storage
+end # module  Props
+end # module  NRSER

@@ -3,20 +3,11 @@
 # Requirements
 # =======================================================================
 
-# Stdlib
-# -----------------------------------------------------------------------
-
-# Deps
-# -----------------------------------------------------------------------
-
 # Project / Package
 # -----------------------------------------------------------------------
 
-
-# Refinements
-# =======================================================================
-
-using NRSER
+require 'nrser/errors/argument_error'
+require 'nrser/errors/type_error'
 
 
 # Declarations
@@ -66,12 +57,9 @@ class NRSER::Sys::Env::Path
       source.flat_map { |entry| entry.to_s.split SEPARATOR }
     
     else
-      raise ArgumentError.new binding.erb <<-END
-        Expected a string or an "array-like" source, found:
-        
-            <%= source.pretty_inspect %>
-        
-      END
+      raise NRSER::ArgumentError.new \
+        %{Expected a string or an "array-like" `source` param.},
+        source: source
     end
     
     Hamster::Vector.new paths.
@@ -115,12 +103,10 @@ class NRSER::Sys::Env::Path
       when Regexp
         path =~ pattern
       else
-        raise TypeError.new binding.erb <<-END
-          Each `*patterns` arg should be String, Proc or Regexp, found:
-          
-              <%= pattern.pretty_inspect %>
-          
-        END
+        raise NRSER::TypeError.new \
+          "Each `*patterns` arg should be String, Proc or Regexp",
+          bad_pattern: pattern,
+          patterns: patterns
       end
     end
   end # .matches_pattern?

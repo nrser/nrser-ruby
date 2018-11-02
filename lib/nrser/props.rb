@@ -7,6 +7,8 @@
 # Project / Package
 # ------------------------------------------------------------------------
 
+require 'nrser/errors/argument_error'
+
 require_relative './props/class_methods'
 require_relative './props/instance_methods'
 
@@ -59,15 +61,11 @@ module Props
     t.hash_.check data
     
     unless data.key?( class_key )
-      raise ArgumentError.new binding.erb <<-ERB
-        Data is missing <%= class_key %> key - no idea what class to
-        instantiate.
-        
-        Data:
-        
-            <%= data.pretty_inspect %>
-        
-      ERB
+      raise NRSER::ArgumentError.new \
+        "Data is missing", class_key,
+        "key - no idea what class to instantiate.",
+        class_key: class_key,
+        data: data
     end
     
     # Get the class name from the data hash using the key, checking that it's
@@ -79,30 +77,17 @@ module Props
     
     # Make sure it's one of ours
     unless klass.included_modules.include?( NRSER::Props )
-      raise ArgumentError.new binding.erb <<-ERB
-        Can not load instance from data - bad class name.
-        
-        Extracted class name
-        
-            <%= class_name.inspect %>
-        
-        from class key
-        
-            <%= class_key.inspect %>
-        
-        which resolved to constant
-        
-            <%= klass.inspect %>
-        
-        but that class does not include the NRSER::Props::Props mixin, which we
-        check for to help protect against executing an unrelated `.from_data`
-        class method when attempting to load.
-        
-        Data:
-        
-            <%= data.pretty_inspect %>
-        
-      ERB
+      raise NRSER::ArgumentError.new \
+        "Can not load instance from data - bad class name.",
+        class_name: class_name,
+        class_key: class_key,
+        resolved_constant: klass,
+        data: data,
+        details: <<~END
+          `resolved_constant` does not include the {NRSER::Props} mixin, which
+          we check for to help protect against executing an unrelated 
+          `.from_data` class method when attempting to load.
+        END
     end
     
     # Kick off the restore and return the result

@@ -8,8 +8,9 @@
 # -----------------------------------------------------------------------
 
 require 'nrser/refinements/types'
-
 require 'nrser/graph/tsorter'
+require 'nrser/errors/argument_error'
+require 'nrser/errors/runtime_error'
 
 require_relative './prop'
 
@@ -154,11 +155,11 @@ class NRSER::Props::Metadata
     t.non_empty_sym.check! name
     
     if @props.key? name
-      raise ArgumentError.new binding.erb <<~END
-        Prop <%= name.inspect %> already set for <%= @klass %>:
-        
-            <%= @props[name].inspect %>
-      END
+      raise NRSER::ArgumentError.new \
+        "Prop", name, "already set for", @klass,
+        prop_name: name,
+        class: @klass,
+        existing_value: @props[ name ]
     end
     
     prop = NRSER::Props::Prop.new @klass, name, **opts
@@ -269,14 +270,9 @@ class NRSER::Props::Metadata
         values_by_name[prop.name] = values[index] if prop
       }
     else
-      raise ArgumentError.new binding.erb <<~END
-        `source` argument must respond to `#each_pair` or `#each_index`
-        
-        Found:
-        
-            <%= source.pretty_inspect %>
-        
-      END
+      raise NRSER::ArgumentError.new \
+        "`source` argument must respond to `#each_pair` or `#each_index`",
+        source: source
     end
     
     # Way to noisy, even for trace
@@ -301,10 +297,10 @@ class NRSER::Props::Metadata
         if primary_props.key? name
           on_dep_prop.call primary_props[name]
         else
-          raise RuntimeError.new binding.erb <<~END
-            Property <%= prop.full_name %> depends on prop `<%= name %>`,
-            but no primary prop with that name could be found!
-          END
+          raise NRSER::RuntimeError.new \
+            "Property", prop.full_name, "depends on prop", name,
+            "but no primary prop with that name could be found!",
+            prop: prop
         end
       }
     }.tsort_each do |prop|

@@ -46,9 +46,7 @@ module NRSER::Props::Mutable::Stash
   
   def self.included base
     unless base < NRSER::Stash
-      raise binding.erb <<~END
-        This class is only for including in {Hash} subclasses!
-      END
+      raise "This class is only for including in {Hash} subclasses!"
     end
     
     base.include NRSER::Props

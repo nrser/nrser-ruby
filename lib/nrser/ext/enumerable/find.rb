@@ -1,6 +1,19 @@
 # encoding: UTF-8
 # frozen_string_literal: true
 
+
+# Requirements
+# ========================================================================
+
+# Project / Package
+# ------------------------------------------------------------------------
+
+require 'nrser/errors/argument_error'
+require 'nrser/errors/multiple_errors'
+
+require 'nrser/types'
+
+
 # Namespace
 # ========================================================================
 
@@ -89,22 +102,14 @@ module Enumerable
   # 
   def find_bounded! bounds, &block
     NRSER::Types.
-      length(bounds).
+      length( bounds ).
       check!( find_all &block ) { |type:, value:|
-        binding.erb <<-END
-          
-          Length of found elements (<%= value.length %>) FAILED to
-          satisfy <%= type.to_s %>.
-          
-          Found entries:
-          
-              <%= value.pretty_inspect %>
-          
-          from enumerable:
-          
-              <%= self.pretty_inspect %>
-          
-        END
+        raise NRSER::Types::CheckError.new \
+          "Length of found elements", value.length, "FAILED to satisfy",
+          "bounds conditions", type,
+          value: value,
+          type: type,
+          enumerable: self
       }
   end # #find_bounded!
 
@@ -229,7 +234,7 @@ module Enumerable
   # @return [V]
   #   Result of first call to `&block` that doesn't raise.
   # 
-  # @raise [ArgumentError]
+  # @raise [NRSER::ArgumentError]
   #   If `enum` was empty (`enum#each` never yielded).
   # 
   # @raise [NRSER::MultipleErrors]

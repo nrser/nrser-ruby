@@ -39,9 +39,7 @@ module NRSER::Props::Immutable::Vector
   
   def self.included base
     unless base < Hamster::Vector
-      raise binding.erb <<~END
-        This class is only for including in {Hamster::Vector} subclasses!
-      END
+      raise "This class is only for including in {Hamster::Vector} subclasses!"
     end
     
     base.include NRSER::Props

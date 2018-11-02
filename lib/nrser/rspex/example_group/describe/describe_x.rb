@@ -2,6 +2,15 @@
 # frozen_string_literal: true
 
 
+# Requirements
+# ========================================================================
+
+# Project / Package
+# ------------------------------------------------------------------------
+
+require 'nrser/errors/argument_error'
+
+
 # Namespace
 # =======================================================================
 
@@ -76,20 +85,11 @@ def describe_x  *description,
   if  metadata.key?( :type ) &&
       metadata[:type] != nil &&
       metadata[:type] != type
-    raise ArgumentError.new binding.erb <<-END
-      `metadata:` keyword argument may not have a `:type` key that conflicts
-      with the `type:` keyword argument.
-      
-      Received:
-        `type`:
-        
-            <%= type.inspect %>
-        
-        `metadata[:type]`:
-        
-            <%= metadata[:type].pretty_inspect %>
-      
-    END
+    raise NRSER::ArgumentError.new \
+      "`metadata:` keyword argument may not have a `:type` key that conflicts",
+      "with the `type:` keyword argument.",
+      type: type,
+      'metadata[ :type ]' => metadata[ :type ]
   end
   
   # Add description of the bindings, if we have any and were told to

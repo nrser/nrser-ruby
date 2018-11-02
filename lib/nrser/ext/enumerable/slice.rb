@@ -65,15 +65,11 @@ module Enumerable
   # 
   def slice? slice, &is_match
     # Check that both args are {Enumerable}
-    unless  ::Enumerable === slice
-      raise TypeError.new binding.erb <<-END
-        `slice` must be {Enumerable}
-        
-        slice (<%= slice.class.safe_name %>):
-        
-            <%= slice.pretty_inspect %>
-        
-      END
+    unless slice.is_a?( ::Enumerable )
+      raise NRSER::TypeError.new \
+        "`slice` must be an {Enumerable}",
+        slice_class: slice.class,
+        slice: slice
     end
     
     if [self, slice].all? { |e|
@@ -82,7 +78,7 @@ module Enumerable
       return array_slice? slice, &is_match
     end
     
-    raise NotImplementedError.new binding.erb <<-END
+    raise NotImplementedError.new <<~END
       Sorry, but general {Enumerable} slice include has not been implemented
       
       It's kinda complicated, or at least seems that way at first, so I'm

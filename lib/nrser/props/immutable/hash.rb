@@ -38,9 +38,7 @@ module NRSER::Props::Immutable::Hash
   
   def self.included base
     unless base < Hamster::Hash
-      raise binding.erb <<~END
-        This class is only for including in {Hamster::Hash} subclasses!
-      END
+      raise "This class is only for including in {Hamster::Hash} subclasses!"
     end
     
     base.include NRSER::Props

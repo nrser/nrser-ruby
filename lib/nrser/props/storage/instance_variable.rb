@@ -2,17 +2,28 @@
 # frozen_string_literal: true
 
 
-# Declarations
+# Requirements
 # =======================================================================
 
-module NRSER::Props::Storage; end
+# Project / Package
+# -----------------------------------------------------------------------
+
+require 'nrser/errors/conflict_error'
+
+
+# Namespace
+# ========================================================================
+
+module  NRSER
+module  Props
+module  Storage
 
 
 # Definitions
 # =======================================================================
 
 # @todo document NRSER::Props::Storage::Key module.
-class NRSER::Props::Storage::InstanceVariable
+class InstanceVariable
   
   DEFAULT_VAR_NAME = :@__NRSER_prop_values
   
@@ -42,18 +53,10 @@ class NRSER::Props::Storage::InstanceVariable
   
   def init instance, collection
     if init? instance
-      raise NRSER::ConflictError.new binding.erb <<~END
-        Already initialized!
-        
-        Instance:
-        
-            <%= instance.pretty_inspect %>
-        
-        Collection:
-        
-            <%= collection.pretty_inspect %>
-        
-      END
+      raise NRSER::ConflictError.new \
+        "Already initialized!",
+        instance: instance,
+        collection: collection
     end
     
     instance.instance_variable_set @var_name, collection
@@ -82,4 +85,12 @@ class NRSER::Props::Storage::InstanceVariable
       value
   end
   
-end
+end # class InstanceVariable
+
+
+# /Namespace
+# ========================================================================
+
+end # module  Storage
+end # module  Props
+end # module  NRSER

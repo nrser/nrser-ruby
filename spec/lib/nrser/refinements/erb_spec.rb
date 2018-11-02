@@ -4,7 +4,7 @@ using NRSER::Types
 require 'nrser/props'
 require 'nrser/props/immutable/hash_variable'
 
-describe 'Binding#erb' do
+describe 'Binding#erb', skip: "outdated" do
   it "refines NRSER.erb into Binding" do
     expect(
       binding.erb <<-BLOCK

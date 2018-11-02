@@ -13,6 +13,8 @@ require 'active_support/core_ext/object/try'
 # Project / Package
 # -----------------------------------------------------------------------
 
+require 'nrser/errors/argument_error'
+
 
 # Refinements
 # =======================================================================
@@ -213,24 +215,17 @@ class Prop
       # the prop doesn't have a source, because defaults don't make any sense
       # for sourced props
       if source?
-        raise ArgumentError.new binding.erb <<-END
-          Can not construct {<%= self.class.safe_name %>} with `default` and `source`
-          
-          Props with {#source} always get their value from that source, so
-          defaults don't make any sense.
-          
-          Attempted to construct prop <%= name.inspect %> for class
-          {<%= defined_in_name %>} with:
-          
-          default:
-          
-              <%= default.pretty_inspect %>
-          
-          source:
-          
-              <%= source.pretty_inspect %>
-          
-        END
+        raise NRSER::ArgumentError.new \
+          "Can not construct", self.class, "with `default` and `source`",
+          "keyword arguments provided",
+          default: default,
+          source: source,
+          prop_name: name,
+          prop_defined_in: defined_in_name,
+          details: <<~END          
+            Props with {#source} always get their value from that source, so
+            defaults don't make any sense.
+          END
       end
       
       if Proc === default
@@ -242,52 +237,43 @@ class Prop
           @deps = default.parameters.map do |param|
             unless  Array === param &&
                     :keyreq == param[0]
-              raise ArgumentError.new binding.erb <<~END
-                Prop default Proc that take args must take only required
-                keywords (`:keyreq` type)
-                
-                This is because this is how the props system figures out
-                any dependency orders.
-                
-                Found:
-                
-                    <%= default.parameters %>
-                
-                For `default` for prop <%= full_name %>:
-                
-                    <%= self.pretty_inspect %>
-                
-              END
+              raise NRSER::ArgumentError.new \
+                "`default` {Proc} has bad parameter spec", param,
+                default: default,
+                prop: self,
+                details: <<~END
+                  Prop default {Proc} that take args must take only required"
+                  keywords (`:keyreq` type).
+                  
+                  This is because this is how the props system figures out
+                  any dependency orders.
+                END
             end
             
             # The keyword name
             param[1]
           end
         else
-          raise ArgumentError.new binding.erb <<~END
-            Prop default Proc must take no params or only required keywords
-            ({Proc#arity} of 0 or 1).
-            
-            Default to prop <%= full_name %> has arity <%= default.arity %>.
-            
-          END
+          raise NRSER::ArgumentError.new \
+            "`default` {Proc} must have arity 0 or 1",
+            default_arity: default.arity,
+            prop_name: full_name,
+            details: <<~END
+              Prop default Proc must take no params or only required keywords
+              ({Proc#arity} of 0 or 1).
+            END
         end
       
       elsif !default.frozen?
-        raise ArgumentError.new binding.erb <<-END
-          Non-proc default values must be frozen
-        
-          Default values that are *not* a {Proc} are shared between *all*
-          instances of the prop'd class, and as such *must* be immutable
-          (`#frozen? == true`).
-          
-          Found `default`:
-          
-              <%= default.pretty_inspect %>
-          
-          when constructing prop <%= name.inspect %>
-          for class <%= defined_in_name %>
-        END
+        raise NRSER::ArgumentError.new \
+          "Non-proc default values must be frozen",
+          default: default,
+          prop_name: full_name,
+          details: <<~END          
+            Default values that are *not* a {Proc} are shared between *all*
+            instances of the prop'd class, and as such *must* be immutable
+            (`#frozen? == true`).
+          END
       end
         
       @has_default = true
@@ -434,9 +420,8 @@ class Prop
         @default
       end
     else
-      raise NameError.new binding.erb <<-END
-        Prop <%= full_name %> has no default value (and none provided).
-      END
+      raise NameError.new,
+        "Prop <%= full_name %> has no default value (and none provided)."
     end
   end
   
@@ -521,18 +506,11 @@ class Prop
   # 
   def set instance, value
     unless primary?
-      raise RuntimeError.new binding.erb <<~END
-        Only {#primary?} props can be set!
-        
-        Tried to set prop #{ prop.name } to value
-        
-            <%= value.pretty_inspect %>
-        
-        in instance
-        
-            <%= instance.pretty_inspect %>
-        
-      END
+      raise NRSER::RuntimeError.new \
+        "Only {#primary?} props can be set!",
+        prop_name: full_name,
+        value: value,
+        instance: instance
     end
     
     instance.class.metadata.storage.put \
@@ -557,19 +535,11 @@ class Prop
   # 
   def check! value
     type.check!( value ) do
-      binding.erb <<-END
-        Value of type <%= value.class.safe_name %> for prop <%= self.full_name %>
-        failed type check.
-        
-        Must satisfy type:
-        
-            <%= type %>
-        
-        Given value:
-        
-            <%= value.pretty_inspect %>
-        
-      END
+      raise NRSER::Types::CheckError.new \
+        "Value of type", value.class, "for prop", full_name,
+        "failed type check.",
+        type: type,
+        value: value
     end
   end # #check!
   
@@ -674,27 +644,22 @@ class Prop
       @from_data.call data
       
     else
-      raise TypeError.new binding.erb <<-ERB
-        Expected `@from_data` to be Symbol, String or Proc;
-        found <%= @from_data.class %>.
-        
-        Acceptable types:
-        
-        -   Symbol or String
-            -   Name of class method on the class this property is defined in
-                (<%= @defined_in %>) to call with data to convert it to a
-                property value.
-                
-        -   Proc
-            -   Procedure to call with data to convert it to a property value.
-        
-        Found `@from_data`:
-        
-            <%= @from_data.pretty_inspect %>
-        
-        (type <%= @from_data.class %>)
-        
-      ERB
+      raise NRSER::TypeError.new \
+        "Expected `@from_data` to be Symbol, String or Proc",
+        "found", @from_data.class,
+        :@from_data => @from_data,
+        :@defined_in => @defined_in,
+        details: <<~END        
+          Acceptable types:
+          
+          -   Symbol or String
+              -   Name of class method on the class this property is defined in
+                  (`@defined_in`) to call with data to convert it to a
+                  property value.
+                  
+          -   Proc
+              -   Procedure to call with data to convert it to a property value.
+          END
     end
     
   end # #value_from_data

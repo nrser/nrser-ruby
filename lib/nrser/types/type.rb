@@ -13,6 +13,8 @@
 # Project / Package
 # -----------------------------------------------------------------------
 
+require 'nrser/errors/type_error'
+
 # Just require the errors here so we don't need to do it everywhere
 require_relative './errors/check_error'
 require_relative './errors/from_string_error'
@@ -67,17 +69,11 @@ class Type
     elsif to_data.respond_to?( :to_proc )
       to_data.to_proc
     else
-      raise TypeError.new binding.erb <<-ERB
-        `to_data:` keyword arg must be `nil`, respond to `#call` or respond
-        to `#to_proc`.
-        
-        Found value:
-        
-            <%= to_data.pretty_inspect %>
-        
-        (type <%= to_data.class %>)
-        
-      ERB
+      raise NRSER::TypeError.new \
+        "`to_data:` keyword arg must be `nil`, respond to `#call` or respond",
+        "to `#to_proc`.",
+        to_data: to_data,
+        'to_data.class' => to_data.class
     end
     
     @from_data = if from_data.nil?
@@ -87,17 +83,11 @@ class Type
     elsif from_data.respond_to?( :to_proc )
       from_data.to_proc
     else
-      raise TypeError.new binding.erb <<-ERB
-        `to_data:` keyword arg must be `nil`, respond to `#call` or respond
-        to `#to_proc`.
-        
-        Found value:
-        
-            <%= from_data.pretty_inspect %>
-        
-        (type <%= from_data.class %>)
-        
-      ERB
+      raise NRSER::TypeError.new \
+        "`from_data:` keyword arg must be `nil`, respond to `#call` or respond",
+        "to `#to_proc`.",
+        from_data: from_data,
+        'from_data.class' => from_data.class
     end
   end # #initialize
   
@@ -302,14 +292,45 @@ class Type
   # @raise [NRSER::Types::CheckError]
   #   If the value does not satisfy this type.
   # 
-  def check! value, &details
+  def check! value, &on_error
     # success case
     return value if test? value
     
-    raise NRSER::Types::CheckError.new \
-      value: value,
+    if on_error
+      response = begin
+        case on_error.arity
+        when 0
+          on_error.call
+        else
+          on_error.call type: self, value: value
+        end
+      rescue StandardError => error
+        error
+      end
+      
+      case response
+      when nil
+        # pass
+        
+      when ::StandardError
+        raise response if response.is_a?( CheckError )
+      
+        logger.error \
+          "`&on_error` must raise a {NRSER::Types::CheckError}, " +
+          "received #{ response.class }",
+          response
+        
+      else
+        logger.error \
+          "`&on_error` must return {NRSER::Types::CheckError} or `nil`",
+          received: response,
+          backtrace: Thread.current.backtrace
+      end
+    end
+    
+    raise CheckError.new \
       type: self,
-      details: details
+      value: value
   end
   
   # Old name for {#check!} without the bang.
