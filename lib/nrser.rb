@@ -67,10 +67,6 @@ require_relative './nrser/core_ext/module/names'
 # Then logging can come in...
 require_relative './nrser/log'
 
-# Tons need this for error messages
-# TODO  Switch to `n_x`?
-require_relative './nrser/core_ext/binding'
-
 # Then everything else...
 require_relative './nrser/char'
 require_relative './nrser/errors'
