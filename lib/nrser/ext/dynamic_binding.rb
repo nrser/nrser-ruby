@@ -92,7 +92,7 @@ module DynamicBinding
         next
       end
 
-      unless const.instance_methods( false ).include? method_name
+      unless const.instance_methods.include? method_name
         logger.trace "NEXT - const has no ##{ method_name } method",
           const: const,
           method_name: method_name
