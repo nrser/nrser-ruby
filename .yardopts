@@ -5,9 +5,12 @@
 --tag status:"Status"
 --plugin yard-commonmarker
 --plugin yard-link_stdlib
+--plugin yard-cucumber
 --private
 --protected
 lib/**/*.rb
+features/**/*.feature
+features/**/*.rb
 -
 README.md
 LICENSE.txt

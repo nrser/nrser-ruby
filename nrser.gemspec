@@ -64,6 +64,11 @@ Gem::Specification.new do |spec|
   # Testing with `rspec`
   spec.add_development_dependency "rspec", '~> 3.7'
   
+  # Trying out the cuc'...
+  spec.add_development_dependency "cucumber", '~> 3.1.0'
+  spec.add_development_dependency "aruba", '~> 0.14.6'
+  spec.add_development_dependency 'yard-cucumber', '~> 4.0.0'
+  
   # Doc site generation with `yard`
   spec.add_development_dependency 'yard', '~> 0.9.15'
   
