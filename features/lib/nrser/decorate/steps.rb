@@ -23,3 +23,11 @@ Then "the response includes:" do |*args|
     expect( @response.dig *key_path ).to eq eval( value )
   end
 end
+
+Then "it responds with {string}" do |string|
+  expect( @response ).to eq string
+end
+
+Then "it responds with:" do |string|
+  expect( @response ).to eq ~string
+end

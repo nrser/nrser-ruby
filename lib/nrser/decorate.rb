@@ -27,9 +27,14 @@ module  NRSER
 # =======================================================================
 
 # @todo document Decorate module.
+# 
+# @see requirements::features::lib::nrser::decorate Features
+# 
 module Decorate
   
   def resolve_decorator_method symbol
+    symbol = symbol.to_sym unless symbol.is_a?( ::Symbol )
+    
     if instance_methods.include? symbol
       instance_method symbol
     elsif methods.include? symbol
@@ -42,14 +47,22 @@ module Decorate
   end
   
   
-  def decorate *decorators, name
-    name = name.to_sym
+  def decorate *decorators, target
     
-    unbound_method = instance_method name
+    name, unbound_method = case target
+    when ::String, ::Symbol
+      [ target, instance_method( target ) ]
+    when ::UnboundMethod
+      [ target.name, target ]
+    else
+      raise NRSER::ArgumentError.new \
+        "`target` (last arg) must be String, Symbol or UnboundMethod",
+        "found", target
+    end
     
     decorated = \
       decorators.reverse_each.reduce unbound_method do |decorated, decorator|
-        if decorator.is_a?( Symbol )
+        if decorator.is_a?( ::Symbol ) || decorator.is_a?( ::String )
           decorator = resolve_decorator_method( decorator ) 
         end
         
@@ -74,7 +87,8 @@ module Decorate
     def call receiver, *args, &block
       target = case decorated
       when Decoration
-        decorated.method( :call ).curry receiver
+        # decorated.method( :call ).curry receiver
+        ->( *a, &b ) { decorated.call receiver, *a, &b }
       when UnboundMethod 
         decorated.bind receiver
       when Symbol
