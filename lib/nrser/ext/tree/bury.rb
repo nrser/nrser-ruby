@@ -184,7 +184,7 @@ module Tree
   # @return (see .guess_label_key_type)
   # 
   def guess_label_key_type
-    Bury.guess_label_key_type self
+    Tree.guess_label_key_type self
   end # #guess_label_key_type
 
 
@@ -230,7 +230,7 @@ module Tree
             parsed_key_type: :guess,
             clobber: false,
             create_arrays_for_unsigned_keys: false
-    Bury.bury_in! \
+    Tree.bury_in! \
       self,
       key_path,
       value,
