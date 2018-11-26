@@ -1,3 +1,7 @@
 [submodule "dev/packages/gems/yard-link_stdlib"]
 	path = dev/packages/gems/yard-link_stdlib
 	url = git@github.com:nrser/yard-link_stdlib.git
+[submodule "dev/packages/gems/yard-cucumber"]
+	path = dev/packages/gems/yard-cucumber
+	url = git@github.com:nrser/yard-cucumber.git
+	branch = nrser
