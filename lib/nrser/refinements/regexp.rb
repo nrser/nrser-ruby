@@ -1,3 +1,4 @@
+# encoding: UTF-8
 # frozen_string_literal: true
 
 # Requirements
@@ -12,26 +13,30 @@
 # Project / Package
 # -----------------------------------------------------------------------
 
+require 'nrser/ext/regexp'
 
-# Refinements
+
+# Namespace
 # =======================================================================
 
-
-# Declarations
-# =======================================================================
-
+module  NRSER
+module  Refinements
 
 # Definitions
 # =======================================================================
 
-# @todo document NRSER::RSpex::Described::Class class.
-class NRSER::RSpex::Described::Class < NRSER::RSpex::Described
-  def initialize ref, parent: nil
-    super ref, type: :class, parent: parent
+
+# @todo document Regexp module.
+module Regexp
+  
+  refine ::Regexp do
+    prepend NRSER::Ext::Regexp
   end
   
-  
-  def to_desc
-    
-  end
-end # class NRSER::RSpex::Described::Class
+end # module Regexp
+
+# /Namespace
+# =======================================================================
+
+end # module Refinements
+end # module NRSER

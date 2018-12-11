@@ -2,17 +2,17 @@ require 'nrser'
 require 'nrser/ext/hash'
 require 'nrser/decorate'
 
-Given "a class:" do |string|
-  @scope = Module.new
-  @scope.class_eval string
-end
-
 When "I create a new instance of `{word}`" do |name|
-  @instance = @scope.const_get( name ).new
+  @subject = @scope.const_get( name ).new
 end
 
-When "call `{word}`" do |name|
-  @response = @instance.send name
+When "I create a new instance of `{word}` as `@{word}`" do |class_name, instance_name|
+  @subject = @scope.const_get( class_name ).new
+  instance_variable_set "@#{ instance_name }", @subject
+end
+
+When "I call `{word}`" do |name|
+  @response = @subject.send name
 end
 
 Then "the response includes:" do |*args|

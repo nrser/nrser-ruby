@@ -26,37 +26,10 @@ module  NRSER
 # It is encouraged to attach the invalid value as the `value:` keyword argument,
 # which is then stored in {#context} hash and can be accessed via {#value}.
 # 
-class ValueError < ::StandardError
+class KeyError < ::KeyError
 
   # Play nice :)
   include NicerError
-  
-  # @!method value?
-  #   `true` if we have a `:value` key in the {#context}.
-  #   
-  #   @return [Boolean]
-  #   
-  # @!method value
-  #   Get the value at the `:value` key in {#context}.
-  #   
-  #   @return [Object]
-  # 
-  def_context_delegator keys: :value
-
-
-  # @!method initialize *message, **kwds
-  #   Create a new {ValueError}.
-  #   
-  #   @param [Array] message
-  #     See {NicerError#initialize}.
-  #   
-  #   @param [Hash<Symbol, Object>] kwds
-  #     Except as called out below, other keywords are passed up to 
-  #     {NicerError#initialize}.
-  #   
-  #   @option kwds [Object] :value
-  #     The problematic value.
-  # 
 
 end # class ValueError
 

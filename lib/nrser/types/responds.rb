@@ -118,7 +118,14 @@ class Respond < Type
   # @raise  (see Type#test?)
   # 
   def test? value
-    response.test message.send_to( value, publicly: publicly )
+    actual_response = begin
+      message.send_to value, publicly: publicly
+    rescue
+      # Methods that raise can't pass any test
+      return false
+    end
+    
+    response.test? actual_response
   end # #test
   
 end # class Responds

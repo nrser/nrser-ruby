@@ -30,8 +30,8 @@ Feature: Decorate an instance method with a singleton method
       end
       """
     
-    When I create a new instance of `A`
-    And call `f`
+    When I create a new instance of `A` as `@instance`
+    And I call `f`
     Then the response includes:
       | KEY                     | VALUE       |
       | method                  | :decorator  |
@@ -64,7 +64,7 @@ Feature: Decorate an instance method with a singleton method
       """
     
     When I create a new instance of `A`
-    And call `f`
+    And I call `f`
     Then it responds with "A.decorator called f and it said: Hi from f :)"
   
   
@@ -88,7 +88,7 @@ Feature: Decorate an instance method with a singleton method
       """
     
     When I create a new instance of `A`
-    And call `f`
+    And I call `f`
     Then it responds with "A.decorator called f and it said: Hello from f!"
   
   
@@ -113,7 +113,7 @@ Feature: Decorate an instance method with a singleton method
       """
     
     When I create a new instance of `A`
-    And call `f`
+    And I call `f`
     Then it responds with "A.decorator called f and it said: Hey there, I'm f!"
     
     
@@ -138,11 +138,10 @@ Feature: Decorate an instance method with a singleton method
       """
     
     When I create a new instance of `A`
-    And call `f`
+    And I call `f`
     Then it responds with "A.decorator called f and it said: f f f f..."
   
   
-    
   Scenario: Decorate with two singleton methods
     Given a class:
       """ruby
@@ -171,5 +170,5 @@ Feature: Decorate an instance method with a singleton method
       """
     
     When I create a new instance of `A`
-    And call `f`
+    And I call `f`
     Then it responds with "A.decorator_1, A.decorator_2, A#f."

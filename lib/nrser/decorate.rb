@@ -32,26 +32,51 @@ module  NRSER
 # 
 module Decorate
   
-  def resolve_decorator_method symbol
-    symbol = symbol.to_sym unless symbol.is_a?( ::Symbol )
+  # Resolve a method name to a reference object.
+  # 
+  # @example
+  #   class A
+  def resolve_method name:, default_type: nil
+    string_name = name.to_s
     
-    if instance_methods.include? symbol
-      instance_method symbol
-    elsif methods.include? symbol
-      method symbol
+    unless  default_type.nil? ||
+            default_type == :instance ||
+            default_type == :singleton ||
+            default_type == :class
+      raise NRSER::ArgumentError.new \
+        "`default_type:` param must be `nil`, `:instance`, `:singleton` or",
+        "`:class`, found", default_type
+    end
+  
+    if string_name.start_with? '#'
+      instance_method string[ 1..-1 ]
+    elsif string_name.start_with? '.'
+      method string[ 1..-1 ]
     else
-      raise NoMethodError,
-            "Symbol #{ symbol.inspect } does not seem to be an instance or " +
-            "singleton method"
+      case default_type
+      when nil
+        raise NRSER::ArgumentError.new \
+          "When `default_type:` param is `nil` `name:` must start with '.'",
+          "or '#'",
+          name: string_name
+      when :instance
+        instance_method string_name
+      when :singleton, :class
+        method string_name
+      else
+        raise NRSER::UnreachableError.new \
+          "Should not be possible given preceding checks of ",
+          "`default_type: param`"
+      end
     end
   end
   
   
   def decorate *decorators, target
     
-    name, unbound_method = case target
+    name, method_ref = case target
     when ::String, ::Symbol
-      [ target, instance_method( target ) ]
+      [ target, resolve_method( name: target, default_type: :instance ) ]
     when ::UnboundMethod
       [ target.name, target ]
     else
@@ -61,15 +86,30 @@ module Decorate
     end
     
     decorated = \
-      decorators.reverse_each.reduce unbound_method do |decorated, decorator|
-        if decorator.is_a?( ::Symbol ) || decorator.is_a?( ::String )
-          decorator = resolve_decorator_method( decorator ) 
+      decorators.reverse_each.reduce method_ref do |decorated, decorator|
+        case decorator
+        when ::Symbol, ::String
+          decorator = resolve_method decorator
+        when Class
+          unless decorator.methods.include? :call
+            decorator = decorator.new
+          end
         end
         
         Decoration.new decorator: decorator, decorated: decorated
       end
     
-    define_method name do |*args, &block|
+    definer = case method_ref
+    when UnboundMethod
+      :define_method
+    when Method
+      :define_singleton_method
+    else
+      raise NRSER::TypeError.new \
+        "Expected {UnboundMethod} or {Method}, found", method_ref
+    end
+    
+    send definer, name do |*args, &block|
       decorated.call self, *args, &block
     end
   end

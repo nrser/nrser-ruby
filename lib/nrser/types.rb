@@ -13,11 +13,21 @@
 # Want to mix logging in
 require 'nrser/log'
 
+
+# Namespace
+# ========================================================================
+
+module  NRSER
+
+
+# Definitions
+# ========================================================================
+
 # Stuff to help you define, test, check and match types in Ruby.
 # 
 # Read the documentation {file:lib/nrser/types/README.md here}.
 # 
-module NRSER::Types
+module Types
   
   # Sub-Tree Requirements
   # ========================================================================
@@ -60,32 +70,44 @@ module NRSER::Types
   
   # Make a {NRSER::Types::Type} from a value.
   # 
-  # If the `value` argument is...
+  # If the `value` argument...
   # 
-  # -   a {NRSER::Types::Type}, it is returned.
+  # 1.  Is a {NRSER::Types::Type}, it is returned.
   #     
-  # -   a {Class}, a new {NRSER::Types::IsA} matching that class is returned.
+  # 2.  Is a {Class}, a new {NRSER::Types::IsA} matching that class is returned.
   #     
   #     This allows things like
   #     
   #         NRSER::Types.check 's', String
   #         NRSER::Types.match 's', String, ->(s) { ... }
-  # 
-  # -   anything else, a new {NRSER::Types::Is} matching that value is
+  #     
+  # 3.  Responds to `#to_type` (and `try_to_type` is `true`), and 
+  #     `value.to_type`'s response is a {NRSER::Types::Type}, that response
+  #     is returned.
+  #     
+  # 4.  Anything else, a new {NRSER::Types::WHen} matching that value is
   #     returned.
   # 
   # @param [Object] value
   # 
   # @return [NRSER::Types::Type]
   # 
-  def self.make value
-    if value.nil?
-      self.Nil
-    elsif value.is_a? NRSER::Types::Type
-      value
-    else
-      self.When value
+  def self.make value, try_to_type: true
+    return self.Nil if value.nil?
+    
+    return value if value.is_a?( NRSER::Types::Type )
+    
+    if try_to_type && value.respond_to?( :to_type )
+      begin
+        type = value.to_type
+      rescue
+        # pass
+      else
+        return type if type.is_a?( NRSER::Types::Type )
+      end
     end
+    
+    self.When value
   end
   
   
@@ -248,7 +270,13 @@ module NRSER::Types
     }
   end # .from_repr
   
-end # NRSER::Types
+end # module Types
+
+
+# /Namespace
+# ========================================================================
+
+end # module NRSER
 
 
 # Post-Processing

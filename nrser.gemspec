@@ -81,14 +81,14 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'yard-link_stdlib', '~> 0.1.0'
   
   # Nicer REPL experience
-  spec.add_development_dependency "pry", '~> 0.11.3'
+  spec.add_development_dependency "pry", '~> 0.12.2'
 
   # Supposed to drop into pry as a debugger on unhandled exceptions, but I 
   # haven't gotten to test it yet
-  spec.add_development_dependency "pry-rescue", '~> 1.4.5'
+  # spec.add_development_dependency "pry-rescue", '~> 1.4.5'
 
   # Move around the stack when you debug with `pry`, really sweet
-  spec.add_development_dependency "pry-stack_explorer", '~> 0.4.9'
+  # spec.add_development_dependency "pry-stack_explorer", '~> 0.4.9'
   
   # My system commands lib
   spec.add_development_dependency "cmds", '~> 0.2.11'
