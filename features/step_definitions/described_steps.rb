@@ -23,6 +23,10 @@ require 'nrser/regexp/composed'
 World ScopeMixin
 World DescribeMixins
 
+
+# Given
+# ----------------------------------------------------------------------------
+
 Given "a class:" do |string|
   scope.class_eval string
   class_name = NRSER::Regexp::Composed.
@@ -32,6 +36,14 @@ Given "a class:" do |string|
 end
 
 
+Given "the class {class}" do |class_name|
+  describe_class class_name
+end
+
+
+# Then
+# ----------------------------------------------------------------------------
+
 Then "the {described} is a(n) {class}" do |described_human_name, class_name|
   expect_described( described_human_name ).to be_a resolve_class( class_name )
 end
@@ -39,6 +51,11 @@ end
 
 Then "it is a(n) {class}" do |class_name|
   expect_it.to be_a resolve_class( class_name )
+end
+
+
+Then "it is a subclass of {class}" do |class_name|
+  expect_it.to be < resolve_class( class_name )
 end
 
 
@@ -56,7 +73,7 @@ end
 
 
 # When "I call {method_identifier}" do |method_identifier|
-#   describe_method method_identifierresponse
+#   describe_method method_identifier
 # end
 
 # When "the {param_name} parameter is {expr}" do |param_name, string|
