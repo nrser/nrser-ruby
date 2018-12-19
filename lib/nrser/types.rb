@@ -243,7 +243,7 @@ module Types
       end
     }
     
-    raise TypeError, <<-END.dedent
+    raise TypeError.new NRSER.dedent <<-END
       Could not match value
       
           #{ value.inspect }
