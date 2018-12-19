@@ -206,6 +206,14 @@ class Resolution
         if described.instance_variable_defined? ivar_name
           value = described.instance_variable_get ivar_name
           
+          # If the `type` represents a {Base} subclass then we want to check the
+          # value against that subclass' {Base.subject_type} as well, since 
+          # {#described}'s instance variables will be actual values, not 
+          # described instances with {Base#subject} values.
+          # 
+          # TODO  This seems to work, but it's kind-of funky... could probably 
+          #       use some improvement.
+          # 
           if (  type.is_a?( t::IsA ) && Base.subclass?( type.mod ) &&
                 type.mod.subject_type.test?( value ) ) ||
                 type.test?( value )
@@ -221,8 +229,41 @@ class Resolution
     end
     
     
-    def add_candidate! name, value, **context
-      check_resolving! __method__, name, value, **context
+    # Create a {Candidate} and add it to `@candidates`, checking that it makes
+    # sense to do so.
+    # 
+    # @note
+    #   This is the **ONLY** way the list of candidates should be manipulated.
+    # 
+    # @private
+    # 
+    # @param [::Symbol] name
+    #   The key in {#from}'s {From#types} that `value` is a candidate for.
+    #   
+    #   **MUST** also be a key in `@resolvable_types`: only resolvable types
+    #   can have candidates because name/type pairs partitioned into 
+    #   `@ivar_only_types` can **only** be resolved from {#described}'s instance
+    #   variables, where there is no ambiguity (handled at construction in 
+    #   {#init_update_from_described!}).
+    # 
+    # @param [::Object] value
+    #   The candidate value (becomes the {Candidate#value}).
+    # 
+    # @param [#to_s] source
+    #   Information about where the `value` came from to set as the 
+    #   {Candidate#source} - useful for debugging / error reporting.
+    # 
+    # @param [Hash<::Symbol, ::Object>] context
+    #   Any other information about where the `value` is coming from that would
+    #   be useful in errors (passed to {#check_resolving!} along with the other
+    #   parameters).
+    # 
+    # @return [Candidate]
+    #   The newly constructed {Candidate} instance, which has been added to 
+    #   `@candidates`.
+    # 
+    def add_candidate! name, value, source:, **context
+      check_resolving! __method__, name, value, source: source, **context
       
       unless @resolvable_types.key? name
         raise KeyError.new \
@@ -235,13 +276,15 @@ class Resolution
       end
       
       Candidate.
-        new( value: value, source: context[ :source ].to_s ).
+        new( value: value, source: source.to_s ).
         tap { |candidate| @candidates[ name ] << candidate }
     end
     
     
     # Called before doing something that only make sense if the {Resolution}
     # is in the process of resolving (like adding a candidate value for a type).
+    # 
+    # @private
     # 
     # @return [nil]
     #   If everything's ok.
@@ -270,9 +313,17 @@ class Resolution
       end
       
       nil
-    end
+    end # #check_resolving! 
     
     
+    # Attempt to resolve the `@candidates` to `@values`.
+    # 
+    # @private
+    # 
+    # @return [nil]
+    #   Mutates the instance, in particular potentially chaning the {#resolved?}
+    #   state.
+    # 
     def try_to_resolve!
       check_resolving! __method__
             
@@ -374,6 +425,8 @@ class Resolution
     # Change to a *failed* state. From which there is no going back. This is
     # called when we know we will never succeed.
     # 
+    # @private
+    # 
     # @param [Array] description
     #   Entries to be merged into a {::String} description.
     # 
@@ -391,7 +444,7 @@ class Resolution
         context
       ]
       nil
-    end
+    end # #failed!
     
   public # end private *****************************************************
   
