@@ -94,6 +94,20 @@ module ScopeMixin
   end # #resolve_const
   
   
+  def resolve_module module_name
+    const = resolve_const module_name
+    
+    unless const.is_a? ::Module
+      raise NRSER::TypeError.new \
+        "Resolved name", module_name.inspect, "but it's not a {::Module}",
+        module_name: module_name,
+        resolved_const: const
+    end
+    
+    const
+  end
+  
+  
   def resolve_class class_name
     const = resolve_const class_name
     

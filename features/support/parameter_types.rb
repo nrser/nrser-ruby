@@ -39,11 +39,22 @@ ParameterType \
   type: Names::Name,
   transformer: ->( string ){
     Names.match string[ 1..-2 ],
-      Names::Method,
-        ->( method_name ) { method_name },
-      
-      Names::SingletonMethod,
-        ->( singleton_method_name ) { singleton_method_name }
+      Names::Method,          ->( _ ) { _ },
+      Names::SingletonMethod, ->( _ ) { _ }
+  }
+
+
+ParameterType \
+  name: 'qualified_method',
+  regexp: re.or(
+    curly_quote( Names::QualifiedSingletonMethod ),
+    curly_quote( Names::QualifiedInstanceMethod ),
+  ),
+  type: Names::Name,
+  transformer: ->( string ){
+    Names.match string[ 1..-2 ],
+      Names::QualifiedSingletonMethod,  ->( _ ) { _ },
+      Names::QualifiedInstanceMethod,   ->( _ ) { _ }
   }
 
 

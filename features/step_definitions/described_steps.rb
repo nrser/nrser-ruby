@@ -49,6 +49,12 @@ end
 
 ### Methods
 
+Given "the method {qualified_method}" \
+do |method_name|
+  describe_method method_name
+end
+
+
 Given "the {described}(')(s) method {method}" \
 do |described_human_name, method_name|
   describe Described::Method.new \
@@ -60,10 +66,24 @@ do |described_human_name, method_name|
 end
 
 
+Given "its method {method}" \
+do |method_name|
+  describe_method method_name
+end
+
+
 # When Steps
 # ----------------------------------------------------------------------------
 
+### Responses
+
 When "I call it with no parameters" \
+do
+  describe_response params: NRSER::Meta::Params.new
+end
+
+
+When "I call the method with no parameters" \
 do
   describe_response params: NRSER::Meta::Params.new
 end
@@ -93,6 +113,12 @@ end
 Then "it is equal to {string}" \
 do |string|
   expect_it.to eq string
+end
+
+
+Then "the {described} is equal to {string}" \
+do |described_human_name, string|
+  expect_described( described_human_name ).to eq string
 end
 
 
