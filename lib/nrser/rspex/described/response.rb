@@ -10,8 +10,8 @@
 # Extending {Callable}
 require_relative './callable'
 
-# Describes {Instance}
-require_relative './instance'
+# Describes {Params}
+require_relative './params'
 
 
 # Refinements
@@ -37,7 +37,7 @@ class Response < Base
   # Config
   # ========================================================================
   
-  subject_type NRSER::Meta::Params
+  subject_type ::Object
   
   from callable: Callable, params: Params do |callable:, params:|
     params.call callable

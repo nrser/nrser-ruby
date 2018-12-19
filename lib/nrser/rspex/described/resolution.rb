@@ -9,8 +9,16 @@
 
 require 'set'
 
+# Deps
+# ----------------------------------------------------------------------------
+
+require 'active_support/core_ext/hash/transform_values'
+
 # Project / Package
 # -----------------------------------------------------------------------
+
+# Mixing logging in
+require 'nrser/log'
 
 require 'nrser/labs/i8/struct'
 
@@ -42,6 +50,16 @@ class Resolution
   
   Candidate = I8::Struct.new value: t.Top, source: t.NonEmptyString
   
+  
+  # Mixins
+  # ========================================================================
+  
+  include NRSER::Log::Mixin
+  
+  
+  # Attributes
+  # ========================================================================
+  
   # TODO document `from` attribute.
   # 
   # @return [From]
@@ -65,6 +83,13 @@ class Resolution
   #   When resolution has failed ({#failed?} responds with `true`).
   #     
   attr_reader :failed_because
+  
+  
+  # TODO document `described` attribute.
+  # 
+  # @return [Base]
+  #     
+  attr_reader :described
   
 
   def initialize from:, described:
@@ -170,7 +195,9 @@ class Resolution
         if described.instance_variable_defined? ivar_name
           value = described.instance_variable_get ivar_name
           
-          if type.test? value
+          if (  type.is_a?( t::IsA ) && Base.subclass?( type.mod ) &&
+                type.mod.subject_type.test?( value ) ) ||
+                type.test?( value )
             add_candidate! name, value, method: __method__, source: ivar_name
           end
         end
@@ -196,9 +223,9 @@ class Resolution
           "Type", name, "already resolved to value", @values[ name ]
       end
       
-      Candidate.new( value: value, source: source ).tap { |candidate|
-        @candidates[ name ] << candidate
-      }
+      Candidate.
+        new( value: value, source: context[ :source ].to_s ).
+        tap { |candidate| @candidates[ name ] << candidate }
     end
     
     
@@ -236,9 +263,9 @@ class Resolution
     
     
     def try_to_resolve!
-      check_resolving!
-      
-      no_candidates = @resolved_types.keys - @candidates.keys
+      check_resolving! __method__
+            
+      no_candidates = @resolvable_types.keys - @candidates.keys
       
       # Bail if there are still names with no candidates
       return unless no_candidates.empty?
@@ -257,8 +284,7 @@ class Resolution
         unique_candidates = \
           candidates.
             select { |name, entries| entries.count == 1 }.
-            map { |name, entries| entries.first }.
-            to_h
+            transform_values( &:first )
         
         # If there are no unique candidates we give up (for now)
         return if unique_candidates.empty?
@@ -276,11 +302,11 @@ class Resolution
         # is the same count as the {::Hash} of unique candidates. And I sort 
         # of think that works...
         # 
-        return if unique_candidates.
+        return if unique_candidates.count != unique_candidates.
             values.
             map { |c| c.value.object_id }.
             to_set.
-            count != unique_candidates.count
+            count
         
         # Remove all the unique names from the working copy
         unique_candidates.keys.each { |name| candidates.delete name }
@@ -318,16 +344,16 @@ class Resolution
       # Shit... this should mean we've actually done it!
       # 
       # So, `resolved_values` should have the same amount of entries as
-      # `@resolved_types`
-      unless resolved_values.count == @resolved_types.count
+      # `@resolvable_types`
+      unless resolved_values.count == @resolvable_types.count
         raise NRSER::RuntimeError.new \
           "Logic failure...  counts don't match",
           resolved_values:  resolved_values,
-          resolved_types:   @resolved_types
+          resolvable_types:   @resolvable_types
       end
       
       # Now just assign and flag the state!
-      @values.merge! new_values
+      @values.merge! resolved_values
       @resolved = true 
       
       nil
@@ -372,7 +398,7 @@ class Resolution
   def update! described
     check_resolving! __method__, described
     
-    @resolved_types.each do |name, type|
+    @resolvable_types.each do |name, type|
       if type.test? described
         add_candidate! name, described.subject,
           method: __method__,

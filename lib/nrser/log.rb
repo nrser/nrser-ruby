@@ -508,6 +508,24 @@ module NRSER::Log
       **kwds
   end # .setup_for_rspec!
   
+  
+  # Call {.setup!} but provides default for running Cucumber features: sync,
+  # write to
+  # 
+  # @param  (see .setup!)
+  # @return (see .setup!)
+  # 
+  def self.setup_for_cucumber!  dest: $stderr,
+                                sync: true,
+                                header: { delete: :process_info },
+                                **kwds
+    setup! \
+      dest: dest,
+      sync: sync,
+      header: header,
+      **kwds
+  end # .setup_for_rspec!
+  
   # @!endgroup Setup Class Methods
   
   # ************************************************************************

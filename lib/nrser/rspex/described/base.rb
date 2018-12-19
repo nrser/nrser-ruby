@@ -18,9 +18,16 @@ require 'active_support/core_ext/string/inflections'
 # Project / Package
 # -----------------------------------------------------------------------
 
+# Mixing logging in
+require 'nrser/log'
+
+# {Base.Names} provides shortcut to {NRSER::Meta::Names}
 require 'nrser/meta/names'
 
+# Using {From} in {Base.from}
 require_relative './from'
+
+# Using {Resolution} in {Base#resolve_subject!}
 require_relative './resolution'
 
 
@@ -50,6 +57,12 @@ module  Described
 # @abstract
 # 
 class Base
+
+  # Mixins
+  # ========================================================================
+  
+  include NRSER::Log::Mixin
+  
   
   # Singleton Methods
   # ========================================================================
@@ -116,6 +129,11 @@ class Base
   end # .subject_type
   
   
+  def self.subclass? object
+    object.is_a?( ::Class ) && object < self
+  end
+  
+  
   # The default standard "human" name for the class (as used in Cucumber 
   # features) based on the class' "demodulized" name (the last segment / 
   # "namespace-less" name).
@@ -161,6 +179,16 @@ class Base
   # Attributes
   # ========================================================================
   
+  # The next described instance up the hierarchy from this one.
+  # 
+  # @return [nil]
+  #   When this instance is a root.
+  # 
+  # @return [Base]
+  #   When this instance is not a root.
+  #     
+  attr_reader :parent
+  
   
   # Construction
   # ========================================================================
@@ -168,6 +196,7 @@ class Base
   # Instantiate a new `Base`.
   def initialize parent: nil, **kwds
     @parent = parent
+    @resolved = nil
     
     if kwds.key? :subject
       self.subject = kwds[ :subject ]
@@ -205,6 +234,16 @@ class Base
   end
   
   
+  def each_ancestor &block
+    if block.nil?
+      enum_for __method__
+    elsif !parent.nil?
+      yield parent
+      parent.each_ancestor &block
+    end
+  end
+  
+  
   def resolve_subject!
     resolutions = self.class.from.
       map { |from| Resolution.new from: from, described: self }
@@ -215,10 +254,10 @@ class Base
       return resolved_from_ivars
     end
     
-    resolved = ancestors.find { |described|
+    each_ancestor.find { |described|
       resolutions.find { |resolution|
         resolution.update! described
-        resolution.resolved?
+        resolved = resolution if resolution.resolved?
       }
     }
     
@@ -227,6 +266,7 @@ class Base
         resolutions: resolutions
     end
     
+    @resolution = resolved
     self.subject = resolved.subject
   end
   

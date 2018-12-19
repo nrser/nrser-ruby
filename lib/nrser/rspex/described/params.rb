@@ -7,11 +7,11 @@
 # Project / Package
 # -----------------------------------------------------------------------
 
-# Extending {Callable}
-require_relative './callable'
+# Subjects are {NRSER::Meta::Params}
+require 'nrser/meta/params'
 
-# Describes {Instance}
-require_relative './instance'
+# Extending {Base}
+require_relative './base'
 
 
 # Refinements
@@ -41,36 +41,25 @@ module  Described
 # 
 class Params < Base
   
+  # Config
+  # ========================================================================
+  
+  subject_type NRSER::Meta::Params
+
+  
   # Construction
   # ========================================================================
   
   def initialize parent: nil, values: {}
-    @positional = {}
-    @keyword = {}
-    @block = nil
-    # TODO  Do I even need this... guess it's dumb to toss data in testing...
-    @block_name = nil
-    
-    values.each &method( :[]= )
+    super( parent: parent, subject: NRSER::Meta::Params.new( values ) )
   end
+  
   
   # Instance Methods
   # ========================================================================
   
-  def []= param_name, value
-    t.match param_name,
-      Names::PositionalParam, ->( param_name ) {
-        @positional[ param_name.var_name ] = value
-      },
-      
-      Names::KeywordParam, ->( param_name ) {
-        @keyword[ param_name.var_name ] = value
-      },
-      
-      Names::BlockParam, ->( param_name ) {
-        @block_name = param_name
-        @block = value
-      }
+  def []= name, value
+    subject[ name ] = value
   end
   
 end # class Callable

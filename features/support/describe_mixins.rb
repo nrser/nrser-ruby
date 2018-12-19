@@ -131,6 +131,13 @@ module DescribeMixins
   end
   
   
+  def describe_response **kwds
+    describe Described::Response.new \
+      parent: described,
+      **kwds
+  end
+  
+  
   def describe_param param_name, value
     if described.is_a? Described::Params
       described[ name ] = value

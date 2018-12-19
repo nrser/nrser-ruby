@@ -49,11 +49,12 @@ class Params
   # ========================================================================
   
   # Instantiate a new `Params`.
-  def initialize
+  def initialize values = {}
     @named_positional = {}
     @keyword = {}
     @block_name = nil
     @block = nil
+    values.each { |name, value| self[ name ] = value }
   end # #initialize
   
   
@@ -88,7 +89,9 @@ class Params
       end
     end
     
-    callable.call *args, **kwds, &@block
+    args << kwds unless kwds.empty?
+    
+    callable.call *args, &@block
   end
   
   

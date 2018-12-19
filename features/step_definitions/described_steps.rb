@@ -27,7 +27,7 @@ World ScopeMixin
 World DescribeMixins
 
 
-# Given
+# Given Steps
 # ----------------------------------------------------------------------------
 
 ### Classes
@@ -60,7 +60,16 @@ do |described_human_name, method_name|
 end
 
 
-# Then
+# When Steps
+# ----------------------------------------------------------------------------
+
+When "I call it with no parameters" \
+do
+  describe_response params: NRSER::Meta::Params.new
+end
+
+
+# Then Steps
 # ----------------------------------------------------------------------------
 
 Then "the {described} is a(n) {class}" \
@@ -78,6 +87,12 @@ end
 Then "it is a subclass of {class}" \
 do |class_name|
   expect_it.to be < resolve_class( class_name )
+end
+
+
+Then "it is equal to {string}" \
+do |string|
+  expect_it.to eq string
 end
 
 
