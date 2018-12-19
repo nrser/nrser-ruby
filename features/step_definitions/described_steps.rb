@@ -93,7 +93,13 @@ do |attribute_name, source|
 end
 
 
-Then "it has a(n) {attr} attribute that is a {class}" \
+Then "it has a(n) {attr} attribute that is {expr}" \
+do |attribute_name, source|
+  expect_it.to have_attributes attribute_name => be( eval( source ) )
+end
+
+
+Then "it has a(n) {attr} attribute that is a(n) {class}" \
 do |attribute_name, class_name|
   expect_it.to have_attributes \
     attribute_name => be_a( resolve_class( class_name ) )
@@ -106,18 +112,4 @@ end
 
 # When "the {param_name} parameter is {expr}" do |param_name, string|
 #   describe_param param_name, eval( string )
-# end
-
-# Then "the {subject} is a(n) {class_name}" do |class_name|
-#   expect( described.subject ).to be_a resolve_class( class_name )
-# end
-
-# Then "the {subject} has a(n) {method_name} attribute that is {expr}" \
-# do |subject, method_name, string|
-#   expect( subject ).to have_attributes method_name => be( eval( string ) )
-# end
-
-# Then "it has a(n) {method_name} attribute that is {expr}" \
-# do |method_name, expr|
-#   expect_it.to have_attributes method_name => be( eval( string ) )
 # end

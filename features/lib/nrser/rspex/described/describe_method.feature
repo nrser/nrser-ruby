@@ -15,6 +15,6 @@ Feature: Describe a {::Method} using {NRSER::RSpex::Described::Method}
     And the class' method {.default_human_name}
     
     Then the method is a {::Method}
-    And it has a `name` attribute equal to `:default_human_name`
+    And it has a `name` attribute that is `:default_human_name`
   
     

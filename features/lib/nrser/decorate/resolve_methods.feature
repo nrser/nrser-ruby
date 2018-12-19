@@ -19,7 +19,7 @@ Feature: Resolve methods by *bare* or *qualified* name
     When I call {A.resolve_method}
     And the `name:` parameter is ".my_singleton_method"
     
-    Then the response is a {Method}
+    Then the response is a {::Method}
     
     And it has a `name` attribute that is `:my_singleton_method`
     
