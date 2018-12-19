@@ -20,6 +20,9 @@ require 'nrser/regexp/composed'
 # Definitions
 # =======================================================================
 
+# Mixins
+# ----------------------------------------------------------------------------
+
 World ScopeMixin
 World DescribeMixins
 
@@ -27,7 +30,10 @@ World DescribeMixins
 # Given
 # ----------------------------------------------------------------------------
 
-Given "a class:" do |string|
+### Classes
+
+Given "a class:" \
+do |string|
   scope.class_eval string
   class_name = NRSER::Regexp::Composed.
     join( 'class (', NRSER::Meta::Names::Module.pattern, ')' ).
@@ -36,25 +42,41 @@ Given "a class:" do |string|
 end
 
 
-Given "the class {class}" do |class_name|
+Given "the class {class}" \
+do |class_name|
   describe_class class_name
+end
+
+### Methods
+
+Given "the {described}(')(s) method {method}" \
+do |described_human_name, method_name|
+  describe Described::Method.new \
+    parent: described,
+    subject: described.
+              find_by_human_name!( described_human_name ).
+              subject.
+              method( method_name.method_name )
 end
 
 
 # Then
 # ----------------------------------------------------------------------------
 
-Then "the {described} is a(n) {class}" do |described_human_name, class_name|
+Then "the {described} is a(n) {class}" \
+do |described_human_name, class_name|
   expect_described( described_human_name ).to be_a resolve_class( class_name )
 end
 
 
-Then "it is a(n) {class}" do |class_name|
+Then "it is a(n) {class}" \
+do |class_name|
   expect_it.to be_a resolve_class( class_name )
 end
 
 
-Then "it is a subclass of {class}" do |class_name|
+Then "it is a subclass of {class}" \
+do |class_name|
   expect_it.to be < resolve_class( class_name )
 end
 
@@ -62,6 +84,12 @@ end
 Then "it has a(n) {attr} attribute equal to {string}" \
 do |attribute_name, string|
   expect_it.to have_attributes attribute_name => string
+end
+
+
+Then "it has a(n) {attr} attribute equal to {expr}" \
+do |attribute_name, source|
+  expect_it.to have_attributes attribute_name => eval( source )
 end
 
 

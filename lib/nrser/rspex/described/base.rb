@@ -80,13 +80,12 @@ class Base
       return @from
     end
     
-    From.new(
-      positional: positional,
-      keyword: keyword,
-      init_block: init_block,
-    ).tap { |from|
-      @from << from
-    }
+    From.
+      new(
+        types: types,
+        init_block: init_block,
+      ).
+      tap { |from| @from << from }
   end
   
   

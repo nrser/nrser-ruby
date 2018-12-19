@@ -393,6 +393,10 @@ module Names
   
   class Method < Name
     pattern /\A[A-Za-z_][a-zA-Z0-9_]*[\?\!]?\z/
+    
+    def method_name
+      self
+    end
   end
   
   

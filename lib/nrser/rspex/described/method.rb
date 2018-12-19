@@ -51,7 +51,7 @@ class Method < Callable
     unbound_method.bind instance
   end
   
-  from object: Object, :@name => Names::Method do |object:, name:|
+  from object: Object, :@name => self.Names::Method do |object:, name:|
     object.method name
   end
   

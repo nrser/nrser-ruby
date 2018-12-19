@@ -20,6 +20,7 @@ require 'nrser/regexp/composed'
 
 require_relative './described/base'
 require_relative './described/class'
+require_relative './described/method'
 
 
 
@@ -37,7 +38,7 @@ module  RSpex
 module NRSER::RSpex::Described
   def self.human_name_pattern full: false, options: nil
     NRSER::Regexp::Composed.or \
-      *Base.subclasses.flat_map { |cls|
+      *Base.descendants.flat_map { |cls|
         cls.human_names.map { |human_name| ::Regexp.escape human_name }
       },
       full: full,

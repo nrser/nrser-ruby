@@ -31,20 +31,35 @@ ParameterType \
 
 
 ParameterType \
+  name: 'method',
+  regexp: re.or(
+    backtick_quote( Names::Method ),
+    curly_quote( Names::SingletonMethod ),
+  ),
+  type: Names::Name,
+  transformer: ->( string ){
+    Names.match string[ 1..-2 ],
+      Names::Method,
+        ->( method_name ) { method_name },
+      
+      Names::SingletonMethod,
+        ->( singleton_method_name ) { singleton_method_name }
+  }
+
+
+ParameterType \
   name: 'described',
   regexp: NRSER::RSpex::Described.human_name_pattern,
   type: ::String,
   transformer: ->( string ){ string }
 
 
-# ParameterType \
-#   name: 'expr',
-#   regexp: re.or(
-#     re.join( re.esc( '{' ), Names::Module, re.esc( '}' ),
-#     re.join( re.esc( '`' ), '.*', re.esc( '`' ) ),
-#   ),
-#   type: Names::Attribute,
-#   transformer: ->( string ){ Names::Attribute.new string[ 1..-2 ] }
+ParameterType \
+  name: 'expr',
+  regexp: re.join( re.esc( '`' ), '.*', re.esc( '`' ) ),
+  type: ::String,
+  transformer: ->( string ){ string[ 1..-2 ] }
+
   
 # class ParamName
   

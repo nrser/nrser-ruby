@@ -19,6 +19,9 @@ require 'nrser/rspex/described'
 # Refinements
 # =======================================================================
 
+require 'nrser/refinements/types'
+using NRSER::Types
+
 
 # Namespace
 # =======================================================================
@@ -27,13 +30,48 @@ require 'nrser/rspex/described'
 # Definitions
 # =======================================================================
 
+Described = NRSER::RSpex::Described
+
 # @todo document DescribeMixins module.
 # 
 module DescribeMixins
   
+  # Constants
+  # ========================================================================
+  
+  # Shortcut to {NRSER::RSpex::Described}, making it less tiring to reference
+  # those classes.
+  # 
+  # @todo
+  #   This was a method but it didn't work form some reason..?
+  # 
+  # Described = NRSER::RSpex::Described
+  # def Described; NRSER::RSpex::Described; end
+  
+  
+  # Instance Methods
+  # ========================================================================
+  
+  # Shortcut to {NRSER::Meta::Names}.
+  # 
+  # @return [::Module]
+  # 
   def Names; NRSER::Meta::Names;  end
   
-  Described = NRSER::RSpex::Described
+  
+  # @!group Accessing {NRSER::RSpex::Described::Base} Instances
+  # --------------------------------------------------------------------------
+  
+  def described
+    @described
+  end
+  
+  
+  def describe described
+    @described = t.check! described, Described::Base
+  end
+  
+  # @!endgroup Accessing {NRSER::RSpex::Described::Base} Instances # *********
   
   
   def expect_it
@@ -43,16 +81,6 @@ module DescribeMixins
   
   def expect_described human_name
     expect described.find_by_human_name!( human_name ).subject
-  end
-    
-  
-  def described
-    @described
-  end
-  
-  
-  def describe described
-    @described = described
   end
   
   

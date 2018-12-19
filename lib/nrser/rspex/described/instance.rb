@@ -42,12 +42,12 @@ module  Described
 # 
 # @abstract
 # 
-class Callable < Base
+class Instance < Base
   
   # Config
   # ========================================================================
   
-  subject_type t.RespondTo( :call )
+  subject_type ::Object
   
   
   # Class Methods
