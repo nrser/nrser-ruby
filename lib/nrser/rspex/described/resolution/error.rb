@@ -7,18 +7,8 @@
 # Project / Package
 # -----------------------------------------------------------------------
 
-# Describes {Callable}
-require_relative './callable'
-
-# Describes {Params}
-require_relative './params'
-
-
-# Refinements
-# =======================================================================
-
-require 'nrser/refinements/types'
-using NRSER::Types
+# {Error} mixes in {NRSER::NicerError}
+require 'nrser/errors/nicer_error'
 
 
 # Namespace
@@ -27,28 +17,28 @@ using NRSER::Types
 module  NRSER
 module  RSpex
 module  Described
+class   Resolution
 
 
 # Definitions
 # =======================================================================
 
-class Response < Base
-
-  # Config
-  # ========================================================================
-  
-  subject_type ::Object
-  
-  from callable: Callable, params: Params do |callable:, params:|
-    params.call callable
-  end
-  
-end # class Response
+# Raised when something goes irreparably wrong with {Resolution}s.
+# 
+# You should not need to rescue {Error} instances during normal use.
+# 
+# @note
+#   Mixes in {NRSER::NicerError}.
+# 
+class Error < ::StandardError
+  include NRSER::NicerError
+end
 
 
 # /Namespace
 # =======================================================================
 
+end # class Resolution
 end # module Described
 end # module RSpex
 end # module NRSER

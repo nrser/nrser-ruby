@@ -50,7 +50,9 @@ class From < I8::Struct.new \
   
   def initialize types:, init_block:
     super(
-      types:    types.map { |k, v| [ k.to_sym, self.class.type_for( v ) ] }.to_h,
+      types:      types.
+                    map { |k, v| [ k.to_sym, self.class.type_for( v ) ] }.
+                    to_h,
       init_block: init_block,
     )
   end

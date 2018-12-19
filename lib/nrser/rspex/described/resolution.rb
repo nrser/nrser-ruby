@@ -17,10 +17,14 @@ require 'active_support/core_ext/hash/transform_values'
 # Project / Package
 # -----------------------------------------------------------------------
 
+# {Resolution::Error} mixes in {NRSER::NicerError}
+require 'nrser/errors/nicer_error'
+
 # Mixing logging in
 require 'nrser/log'
 
-require 'nrser/labs/i8/struct'
+# {Resolution}s track value candidates in {Candidate} instances
+require_relative './resolution/candidate'
 
 require_relative './from'
 
@@ -45,12 +49,6 @@ module  Described
 
 class Resolution
   
-  # Constants
-  # ==========================================================================
-  
-  Candidate = I8::Struct.new value: t.Top, source: t.NonEmptyString
-  
-  
   # Mixins
   # ========================================================================
   
@@ -60,18 +58,20 @@ class Resolution
   # Attributes
   # ========================================================================
   
-  # TODO document `from` attribute.
+  # The {From} instance entry in the {#described} instance class' {Base.from}
+  # that defines the resolution specification {From#types} and subject creation
+  # block {From#init_block}.
   # 
   # @return [From]
   #     
   attr_reader :from
   
   
-  # TODO document `from_keys` attribute.
+  # The described instance to resolve a {Base#subject} for.
   # 
-  # @return [Set<Symbol>]
+  # @return [Base]
   #     
-  attr_reader :from_keys
+  attr_reader :described
   
   
   # Some data indicating *why* resolution failed.
@@ -85,16 +85,22 @@ class Resolution
   attr_reader :failed_because
   
   
-  # TODO document `described` attribute.
+  # Construct a new {Resolution} for resolving the subject for a {Base} instance
+  # and one of the {From} instances in the {Base} class' {Base.from} array.
   # 
-  # @return [Base]
-  #     
-  attr_reader :described
-  
-
+  # @param [From] from 
+  #   The {From} instance this resolution is for (an entry from the `described:`
+  #   value's {Base.from}).
+  # 
+  # @param [Base] described
+  #   The described instance to resolve from.
+  # 
+  # @raise [NRSER::Types::CheckError]
+  #   If the parameter values don't satisfy their types.
+  #   
   def initialize from:, described:
-    @from = from
-    @described = described
+    @from = t( From ).check! from
+    @described = t( Base ).check! described
     
     # A flag we throw via a call to {#failed!} when we know we can never 
     # resolve
@@ -141,6 +147,9 @@ class Resolution
     # 
     # @private
     # 
+    # @return [nil]
+    #   Mutates the instance.
+    # 
     def init_update_from_described!
       # Assign to `@values` for each of the "instance-variable-only" types,
       # since the only place we can get them is from `described`, and we've got
@@ -184,6 +193,8 @@ class Resolution
                   type: type
           return
         end
+        
+        nil
       end # @ivar_only_types.each
       
       # Now swing through the resolvable types and see if {#described} has

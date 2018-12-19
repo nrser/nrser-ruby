@@ -7,11 +7,8 @@
 # Project / Package
 # -----------------------------------------------------------------------
 
-# Describes {Callable}
-require_relative './callable'
-
-# Describes {Params}
-require_relative './params'
+# {Candidate} is a {I8::Struct}
+require 'nrser/labs/i8/struct'
 
 
 # Refinements
@@ -27,28 +24,18 @@ using NRSER::Types
 module  NRSER
 module  RSpex
 module  Described
+class   Resolution
 
 
 # Definitions
 # =======================================================================
 
-class Response < Base
-
-  # Config
-  # ========================================================================
-  
-  subject_type ::Object
-  
-  from callable: Callable, params: Params do |callable:, params:|
-    params.call callable
-  end
-  
-end # class Response
-
+Candidate = I8::Struct.new value: t.Top, source: t.NonEmptyString
 
 # /Namespace
 # =======================================================================
 
+end # class Resolution
 end # module Described
 end # module RSpex
 end # module NRSER

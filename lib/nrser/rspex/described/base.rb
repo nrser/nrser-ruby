@@ -30,6 +30,9 @@ require_relative './from'
 # Using {Resolution} in {Base#resolve_subject!}
 require_relative './resolution'
 
+# {Resolution#resolve_subject!} raises {Resolution::AllFailedError}
+require_relative './resolution/all_failed_error'
+
 
 # Refinements
 # =======================================================================
@@ -230,6 +233,12 @@ class Base
   
   
   def subject= subject
+    if instance_variable_defined? :@subject
+      raise NRSER::ConflictError.new \
+        "Subject already set to", @subject,
+        self: self
+    end
+    
     @subject = self.class.subject_type.check! subject
   end
   
@@ -244,31 +253,76 @@ class Base
   end
   
   
-  def resolve_subject!
-    resolutions = self.class.from.
-      map { |from| Resolution.new from: from, described: self }
+  private
+  # ========================================================================
     
-    resolved = resolutions.find &:resolved?
-    
-    unless resolved.nil?
-      return resolved_from_ivars
-    end
-    
-    each_ancestor.find { |described|
-      resolutions.find { |resolution|
-        resolution.update! described
-        resolved = resolution if resolution.resolved?
+    # Set `@subject` from the first successful {Resolution}.
+    #
+    # A {Resolution} is created for each {.from} entry, all referencing this
+    # instance. 
+    #
+    # If any resolution is {Resolution#resolved?} from this instance's instance
+    # variables, the {Resolution#subject} of first one (in order returned by
+    # {.from}) is assigned to `@subject`.
+    #
+    # Otherwise, the described instances in {#each_ancestor} (if any) are
+    # walked, and the first one to successfully {Resolution#resolved?} has it's
+    # {Resolution#subject} assigned to `@subject`.
+    #
+    # If no {Resolution} resolves a {ResolutionError} is raised.
+    # 
+    # @private
+    # 
+    # @note
+    #   Called in {#subject} to define `@subject` if needed so it can be
+    #   returned.
+    #   
+    #   Either:
+    #   
+    #   1.  Sets `@subject` and `@resolution` variables **or**
+    #   2.  Raises.
+    #   
+    #   Presumably only called once. However, **does *not* check that `@subject`
+    #   and `@resolution` are 
+    #
+    #
+    # @return [nil]
+    #   When method has mutated `self` by setting `@subject` and `@resolution`.
+    # 
+    # @raise [Resolution::AllFailedError]
+    #   When subject resolution fails.
+    #   
+    # 
+    def resolve_subject!
+      resolutions = self.class.from.
+        map { |from| Resolution.new from: from, described: self }
+      
+      resolved = resolutions.find &:resolved?
+      
+      unless resolved.nil?
+        return resolved_from_ivars
+      end
+      
+      each_ancestor.find { |described|
+        resolutions.find { |resolution|
+          resolution.update! described
+          resolved = resolution if resolution.resolved?
+        }
       }
-    }
+      
+      if resolved.nil?
+        raise Resolution::AllFailedError.new "Unable to resolve", self,
+          resolutions: resolutions
+      end
+      
+      @resolution = t.IsA( Resolution ).check! resolved
+      self.subject = resolved.subject
+      
+      nil
+    end # #resolve_subject!
     
-    if resolved.nil?
-      raise NRSER::RuntimeError.new "Unable to resolve", self,
-        resolutions: resolutions
-    end
-    
-    @resolution = resolved
-    self.subject = resolved.subject
-  end
+  public # end private *****************************************************
+  
   
 end # class Base
 
