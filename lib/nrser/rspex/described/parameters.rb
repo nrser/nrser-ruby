@@ -39,7 +39,7 @@ module  Described
 # 
 # @abstract
 # 
-class Params < Base
+class Parameters < Base
   
   # Config
   # ========================================================================
@@ -50,9 +50,9 @@ class Params < Base
   # Construction
   # ========================================================================
   
-  def initialize parent: nil, values: {}
-    super( parent: parent, subject: NRSER::Meta::Params.new( values ) )
-  end
+  # def initialize parent: nil, values: {}
+  #   super( parent: parent, subject: NRSER::Meta::Params.new( values ) )
+  # end
   
   
   # Instance Methods

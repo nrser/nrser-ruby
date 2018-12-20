@@ -45,15 +45,13 @@ module Names
       value,
       *clauses.
         each_slice( 2 ).
-        map { |(cls, proc)|
-          unless Name.name_subclass? cls
-            raise NRSER::TypeError.new \
-              "Each clause must start with a", Name, "subclass, found", cls
+        flat_map { |(type, proc)|
+          if Name.name_subclass? type
+            [ type, ->( object ) { proc.call type.new( object ) } ]
+          else
+            [ type, proc ]
           end
-          
-          [ cls, ->( object ) { proc.call cls.new( object ) } ]
-        }.
-        flatten
+        }
   end
   
   
@@ -153,11 +151,20 @@ module Names
             "`#{ name }.pattern` is already set to", @pattern
         end
         
-        @pattern = re.join \
-          *objects.map { |object|
-            if name_subclass?( object ) then object.pattern else object end
-          },
-          full: true
+        @pattern = if objects.length == 1 &&
+                      objects[0].is_a?( NRSER::Regexp::Composed )
+          if objects[0].full?
+            objects[0]
+          else
+            objects[0].to_full
+          end
+        else
+          re.join \
+            *objects.map { |object|
+              if name_subclass?( object ) then object.pattern else object end
+            },
+            full: true
+        end
       end
       
       unless @pattern.is_a? ::Regexp
@@ -201,6 +208,7 @@ module Names
       unless pattern =~ string
         raise NRSER::ArgumentError.new \
           self, "can only be constructed of strings that match", pattern,
+          string: string,
           pattern: pattern
       end
       
@@ -384,15 +392,26 @@ module Names
   
   class Param < Name
     # pattern PositionalParam | KeywordParam | BlockParam
-    pattern re.or( PositionalParam, KeywordParam, BlockParam )
+    pattern re.or( PositionalParam, KeywordParam, BlockParam, full: true )
   end
   
   
   # Method Names
   # ==========================================================================
   
+  class OperatorMethod < Name
+    pattern \
+      re.or(
+        *%w([] []= ** ~ ~ @+ @- * / % + - >> << & ^ | <= < > >= <=> == === != =~ !~).
+          map { |s| re.esc s },
+        full: true
+      )
+  end
+  
+  
   class Method < Name
-    pattern /\A[A-Za-z_][a-zA-Z0-9_]*[\?\!]?\z/
+    pattern \
+      re.or( OperatorMethod, /\A[A-Za-z_][a-zA-Z0-9_]*[\?\!]?\z/, full: true )
     
     def method_name
       self

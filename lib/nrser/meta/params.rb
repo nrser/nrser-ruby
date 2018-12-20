@@ -13,11 +13,18 @@
 # Project / Package
 # -----------------------------------------------------------------------
 
+# Uses logging
+require 'nrser/log'
+
+# Matches named parameters using {Names}
 require_relative './names'
 
 
 # Refinements
 # =======================================================================
+
+require 'nrser/refinements/types'
+using NRSER::Types
 
 
 # Namespace
@@ -33,28 +40,29 @@ module  Meta
 # @todo document Params class.
 class Params
   
-  # Constants
+  # Mixins
   # ========================================================================
   
-  
-  # Singleton Methods
-  # ========================================================================
-  
-  
-  # Attributes
-  # ========================================================================
+  include NRSER::Log::Mixin #; logger.level = :trace
   
   
   # Construction
   # ========================================================================
   
   # Instantiate a new `Params`.
-  def initialize values = {}
-    @named_positional = {}
+  def initialize  named: {},
+                  args: [],
+                  kwds: {},
+                  block: nil,
+                  block_name: nil
+    @positional = {}
     @keyword = {}
-    @block_name = nil
-    @block = nil
-    values.each { |name, value| self[ name ] = value }
+    @block = block
+    @block_name = block_name
+    
+    named.each { |name, value| set name, value }
+    args.each_with_index { |value, index| set index, value }
+    kwds.each { |name, value| set "#{ name }:", value }
   end # #initialize
   
   
@@ -65,23 +73,59 @@ class Params
     args = []
     kwds = {}
     
+    positional = @positional.dup
+    keyword = @keyword.dup
+    
     # NOTE  `@block` is *always* passed, since it may not be explicitly declared
     #       in the `callable.parameters`
     
-    callable.parameters.each do |(type, name)|
+    callable.parameters.each_with_index do |(type, name), index|
       case type
-      when :req
-        args << @named_positional.fetch( name )
-      when :opt
-        if @named_positional.key?( name )
-          args << @named_positional[ name ]
+      when :req, :opt
+        if positional.key?( index ) && positional.key?( name )
+          raise NRSER::ConflictError.new \
+            "Value set for positional parameter by both name and index",
+            name: name,
+            name_value: positional[ name ],
+            index: index,
+            index_value: positional[ index ]
         end
-      when :keyreq
-        kwds[ name ] = @keyword.fetch( name )
-      when :key
-        kwds[ name ] = @keyword[ name ] if @keyword.key?( name )
+        
+        if positional.key?( index )
+          args << positional.delete( index )
+        elsif positional.key?( name )
+          args << positional.delete( name )
+        elsif type == :req
+          raise NRSER::ArgumentError.new \
+            "Argument", name, "at index", index, "is required, but no value",
+            "is available",
+            callable: callable,
+            callable_parameters: callable.parameters,
+            params: self
+        end
+      when :keyreq, :key
+        if keywords.key? name
+          kwds[ name ] = keywords.delete( name )
+        elsif type == :keyreq
+          raise NRSER::ArgumentError.new \
+            "Keyword argument", name, "is required, but no value is available",
+            callable: callable,
+            callable_parameters: callable.parameters,
+            params: self
+        end
       when :rest
-        raise "Can't deal with :rest param yet :/"
+        # raise "Can't deal with :rest param yet :/"
+        
+        logger.trace "Found :rest parameter, pushing rest of positional" do {
+          parameters: callable.parameters,
+          positional: positional,
+          self: self
+        } end
+          
+        positional.keys.select { |i| i >= index }.sort.each { |i|
+          args << positional.delete( i )
+        }
+        
       when :block
         # pass
       else
@@ -89,16 +133,26 @@ class Params
       end
     end
     
+        
+    logger.trace "Calling",
+      args: args,
+      kwds: kwds,
+      block: @block
+    
     args << kwds unless kwds.empty?
     
     callable.call *args, &@block
   end
   
   
-  def []= name, value
+  def set name, value
     Names.match name,
+      t.Index, ->( index ) {
+        @positional[ index ] = value  
+      },
+      
       Names::PositionalParam, ->( param_name ) {
-        @named_positional[ param_name.var_sym ] = value
+        @positional[ param_name.var_sym ] = value
       },
       
       Names::KeywordParam, ->( param_name ) {
@@ -110,6 +164,8 @@ class Params
         @block = value
       }
   end
+  
+  alias_method :[]=, :set
   
   
 end # class Params

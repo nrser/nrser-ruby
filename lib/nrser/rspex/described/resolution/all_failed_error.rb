@@ -11,6 +11,13 @@
 require_relative './error'
 
 
+# Refinements
+# ========================================================================
+
+require 'nrser/refinements/types'
+using NRSER::Types
+
+
 # Namespace
 # =======================================================================
 
@@ -55,7 +62,7 @@ class AllFailedError < Error
   #   If `resolutions:` is not the correct type.
   # 
   def initialize *message, resolutions:, **kwds
-    t.Array( Resolution ).check! resolution
+    t.Array( Resolution ).check! resolutions
     
     super( *message, resolutions: resolutions, **kwds )
   end

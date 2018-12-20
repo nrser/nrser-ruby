@@ -138,14 +138,20 @@ module DescribeMixins
   end
   
   
-  def describe_param param_name, value
-    if described.is_a? Described::Params
+  def describe_param name, value
+    if described.is_a? Described::Parameters
       described[ name ] = value
     else
-      describe Described::Params.new \
+      describe Described::Parameters.new \
         parent: described,
-        values: { name => value }
+        subject: NRSER::Meta::Params.new( named: { name => value } )
     end
+  end
+  
+  def describe_params *args, **kwds, &block
+    describe Described::Parameters.new \
+      parent: described,
+      subject: NRSER::Meta::Params.new( args: args, kwds: kwds, block: block )
   end
   
 end # module DescribeMixins

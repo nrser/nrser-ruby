@@ -11,7 +11,7 @@
 require_relative './callable'
 
 # Describes {Params}
-require_relative './params'
+require_relative './parameters'
 
 
 # Refinements
@@ -39,7 +39,7 @@ class Response < Base
   
   subject_type ::Object
   
-  from callable: Callable, params: Params do |callable:, params:|
+  from callable: Callable, params: Parameters do |callable:, params:|
     params.call callable
   end
   

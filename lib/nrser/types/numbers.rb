@@ -146,9 +146,8 @@ end
 def_type      :NonNegativeInteger,
   symbolic:   'ℕ⁰',
   aliases:  [ :non_neg_int,
-              :Unsigned,
-              :unsigned,
-              :index,
+              :Unsigned, :unsigned,
+              :Index, :index,
               :non_negative_int, ],
 &->( **options ) do
   intersection \

@@ -1,13 +1,39 @@
+# encoding: UTF-8
+# frozen_string_literal: true
+
 require 'nrser/meta/names'
 require 'nrser/rspex/described'
+
 
 Names = NRSER::Meta::Names
 
 def re; NRSER::Regexp::Composed; end
 
 
+DOUBLE_QUOTED_STRING_RE = /"(?:[^"\\]|\\.)*"/
+SINGLE_QUOTED_STRING_RE = /'(?:[^'\\]|\\.)*'/
+
+QUOTED_STRING_RE = re.or \
+  DOUBLE_QUOTED_STRING_RE,
+  SINGLE_QUOTED_STRING_RE
+
+
 def curly_quote *patterns
   re.join re.esc( '{' ), *patterns, re.esc( '}' )
+end
+
+
+def curly_quoted? string
+  string[ 0 ] == '{' && string[ -1 ] == '}'
+end
+
+
+def curly_unquote string
+  if curly_quoted? string
+    string[ 1..-2 ]
+  else
+    string
+  end
 end
 
 
@@ -16,18 +42,56 @@ def backtick_quote *patterns
 end
 
 
+def backtick_quoted? string
+  string[ 0 ] == '`' && string[ -1 ] == '`'
+end
+
+
+def backtick_unquote string
+  if backtick_quoted? string
+    string[ 1..-2 ]
+  else
+    string
+  end
+end
+
+
+def unquote string
+  if backtick_quoted? string
+    backtick_unquote string
+  elsif curly_quoted? string
+    curly_unquote string
+  else
+    string
+  end
+end
+
+
+BACKTICK_QUOTED_EXPR_RE = backtick_quote '[^\`]*'
+
+EXPR_RE = re.or \
+  QUOTED_STRING_RE,
+  BACKTICK_QUOTED_EXPR_RE
+
+EXPR_LIST_RE = re.join EXPR_RE, '(?:,\s*', EXPR_RE, ')*'
+
+
+def expr? string
+  EXPR_RE =~ string
+end
+
 ParameterType \
   name: 'class',
   regexp: curly_quote( Names::Module ),
   type: Names::Module,
-  transformer: ->( string ) { Names::Module.new string[ 1..-2 ] }
+  transformer: ->( string ) { Names::Module.new curly_unquote( string ) }
 
 
 ParameterType \
   name: 'attr',
   regexp: backtick_quote( Names::Attribute ),
   type: Names::Attribute,
-  transformer: ->( string ){ Names::Attribute.new string[ 1..-2 ] }
+  transformer: ->( string ){ Names::Attribute.new curly_unquote( string ) }
 
 
 ParameterType \
@@ -67,73 +131,22 @@ ParameterType \
 
 ParameterType \
   name: 'expr',
-  regexp: re.join( re.esc( '`' ), '.*', re.esc( '`' ) ),
+  regexp: EXPR_RE,
   type: ::String,
-  transformer: ->( string ){ string[ 1..-2 ] }
-
-  
-# class ParamName
-  
-#   def self.from_s string
-#     if string.start_with?( '&' ) && string.end_with?( ':' )
-#       raise NRSER::ArgumentError.new \
-#         "`string` can not start with '&' and end with ':', found",
-#         string.inspect
-#     end
-    
-#     name, type = if string.start_with? '&'
-#       [ string[ 1..-1 ], :block ]
-#     elsif string.end_with? ':'
-#       [ string[ 0..-2 ], :keyword ]
-#     else
-#       [ string, :positional ]
-#     end
-    
-#     new name: name, type: type
-#   end
-  
-  
-#   # The parameter name (without `&` prefix or `:` suffix).
-#   # 
-#   # @return [String]
-#   #     
-#   attr_reader :name
-  
-  
-#   # The parameter type.
-#   # 
-#   # @return [:positional | :keyword | :block]
-#   #     
-#   attr_reader :type
-  
-  
-#   def initialize name:, type:
-#     @name = name
-#     @type = type
-#   end
-  
-# end
-  
-
-# ParameterType \
-#   name: 'param',
-#   regexp: /\&?[a-zA-Z0-9_]+\:?/,
-#   type: ParamName,
-#   transformer: ParamName.method( :from_s ),
-#   use_for_snippets: false
+  transformer: ->( string ){ backtick_unquote string }
 
 
-# ParameterType \
-#   name: 'const',
-#   regexp: /(?:\:\:)?[A-Z_][a-zA-Z0-9_]*(?:\:\:[A-Z_][A-Za-z0-9_]*)*/,
-#   type: ::String,
-#   transformer: ->( string ) { string }
+ParameterType \
+  name: 'exprs',
+  regexp: EXPR_LIST_RE,
+  type: ::String,
+  transformer: ->( string ) {
+    string.scan( EXPR_RE ).map &method( :backtick_unquote )
+  }
 
 
-# ParameterType \
-#   name: 'any',
-#   regexp: /.*/,
-#   type: ::String,
-#   transformer: ->( string ) { string },
-#   use_for_snippets: false
-  
+ParameterType \
+  name: 'param',
+  regexp: backtick_quote( Names::Param ),
+  type: Names::Param,
+  transformer: ->( string ) { Names::Param.new backtick_unquote( string ) }
