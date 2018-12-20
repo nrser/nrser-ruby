@@ -390,9 +390,37 @@ module Names
   end
   
   
+  class RestParam < BaseParam
+    pattern re.esc( '*' ), Variable
+    
+    def initialize string
+      @var_name = Variable.new string[ 2..-1 ]
+      super( string )
+    end
+  end
+  
+  
+  class KeyRestParam < BaseParam
+    pattern re.esc( '**' ), Variable
+    
+    def initialize string
+      @var_name = Variable.new string[ 3..-1 ]
+      super( string )
+    end
+  end
+  
+  
   class Param < Name
     # pattern PositionalParam | KeywordParam | BlockParam
-    pattern re.or( PositionalParam, KeywordParam, BlockParam, full: true )
+    pattern \
+      re.or(
+        PositionalParam,
+        KeywordParam,
+        BlockParam,
+        RestParam,
+        KeyRestParam,
+        full: true
+      )
   end
   
   

@@ -46,6 +46,9 @@ Feature: Describe positional parameters
     
     # These should make sense. You can of course put quoted strings *inside* 
     # backtick expressions if you want to for some reason.
+    # 
+    # NOTE  The column heading must be present, but may be anything.
+    # 
     And the parameters:
       | VALUE                 |
       | `:a`                  |

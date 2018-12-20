@@ -171,6 +171,12 @@ do |described_human_name, source|
 end
 
 
+Then "the {described} is equal to:" \
+do |described_human_name, source|
+  expect_described( described_human_name ).to eq eval( source )
+end
+
+
 Then "the {described} is {expr}" \
 do |described_human_name, source|
   expect_described( described_human_name ).to be eval( source )

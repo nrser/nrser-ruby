@@ -59,6 +59,7 @@ class Params
     @keyword = {}
     @block = block
     @block_name = block_name
+    @rest = nil
     
     named.each { |name, value| set name, value }
     args.each_with_index { |value, index| set index, value }
@@ -104,8 +105,8 @@ class Params
             params: self
         end
       when :keyreq, :key
-        if keywords.key? name
-          kwds[ name ] = keywords.delete( name )
+        if keyword.key? name
+          kwds[ name ] = keyword.delete( name )
         elsif type == :keyreq
           raise NRSER::ArgumentError.new \
             "Keyword argument", name, "is required, but no value is available",
@@ -114,20 +115,28 @@ class Params
             params: self
         end
       when :rest
-        # raise "Can't deal with :rest param yet :/"
         
-        logger.trace "Found :rest parameter, pushing rest of positional" do {
-          parameters: callable.parameters,
-          positional: positional,
-          self: self
-        } end
+        if @rest.nil?
+        
+          logger.trace "Pushing rest of positional" do {
+            parameters: callable.parameters,
+            positional: positional,
+            self: self
+          } end
           
-        positional.keys.select { |i| i >= index }.sort.each { |i|
-          args << positional.delete( i )
-        }
-        
+          positional.keys.select { |i| i >= index }.sort.each { |i|
+            args << positional.delete( i )
+          }
+          
+        else
+          args.push *@rest
+        end
+      
+      when :keyrest
+        # Going to send all the keywords
+        kwds = @keyword.dup
       when :block
-        # pass
+        # pass, dealt with below
       else
         raise "Unknown param type: #{ type.inspect }"
       end
@@ -162,6 +171,14 @@ class Params
       Names::BlockParam, ->( param_name ) {
         @block_name = param_name.var_sym
         @block = value
+      },
+      
+      Names::RestParam, ->( param_name ) {
+        @rest = value
+      },
+      
+      Names::KeyRestParam, ->( param_name ) {
+        @keyword.merge! **value
       }
   end
   
