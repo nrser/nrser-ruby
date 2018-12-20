@@ -92,7 +92,7 @@ ParameterType \
   name: 'attr',
   regexp: backtick_quote( Names::Attribute ),
   type: Names::Attribute,
-  transformer: ->( string ){ Names::Attribute.new curly_unquote( string ) }
+  transformer: ->( string ){ Names::Attribute.new backtick_unquote( string ) }
 
 
 ParameterType \

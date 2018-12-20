@@ -179,13 +179,8 @@ end
 
 Then "the {described} is {expr}" \
 do |described_human_name, source|
-  expect_described( described_human_name ).to be eval( source )
-end
-
-
-Then "it has a(n) {attr} attribute equal to {string}" \
-do |attribute_name, string|
-  expect_it.to have_attributes attribute_name => string
+  expect_described( described_human_name ).
+    to be eval( backtick_unquote source  )
 end
 
 
