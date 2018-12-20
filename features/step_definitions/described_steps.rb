@@ -30,6 +30,17 @@ World DescribeMixins
 # Given Steps
 # ----------------------------------------------------------------------------
 
+### Modules
+
+Given "a module:" do |source|
+  scope.class_eval source
+  module_name = NRSER::Regexp::Composed.
+    join( 'module (', NRSER::Meta::Names::Module.pattern, ')' ).
+    match( source )[ 1 ]
+  describe_module module_name
+end
+
+
 ### Classes
 
 Given "a class:" \
@@ -83,17 +94,18 @@ end
 
 
 Given "the parameters:" do |table|
-  describe_params \
-    *table.rows.map { |row|
-      string = row.first
-      
-      if expr? string
-        eval backtick_unquote( string )
-      else
-        raise NotImplementedError,
-              "TODO can only handle expr strings so far"
-      end
-    }
+  
+  case table.column_names.count
+  when 1
+    describe_params *table.rows.map { |row| value_for row.first }
+  when 2
+    table.rows.each do |(name, string)|
+      describe_param name, value_for( string )
+    end
+  else
+    raise "Parameter table must be 1 or 2 columns, found #{ table.column_names.count }"
+  end
+
 end
 
 
@@ -147,15 +159,21 @@ Then "it is equal to {string}" do |string|
 end
 
 
-Then "the {described} is equal to {string}" \
-do |described_human_name, string|
-  expect_described( described_human_name ).to eq string
-end
+# Then "the {described} is equal to {string}" \
+# do |described_human_name, string|
+#   expect_described( described_human_name ).to eq string
+# end
 
 
 Then "the {described} is equal to {expr}" \
 do |described_human_name, source|
   expect_described( described_human_name ).to eq eval( source )
+end
+
+
+Then "the {described} is {expr}" \
+do |described_human_name, source|
+  expect_described( described_human_name ).to be eval( source )
 end
 
 

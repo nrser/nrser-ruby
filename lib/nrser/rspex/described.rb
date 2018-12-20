@@ -21,6 +21,7 @@ require 'nrser/regexp/composed'
 require_relative './described/base'
 require_relative './described/class'
 require_relative './described/method'
+require_relative './described/module'
 require_relative './described/response'
 
 

@@ -84,10 +84,27 @@ module DescribeMixins
   end
   
   
+  def value_for raw_string
+    if expr? raw_string
+      eval backtick_unquote( raw_string )
+    else
+      raise NotImplementedError,
+            "TODO can only handle expr strings so far, found #{ raw_string.inspect }"
+    end
+  end
+  
+  
   def describe_class class_name
     describe Described::Class.new \
       parent: described,
       subject: resolve_class( class_name )
+  end
+  
+  
+  def describe_module module_name
+    describe Described::Module.new \
+      parent: described,
+      subject: resolve_module( module_name )
   end
   
   
@@ -147,6 +164,7 @@ module DescribeMixins
         subject: NRSER::Meta::Params.new( named: { name => value } )
     end
   end
+  
   
   def describe_params *args, **kwds, &block
     describe Described::Parameters.new \

@@ -80,6 +80,7 @@ def expr? string
   EXPR_RE =~ string
 end
 
+
 ParameterType \
   name: 'class',
   regexp: curly_quote( Names::Module ),
