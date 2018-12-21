@@ -49,9 +49,9 @@ module Decorate
     end
   
     if string_name.start_with? '#'
-      instance_method string[ 1..-1 ]
+      instance_method string_name[ 1..-1 ]
     elsif string_name.start_with? '.'
-      method string[ 1..-1 ]
+      method string_name[ 1..-1 ]
     else
       case default_type
       when nil

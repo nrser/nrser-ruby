@@ -162,6 +162,12 @@ end
 end
 
 
+When "I call {qualified_method}( with the parameters)" do |method_name|
+  describe_method method_name
+  describe_response
+end
+
+
 # Then Steps
 # ----------------------------------------------------------------------------
 
@@ -214,6 +220,13 @@ end
 Then "it has a(n) {attr} attribute that is {expr}" \
 do |attribute_name, source|
   expect_it.to have_attributes attribute_name => be( eval( source ) )
+end
+
+
+Then "it has a(n) {attr} attribute that is {class}" \
+do |attribute_name, class_name|
+  expect_it.to have_attributes \
+    attribute_name => be( resolve_class( class_name ) )
 end
 
 

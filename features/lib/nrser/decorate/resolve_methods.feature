@@ -6,6 +6,8 @@ Feature: Resolve methods by *bare* or *qualified* name
   Background:
     Given a class:
       """ruby
+      require 'nrser/decorate'
+      
       class A
         extend NRSER::Decorate
         
@@ -16,8 +18,9 @@ Feature: Resolve methods by *bare* or *qualified* name
       """
   
   Scenario: Name is a *qualified* singleton method
+    Given the `name:` parameter is ".my_singleton_method"
+    
     When I call {A.resolve_method}
-    And the `name:` parameter is ".my_singleton_method"
     
     Then the response is a {::Method}
     
