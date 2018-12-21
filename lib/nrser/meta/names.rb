@@ -357,6 +357,11 @@ module Names
       var_name.to_sym
     end
     
+    
+    def block?
+      is_a? BlockParam
+    end
+    
   end
   
   
@@ -411,7 +416,7 @@ module Names
   
   
   class Param < Name
-    # pattern PositionalParam | KeywordParam | BlockParam
+    
     pattern \
       re.or(
         PositionalParam,
@@ -421,6 +426,10 @@ module Names
         KeyRestParam,
         full: true
       )
+    
+    def block?
+      BlockParam.pattern =~ self
+    end
   end
   
   

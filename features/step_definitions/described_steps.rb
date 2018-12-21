@@ -94,40 +94,49 @@ end
 ### Parameters
 
 Given "the parameters {exprs}" \
-do |sources|
-  describe_params \
-    *sources.map { |source| eval source }
+do |source_strings|
+  describe_positional_params source_strings
 end
 
 
 Given "the parameters:" do |table|
-  
   case table.column_names.count
   when 1
-    describe_params *table.rows.map { |row| value_for row.first }
+    # The table is interpreted as a list of positional values, the last of 
+    # which *may* be a block.
+    describe_positional_params table.rows.map( &:first )
   when 2
+    # The table is interpreted as parameter name/value pairs, with the names
+    # in {NRSER::Meta::Names} format (`arg`, `kwd:`, `&block`)
     table.rows.each do |(name, string)|
-      describe_param name, value_for( string )
+      name = Names::Param.new name
+      describe_param name, value_for( string, accept_unary_ampersand: name.block? )
     end
   else
-    raise "Parameter table must be 1 or 2 columns, found #{ table.column_names.count }"
+    # We don't handle any other dimensions
+    raise NRSER::RuntimeError.new \
+      "Parameter table must be 1 or 2 columns, found ",
+      table.column_names.count,
+      table: table
   end
-
 end
 
 
 Given "the {param} parameter is {expr}" do |param_name, source|
-  describe_param param_name, eval( source )
+  describe_param \
+    param_name,
+    value_for( source, accept_unary_ampersand: param_name.block? )
 end
 
 
-Given "the block parameter is {expr}" do |source|
+Given "the block parameter is {expr}" do |source_string|
   if described.is_a? Described::Parameters
-    described.block = eval source
+    described.block = value_for source_string
   else
-    describe Described::Parameters.new \
-      parent: described,
-      subject: NRSER::Meta::Params.new( block: eval( source ) )
+    describe :parameters,
+      subject: NRSER::Meta::Params.new(
+        block: value_for( source_string, accept_unary_ampersand: true )
+      )
   end
 end
 

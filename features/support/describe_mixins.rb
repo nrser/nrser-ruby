@@ -151,12 +151,19 @@ module DescribeMixins
   end
   
   
-  def value_for raw_string
-    if expr? raw_string
-      eval backtick_unquote( raw_string )
+  def value_for string, accept_unary_ampersand: false
+    if expr? string
+      source_string = backtick_unquote string
+      
+      if accept_unary_ampersand && unary_ampersand_expr?( source_string )
+        eval "->( &block ) { block }.call( #{ source_string } )"
+      else
+        eval source_string
+      end
     else
       raise NotImplementedError,
-            "TODO can only handle expr strings so far, found #{ raw_string.inspect }"
+            ( "TODO can only handle expr strings so far," +
+              "found #{ string.inspect }:#{ string.class }" )
     end
   end
   
@@ -236,10 +243,22 @@ module DescribeMixins
   end
   
   
-  def describe_params *args, **kwds, &block
-    describe Described::Parameters.new \
-      parent: described,
-      subject: NRSER::Meta::Params.new( args: args, kwds: kwds, block: block )
+  def describe_positional_params strings
+    # Unquote to {SourceString} instances, if not already
+    source_strings = strings.map { |s| backtick_unquote s }
+    
+    # Handle the last entry being a `&...` expression, which is interpreted as 
+    # the block parameter
+    if unary_ampersand_expr? source_strings[ -1 ]
+      args = source_strings[ 0..-2 ].map { |s| value_for s }
+      block = value_for source_strings[ -1 ], accept_unary_ampersand: true
+    else
+      args = source_strings.map { |s| value_for s }
+      block = nil
+    end
+    
+    describe :parameters,
+      subject: NRSER::Meta::Params.new( args: args, block: block )
   end
   
   # @!endgroup Describe Helper Instance Methods # ****************************

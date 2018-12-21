@@ -26,4 +26,37 @@ end
 require "rubygems"
 require "bundler/setup"
 
+# Edits
+# ============================================================================
+
+require 'pathname'
+
+gemroot = Pathname.new( __dir__ ).join( '../..' ).expand_path
+
+relative_path_for = ->( gemroot_relative_path ) {
+  gemroot.
+    join( gemroot_relative_path ).
+    relative_path_from( Pathname.getwd ).to_s
+}
+
+arg_aliases = {
+  '--desc' => 'features/lib/nrser/rspex/described',
+}
+
+if ARGV.length == 0
+  # Run everything when ARGV is empty
+  ARGV[0] = relative_path_for.call 'features'
+  
+else
+  ARGV.each_with_index { |arg, index|
+    if ( gemroot_relative_path = arg_aliases[ arg ] )
+      ARGV[ index ] = relative_path_for.call gemroot_relative_path
+      puts "EXPANDED arg alias: #{ arg } => #{ ARGV[ index ] }\n\n"
+    end
+  }
+  
+end
+
+# END Edits ******************************************************************
+
 load Gem.bin_path("cucumber", "cucumber")

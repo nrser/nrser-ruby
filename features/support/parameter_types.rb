@@ -43,13 +43,16 @@ end
 
 
 def backtick_quoted? string
-  string[ 0 ] == '`' && string[ -1 ] == '`'
+  !string.is_a?( SourceString ) &&
+  ( string[ 0 ] == '`' && string[ -1 ] == '`' )
 end
 
 
 def backtick_unquote string
+  return string if string.is_a?( SourceString )
+  
   if backtick_quoted? string
-    string[ 1..-2 ]
+    SourceString.new string[ 1..-2 ]
   else
     string
   end
@@ -76,8 +79,21 @@ EXPR_RE = re.or \
 EXPR_LIST_RE = re.join EXPR_RE, '(?:,\s*', EXPR_RE, ')*'
 
 
+class SourceString < ::String; end
+
+
 def expr? string
-  EXPR_RE =~ string
+  case string
+  when SourceString
+    true
+  else
+    EXPR_RE =~ string
+  end
+end
+
+
+def unary_ampersand_expr? source_string
+  source_string.start_with? '&'
 end
 
 
@@ -133,16 +149,16 @@ ParameterType \
 ParameterType \
   name: 'expr',
   regexp: EXPR_RE,
-  type: ::String,
-  transformer: ->( string ){ backtick_unquote string }
+  type: SourceString,
+  transformer: ->( raw_string ){ backtick_unquote raw_string }
 
 
 ParameterType \
   name: 'exprs',
   regexp: EXPR_LIST_RE,
-  type: ::String,
-  transformer: ->( string ) {
-    string.scan( EXPR_RE ).map &method( :backtick_unquote )
+  type: Array,
+  transformer: ->( raw_string ) {
+    raw_string.scan( EXPR_RE ).map &method( :backtick_unquote )
   }
 
 
