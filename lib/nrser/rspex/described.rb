@@ -37,8 +37,7 @@ module  RSpex
 # Definitions
 # =======================================================================
 
-# 
-module NRSER::RSpex::Described
+module Described
   def self.human_name_pattern full: false, options: nil
     NRSER::Regexp::Composed.or \
       *Base.descendants.flat_map { |cls|

@@ -93,8 +93,8 @@ Feature: Describe parameters by name
   
   Scenario: Using unary `&` format in in-line parameter lists
     
-    Unary `&` format can be used in the **last** value row in single-column
-    positional value tables to denote that the value is the block parameter.
+    Unary `&` format can be used in the **last** value in in-line positional
+    parameter lists.
     
     NOTE  This is (at this time) the **ONLY** way to describe a block parameter
           in in-line positional value lists. Otherwise we have no way of knowing
