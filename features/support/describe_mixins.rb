@@ -10,6 +10,9 @@
 # Deps
 # -----------------------------------------------------------------------
 
+# Using {::String#camelize}
+require 'active_support/core_ext/string/inflections'
+
 # Project / Package
 # -----------------------------------------------------------------------
 
@@ -67,9 +70,73 @@ module DescribeMixins
   end
   
   
-  def describe described
-    @described = t.check! described, Described::Base
-  end
+  # Set {#described} to a new {NRSER::RSpex::Described::Base} instance whose
+  # parent is the current {#described}.
+  # 
+  # @overload describe described
+  #   Describe an already constructed {NRSER::RSpex::Described::Base}.
+  #   
+  #   @note
+  #     I think this is kind-of legacy at this point, preferring the second
+  #     form that avoids having to properly provide the `parent` at every
+  #     construction site.
+  #   
+  #   @param [NRSER::RSpex::Described::Base] described
+  #     The new description.
+  #     
+  #     Check that the {NRSER::RSpex::Described::Base#parent} is the current
+  #     {#described}.
+  #   
+  #   @return [NRSER::RSpex::Described::Base]
+  #     Newly set {#described}.
+  # 
+  # @overload describe described_name, **kwds
+  #   Construct a new described using the name of the class and keyword 
+  #   parameters.
+  #   
+  #   @note
+  #     I think this is the preferred form of the method, as it will let me 
+  #     thin out some of the `#describe_...` methods that don't do anything
+  #     more than this.
+  #     
+  #   @example
+  #     describe :object, subject: "whatever"
+  #   
+  #   @param [::String | ::Symbol] described_name
+  #     Which class to construct.
+  #   
+  #   @param [Hash<Symbol, Object>] kwds
+  #     Keyword parameters to pass to the described class' constructor.
+  #     
+  #     Don't put `parent:` in here; it's added automatically.
+  #     
+  #   @return [NRSER::RSpex::Described::Base]
+  #     Newly set {#described}.
+  #     
+  def describe *args
+    @described = t.match args,
+      t.tuple( Described::Base ),
+        ->( (described) ) {
+          unless described.parent.equal? @described
+            raise NRSER::ArgumentError.new \
+              "A constructed", Described::Base, "was passed as the sole",
+              "argument, but it's parent is not the current {#described}",
+              new_described: described,
+              current_described: @described
+          end
+          
+          described
+        },
+      
+      t.tuple( t.Label, t.Kwds ),
+        ->( (described_name, kwds) ) {
+          Described.
+            const_get( described_name.to_s.camelize ).
+            new \
+              **kwds,
+              parent: @described
+        }
+  end # #describe
   
   # @!endgroup Accessing {NRSER::RSpex::Described::Base} Instances # *********
   
@@ -93,6 +160,9 @@ module DescribeMixins
     end
   end
   
+  
+  # @!group Describe Helper Instance Methods
+  # --------------------------------------------------------------------------
   
   def describe_class class_name
     describe Described::Class.new \
@@ -171,6 +241,8 @@ module DescribeMixins
       parent: described,
       subject: NRSER::Meta::Params.new( args: args, kwds: kwds, block: block )
   end
+  
+  # @!endgroup Describe Helper Instance Methods # ****************************
   
 end # module DescribeMixins
 

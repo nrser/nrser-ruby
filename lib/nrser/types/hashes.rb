@@ -246,6 +246,31 @@ def_type        :Hash,
   end
 end # .Hash
 
+
+# @!method self.Kwds **options
+#   Keyword arguments (or options) {.Hash}, which is just a {.Hash} where the
+#   key type is {.Symbol}.
+#   
+#   @param [TYPE] values
+#     Type for the hash values. Will be made into a type by {.make} if it's not 
+#     one already.
+#     
+#     **WARNING**   Don't pass `nil` unless you mean that all the values must be
+#                   `nil`! Omit the keyword or pass {.Top}.
+# 
+#   @param [Hash] options
+#     Passed to {Type#initialize}.
+#   
+#   @return [HashOfType]
+#   
+def_type        :Kwds,
+  aliases:      [ :Options, :Keywords ],
+  parameterize: [ :keys, :values ],
+&->( values: self.Top, **options ) do
+  HashOfType.new keys: self.Symbol, values: values, **options
+end # .Kwds
+
+
 # @!endgroup Hash Type Factories # *******************************************
 
 

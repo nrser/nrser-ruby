@@ -30,6 +30,13 @@ World DescribeMixins
 # Given Steps
 # ----------------------------------------------------------------------------
 
+### Objects
+
+Given "the object {expr}" do |source|
+  describe :object, subject: eval( source )
+end
+
+
 ### Modules
 
 Given "a module:" do |source|
@@ -109,6 +116,22 @@ Given "the parameters:" do |table|
 end
 
 
+Given "the {param} parameter is {expr}" do |param_name, source|
+  describe_param param_name, eval( source )
+end
+
+
+Given "the block parameter is {expr}" do |source|
+  if described.is_a? Described::Parameters
+    described.block = eval source
+  else
+    describe Described::Parameters.new \
+      parent: described,
+      subject: NRSER::Meta::Params.new( block: eval( source ) )
+  end
+end
+
+
 # When Steps
 # ----------------------------------------------------------------------------
 
@@ -127,11 +150,6 @@ end
   When pattern do
     describe_response
   end
-end
-
-
-When "the {param} parameter is {expr}" do |param_name, source|
-  describe_param param_name, eval( source )
 end
 
 
@@ -157,12 +175,6 @@ end
 Then "it is equal to {string}" do |string|
   expect_it.to eq string
 end
-
-
-# Then "the {described} is equal to {string}" \
-# do |described_human_name, string|
-#   expect_described( described_human_name ).to eq string
-# end
 
 
 Then "the {described} is equal to {expr}" \

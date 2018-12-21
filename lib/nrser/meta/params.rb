@@ -46,6 +46,20 @@ class Params
   include NRSER::Log::Mixin #; logger.level = :trace
   
   
+  # Attributes
+  # ========================================================================
+  
+  # The block parameter, if any.
+  # 
+  # @return [nil]
+  #   Ain't got no block.
+  # 
+  # @return [#call]
+  #   The block that will be given to {#call}s.
+  #     
+  attr_accessor :block
+  
+  
   # Construction
   # ========================================================================
   

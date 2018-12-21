@@ -4,7 +4,7 @@ Feature: Describe parameters by name
     
     Given the object `[ 1, 2, 3, 4]`
     And the object's method `map`
-    And the block parameter is `&:even?`
+    And the block parameter is `->( n ) { n.even? }`
     
     When I call the method with the parameters
     
