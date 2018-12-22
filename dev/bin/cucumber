@@ -40,7 +40,7 @@ relative_path_for = ->( gemroot_relative_path ) {
 }
 
 arg_aliases = {
-  '--desc' => 'features/lib/nrser/rspex/described',
+  '--desc' => 'features/lib/nrser/described',
 }
 
 if ARGV.length == 0

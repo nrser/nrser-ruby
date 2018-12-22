@@ -4,14 +4,17 @@
 # Requirements
 # =======================================================================
 
+# Stdlib
+# -----------------------------------------------------------------------
+
+# Deps
+# -----------------------------------------------------------------------
+
 # Project / Package
 # -----------------------------------------------------------------------
 
-# Extending {Callable}
-require_relative './callable'
-
-# Describes {Instance}
-require_relative './instance'
+# Extending {Base}
+require_relative './base'
 
 
 # Refinements
@@ -25,35 +28,37 @@ using NRSER::Types
 # =======================================================================
 
 module  NRSER
-module  RSpex
 module  Described
 
 
 # Definitions
 # =======================================================================
 
-# Abstract base class for all {NRSER::RSpex} description objects.
+# @todo doc me!
 # 
-# Description objects formalize and extend {RSpec}'s explicit subject 
-# functionality.
-# 
-# @abstract
-# 
-class Method < Callable
+class Instance < Base
   
   # Config
   # ========================================================================
   
-  subject_type ::Method
+  subject_type ::Object
   
-  from instance: Instance, unbound_method: UnboundMethod \
-  do |instance:, unbound_method:|
-    unbound_method.bind instance
-  end
   
-  from object: Object, :@name => self.Names::Method do |object:, name:|
-    object.method name
-  end
+  # Class Methods
+  # ========================================================================
+  
+  
+  # Attributes
+  # ========================================================================
+  
+  
+  # Construction
+  # ========================================================================
+  
+  
+  # Instance Methods
+  # ========================================================================
+  
   
 end # class Callable
 
@@ -62,5 +67,4 @@ end # class Callable
 # =======================================================================
 
 end # module Described
-end # module RSpex
 end # module NRSER

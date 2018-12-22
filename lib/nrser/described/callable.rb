@@ -28,26 +28,20 @@ using NRSER::Types
 # =======================================================================
 
 module  NRSER
-module  RSpex
 module  Described
 
 
 # Definitions
 # =======================================================================
 
-# Abstract base class for all {NRSER::RSpex} description objects.
+# @todo doc me
 # 
-# Description objects formalize and extend {RSpec}'s explicit subject 
-# functionality.
-# 
-# @abstract
-# 
-class Instance < Base
+class Callable < Base
   
   # Config
   # ========================================================================
   
-  subject_type ::Object
+  subject_type t.RespondTo( :call )
   
   
   # Class Methods
@@ -73,5 +67,4 @@ end # class Callable
 # =======================================================================
 
 end # module Described
-end # module RSpex
 end # module NRSER

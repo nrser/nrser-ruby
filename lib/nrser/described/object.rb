@@ -15,7 +15,6 @@ require_relative './base'
 # =======================================================================
 
 module  NRSER
-module  RSpex
 module  Described
 
 
@@ -38,5 +37,4 @@ end # class Object
 # =======================================================================
 
 end # module Described
-end # module RSpex
 end # module NRSER

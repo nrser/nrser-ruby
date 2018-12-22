@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# encoding: UTF-8
 
 # Requirements
 # =======================================================================
@@ -19,22 +20,20 @@ require_relative './base'
 # =======================================================================
 
 module  NRSER
-module  RSpex
 module  Described
 
 
 # Definitions
 # =======================================================================
 
-# @todo document NRSER::RSpex::Described::Class class.
+# @todo document {Class} class.
 class Class < Base
   subject_type ::Class
-end # class NRSER::RSpex::Described::Class
+end # class Class
 
 
 # /Namespace
 # =======================================================================
 
 end # module Described
-end # module RSpex
 end # module NRSER

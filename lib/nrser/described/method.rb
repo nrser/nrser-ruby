@@ -7,7 +7,11 @@
 # Project / Package
 # -----------------------------------------------------------------------
 
-require 'nrser/labs/i8/struct'
+# Extending {Callable}
+require_relative './callable'
+
+# Describes {Instance}
+require_relative './instance'
 
 
 # Refinements
@@ -21,46 +25,35 @@ using NRSER::Types
 # =======================================================================
 
 module  NRSER
-module  RSpex
 module  Described
 
 
 # Definitions
 # =======================================================================
 
-class From < I8::Struct.new \
-              types:    t.Hash( keys: t.Symbol, values: t.Type ),
-              init_block: t.IsA( Proc )
+# @todo doc me!
+# 
+class Method < Callable
   
-  # @todo Document type_for method.
-  # 
-  # @param [type] arg_name
-  #   @todo Add name param description.
-  # 
-  # @return [return_type]
-  #   @todo Document return value.
-  # 
-  def self.type_for value
-    if Base.subclass? value
-      t.IsA value
-    else
-      t.make value
-    end
-  end # .type_for
+  # Config
+  # ========================================================================
   
-  def initialize types:, init_block:
-    super(
-      types:      types.
-                    map { |k, v| [ k.to_sym, self.class.type_for( v ) ] }.
-                    to_h,
-      init_block: init_block,
-    )
+  subject_type ::Method
+  
+  from instance: Instance, unbound_method: UnboundMethod \
+  do |instance:, unbound_method:|
+    unbound_method.bind instance
   end
-end # class From
+  
+  from object: Object, :@name => self.Names::Method do |object:, name:|
+    object.method name
+  end
+  
+end # class Callable
+
 
 # /Namespace
 # =======================================================================
 
 end # module Described
-end # module RSpex
 end # module NRSER

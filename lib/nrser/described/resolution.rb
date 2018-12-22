@@ -40,7 +40,6 @@ using NRSER::Types
 # =======================================================================
 
 module  NRSER
-module  RSpex
 module  Described
 
 
@@ -142,7 +141,7 @@ class Resolution
   # ========================================================================
     
     # Initialization helper to set values an candidates from {#described}'s
-    # instance variables (the names and the {NRSER::RSpex::Described::Base}
+    # instance variables (the names and the {NRSER::Described::Base}
     # instance was initialized with, besides it's `@parent`).
     # 
     # @private
@@ -495,5 +494,4 @@ end # class Resolution
 # =======================================================================
 
 end # module Described
-end # module RSpex
 end # module NRSER

@@ -25,7 +25,6 @@ using NRSER::Types
 # =======================================================================
 
 module  NRSER
-module  RSpex
 module  Described
 
 
@@ -50,5 +49,4 @@ end # class Response
 # =======================================================================
 
 end # module Described
-end # module RSpex
 end # module NRSER

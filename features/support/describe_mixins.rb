@@ -16,7 +16,7 @@ require 'active_support/core_ext/string/inflections'
 # Project / Package
 # -----------------------------------------------------------------------
 
-require 'nrser/rspex/described'
+require 'nrser/described'
 
 
 # Refinements
@@ -33,8 +33,6 @@ using NRSER::Types
 # Definitions
 # =======================================================================
 
-Described = NRSER::RSpex::Described
-
 # @todo document DescribeMixins module.
 # 
 module DescribeMixins
@@ -42,14 +40,14 @@ module DescribeMixins
   # Constants
   # ========================================================================
   
-  # Shortcut to {NRSER::RSpex::Described}, making it less tiring to reference
+  # Shortcut to {NRSER::Described}, making it less tiring to reference
   # those classes.
   # 
   # @todo
   #   This was a method but it didn't work form some reason..?
   # 
-  # Described = NRSER::RSpex::Described
-  # def Described; NRSER::RSpex::Described; end
+  # Described = NRSER::Described
+  # def Described; NRSER::Described; end
   
   
   # Instance Methods
@@ -62,7 +60,7 @@ module DescribeMixins
   def Names; NRSER::Meta::Names;  end
   
   
-  # @!group Accessing {NRSER::RSpex::Described::Base} Instances
+  # @!group Accessing {NRSER::Described::Base} Instances
   # --------------------------------------------------------------------------
   
   def described
@@ -70,24 +68,24 @@ module DescribeMixins
   end
   
   
-  # Set {#described} to a new {NRSER::RSpex::Described::Base} instance whose
+  # Set {#described} to a new {NRSER::Described::Base} instance whose
   # parent is the current {#described}.
   # 
   # @overload describe described
-  #   Describe an already constructed {NRSER::RSpex::Described::Base}.
+  #   Describe an already constructed {NRSER::Described::Base}.
   #   
   #   @note
   #     I think this is kind-of legacy at this point, preferring the second
   #     form that avoids having to properly provide the `parent` at every
   #     construction site.
   #   
-  #   @param [NRSER::RSpex::Described::Base] described
+  #   @param [NRSER::Described::Base] described
   #     The new description.
   #     
-  #     Check that the {NRSER::RSpex::Described::Base#parent} is the current
+  #     Check that the {NRSER::Described::Base#parent} is the current
   #     {#described}.
   #   
-  #   @return [NRSER::RSpex::Described::Base]
+  #   @return [NRSER::Described::Base]
   #     Newly set {#described}.
   # 
   # @overload describe described_name, **kwds
@@ -110,16 +108,16 @@ module DescribeMixins
   #     
   #     Don't put `parent:` in here; it's added automatically.
   #     
-  #   @return [NRSER::RSpex::Described::Base]
+  #   @return [NRSER::Described::Base]
   #     Newly set {#described}.
   #     
   def describe *args
     @described = t.match args,
-      t.tuple( Described::Base ),
+      t.tuple( NRSER::Described::Base ),
         ->( (described) ) {
           unless described.parent.equal? @described
             raise NRSER::ArgumentError.new \
-              "A constructed", Described::Base, "was passed as the sole",
+              "A constructed", NRSER::Described::Base, "was passed as the sole",
               "argument, but it's parent is not the current {#described}",
               new_described: described,
               current_described: @described
@@ -128,17 +126,17 @@ module DescribeMixins
           described
         },
       
-      t.tuple( t.Label, t.Kwds ),
+      ( t.tuple( t.Label ) | t.tuple( t.Label, t.Kwds ) ),
         ->( (described_name, kwds) ) {
-          Described.
+          NRSER::Described.
             const_get( described_name.to_s.camelize ).
             new \
-              **kwds,
+              **( kwds || {} ),
               parent: @described
         }
   end # #describe
   
-  # @!endgroup Accessing {NRSER::RSpex::Described::Base} Instances # *********
+  # @!endgroup Accessing {NRSER::Described::Base} Instances # *********
   
   
   def expect_it
@@ -161,9 +159,9 @@ module DescribeMixins
         eval source_string
       end
     else
-      raise NotImplementedError,
-            ( "TODO can only handle expr strings so far," +
-              "found #{ string.inspect }:#{ string.class }" )
+      raise NRSER::NotImplementedError.new \
+        "TODO can only handle expr strings so far, found", string.inspect,
+        "(which is a", string.class, ")"
     end
   end
   
@@ -172,16 +170,12 @@ module DescribeMixins
   # --------------------------------------------------------------------------
   
   def describe_class class_name
-    describe Described::Class.new \
-      parent: described,
-      subject: resolve_class( class_name )
+    describe :class, subject: resolve_class( class_name )
   end
   
   
   def describe_module module_name
-    describe Described::Module.new \
-      parent: described,
-      subject: resolve_module( module_name )
+    describe :module, subject: resolve_module( module_name )
   end
   
   
@@ -191,53 +185,35 @@ module DescribeMixins
         const = resolve_module name.module_name
         method = const.method name.method_name
         
-        describe Described::Method.new \
-          parent: described,
-          subject: method
+        describe :method, subject: method
       },
       
       Names::QualifiedInstanceMethod, ->( name ) {
         cls = resolve_class name.module_name
         unbound_method = cls.instance_method name.method_name
         
-        describe Described::InstanceMethod.new \
-          parent: described,
-          subject: unbound_method
+        describe :instance_method, subject: unbound_method
       },
       
       Names::SingletonMethod, ->( name ) {
-        describe Described::Method.new \
-          parent: described,
-          name: name.method_name
+        describe :method, name: name.method_name
       },
       
       NRSER::Meta::Names::InstanceMethod, ->( name ) {
-        describe Described::InstanceMethod.new \
-          parent: described,
-          name: name.method_name
+        describe :instance_method, name: name.method_name
       },
       
       NRSER::Meta::Names::Method, ->( name ) {
-        describe Described::Method.new \
-          parent: described,
-          name: name
+        describe :method, name: name
       }
   end
   
   
-  def describe_response **kwds
-    describe Described::Response.new \
-      parent: described,
-      **kwds
-  end
-  
-  
   def describe_param name, value
-    if described.is_a? Described::Parameters
+    if described.is_a? NRSER::Described::Parameters
       described[ name ] = value
     else
-      describe Described::Parameters.new \
-        parent: described,
+      describe :parameters,
         subject: NRSER::Meta::Params.new( named: { name => value } )
     end
   end

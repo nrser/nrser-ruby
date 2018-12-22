@@ -1,6 +1,25 @@
+# encoding: UTF-8
+# frozen_string_literal: true
+
+# Requirements
+# =======================================================================
+
+# Project / Package
+# -----------------------------------------------------------------------
+
 require 'nrser/core_ext/object/lazy_var'
 
-require_relative './nicer_error'
+require_relative './not_implemented_error'
+
+
+# Namespace
+# =======================================================================
+
+module  NRSER
+
+
+# Definitions
+# =======================================================================
 
 # Extension of Ruby's {NotImplementedError} to provide a useful message
 # and convenient constructor for abstract methods.
@@ -13,13 +32,10 @@ require_relative './nicer_error'
 #     raise NRSER::AbstractMethodError.new( self, __method__ )
 # 
 # 
-class NRSER::AbstractMethodError < NotImplementedError
+class AbstractMethodError < NotImplementedError
   
   # Mixins
   # ========================================================================
-  
-  # Be nicer!
-  include NRSER::NicerError
   
   # Be log!
   include NRSER::Log::Mixin
@@ -147,4 +163,10 @@ class NRSER::AbstractMethodError < NotImplementedError
     end
   end
   
-end # class NRSER::AbstractMethodError
+end # class AbstractMethodError
+
+
+# /Namespace
+# =======================================================================
+
+end # module NRSER

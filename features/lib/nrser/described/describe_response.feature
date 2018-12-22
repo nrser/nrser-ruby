@@ -2,7 +2,7 @@ Feature: Describe a method's response
   
   These scenarios walk through examples of how to describe the response to a
   method call, which is represented internally by a
-  {NRSER::RSpex::Described::Response} instance.
+  {NRSER::Described::Response} instance.
   
   Scenario: (1)  Describing the response of a class' singleton method
     

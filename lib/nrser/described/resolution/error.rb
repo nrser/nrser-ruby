@@ -1,40 +1,42 @@
+# encoding: UTF-8
 # frozen_string_literal: true
 
 # Requirements
 # =======================================================================
 
-# Stdlib
-# -----------------------------------------------------------------------
-
-# Deps
-# -----------------------------------------------------------------------
-
 # Project / Package
 # -----------------------------------------------------------------------
 
-require_relative './base'
+# {Error} mixes in {NRSER::NicerError}
+require 'nrser/errors/nicer_error'
 
 
 # Namespace
 # =======================================================================
 
 module  NRSER
-module  RSpex
 module  Described
+class   Resolution
 
 
 # Definitions
 # =======================================================================
 
-# @todo document NRSER::RSpex::Described::Class class.
-class Module < Base
-  subject_type ::Module
-end # class NRSER::RSpex::Described::Class
+# Raised when something goes irreparably wrong with {Resolution}s.
+# 
+# You should not need to rescue {Error} instances during normal use.
+# 
+# @note
+#   Mixes in {NRSER::NicerError}.
+# 
+class Error < ::StandardError
+  include NRSER::NicerError
+end
 
 
 # /Namespace
 # =======================================================================
 
+end # class Resolution
 end # module Described
-end # module RSpex
 end # module NRSER

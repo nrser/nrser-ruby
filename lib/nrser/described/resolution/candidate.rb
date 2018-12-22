@@ -22,7 +22,6 @@ using NRSER::Types
 # =======================================================================
 
 module  NRSER
-module  RSpex
 module  Described
 class   Resolution
 
@@ -37,5 +36,4 @@ Candidate = I8::Struct.new value: t.Top, source: t.NonEmptyString
 
 end # class Resolution
 end # module Described
-end # module RSpex
 end # module NRSER

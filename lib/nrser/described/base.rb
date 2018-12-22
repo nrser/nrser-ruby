@@ -45,16 +45,15 @@ using NRSER::Types
 # =======================================================================
 
 module  NRSER
-module  RSpex
 module  Described
 
 
 # Definitions
 # =======================================================================
 
-# Abstract base class for all {NRSER::RSpex} description objects.
+# Abstract base class for all description objects.
 # 
-# Description objects formalize and extend {RSpec}'s explicit subject 
+# Description objects are a bit like an extension of {RSpec}'s explicit subject 
 # functionality.
 # 
 # @abstract
@@ -142,7 +141,7 @@ class Base
   # "namespace-less" name).
   # 
   # @example
-  #   NRSER::RSpex::Described::InstanceMethod.default_human_name
+  #   NRSER::Described::InstanceMethod.default_human_name
   #   #=> "instance method"
   # 
   # @return [String]
@@ -331,5 +330,4 @@ end # class Base
 # =======================================================================
 
 end # module Described
-end # module RSpex
 end # module NRSER

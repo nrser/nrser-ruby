@@ -76,8 +76,7 @@ end
 
 Given "the {described}(')(s) method {method}" \
 do |described_human_name, method_name|
-  describe Described::Method.new \
-    parent: described,
+  describe :method,
     subject: described.
               find_by_human_name!( described_human_name ).
               subject.
@@ -130,7 +129,7 @@ end
 
 
 Given "the block parameter is {expr}" do |source_string|
-  if described.is_a? Described::Parameters
+  if described.is_a? NRSER::Described::Parameters
     described.block = value_for source_string
   else
     describe :parameters,
@@ -149,7 +148,7 @@ end
 [ "I call it with no parameters",
   "I call the method with no parameters" ].each do |pattern|
   When pattern do
-    describe_response params: NRSER::Meta::Params.new
+    describe :response, params: NRSER::Meta::Params.new
   end
 end
 
@@ -157,14 +156,14 @@ end
 [ "I call it( with the parameters)",
    "I call the method( with the parameters)" ].each do |pattern|
   When pattern do
-    describe_response
+    describe :response
   end
 end
 
 
 When "I call {qualified_method}( with the parameters)" do |method_name|
   describe_method method_name
-  describe_response
+  describe :response
 end
 
 

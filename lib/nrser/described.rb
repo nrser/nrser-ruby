@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# encoding: UTF-8
 
 # Requirements
 # =======================================================================
@@ -31,7 +32,6 @@ require_relative './described/response'
 # ========================================================================
 
 module  NRSER
-module  RSpex
 
 
 # Definitions
@@ -52,5 +52,4 @@ end # module Described
 # /Namespace
 # ========================================================================
 
-end # module RSpex
 end # module NRSER

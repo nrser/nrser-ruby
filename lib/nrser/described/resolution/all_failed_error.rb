@@ -22,7 +22,6 @@ using NRSER::Types
 # =======================================================================
 
 module  NRSER
-module  RSpex
 module  Described
 class   Resolution
 
@@ -75,5 +74,4 @@ end # class AllFailedError
 
 end # class Resolution
 end # module Described
-end # module RSpex
 end # module NRSER

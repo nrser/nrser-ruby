@@ -2,7 +2,7 @@
 # frozen_string_literal: true
 
 require 'nrser/meta/names'
-require 'nrser/rspex/described'
+require 'nrser/described'
 
 
 Names = NRSER::Meta::Names
@@ -141,7 +141,7 @@ ParameterType \
 
 ParameterType \
   name: 'described',
-  regexp: NRSER::RSpex::Described.human_name_pattern,
+  regexp: NRSER::Described.human_name_pattern,
   type: ::String,
   transformer: ->( string ){ string }
 
