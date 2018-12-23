@@ -1,0 +1,18 @@
+# encoding: UTF-8
+# frozen_string_literal: true
+# 
+##############################################################################
+# Bootstrap {NRSER::Described} for Cucumber
+# ============================================================================
+# 
+# Connects {NRSER::Described} into Cucumber.
+# 
+# Require this file in your `features/env/described.rb` or equivalent.
+# 
+##############################################################################
+
+require_relative './world'
+
+World NRSER::Described::Cucumber::World::Describe
+World NRSER::Described::Cucumber::World::Expect
+World NRSER::Described::Cucumber::World::Scope

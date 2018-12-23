@@ -29,26 +29,21 @@ using NRSER::Types
 # Namespace
 # =======================================================================
 
+module  NRSER
+module  Described
+module  Cucumber
+module  World
+
 
 # Definitions
 # =======================================================================
 
-# @todo document DescribeMixins module.
+# World mixins to manage the description hierarchy.
 # 
-module DescribeMixins
-  
-  # Constants
-  # ========================================================================
-  
-  # Shortcut to {NRSER::Described}, making it less tiring to reference
-  # those classes.
-  # 
-  # @todo
-  #   This was a method but it didn't work form some reason..?
-  # 
-  # Described = NRSER::Described
-  # def Described; NRSER::Described; end
-  
+# Mixed in to the "step classes" where steps are executed via 
+# {Cucumber::Glue::DSL::World}.
+# 
+module Describe
   
   # Instance Methods
   # ========================================================================
@@ -60,9 +55,18 @@ module DescribeMixins
   def Names; NRSER::Meta::Names;  end
   
   
-  # @!group Accessing {NRSER::Described::Base} Instances
+  # @!group Accessing Descriptions Instance Methods
   # --------------------------------------------------------------------------
   
+  # What's being described.
+  # 
+  # @return [nil]
+  #   When nothing has been {#describe}'d yet.
+  # 
+  # @return [NRSER::Described::Base]
+  #   The current description instance (youngest child in the description
+  #   hierarchy).
+  #   
   def described
     @described
   end
@@ -136,7 +140,7 @@ module DescribeMixins
         }
   end # #describe
   
-  # @!endgroup Accessing {NRSER::Described::Base} Instances # *********
+  # @!endgroup Accessing Descriptions Instance Methods # *********************
   
   
   def expect_it
@@ -241,5 +245,11 @@ module DescribeMixins
   
 end # module DescribeMixins
 
+
 # /Namespace
 # =======================================================================
+
+end # module World
+end # module Cucumber
+end # module Described
+end # module NRSER
