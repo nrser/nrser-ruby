@@ -1,6 +1,6 @@
 module NRSER
   module Types
-    refine Object do
+    refine ::Object do
       def t *args
         if args.empty?
           NRSER::Types

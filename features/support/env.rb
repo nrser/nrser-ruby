@@ -22,4 +22,8 @@ require 'nrser/core_ext/string/squiggle'
 # Config
 # =======================================================================
 
+# Don't load pryrc - we went the env exactly how it is, and there's a huge mess
+# of shit in there
+Pry.config.should_load_rc = false
+
 NRSER::Log.setup_for_cucumber!

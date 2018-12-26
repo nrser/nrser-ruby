@@ -13,30 +13,32 @@
 # Project / Package
 # -----------------------------------------------------------------------
 
-require 'nrser/ext/regexp'
+
+# Refinements
+# =======================================================================
 
 
 # Namespace
 # =======================================================================
 
 module  NRSER
-module  Refinements
+module  Described
+module  Cucumber
+
 
 # Definitions
 # =======================================================================
 
-
-# @todo document Regexp module.
-module Regexp
+# @todo doc me!
+module Steps
   
-  refine ::Regexp do
-    prepend NRSER::Ext::Regexp
-  end
+  # module definition...
   
-end # module Regexp
+end # module Steps
 
 # /Namespace
 # =======================================================================
 
-end # module Refinements
+end # module Cucumber
+end # module Described
 end # module NRSER

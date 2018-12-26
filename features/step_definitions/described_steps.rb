@@ -14,7 +14,7 @@
 # -----------------------------------------------------------------------
 
 require 'nrser/meta/names'
-require 'nrser/regexp/composed'
+require 'nrser/regexps/composed'
 
 
 # Definitions
@@ -25,8 +25,8 @@ require 'nrser/regexp/composed'
 
 ### Objects
 
-Given "the object {expr}" do |source|
-  describe :object, subject: eval( source )
+Given "the object {value}" do |value|
+  describe :object, subject: value
 end
 
 
@@ -34,7 +34,7 @@ end
 
 Given "a module:" do |source|
   scope.class_eval source
-  module_name = NRSER::Regexp::Composed.
+  module_name = NRSER::Regexps::Composed.
     join( 'module (', NRSER::Meta::Names::Module.pattern, ')' ).
     match( source )[ 1 ]
   describe_module module_name
@@ -43,27 +43,29 @@ end
 
 ### Classes
 
-Given "a class:" \
-do |string|
+Given "a class:" do |string|
   scope.class_eval string
-  class_name = NRSER::Regexp::Composed.
+  class_name = NRSER::Regexps::Composed.
     join( 'class (', NRSER::Meta::Names::Module.pattern, ')' ).
     match( string )[ 1 ]
   describe_class class_name
 end
 
 
-Given "the class {class}" \
-do |class_name|
+Given "the class {class}" do |class_name|
   describe_class class_name
 end
 
 
 ### Methods
 
-Given "the (instance )method {qualified_method}" \
-do |method_name|
-  describe_method method_name
+[
+  "the (instance )method {qualified_method}",
+  "its method {method}"
+].each do |template|
+  Given template do |method_name|
+    describe_method method_name
+  end
 end
 
 
@@ -74,12 +76,6 @@ do |described_human_name, method_name|
               find_by_human_name!( described_human_name ).
               subject.
               method( method_name.method_name )
-end
-
-
-Given "its method {method}" \
-do |method_name|
-  describe_method method_name
 end
 
 
@@ -102,7 +98,8 @@ Given "the parameters:" do |table|
     # in {NRSER::Meta::Names} format (`arg`, `kwd:`, `&block`)
     table.rows.each do |(name, string)|
       name = Names::Param.new name
-      describe_param name, value_for( string, accept_unary_ampersand: name.block? )
+      describe_param name,
+        value_for( string, accept_unary_ampersand: name.block? )
     end
   else
     # We don't handle any other dimensions
@@ -138,17 +135,21 @@ end
 
 ### Responses
 
-[ "I call it with no parameters",
-  "I call the method with no parameters" ].each do |pattern|
-  When pattern do
+[
+  "I call it with no parameters",
+  "I call the method with no parameters"
+].each do |template|
+  When template do
     describe :response, params: NRSER::Meta::Params.new
   end
 end
 
 
-[ "I call it( with the parameters)",
-   "I call the method( with the parameters)" ].each do |pattern|
-  When pattern do
+[
+  "I call it( with the parameters)",
+  "I call the method( with the parameters)"
+].each do |template|
+  When template do
     describe :response
   end
 end
@@ -179,46 +180,43 @@ Then "it is a subclass of {class}" do |class_name|
 end
 
 
-Then "it is equal to {string}" do |string|
-  expect_it.to eq string
+Then "it is {value}" do |value|
+  expect_it.to be value
 end
 
 
-Then "the {described} is equal to {expr}" \
-do |described_human_name, source|
-  expect_described( described_human_name ).to eq eval( source )
+Then "it is equal to {value}" do |value|
+  expect_it.to eq value
+end
+
+
+Then "the {described} is equal to {value}" \
+do |described_human_name, value|
+  expect_described( described_human_name ).to eq value
 end
 
 
 Then "the {described} is equal to:" \
+do |described_human_name, source_code|
+  expect_described( described_human_name ).to eq eval( source_code )
+end
+
+
+Then "the {described} is {value}" \
 do |described_human_name, source|
-  expect_described( described_human_name ).to eq eval( source )
+  expect_described( described_human_name ).to be value
 end
 
 
-Then "the {described} is {expr}" \
-do |described_human_name, source|
-  expect_described( described_human_name ).
-    to be eval( backtick_unquote source  )
+Then "it has a(n) {attr} attribute equal to {value}" \
+do |attribute_name, value|
+  expect_it.to have_attributes attribute_name => value
 end
 
 
-Then "it has a(n) {attr} attribute equal to {expr}" \
-do |attribute_name, source|
-  expect_it.to have_attributes attribute_name => eval( source )
-end
-
-
-Then "it has a(n) {attr} attribute that is {expr}" \
-do |attribute_name, source|
-  expect_it.to have_attributes attribute_name => be( eval( source ) )
-end
-
-
-Then "it has a(n) {attr} attribute that is {class}" \
-do |attribute_name, class_name|
-  expect_it.to have_attributes \
-    attribute_name => be( resolve_class( class_name ) )
+Then "it has a(n) {attr} attribute that is {value}" \
+do |attribute_name, value|
+  expect_it.to have_attributes attribute_name => be( value )
 end
 
 

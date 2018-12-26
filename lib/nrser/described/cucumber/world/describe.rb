@@ -142,17 +142,6 @@ module Describe
   
   # @!endgroup Accessing Descriptions Instance Methods # *********************
   
-  
-  def expect_it
-    expect described.subject
-  end
-  
-  
-  def expect_described human_name
-    expect described.find_by_human_name!( human_name ).subject
-  end
-  
-  
   def value_for string, accept_unary_ampersand: false
     if expr? string
       source_string = backtick_unquote string

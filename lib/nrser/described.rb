@@ -10,14 +10,14 @@
 # Deps
 # -----------------------------------------------------------------------
 
-# Using {::Class#subclasses}
+# Using {::Class#descendants}
 require 'active_support/core_ext/class/subclasses'
 
 # Project / Package
 # -----------------------------------------------------------------------
 
-# Using {NRSER::Regexp::Composed.or}
-require 'nrser/regexp/composed'
+# Using {NRSER::Regexps::Composed.or}
+require 'nrser/regexps/composed'
 
 require_relative './described/base'
 require_relative './described/class'
@@ -39,7 +39,7 @@ module  NRSER
 
 module Described
   def self.human_name_pattern full: false, options: nil
-    NRSER::Regexp::Composed.or \
+    NRSER::Regexps::Composed.or \
       *Base.descendants.flat_map { |cls|
         cls.human_names.map { |human_name| ::Regexp.escape human_name }
       },

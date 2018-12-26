@@ -18,11 +18,35 @@ module  World
 # 
 module Expect
   
+  # Create an RSpec expectation for {#described}'s {Base#subject}.
+  # 
+  # @note
+  #   This will trigger subject resolution on the description instance if the
+  #   subject is not already resolved.
+  # 
+  # @return [RSpec::Expectations::ExpectationTarget]
+  # 
   def expect_it
     expect described.subject
   end
   
   
+  # Find the nearest description instance that's class has a provided "human
+  # name", and create an RSpec expectation for it's {Base#subject}.
+  # 
+  # @note
+  #   This will trigger subject resolution on the found description instance if 
+  #   its subject is not already resolved.
+  # 
+  # @example Expect the nearest {NRSER::Described::Method}
+  #   expect_described "method"
+  # 
+  # @param [::String] human_name
+  #   A {NRSER::Described::Base.human_name} for the desired
+  #   {NRSER::Described::Base} subclass.
+  # 
+  # @return [RSpec::Expectations::ExpectationTarget]
+  # 
   def expect_described human_name
     expect described.find_by_human_name!( human_name ).subject
   end

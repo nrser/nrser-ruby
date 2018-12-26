@@ -61,13 +61,11 @@ class AbstractMethodError < NotImplementedError
   attr_reader :method_instance
   
   
-  
   # TODO document `instance` attribute.
   # 
   # @return [attr_type]
   #     
   attr_reader :instance
-  
   
   
   # Construct a new `AbstractMethodError`.

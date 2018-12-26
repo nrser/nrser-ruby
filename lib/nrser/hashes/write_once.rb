@@ -14,7 +14,7 @@ require 'nrser/labs/stash'
 # =======================================================================
 
 module  NRSER
-module  Hash
+module  Hashes
 
 
 # Definitions
@@ -44,5 +44,5 @@ end # class WriteOnce
 # /Namespace
 # =======================================================================
 
-end # module Hash
+end # module Hashes
 end # module NRSER

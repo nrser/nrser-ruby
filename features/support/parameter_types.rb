@@ -7,7 +7,7 @@ require 'nrser/described'
 
 Names = NRSER::Meta::Names
 
-def re; NRSER::Regexp::Composed; end
+def re; NRSER::Regexps::Composed; end
 
 
 DOUBLE_QUOTED_STRING_RE = /"(?:[^"\\]|\\.)*"/
@@ -72,11 +72,18 @@ end
 
 BACKTICK_QUOTED_EXPR_RE = backtick_quote '[^\`]*'
 
+STRING_REGEXP = /"([^"\\]*(\\.[^"\\]*)*)"|'([^'\\]*(\\.[^'\\]*)*)'/
+
+INTEGER_REGEXPS = [/-?\d+/, /\d+/]
+FLOAT_REGEXP = /-?\d*\.\d+/
+
 EXPR_RE = re.or \
   QUOTED_STRING_RE,
   BACKTICK_QUOTED_EXPR_RE
 
 EXPR_LIST_RE = re.join EXPR_RE, '(?:,\s*', EXPR_RE, ')*'
+
+CURLY_QUOTED_CONSTANT = curly_quote( Names::Constant.pattern )
 
 
 class SourceString < ::String; end
@@ -95,6 +102,15 @@ end
 def unary_ampersand_expr? source_string
   source_string.start_with? '&'
 end
+
+
+ParameterType \
+  name: 'const',
+  regexp: curly_quote( Names::Constant ),
+  type: ::Object,
+  transformer: ->( string ) {
+    resolve_const curly_unquote( string )
+  }
 
 
 ParameterType \
@@ -152,6 +168,39 @@ ParameterType \
   type: SourceString,
   transformer: ->( raw_string ){ backtick_unquote raw_string }
 
+
+ParameterType \
+  name: 'value',
+  regexp: [
+    BACKTICK_QUOTED_EXPR_RE,
+    # STRING_REGEXP,
+    QUOTED_STRING_RE,
+    *INTEGER_REGEXPS,
+    CURLY_QUOTED_CONSTANT,
+  ],
+  type: ::Object,
+  transformer: ->( string ) {
+    case string
+    # when nil
+    #   binding.pry
+    #   nil
+    when BACKTICK_QUOTED_EXPR_RE
+      eval backtick_unquote( string )
+    # when STRING_REGEXP
+    #   string.gsub( /\\"/, '"' ).gsub( /\\'/, "'" )
+    when QUOTED_STRING_RE
+      eval string
+    when *INTEGER_REGEXPS
+      string.to_i
+    when FLOAT_REGEXP
+      string.to_f
+    when CURLY_QUOTED_CONSTANT
+      resolve_const curly_unquote( string )
+    else
+      raise "SHOULDN'T BE HERE"
+    end
+  }
+  
 
 ParameterType \
   name: 'exprs',

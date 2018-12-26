@@ -1,0 +1,61 @@
+# encoding: UTF-8
+# frozen_string_literal: true
+
+# Requirements
+# =======================================================================
+
+# Project / Package
+# -----------------------------------------------------------------------
+
+# Need {NRSER::Described.human_name_pattern}
+require 'nrser/described'
+
+# Need to extend in the {Declare} mixin to get `.declare`, etc.
+require_relative './declare'
+
+
+# Namespace
+# =======================================================================
+
+module  NRSER
+module  Described
+module  Cucumber
+module  ParameterTypes
+
+
+# Definitions
+# =======================================================================
+
+# Declarations of {Cucumber::Glue::DLS::ParameterType} construction values
+# used to create parameter types that match {NRSER::Described::Base} instances
+# in the description hierarchy.
+# 
+module Descriptions
+  
+  extend Declare
+  
+  
+  declare           :described_name,
+    regexp:         NRSER::Described.human_name_pattern,
+    type:           ::String,
+    transformer:    ->( string ) { string }
+  
+  
+  declare           :described,
+    regexp:         declarations[ :described_name ][ :regexp ],
+    type:           NRSER::Described::Base,
+    transformer:    ->( string ) {
+      described.find_by_human_name! string
+    }
+    
+  
+end # module Descriptions  
+
+
+# /Namespace
+# =======================================================================
+
+end # module ParameterTypes
+end # module Cucumber
+end # module Described
+end # module NRSER

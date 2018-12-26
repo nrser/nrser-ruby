@@ -1,28 +1,12 @@
 # encoding: UTF-8
 # frozen_string_literal: true
 
-# Requirements
-# =======================================================================
-
-# Stdlib
-# -----------------------------------------------------------------------
-
-# Deps
-# -----------------------------------------------------------------------
-
-# Project / Package
-# -----------------------------------------------------------------------
-
-
-# Refinements
-# =======================================================================
-
 
 # Namespace
 # =======================================================================
 
 module  NRSER
-module  Regexp
+module  Regexps
 
 
 # Definitions
@@ -78,7 +62,7 @@ class Composed < ::Regexp
   # operation, which allows simplifying `op( op( A, B ), C ) => op( A, B, C )`,
   # resulting in cleaner composed sources.
   # 
-  # @param [::Array<#to_re, ::Regexp, ::String, #to_re, #to_s>] objects
+  # @param [::Array<#to_re | ::Regexp | ::String | #to_s>] objects
   #   Elements to join (in order) to form the source for the new {::Regexp}.
   #   
   #   Objects that respond to `#to_re` have that called first to covert them to
@@ -115,7 +99,7 @@ class Composed < ::Regexp
     
     objects.each do |object|
       # Allow the object to become a {::Regexp} (probably a 
-      # {NRSER::Regexp::Composed}) if it can do so. This was put in to support 
+      # {NRSER::Regexps::Composed}) if it can do so. This was put in to support 
       # {NRSER::Meta::Names::Name} subclasses, but may be of use in other 
       # situations too.
       object = object.to_re if object.respond_to?( :to_re )
@@ -157,7 +141,7 @@ class Composed < ::Regexp
   
   
   # Join regular expressions and/or source strings into in {Composed}
-  # that matches the ordered combination of them.
+  # that matches any of them.
   # 
   # @param    (see .compose_associative)
   # @return   (see .compose_associative)
@@ -338,5 +322,5 @@ end # class Composed
 # /Namespace
 # =======================================================================
 
-end # module Regexp
+end # module Regexps
 end # module NRSER

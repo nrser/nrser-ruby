@@ -14,7 +14,7 @@
 # Project / Package
 # ------------------------------------------------------------------------
 
-require 'nrser/regexp/composed'
+require 'nrser/regexps/composed'
 
 
 # Namespace
@@ -44,7 +44,7 @@ module Regexp
   
   
   def to_full_source
-    NRSER::Regexp::Composed.to_full_source self
+    NRSER::Regexps::Composed.to_full_source self
   end
   
   
@@ -58,7 +58,7 @@ module Regexp
   
   
   def to_fragment_source
-    NRSER::Regexp::Composed.to_fragment_source self
+    NRSER::Regexps::Composed.to_fragment_source self
   end
   
   
@@ -72,14 +72,14 @@ module Regexp
   
   
   def join *others
-    NRSER::Regexp::Composed.join self, *others,
+    NRSER::Regexps::Composed.join self, *others,
       full: n_x.full?,
       options: options
   end
   
   
   def or *others
-    NRSER::Regexp::Composed.or self, *others,
+    NRSER::Regexps::Composed.or self, *others,
       full: n_x.full?,
       options: options
   end
