@@ -446,8 +446,18 @@ class ParameterType < ::Cucumber::CucumberExpressions::ParameterType
   end
   
   
+  def =~ string
+    to_re =~ string
+  end
+  
+  
+  def match *args
+    to_re.match *args
+  end
+  
+  
   def to_re
-    re.or *regexps
+    @composed_regexp ||= re.or *regexps
   end
   
   

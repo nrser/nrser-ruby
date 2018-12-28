@@ -55,33 +55,33 @@ class Literal < Token
     end
     
     # @note
-    #   Regular expression and `gsub` copied from
+    #   Regular expression and `gsub` adapted from
     #   {::Cucumber::CucumberExpressions::ParameterTypeRegistry}
     #   (MIT license).
     # 
     class SingleQuoted < String
-      pattern /'([^'\\]*(\\.[^'\\]*)*)'/
+      pattern /'(?:[^'\\]*(?:\\.[^'\\]*)*)'/
       
       quote :single
       
       def unquote
-        [ 1.. -2 ].gsub( /\\'/, "'" )
+        self[ 1.. -2 ].gsub( /\\'/, "'" )
       end
       
     end
     
     # @note
-    #   Regular expression and `gsub` copied from
+    #   Regular expression and `gsub` adapted from
     #   {::Cucumber::CucumberExpressions::ParameterTypeRegistry}
     #   (MIT license).
     # 
     class DoubleQuoted < String
-      pattern /"([^"\\]*(\\.[^"\\]*)*)"/
+      pattern /"(?:[^"\\]*(?:\\.[^"\\]*)*)"/
       
       quote :double
       
       def unquote
-        [ 1..-2 ].gsub( /\\"/, '"' ).gsub( /\\'/, "'" )
+        self[ 1..-2 ].gsub( /\\"/, '"' ).gsub( /\\'/, "'" )
       end
     end
     

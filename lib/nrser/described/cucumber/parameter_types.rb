@@ -71,6 +71,11 @@ module ParameterTypes
   end
   
   
+  def self.[] name
+    parameter_types[ name.to_sym ]
+  end
+  
+  
   def self.register!
     parameter_types.each do |name, parameter_type|
       ::Cucumber::Glue::Dsl.define_parameter_type parameter_type

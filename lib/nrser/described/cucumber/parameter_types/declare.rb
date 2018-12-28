@@ -38,6 +38,11 @@ module Declare
   end
   
   
+  def [] name
+    parameter_types[ name.to_sym ]
+  end
+  
+  
   def def_parameter_type name:, **kwds
     name = name.to_sym unless name.is_a?( ::Symbol )
   

@@ -138,13 +138,20 @@ module Values
     name:           :params,
                     # Good lord... this {::Regexp} source is gonna be a messs...
     patterns:       re.join(
-                        parameter_types[ :value ],
-                        '(?:,\s*', parameter_types[ :value ], ')*'
+                      parameter_types[ :value ],
+                      '(?:,\s*', parameter_types[ :value ], ')*'
                     ),
+    # patterns:       re.join(
+    #                   /abc/,
+    #                   '(?:,\s*', /abc/, ')*'
+    #                 ),
     type:           ::Array,
-    transformer:    ->( *tokens ) {
-      binding.pry
-      string.scan VALUE_REGEXP
+    transformer:    ->( full_string ) {
+      parameter_type = \
+        NRSER::Described::Cucumber::ParameterTypes::Values.
+          parameter_types[ :value ]
+      full_string.
+        scan( parameter_type.to_re )
     }
   
   
