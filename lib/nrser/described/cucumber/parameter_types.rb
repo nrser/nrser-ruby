@@ -10,10 +10,9 @@
 require 'set'
 
 # Deps
-# ----------------------------------------------------------------------------
+# -----------------------------------------------------------------------
 
-# Need {::Cucumber::Glue::DSL.define_parameter_type} in
-# {ParameterTypes.register!}
+# Need {::Cucumber::Glue::DSL.define_parameter_type} to register
 require 'cucumber/glue/dsl'
 
 # Project / Package
@@ -69,6 +68,13 @@ module ParameterTypes
           result[ name ] = parameter_type
         }
       }
+  end
+  
+  
+  def self.register!
+    parameter_types.each do |name, parameter_type|
+      ::Cucumber::Glue::Dsl.define_parameter_type parameter_type
+    end
   end
   
 end # module ParameterTypes

@@ -446,6 +446,11 @@ class ParameterType < ::Cucumber::CucumberExpressions::ParameterType
   end
   
   
+  def to_re
+    re.or *regexps
+  end
+  
+  
 end # class ParameterType
 
 

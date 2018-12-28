@@ -133,17 +133,19 @@ module Values
     type:           ::Object,
     transformer:    :to_value
   
-  # FIXME !!!
-  # declare           :params,
-  #                   # Good lord... this {::Regexp} source is gonna be a messs...
-  #   regexp:         re.join(
-  #                       VALUE_REGEXP,
-  #                       '(?:,\s*', VALUE_REGEXP, ')*'
-  #                   ),
-  #   type:           ::Array,
-  #   transformer:    ->( string ) {
-  #     string.scan VALUE_REGEXP
-  #   }
+  
+  def_parameter_type \
+    name:           :params,
+                    # Good lord... this {::Regexp} source is gonna be a messs...
+    patterns:       re.join(
+                        parameter_types[ :value ],
+                        '(?:,\s*', parameter_types[ :value ], ')*'
+                    ),
+    type:           ::Array,
+    transformer:    ->( *tokens ) {
+      binding.pry
+      string.scan VALUE_REGEXP
+    }
   
   
   

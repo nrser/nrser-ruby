@@ -83,10 +83,10 @@ end
 
 ### Parameters
 
-# Given "the parameters {params}" \
-# do |value_strings|
-#   describe_positional_params value_strings
-# end
+Given "the parameters {params}" \
+do |value_strings|
+  describe_positional_params value_strings
+end
 
 
 Given "the parameters:" do |table|

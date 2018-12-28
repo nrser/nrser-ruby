@@ -4,12 +4,6 @@
 # Requirements
 # =======================================================================
 
-# Stdlib
-# -----------------------------------------------------------------------
-
-# Deps
-# -----------------------------------------------------------------------
-
 # Project / Package
 # -----------------------------------------------------------------------
 
@@ -56,7 +50,6 @@ module Declare
     
     ParameterType.new( name: name, **kwds ).tap { |parameter_type|
       parameter_types[ name ] = parameter_type
-      ::Cucumber::Glue::Dsl.define_parameter_type parameter_type
     }
   end
   
