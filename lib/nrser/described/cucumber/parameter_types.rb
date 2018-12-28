@@ -71,13 +71,6 @@ module ParameterTypes
       }
   end
   
-  
-  def self.register!
-    parameter_types.each do |name, parameter_type|
-      ::Cucumber::Glue::Dsl.define_parameter_type parameter_type
-    end
-  end
-  
 end # module ParameterTypes
 
 

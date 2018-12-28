@@ -21,6 +21,3 @@ World NRSER::Described::Cucumber::World::Expect
 World NRSER::Described::Cucumber::World::Scope
 World NRSER::Described::Cucumber::World::ValueFor
 World NRSER::Described::Cucumber::World::Quote
-
-NRSER::Described::Cucumber::ParameterTypes.register! # method( :ParameterType )
-
