@@ -142,22 +142,6 @@ module Describe
   
   # @!endgroup Accessing Descriptions Instance Methods # *********************
   
-  def value_for string, accept_unary_ampersand: false
-    if expr? string
-      source_string = backtick_unquote string
-      
-      if accept_unary_ampersand && unary_ampersand_expr?( source_string )
-        eval "->( &block ) { block }.call( #{ source_string } )"
-      else
-        eval source_string
-      end
-    else
-      raise NRSER::NotImplementedError.new \
-        "TODO can only handle expr strings so far, found", string.inspect,
-        "(which is a", string.class, ")"
-    end
-  end
-  
   
   # @!group Describe Helper Instance Methods
   # --------------------------------------------------------------------------
@@ -174,30 +158,30 @@ module Describe
   
   def describe_method identifier
     Names.match identifier,
-      Names::QualifiedSingletonMethod, ->( name ) {
-        const = resolve_module name.module_name
-        method = const.method name.method_name
+      Names::Method::Explicit::Singleton, ->( name ) {
+        const = resolve_const name.receiver_name
+        method = const.method name.bare_name
         
         describe :method, subject: method
       },
       
-      Names::QualifiedInstanceMethod, ->( name ) {
-        cls = resolve_class name.module_name
-        unbound_method = cls.instance_method name.method_name
+      Names::Method::Explicit::Instance, ->( name ) {
+        const = resolve_const name.receiver_name
+        unbound_method = const.instance_method name.bare_name
         
         describe :instance_method, subject: unbound_method
       },
       
-      Names::SingletonMethod, ->( name ) {
-        describe :method, name: name.method_name
+      Names::Method::Singleton, ->( name ) {
+        describe :method, name: name.bare_name
       },
       
-      NRSER::Meta::Names::InstanceMethod, ->( name ) {
-        describe :instance_method, name: name.method_name
+      Names::Method::Instance, ->( name ) {
+        describe :instance_method, name: name.bare_name
       },
       
-      NRSER::Meta::Names::Method, ->( name ) {
-        describe :method, name: name
+      NRSER::Meta::Names::Method::Bare, ->( bare_name ) {
+        describe :method, name: bare_name
       }
   end
   
@@ -212,17 +196,15 @@ module Describe
   end
   
   
-  def describe_positional_params strings
-    # Unquote to {SourceString} instances, if not already
-    source_strings = strings.map { |s| backtick_unquote s }
+  def describe_positional_params value_strings
     
     # Handle the last entry being a `&...` expression, which is interpreted as 
     # the block parameter
-    if unary_ampersand_expr? source_strings[ -1 ]
-      args = source_strings[ 0..-2 ].map { |s| value_for s }
-      block = value_for source_strings[ -1 ], accept_unary_ampersand: true
+    if ParameterTypes::Values.block_expr? value_strings[ -1 ]
+      args = value_strings[ 0..-2 ].map { |s| value_for s }
+      block = value_for value_strings[ -1 ], accept_block: true
     else
-      args = source_strings.map { |s| value_for s }
+      args = value_strings.map { |s| value_for s }
       block = nil
     end
     

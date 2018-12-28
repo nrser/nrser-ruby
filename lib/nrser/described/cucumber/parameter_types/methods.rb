@@ -10,8 +10,11 @@
 # Using names of Ruby things
 require 'nrser/meta/names'
 
+# Using the parameter tokens
+require 'nrser/described/cucumber/tokens'
+
 # Need to extend in the {Quote} mixin
-require_relative './quote'
+require 'nrser/described/cucumber/world/quote'
 
 # Need to extend in the {Declare} mixin to get `.declare`, etc.
 require_relative './declare'
@@ -41,65 +44,60 @@ module  ParameterTypes
 module Methods
 
   extend Declare
-  extend Quote
+  extend World::Quote
+
   
-  declare           :method_name,
-    regexp:      [  backtick_quote( Names::Method::Bare ),
-                    curly_quote( Names::Method::Singleton ),
-                    curly_quote( Names::Method::Instance ),
-                    curly_quote( Names::Method::Explicit::Singleton ),
-                    curly_quote( Names::Method::Explicit::Instance ) ],
+  def_parameter_type  \
+    name:           :method_name,
+    patterns:     [ Tokens::Method::Bare,
+                    Tokens::Method::Singleton,
+                    Tokens::Method::Instance,
+                    Tokens::Method::Explicit::Singleton,
+                    Tokens::Method::Explicit::Instance, ],
     type:           NRSER::Meta::Names::Method,
-    transformer:    ->( string ) {
-      NRSER::Meta::Names::Method.from unquote( string )
-    }
+    transformer:    :unquote
     
   
-  declare           :singleton_method_name,
-    regexp:      [  backtick_quote( Names::Method::Bare ),
-                    curly_quote( Names::Method::Singleton ),
-                    curly_quote( Names::Method::Explicit::Singleton ) ],
+  def_parameter_type \
+    name:           :singleton_method_name,
+    patterns:     [ Tokens::Method::Bare,
+                    Tokens::Method::Singleton,
+                    Tokens::Method::Explicit::Singleton, ],
     type:           NRSER::Meta::Names::Method,
-    transformer:    ->( string ) {
-      # TODO  Should this convert {Bare} to {Singleton}?
-      NRSER::Meta::Names::Method.from unquote( string )
-    }
+    transformer:    :unquote
     
     
-  declare           :instance_method_name,
-    regexp:      [  backtick_quote( Names::Method::Bare ),
-                    curly_quote( Names::Method::Instance ),
-                    curly_quote( Names::Method::Explicit::Instance ) ],
+  def_parameter_type \
+    name:           :instance_method_name,
+    patterns:     [ Tokens::Method::Bare,
+                    Tokens::Method::Instance,
+                    Tokens::Method::Explicit::Instance, ],
     type:           NRSER::Meta::Names::Method,
-    transformer:    ->( string ) {
-      # TODO  Should this convert {Bare} to {Instance}?
-      NRSER::Meta::Names::Method.from unquote( string )
-    }
+    transformer:    :unquote
   
   
-  declare           :method,
-    regexp:         declarations[ :method_name ][ :regexp ],
+  def_parameter_type \
+    name:           :method,
+    patterns:       parameter_types[ :method_name ],
     type:           ::Object, # Really {::Method} or {::UnboundMethod}
-    transformer:    ->( string ) {
-      resolve_method NRSER::Meta::Names::Method.from( unquote( string ) )
-    }
+    transformer:    ->( method_token ) { resolve_method method_token.unquote }
   
   
-  declare           :singleton_method,
-    regexp:         declarations[ :singleton_method_name ][ :regexp ],
+  def_parameter_type \
+    name:           :singleton_method,
+    patterns:       parameter_types[ :singleton_method_name ],
     type:           ::Method,
-    transformer:    ->( string ) {
-      resolve_singleton_method \
-        NRSER::Meta::Names::Method.from( unquote( string ) )
+    transformer:    ->( method_token ) {
+      resolve_singleton_method method_token.unquote
     }
   
   
-  declare           :instance_method,
-    regexp:         declarations[ :instance_method_name ][ :regexp ],
+  def_parameter_type \
+    name:           :instance_method,
+    patterns:       parameter_types[ :instance_method_name ],
     type:           ::UnboundMethod,
-    transformer:    ->( string ) {
-      resolve_instance_method \
-        NRSER::Meta::Names::Method.from( unquote( string ) )
+    transformer:    ->( method_token ) {
+      resolve_instance_method method_token.unquote
     }
   
     

@@ -14,5 +14,12 @@ rescue LoadError => error
   require "irb"
   IRB.start
 else
+  # The `pry-rescue` and `pry-stack_explorer` are super useful when debugging,
+  # but they seem to cause problems when enabled at the console.
+  # 
+  # Would be nice to figure out how to selectively blacklist, but this should do
+  # for now...
+  Pry.config.should_load_plugins = false
+  
   Pry.start
 end

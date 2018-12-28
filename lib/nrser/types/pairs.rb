@@ -123,6 +123,14 @@ def_type        :Pair,
     **options
 end # .Pair
 
+
+# def_type          :Pairs,
+#   parameterize:   [ :keys, :values ],
+# &->( keys: self.Top, values: self.Top **options ) do
+#   self.Union \
+    
+# end
+
 # @!endgroup Pairs Type Factories # ******************************************
 
 

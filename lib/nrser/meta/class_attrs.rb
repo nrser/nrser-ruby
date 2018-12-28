@@ -1,3 +1,26 @@
+# encoding: UTF-8
+# frozen_string_literal: true
+
+# Requirements
+# =======================================================================
+
+# Project / Package
+# -----------------------------------------------------------------------
+
+require 'nrser/no_arg'
+
+
+# Namespace
+# =======================================================================
+
+module  NRSER
+module  Meta
+
+
+# Definitions
+# =======================================================================
+
+
 # Mixin to provide methods to define and access class attributes - variables
 # that act like instance variables with regards to inheritance but for the
 # class itself.
@@ -63,9 +86,8 @@ module NRSER::Meta::ClassAttrs
         
       else
         # Nope, we can't, raise.
-        raise NoMethodError.new NRSER.squish <<-END
-          #{ name.inspect } is not defined anywhere in the class hierarchy
-        END
+        raise NoMethodError,
+          "#{ name.inspect } is not defined anywhere in the class hierarchy"
 
       end # if we have a default value / else
       
@@ -74,7 +96,8 @@ module NRSER::Meta::ClassAttrs
 
     def class_attr_accessor attr,
                             default: NRSER::NO_ARG,
-                            default_from: NRSER::NO_ARG
+                            default_from: NRSER::NO_ARG,
+                            write_once: false
       
       var_name = "@#{ attr }".to_sym
       
@@ -86,20 +109,39 @@ module NRSER::Meta::ClassAttrs
                                       default: default,
                                       default_from: default_from
           when 1
+            if write_once && instance_variable_defined?( var_name )
+              raise NRSER::ConflictError.new \
+                attr, "can only be written once (typically as part of",
+                "configuration)",
+                current_value: instance_variable_get( var_name )
+            end
+            
             instance_variable_set var_name, args[0]
           else
-            raise ArgumentError.new NRSER.squish <<-END
-              wrong number of arguments
-              (given #{ args.length }, expected 0 or 1)
-            END
+            raise NRSER::ArgumentError.new \
+              "wrong number of arguments (given", args.length,
+              "expected 0 or 1)"
           end
         end
         
         define_method("#{ attr }=") do |value|
+          if write_once && instance_variable_defined?( var_name )
+            raise NRSER::ConflictError.new \
+              attr, "can only be written once (typically as part of",
+              "configuration)",
+              current_value: instance_variable_get( var_name )
+          end
+          
           instance_variable_set var_name, value
         end
       end
-    end
+    end # class_attr_accessor
+    
+    
+    def class_attr *args
+      class_attr_accessor *args
+    end # class_attr
+    
     
     def class_attr_writer attr
       var_name = "@#{ attr }".to_sym
@@ -109,7 +151,8 @@ module NRSER::Meta::ClassAttrs
           instance_variable_set var_name, value
         end
       end
-    end
+    end # #class_attr_writer
+    
   end # module ClassMethods
   
   # Extend the including class with {NRSER::Meta::ClassAttrs::ClassMethods}
@@ -117,4 +160,10 @@ module NRSER::Meta::ClassAttrs
     base.extend ClassMethods
   end
   
-end # module NRSER::Meta::ClassAttrs
+end # module ClassAttrs
+
+# /Namespace
+# =======================================================================
+
+end # module Meta
+end # module NRSER

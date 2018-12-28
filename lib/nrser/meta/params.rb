@@ -174,24 +174,24 @@ class Params
         @positional[ index ] = value  
       },
       
-      Names::PositionalParam, ->( param_name ) {
+      Names::Param::Positional, ->( param_name ) {
         @positional[ param_name.var_sym ] = value
       },
       
-      Names::KeywordParam, ->( param_name ) {
+      Names::Param::Keyword, ->( param_name ) {
         @keyword[ param_name.var_sym ] = value
       },
       
-      Names::BlockParam, ->( param_name ) {
+      Names::Param::Block, ->( param_name ) {
         @block_name = param_name.var_sym
         @block = value
       },
       
-      Names::RestParam, ->( param_name ) {
+      Names::Param::Rest, ->( param_name ) {
         @rest = value
       },
       
-      Names::KeyRestParam, ->( param_name ) {
+      Names::Param::KeyRest, ->( param_name ) {
         @keyword.merge! **value
       }
   end

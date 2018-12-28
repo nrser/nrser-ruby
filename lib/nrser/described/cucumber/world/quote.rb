@@ -27,7 +27,7 @@ using NRSER::Regexps
 module  NRSER
 module  Described
 module  Cucumber
-module  ParameterTypes
+module  World
 
 
 # Definitions
@@ -96,7 +96,7 @@ end # module Quote
 # /Namespace
 # =======================================================================
 
-end # module ParameterTypes
+end # module World
 end # module Cucumber
 end # module Described
 end # module NRSER

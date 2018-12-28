@@ -9,6 +9,13 @@
 
 require 'set'
 
+# Deps
+# ----------------------------------------------------------------------------
+
+# Need {::Cucumber::Glue::DSL.define_parameter_type} in
+# {ParameterTypes.register!}
+require 'cucumber/glue/dsl'
+
 # Project / Package
 # -----------------------------------------------------------------------
 
@@ -17,7 +24,7 @@ require_relative './parameter_types/consts'
 require_relative './parameter_types/declare'
 require_relative './parameter_types/descriptions'
 require_relative './parameter_types/methods'
-require_relative './parameter_types/quote'
+require_relative './parameter_types/params'
 require_relative './parameter_types/values'
 require_relative './parameter_types/vars'
 
@@ -38,35 +45,36 @@ module  Cucumber
 # 
 module ParameterTypes  
   
-  def self.declaration_modules
+  def self.definition_modules
     constants.
       map { |name| const_get name }.
       select { |const|
-        const.is_a?( ::Module ) && const.respond_to?( :declarations )
+        const.is_a?( ::Module ) && const.respond_to?( :parameter_types )
       }
   end
   
   
-  def self.declarations
-    declaration_modules.
+  def self.parameter_types
+    definition_modules.
       each_with_object( {} ) { |mod, result|
-        mod.declarations.each { |name, values|
+        mod.parameter_types.each { |name, parameter_type|
           if result.key? name
             raise NRSER::ConflictError.new \
               "Name", name, "in module", mod, "conflicts with previous",
-              "declaration",
-              previous_declaration: result[ name ]
+              "definition",
+              previous_parameter_type: result[ name ],
+              conflicting_parameter_type: parameter_type
           end
           
-          result[ name ] = values
+          result[ name ] = parameter_type
         }
       }
   end
   
   
   def self.register!
-    declarations.each do |name, values|
-      ParameterType **values
+    parameter_types.each do |name, parameter_type|
+      ::Cucumber::Glue::Dsl.define_parameter_type parameter_type
     end
   end
   

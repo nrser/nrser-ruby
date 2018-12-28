@@ -11,7 +11,10 @@
 require 'nrser/meta/names'
 
 # Need to extend in the {Quote} mixin
-require_relative './quote'
+require 'nrser/described/cucumber/world/quote'
+
+# Need to deal with tokens
+require 'nrser/described/cucumber/tokens'
 
 # Need to extend in the {Declare} mixin to get `.declare`, etc.
 require_relative './declare'
@@ -42,17 +45,15 @@ module  ParameterTypes
 module Vars
   
   extend Declare
-  extend Quote
+  extend World::Quote
   
   
-  declare           :var_name,
-    regexp:      [  backtick_quote( NRSER::Meta::Names::Var::Local ),
-                    backtick_quote( NRSER::Meta::Names::Var::Instance ),
-                    backtick_quote( NRSER::Meta::Names::Var::Global ), ],
-    type:           NRSER::Meta::Names::Var,
-    transformer:    ->( string ) {
-      NRSER::Meta::Names::Var.from unquote( string )
-    }
+  def_parameter_type    \
+    name:           :var_name,
+    patterns:    [  Tokens::Var::Local,
+                    Tokens::Var::Instance,
+                    Tokens::Var::Global, ],
+    transformer:    :unquote
     
       
 end # module Vars  

@@ -7,19 +7,14 @@
 # Project / Package
 # -----------------------------------------------------------------------
 
-# Need to extend in the {Declare} mixin to get `.declare`, etc.
-require_relative './declare'
+# Need to deal with tokens
+require 'nrser/described/cucumber/tokens'
 
 # Need to extend in the {Quote} mixin
-require_relative './quote'
+require 'nrser/described/cucumber/world/quote'
 
-# Using the regular expressions and transformers for constants to match and
-# transform them as values
-require_relative './consts'
-
-# Using the regular expressions and transformers for methods to match and
-# transform them as values
-require_relative './methods'
+# Need to extend in the {Declare} mixin to get `.declare`, etc.
+require_relative './declare'
 
 
 # Refinements
@@ -50,68 +45,108 @@ module Values
   # ========================================================================
   
   extend Declare
-  extend Quote
+  extend World::Quote
   
   
   # Constants
   # ========================================================================
   
-  EXPR_REGEXP = backtick_quote '[^\`]*'
+  # DOUBLE_QUOTED_STRING_REGEXP = re.new /"(?:[^"\\]|\\.)*"/
+  # SINGLE_QUOTED_STRING_REGEXP = re.new /'(?:[^'\\]|\\.)*'/
   
-  DOUBLE_QUOTED_STRING_REGEXP = /"(?:[^"\\]|\\.)*"/
-  SINGLE_QUOTED_STRING_REGEXP = /'(?:[^'\\]|\\.)*'/
+  # STRING_REGEXP = \
+  #   re.or DOUBLE_QUOTED_STRING_REGEXP, SINGLE_QUOTED_STRING_REGEXP
   
-  STRING_REGEXP = \
-    re.or DOUBLE_QUOTED_STRING_REGEXP, SINGLE_QUOTED_STRING_REGEXP
+  # INTEGER_REGEXPS = [ /-?\d+/, /\d+/ ].map { |r| re.new r }
   
-  INTEGER_REGEXPS = [ /-?\d+/, /\d+/ ]
+  # FLOAT_REGEXP = re.new /-?\d*\.\d+/
   
-  FLOAT_REGEXP = /-?\d*\.\d+/
+  # EXPR_REGEXP = backtick_quote '[^\`]*'
+  
+  
+  # # The list of {::Regexp} for the different things that can be a value.
+  # # 
+  # # Though we can (and will!) combine them using {NRSER::Regexps::Composed.or},
+  # # inspection of {::Cucumber::CucumberExpressions::ParameterType} reveals not
+  # # only that it accepts a list of possible regular expressions, but it simply
+  # # extracts the source strings from them, so this should be more efficient and
+  # # be much easier to deal with in debugging.
+  # # 
+  # # @return [::Array<::Regexp>]
+  # # 
+  # VALUE_REGEXPS = [ STRING_REGEXP,
+  #                   *INTEGER_REGEXPS,
+  #                   FLOAT_REGEXP,
+  #                   EXPR_REGEXP,
+  #                   *Consts.declarations[ :const ][ :regexp ],
+  #                   *Methods.declarations[ :method ][ :regexp ] ]
+  
+  
+  # # {VALUE_REGEXPS} combined into a single expression using 
+  # # {NRSER::Regexps::Composed.or}, which we will need to form an expression to
+  # # match comma-separated list of them (for matching parameter lists).
+  # # 
+  # # @note
+  # #   This is a *terribly* long and complicated regular expression (over 1400
+  # #   characters at the moment).
+  # # 
+  # # @return [NRSER::Regexps::Composed]
+  # # 
+  # VALUE_REGEXP = re.or *VALUE_REGEXPS
   
   
   # Declarations
   # ============================================================================
   
-  declare           :expr,
-    regexp:         EXPR_REGEXP,
-    type:           ::Object,
-    transformer:    ->( string ) {
-      eval backtick_unquote( string )
-    }     
+  def self.block_expr? string
+    string = backtick_unquote( string ) if backtick_quoted?( string )
+    string.start_with? '&'
+  end
+  
+  def_parameter_type \
+    name:           :raw_expr,
+    patterns:       Tokens::Expr
+  
+  def_parameter_type \
+    name:           :expr_src,
+    patterns:       Tokens::Expr,
+    transformer:    :unquote
+  
+  def_parameter_type \
+    name:           :expr,
+    patterns:       Tokens::Expr,
+    transformer:    :to_value
   
   
-  declare           :value,
-    regexp:       [ STRING_REGEXP,
-                    *INTEGER_REGEXPS,
-                    FLOAT_REGEXP,
-                    *declarations[ :expr ][ :regexp ],
-                    *Consts.declarations[ :const ][ :regexp ],
-                    *Methods.declarations[ :method ][ :regexp ], ],
+  def_parameter_type \
+    name:         :value,
+    patterns:     [ Tokens::Expr,
+                    Tokens::Literal::String::SingleQuoted,
+                    Tokens::Literal::String::DoubleQuoted,
+                    Tokens::Literal::Integer,
+                    Tokens::Literal::Float,
+                    Tokens::Const,
+                    Tokens::Method::Singleton,
+                    Tokens::Method::Instance,
+                    Tokens::Method::Explicit::Singleton,
+                    Tokens::Method::Explicit::Instance, ],
     type:           ::Object,
-    transformer:    ->( string ) {
-      case string
-      when STRING_REGEXP
-        eval string
-        
-      when *INTEGER_REGEXPS
-        string.to_i
-        
-      when FLOAT_REGEXP
-        string.to_f
-        
-      when *declarations[ :expr ][ :regexp ]
-        instance_eval string, &declarations[ :expr ][ :transformer ]
-        
-      when *Consts.declarations[ :const ][ :regexp ]
-        instance_eval string, &Consts.declarations[ :const ][ :transformer ]
-      
-      when *Methods.declated[ :method ][ :regexp ]
-        instance_eval string, &Methods.declarations[ :method ][ :transformer ]
-        
-      else
-        raise NRSER::UnreachableError
-      end
-    }
+    transformer:    :to_value
+  
+  # FIXME !!!
+  # declare           :params,
+  #                   # Good lord... this {::Regexp} source is gonna be a messs...
+  #   regexp:         re.join(
+  #                       VALUE_REGEXP,
+  #                       '(?:,\s*', VALUE_REGEXP, ')*'
+  #                   ),
+  #   type:           ::Array,
+  #   transformer:    ->( string ) {
+  #     string.scan VALUE_REGEXP
+  #   }
+  
+  
+  
   
 end # module Values  
 

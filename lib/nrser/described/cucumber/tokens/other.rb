@@ -4,40 +4,56 @@
 # Requirements
 # =======================================================================
 
-# Stdlib
-# -----------------------------------------------------------------------
-
-# Deps
-# -----------------------------------------------------------------------
-
 # Project / Package
 # -----------------------------------------------------------------------
 
-require 'nrser/regexps/composed'
-require 'nrser/ext/regexp'
+# Extends {Token}
+require_relative './token'
+
+
+# Refinements
+# =======================================================================
+
+require 'nrser/refinements/regexps'
+using NRSER::Regexps
 
 
 # Namespace
 # =======================================================================
 
 module  NRSER
-module  Regexps
+module  Described
+module  Cucumber
+module  Tokens
+
 
 # Definitions
 # =======================================================================
 
-refine ::Regexp do
-  prepend NRSER::Ext::Regexp
-end
-
-refine ::Object do
-  def re
-    NRSER::Regexps::Composed
+# 
+class Other < Token
+  
+  quote nil
+  pattern '.*'
+  
+  unquote_type  self
+  to_value_type self
+  
+  def unquote
+    self
   end
-end
+  
+  def to_value
+    self
+  end
+  
+end # class Expr
+  
 
 # /Namespace
 # =======================================================================
 
-end # module Regexps
+end # module Tokens
+end # module Cucumber
+end # module Described
 end # module NRSER

@@ -35,14 +35,15 @@ module Descriptions
   extend Declare
   
   
-  declare           :described_name,
-    regexp:         NRSER::Described.human_name_pattern,
-    type:           ::String,
-    transformer:    ->( string ) { string }
+  def_parameter_type \
+    name:           :described_name,
+    patterns:       NRSER::Described.human_name_pattern,
+    type:           ::String
   
   
-  declare           :described,
-    regexp:         declarations[ :described_name ][ :regexp ],
+  def_parameter_type \
+    name:           :described,
+    patterns:       parameter_types[ :described_name ],
     type:           NRSER::Described::Base,
     transformer:    ->( string ) {
       described.find_by_human_name! string

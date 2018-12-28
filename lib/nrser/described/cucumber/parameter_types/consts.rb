@@ -10,8 +10,11 @@
 # Using names of Ruby things
 require 'nrser/meta/names'
 
+# Using the parameter tokens
+require 'nrser/described/cucumber/tokens'
+
 # Need to extend in the {Quote} mixin
-require_relative './quote'
+require 'nrser/described/cucumber/world/quote'
 
 # Need to extend in the {Declare} mixin to get `.declare`, etc.
 require_relative './declare'
@@ -42,40 +45,31 @@ module  ParameterTypes
 module Consts
   
   extend Declare
-  extend Quote
+  extend World::Quote
+  
+    
+  def_parameter_type \
+    name:           :const_name,
+    patterns:       Tokens::Const,
+    transformer:    :unquote
   
   
-  declare           :const_name,
-    regexp:         curly_quote( NRSER::Meta::Names::Const ),
-    type:           NRSER::Meta::Names::Const,
-    transformer:    ->( string ) {
-      NRSER::Meta::Names::Const.new curly_unquote( string )
-    }
+  def_parameter_type \
+    name:           :const,
+    patterns:       Tokens::Const,
+    transformer:    :to_value
   
   
-  declare           :const,
-    regexp:         declarations[ :const_name ][ :regexp ],
-    type:           NRSER::Meta::Names::Const,
-    transformer:    ->( string ) {
-      resolve_const NRSER::Meta::Names::Const.new( curly_unquote( string ) )
-    }
+  def_parameter_type \
+    name:           :module,
+    patterns:       Tokens::Const,
+    transformer:    :to_module
   
-  
-  declare           :module,
-    regexp:         declarations[ :const_name ][ :regexp ],
-    type:           NRSER::Meta::Names::Const,
-    transformer:    ->( string ) {
-      resolve_module NRSER::Meta::Names::Const.new( curly_unquote( string ) )
-    }
-  
-  
-  declare           :class,
-    regexp:         declarations[ :const_name ][ :regexp ],
-    type:           NRSER::Meta::Names::Const,
-    transformer:    ->( string ) {
-      resolve_class NRSER::Meta::Names::Const.new( curly_unquote( string ) )
-    }
-  
+
+  def_parameter_type \
+    name:           :class,
+    patterns:       Tokens::Const,
+    transformer:    :to_class
   
 end # module Consts  
 
