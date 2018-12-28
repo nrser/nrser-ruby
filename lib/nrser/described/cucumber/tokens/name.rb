@@ -107,11 +107,11 @@ class Method < Name
     quote :curly
     
     class Singleton < Explicit
-      name_class NRSER::Meta::Names::Method::Singleton
+      name_class NRSER::Meta::Names::Method::Explicit::Singleton
     end
     
     class Instance < Explicit
-      name_class NRSER::Meta::Names::Method::Instance
+      name_class NRSER::Meta::Names::Method::Explicit::Instance
     end
   end # class Explicit
 end # class Method
