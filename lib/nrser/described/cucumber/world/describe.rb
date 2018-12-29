@@ -196,15 +196,15 @@ module Describe
   end
   
   
-  def describe_positional_params value_strings
+  def describe_positional_params values
     
     # Handle the last entry being a `&...` expression, which is interpreted as 
     # the block parameter
-    if ParameterTypes::Values.block_expr? value_strings[ -1 ]
-      args = value_strings[ 0..-2 ].map { |s| value_for s }
-      block = value_for value_strings[ -1 ], accept_block: true
+    if values[ -1 ].is_a? Wrappers::Block
+      args = values[ 0..-2 ]
+      block = value_strings[ -1 ]
     else
-      args = value_strings.map { |s| value_for s }
+      args = values
       block = nil
     end
     

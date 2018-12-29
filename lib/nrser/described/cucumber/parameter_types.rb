@@ -71,9 +71,18 @@ module ParameterTypes
   end
   
   
-  def self.[] name
-    parameter_types[ name.to_sym ]
+  def self.find! name
+    name = name.to_sym unless name.is_a?( ::Symbol )
+    
+    definition_modules.each do |mod|
+      return mod.parameter_types[ name ] if mod.parameter_types.key?( name )
+    end
+    
+    raise NRSER::KeyError.new \
+      "Parameter type", name, "not found"
   end
+  
+  singleton_class.send :alias_method, :[], :find!
   
   
   def self.register!

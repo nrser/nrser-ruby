@@ -36,6 +36,8 @@ module ValueFor
   # ========================================================================
   
   def value_for value_string, accept_block: false
+    raise "HERE"
+    
     # if accept_block && ParameterTypes::Values.block_expr?( value_string )
     #   eval "->( &block ) { block }.call( #{ value_string } )"
     # else
@@ -44,7 +46,7 @@ module ValueFor
     #     &ParameterTypes::Values.declarations[ :value ][ :transformer ]
     # end
     
-    ParameterTypes::Values[ :value ].transform self, [ value_string ]
+    # ParameterTypes::Values[ :value ].transform self, [ value_string ]
   
     # if expr? string
     #   source_string = backtick_unquote string

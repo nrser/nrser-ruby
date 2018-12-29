@@ -118,7 +118,7 @@ module Values
     transformer:    :to_value
   
   
-  def_parameter_type \
+  VALUE = def_parameter_type \
     name:         :value,
     patterns:     [ Tokens::Expr,
                     Tokens::Literal::String::SingleQuoted,
@@ -134,28 +134,30 @@ module Values
     transformer:    :to_value
   
   
-  def_parameter_type \
-    name:           :params,
+  # A comma-separated list of {VALUE}.
+  # 
+  # @return [ParameterType]
+  # 
+  VALUES = def_parameter_type \
+    name:           :values,
                     # Good lord... this {::Regexp} source is gonna be a messs...
     patterns:       re.join(
-                      parameter_types[ :value ],
-                      '(?:,\s*', parameter_types[ :value ], ')*'
+                      VALUE,
+                      '(?:,\s*', VALUE, ')*'
                     ),
-    # patterns:       re.join(
-    #                   /abc/,
-    #                   '(?:,\s*', /abc/, ')*'
-    #                 ),
     type:           ::Array,
     transformer:    ->( full_string ) {
-      parameter_type = \
-        NRSER::Described::Cucumber::ParameterTypes::Values.
-          parameter_types[ :value ]
+      # Need to use full path to the constant here since we're evaluated in
+      # the scenario instance
+      value_parameter_type = \
+        NRSER::Described::Cucumber::ParameterTypes::Values::VALUE
+      
       full_string.
-        scan( parameter_type.to_re )
+        scan( value_parameter_type.to_re ).
+        map { |raw_value_string|
+          value_parameter_type.transform self, [ raw_value_string ]
+        }
     }
-  
-  
-  
   
 end # module Values  
 

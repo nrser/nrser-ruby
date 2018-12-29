@@ -19,6 +19,9 @@ require 'nrser/described/cucumber/tokens'
 # Need to extend in the {Declare} mixin to get `.declare`, etc.
 require_relative './declare'
 
+# Need {Values::VALUE} parameter type to match value strings
+require_relative './values'
+
 
 # Refinements
 # =======================================================================
@@ -48,7 +51,14 @@ module Params
   extend World::Quote
   
   
-  def_parameter_type \
+  # Constants
+  # ========================================================================
+  
+  # Match a parameter name.
+  # 
+  # @return [ParameterType]
+  # 
+  PARAM_NAME = def_parameter_type \
     name:          :param_name,
     patterns:     [ Tokens::Param::Positional,
                     Tokens::Param::Keyword,
@@ -57,7 +67,6 @@ module Params
                     Tokens::Param::KeyRest, ],
     type:           NRSER::Meta::Names::Param,
     transformer:    :unquote
-    
       
 end # module Params  
 

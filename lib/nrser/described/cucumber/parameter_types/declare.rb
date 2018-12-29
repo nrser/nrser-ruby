@@ -39,7 +39,7 @@ module Declare
   
   
   def [] name
-    parameter_types[ name.to_sym ]
+    parameter_types.fetch name.to_sym
   end
   
   

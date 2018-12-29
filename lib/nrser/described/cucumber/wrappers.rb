@@ -27,6 +27,10 @@ module Wrappers
   
   module Strings
     class Src < ::String
+      def block?
+        start_with? '&'
+      end
+      
       # @return [Block]
       #   If {.block?} is `true`.
       # 
@@ -35,9 +39,9 @@ module Wrappers
       # 
       def to_value self_obj
         if block?
-          self_obj.eval "#{ Block.name }.new #{ self }"
+          self_obj.send :eval, "#{ Block.name }.new #{ self }"
         else
-          self_obj.eval self
+          self_obj.send :eval, self
         end
       end
     end # class Src
