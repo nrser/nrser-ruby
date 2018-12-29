@@ -48,71 +48,21 @@ module Values
   extend World::Quote
   
   
-  # Constants
-  # ========================================================================
+  # Parameter Types
+  # ========================================================================  
   
-  # DOUBLE_QUOTED_STRING_REGEXP = re.new /"(?:[^"\\]|\\.)*"/
-  # SINGLE_QUOTED_STRING_REGEXP = re.new /'(?:[^'\\]|\\.)*'/
-  
-  # STRING_REGEXP = \
-  #   re.or DOUBLE_QUOTED_STRING_REGEXP, SINGLE_QUOTED_STRING_REGEXP
-  
-  # INTEGER_REGEXPS = [ /-?\d+/, /\d+/ ].map { |r| re.new r }
-  
-  # FLOAT_REGEXP = re.new /-?\d*\.\d+/
-  
-  # EXPR_REGEXP = backtick_quote '[^\`]*'
-  
-  
-  # # The list of {::Regexp} for the different things that can be a value.
-  # # 
-  # # Though we can (and will!) combine them using {NRSER::Regexps::Composed.or},
-  # # inspection of {::Cucumber::CucumberExpressions::ParameterType} reveals not
-  # # only that it accepts a list of possible regular expressions, but it simply
-  # # extracts the source strings from them, so this should be more efficient and
-  # # be much easier to deal with in debugging.
-  # # 
-  # # @return [::Array<::Regexp>]
-  # # 
-  # VALUE_REGEXPS = [ STRING_REGEXP,
-  #                   *INTEGER_REGEXPS,
-  #                   FLOAT_REGEXP,
-  #                   EXPR_REGEXP,
-  #                   *Consts.declarations[ :const ][ :regexp ],
-  #                   *Methods.declarations[ :method ][ :regexp ] ]
-  
-  
-  # # {VALUE_REGEXPS} combined into a single expression using 
-  # # {NRSER::Regexps::Composed.or}, which we will need to form an expression to
-  # # match comma-separated list of them (for matching parameter lists).
-  # # 
-  # # @note
-  # #   This is a *terribly* long and complicated regular expression (over 1400
-  # #   characters at the moment).
-  # # 
-  # # @return [NRSER::Regexps::Composed]
-  # # 
-  # VALUE_REGEXP = re.or *VALUE_REGEXPS
-  
-  
-  # Declarations
-  # ============================================================================
-  
-  def self.block_expr? string
-    string = backtick_unquote( string ) if backtick_quoted?( string )
-    string.start_with? '&'
-  end
-  
-  def_parameter_type \
+  RAW_EXPR = def_parameter_type \
     name:           :raw_expr,
     patterns:       Tokens::Expr
   
-  def_parameter_type \
+  
+  EXPR_SRC = def_parameter_type \
     name:           :expr_src,
     patterns:       Tokens::Expr,
     transformer:    :unquote
   
-  def_parameter_type \
+  
+  EXPR = def_parameter_type \
     name:           :expr,
     patterns:       Tokens::Expr,
     transformer:    :to_value
@@ -141,10 +91,7 @@ module Values
   VALUES = def_parameter_type \
     name:           :values,
                     # Good lord... this {::Regexp} source is gonna be a messs...
-    patterns:       re.join(
-                      VALUE,
-                      '(?:,\s*', VALUE, ')*'
-                    ),
+    patterns:       re.join( VALUE, '(?:,\s*', VALUE, ')*' ),
     type:           ::Array,
     transformer:    ->( full_string ) {
       # Need to use full path to the constant here since we're evaluated in
