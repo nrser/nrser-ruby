@@ -47,26 +47,41 @@ module Consts
   extend Declare
   extend World::Quote
   
-    
-  def_parameter_type \
+  # Match a {Tokens::Const} string.
+  # 
+  # @return {ParameterType}
+  # 
+  CONST_NAME = def_parameter_type \
     name:           :const_name,
     patterns:       Tokens::Const,
     transformer:    :unquote
   
   
-  def_parameter_type \
+  # Match a {Tokens::Const} and resolve it or raise.
+  # 
+  # @return {ParameterType}
+  # 
+  CONST = def_parameter_type \
     name:           :const,
     patterns:       Tokens::Const,
     transformer:    :to_value
   
   
-  def_parameter_type \
+  # Match a {Tokens::Const} and resolve it to a {::Module} or raise.
+  # 
+  # @return {ParameterType}
+  # 
+  MODULE = def_parameter_type \
     name:           :module,
     patterns:       Tokens::Const,
     transformer:    :to_module
   
-
-  def_parameter_type \
+  
+  # Match a {Tokens::Const} and resolve it to a {::Class} or raise.
+  # 
+  # @return {ParameterType}
+  # 
+  CLASS = def_parameter_type \
     name:           :class,
     patterns:       Tokens::Const,
     transformer:    :to_class

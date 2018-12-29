@@ -164,35 +164,18 @@ class ParameterType < ::Cucumber::CucumberExpressions::ParameterType
   #   
   #   When a {::Symbol} is provided, it is interpreted as the name of an 
   #   instance method on {Tokens::Token} to call on each matched token to create
-  #   the final transformed value.
+  #   the final transformed value, and a `transformer:` {::Proc} generated
+  #   to properly handle matches.
   #   
-  #   In practice, `:unquote` and `:to_value` are used to denote the 
-  #   {Tokens::Token#unquote} and {Tokens::Token#to_value} methods,
-  #   respectively, and unless you're only matching your own extensions of 
-  #   {Tokens::Token} that all implement a new method, or doing something clever
-  #   or idiotic that I haven't thought of, you should probably stick to those
-  #   too.
+  #   `:unquote` and `:to_value` should be supported for all {Tokens::Token},
+  #   and {Tokens::Token} subclasses may define methods to support additional
+  #   transformations ({Tokens::Const} does so with `:to_class` and 
+  #   `:to_module`).
   #   
-  #   In detail, the instance method must exist on all tokens that the parameter
-  #   type will process, and may take either:
+  #   See
+  #   {file:lib/nrser/described/cucumber/parameter_types/doc/parameter_type/generated_transformers.md}
+  #   for detailed information.
   #   
-  #   1.  Zero parameters. This denotes that the transformation is independent
-  #       of the scenario instance environment, as it will be called with no 
-  #       parameters and will not have anything except it's own instance data
-  #       and generally accessible objects to use.
-  #       
-  #       This is the case for {Tokens::Token#unquote} and many 
-  #       {Tokens::Token#to_value} like {Tokens::Literal::Integer} that do not
-  #       need access to the scenario instance.
-  #       
-  #   2.  One parameter, which will be the scenario instance (called `self_obj`
-  #       in the relevant code here and in Cucumber).
-  #       
-  #       This denotes that the token needs the scenario instance to transform.
-  #       
-  #       This is the case for {Tokens::Expr}, which `eval`s it's unquoted
-  #       contents in the scenario instance to permit access to the scenario
-  #       data.
   #  
   def initialize  name:,
                   patterns:,

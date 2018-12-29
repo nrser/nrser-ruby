@@ -16,8 +16,8 @@
 # {Name} subclasses wrap name patterned classes
 require 'nrser/meta/names'
 
-# {Name} extends {Token}
-require_relative './token'
+# {Const} extends {Name}
+require_relative './name'
 
 
 # Refinements
@@ -39,24 +39,31 @@ module  Tokens
 # Definitions
 # =======================================================================
 
-  
-class Name < Token
+class Param < Name
+  quote :backtick
 
-  def self.name_class name_class = nil
-    unless name_class.nil?
-      unquote_type name_class
-      pattern send( "#{ quote }_quote", name_class )
-    end
-    
-    unquote_type
+  class Positional < Param
+    name_class NRSER::Meta::Names::Param::Positional
   end
   
-  def unquote
-    self.class.unquote_type.new super()
+  class Keyword < Param
+    name_class NRSER::Meta::Names::Param::Keyword
   end
   
-end # class Name
+  class Block < Param
+    name_class NRSER::Meta::Names::Param::Block
+  end
   
+  class Rest < Param
+    name_class NRSER::Meta::Names::Param::Rest
+  end
+  
+  class KeyRest < Param
+    name_class NRSER::Meta::Names::Param::KeyRest
+  end
+  
+end # class Param
+
 
 # /Namespace
 # =======================================================================

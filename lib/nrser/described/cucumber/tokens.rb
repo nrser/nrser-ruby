@@ -14,11 +14,13 @@
 # -----------------------------------------------------------------------
 
 # Subtree
+require_relative './tokens/const'
 require_relative './tokens/expr'
 require_relative './tokens/literal'
-require_relative './tokens/name'
+require_relative './tokens/method'
 require_relative './tokens/other'
-require_relative './tokens/token'
+require_relative './tokens/param'
+require_relative './tokens/var'
 
 
 # Refinements
@@ -43,25 +45,8 @@ module  Cucumber
 # process classes of string input from Cucumber feature files.
 # 
 module Tokens
-  
-  # class Value < Token
-  #   pattern \
-  #     re.or(
-  #       Expr::Quoted,
-  #       Literal::String::SingleQuoted,
-  #       Literal::String::DoubleQuoted,
-  #       Literal::Integer,
-  #       Literal::Float,
-  #       Link::Const,
-  #       Link::Method::Singleton,
-  #       Link::Method::Instance,
-  #       Link::Method::Explicit::Singleton,
-  #       Link::Method::Explicit::Instance,
-  #       full: true
-  #     )
-  # end # Value
-  
 end # module Tokens
+
 
 # /Namespace
 # =======================================================================

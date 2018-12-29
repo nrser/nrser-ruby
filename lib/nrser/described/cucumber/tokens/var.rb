@@ -16,8 +16,8 @@
 # {Name} subclasses wrap name patterned classes
 require 'nrser/meta/names'
 
-# {Name} extends {Token}
-require_relative './token'
+# {Const} extends {Name}
+require_relative './name'
 
 
 # Refinements
@@ -39,24 +39,46 @@ module  Tokens
 # Definitions
 # =======================================================================
 
+# Tokens that match variables names by extending {Name} and referencing
+# {NRSER::Meta::Names::Var} subclasses.
+# 
+class Var < Name
   
-class Name < Token
+  # Config
+  # ==========================================================================
+  
+  # All variable tokens are backtick (`) quoted.
+  quote :backtick
+  
+  
+  # Subclasses
+  # ==========================================================================
+  
+  # {Var} token matching local variable names via
+  # {NRSER::Meta::Names::Var::Local}.
+  # 
+  class Local < Var
+    name_class NRSER::Meta::Names::Var::Local
+  end
+  
+  
+  # {Var} token matching instance variable names via
+  # {NRSER::Meta::Names::Var::Instance}.
+  # 
+  class Instance < Var
+    name_class NRSER::Meta::Names::Var::Instance
+  end
+  
+  
+  # {Var} token matching global variable names (really, anything starting with
+  # `$`) via {NRSER::Meta::Names::Var::Global}.
+  # 
+  class Global < Var
+    name_class NRSER::Meta::Names::Var::Global
+  end
+  
+end # class Var
 
-  def self.name_class name_class = nil
-    unless name_class.nil?
-      unquote_type name_class
-      pattern send( "#{ quote }_quote", name_class )
-    end
-    
-    unquote_type
-  end
-  
-  def unquote
-    self.class.unquote_type.new super()
-  end
-  
-end # class Name
-  
 
 # /Namespace
 # =======================================================================
