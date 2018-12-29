@@ -35,7 +35,7 @@ module Descriptions
   extend Declare
   
   
-  def_parameter_type \
+  DESCRIBED_NAME = def_parameter_type \
     name:           :described_name,
     patterns:       NRSER::Described.human_name_pattern,
     type:           ::String
@@ -43,7 +43,7 @@ module Descriptions
   
   def_parameter_type \
     name:           :described,
-    patterns:       parameter_types[ :described_name ],
+    patterns:       DESCRIBED_NAME,
     type:           NRSER::Described::Base,
     transformer:    ->( string ) {
       described.find_by_human_name! string

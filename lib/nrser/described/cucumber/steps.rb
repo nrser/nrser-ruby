@@ -4,12 +4,6 @@
 # Requirements
 # =======================================================================
 
-# Stdlib
-# -----------------------------------------------------------------------
-
-# Deps
-# -----------------------------------------------------------------------
-
 # Project / Package
 # -----------------------------------------------------------------------
 
@@ -17,6 +11,7 @@
 require_relative './steps/classes'
 require_relative './steps/expectations'
 require_relative './steps/methods'
+require_relative './steps/modules'
 require_relative './steps/objects'
 require_relative './steps/parameters'
 require_relative './steps/responses'

@@ -51,7 +51,7 @@ module Parameters
           table.rows.map { |row|
             ParameterTypes::Values::VALUE.transform self, [ row.first ]
           }
-        
+      
       when 2
         # The table is interpreted as parameter name/value pairs, with the names
         # in {NRSER::Meta::Names} format (`arg`, `kwd:`, `&block`)

@@ -202,7 +202,7 @@ module Describe
     # the block parameter
     if values[ -1 ].is_a? Wrappers::Block
       args = values[ 0..-2 ]
-      block = value_strings[ -1 ]
+      block = values[ -1 ]
     else
       args = values
       block = nil
