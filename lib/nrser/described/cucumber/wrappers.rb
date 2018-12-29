@@ -26,9 +26,6 @@ module Wrappers
   
   
   module Strings
-    class Match < ::String
-    end # class 
-    
     class Src < ::String
       # @return [Block]
       #   If {.block?} is `true`.
