@@ -10,16 +10,15 @@
 # Deps
 # -----------------------------------------------------------------------
 
+# Need {::Cucumber::Glue::DSL.register_rb_step_definition} to register
+require 'cucumber/glue/dsl'
+
 # Project / Package
 # -----------------------------------------------------------------------
 
-# Subtree
-require_relative './steps/classes'
-require_relative './steps/expectations'
-require_relative './steps/methods'
-require_relative './steps/objects'
-require_relative './steps/parameters'
-require_relative './steps/responses'
+
+# Refinements
+# =======================================================================
 
 
 # Namespace
@@ -28,21 +27,26 @@ require_relative './steps/responses'
 module  NRSER
 module  Described
 module  Cucumber
+module  Steps
 
 
 # Definitions
 # =======================================================================
 
-# Submodules define (register) the {::Cucumber::Glue::StepDefinition}s (the
-# normal Given, When and Then, which are all just aliases to the same thing).
-#
-module Steps
-end # module Steps
-
+module Helpers
+  
+  def Step *args, &block
+    ::Cucumber::Glue::Dsl.
+      instance_method( :register_rb_step_definition ).
+      bind( self ).call *args, &block
+  end
+  
+end # module Helpers
 
 # /Namespace
 # =======================================================================
 
+end # module Steps
 end # module Cucumber
 end # module Described
 end # module NRSER

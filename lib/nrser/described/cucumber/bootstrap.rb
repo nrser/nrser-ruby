@@ -23,3 +23,5 @@ World NRSER::Described::Cucumber::World::ValueFor
 World NRSER::Described::Cucumber::World::Quote
 
 NRSER::Described::Cucumber::ParameterTypes.register!
+
+require_relative './steps'

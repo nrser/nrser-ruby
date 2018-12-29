@@ -4,22 +4,11 @@
 # Requirements
 # =======================================================================
 
-# Stdlib
-# -----------------------------------------------------------------------
-
-# Deps
-# -----------------------------------------------------------------------
-
 # Project / Package
 # -----------------------------------------------------------------------
 
-# Subtree
-require_relative './steps/classes'
-require_relative './steps/expectations'
-require_relative './steps/methods'
-require_relative './steps/objects'
-require_relative './steps/parameters'
-require_relative './steps/responses'
+# Extending in {Helpers}
+require_relative './helpers'
 
 
 # Namespace
@@ -28,21 +17,34 @@ require_relative './steps/responses'
 module  NRSER
 module  Described
 module  Cucumber
+module  Steps
 
 
 # Definitions
 # =======================================================================
 
-# Submodules define (register) the {::Cucumber::Glue::StepDefinition}s (the
-# normal Given, When and Then, which are all just aliases to the same thing).
-#
-module Steps
-end # module Steps
-
+module Objects
+  
+  # Mixins
+  # ==========================================================================
+  
+  extend Helpers
+  
+  
+  # Steps
+  # ==========================================================================
+  
+  THE_OBJECT = \
+    Step "the object {value}" do |value|
+      describe :object, subject: value
+    end
+  
+end # module Objects
 
 # /Namespace
 # =======================================================================
 
+end # module Steps
 end # module Cucumber
 end # module Described
 end # module NRSER

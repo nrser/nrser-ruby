@@ -52,7 +52,7 @@ module Describe
   # 
   # @return [::Module]
   # 
-  def Names; NRSER::Meta::Names;  end
+  Names = NRSER::Meta::Names
   
   
   # @!group Accessing Descriptions Instance Methods
