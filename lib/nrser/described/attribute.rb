@@ -7,16 +7,15 @@
 # Project / Package
 # -----------------------------------------------------------------------
 
-# Subtree
-require_relative './steps/attributes'
-require_relative './steps/classes'
-require_relative './steps/errors'
-require_relative './steps/expectations'
-require_relative './steps/methods'
-require_relative './steps/modules'
-require_relative './steps/objects'
-require_relative './steps/parameters'
-require_relative './steps/responses'
+# Extending {Base}
+require_relative './base'
+
+
+# Refinements
+# =======================================================================
+
+require 'nrser/refinements/types'
+using NRSER::Types
 
 
 # Namespace
@@ -24,22 +23,29 @@ require_relative './steps/responses'
 
 module  NRSER
 module  Described
-module  Cucumber
 
 
 # Definitions
 # =======================================================================
 
-# Submodules define (register) the {::Cucumber::Glue::StepDefinition}s (the
-# normal Given, When and Then, which are all just aliases to the same thing).
-#
-module Steps
-end # module Steps
+# @todo doc me!
+# 
+class Attribute < Base
+  
+  # Config
+  # ========================================================================
+  
+  subject_type ::Object
+  
+  from object: Object, :@name => self.Names::Method do |object:, name:|
+    object.public_send name
+  end
+  
+end # class Attribute
 
 
 # /Namespace
 # =======================================================================
 
-end # module Cucumber
 end # module Described
 end # module NRSER

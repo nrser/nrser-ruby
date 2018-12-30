@@ -66,6 +66,12 @@ class Base
   include NRSER::Log::Mixin
   
   
+  # Constants
+  # ========================================================================
+  
+  RESOLUTION_TYPE = t.IsA( Resolution ) & t.Attributes( :resolved? => true )
+  
+  
   # Singleton Methods
   # ========================================================================
   
@@ -196,9 +202,11 @@ class Base
   # ========================================================================
   
   # Instantiate a new `Base`.
-  def initialize parent: nil, **kwds
+  def initialize parent: nil, head:, **kwds
+    @head = head
     @parent = parent
     @resolved = nil
+    @resolving = false
     
     if kwds.key? :subject
       self.subject = kwds[ :subject ]
@@ -242,18 +250,63 @@ class Base
   end
   
   
-  def each_ancestor &block
+  def each &block
     if block.nil?
       enum_for __method__
-    elsif !parent.nil?
-      yield parent
-      parent.each_ancestor &block
+    else
+      yield self
+      parent.each &block if !parent.nil?
     end
+  end
+  
+  
+  # Is this description inside it's {#resolve_subject!} method?
+  # 
+  # We need to know when picking descriptions to attempt to resolve against
+  # so we can avoid resolution loops.
+  # 
+  # @return [Boolean]
+  # 
+  def resolving?
+    @resolving
   end
   
   
   private
   # ========================================================================
+    
+    # Set the `@resolution`. It can only be set once. This sets the {#subject}
+    # as well.
+    # 
+    # @private
+    # 
+    # @param [Resolution] resolution
+    #   The resolution for this description's subject. Checked with 
+    #   {RESOLUTION_TYPE}, which verifies it's class and that it's
+    #   {Resolution#resolved?}.
+    # 
+    # @return [Resolution]
+    #   The resolution.
+    # 
+    # @raise [NRSER::ConflictError]
+    #   If `@resolution` is already set.
+    # 
+    # @raise (see #subject=)
+    # 
+    def resolution= resolution
+      unless @resolution.nil?
+        raise NRSER::ConflictError.new \
+          "`@resolution` already set",
+            current_resolution: @resolution,
+            resolution_arg: resolution
+      end
+      
+      RESOLUTION_TYPE.check! resolution
+      
+      self.subject = resolution.subject
+      @resolution = resolution
+    end # #resolution=
+      
     
     # Set `@subject` from the first successful {Resolution}.
     #
@@ -290,38 +343,85 @@ class Base
     # 
     # @raise [Resolution::AllFailedError]
     #   When subject resolution fails.
-    #   
     # 
     def resolve_subject!
-      resolutions = self.class.from.
-        map { |from| Resolution.new from: from, described: self }
-      
-      resolved = resolutions.find &:resolved?
-      
-      unless resolved.nil?
-        return resolved_from_ivars
+      # Protect from re-entry while resolving. This helps catching resolution
+      # loops by being clear about what happen and providing a cleaner stack
+      # trace than the stack overflow likely to happen otherwise.
+      if @resolving
+        raise NRSER::UnreachableError.new \
+          "Subject resolution loop!",
+          described: self
       end
       
-      each_ancestor.find { |described|
-        resolutions.find { |resolution|
-          resolution.update! described
-          resolved = resolution if resolution.resolved?
-        }
-      }
-      
-      if resolved.nil?
-        raise Resolution::AllFailedError.new "Unable to resolve", self,
-          resolutions: resolutions
+      # Ensure around the rest of the the method to make sure we set 
+      # `@resolving` to `false` when exiting.
+      begin
+        # Set the resolving flag so that neither this described nor any others
+        # attempt to resolve from it while it is resolving.
+        @resolving = true
+        
+        # Construct resolution instances for each of the {From} instances 
+        # declared on the class
+        resolutions = self.class.from.
+          map { |from| Resolution.new from: from, described: self }
+        
+        # Set the resolution:
+        # 
+        # 1.  If any of the resolutions was already able to resolve, use that.
+        # 2.  Otherwise, call {#update_until_resolved!} to update from the 
+        #     description hierarchy or raise.
+        # 
+        self.resolution = \
+          resolutions.find( &:resolved? ) ||
+            update_until_resolved!( resolutions )
+        
+        nil
+      ensure
+        # Set `@resolving` to false when exiting the method regardless of
+        # what happen
+        @resolving = false
       end
-      
-      @resolution = t.IsA( Resolution ).check! resolved
-      self.subject = resolved.subject
-      
-      nil
     end # #resolve_subject!
     
+    
+    # For each {Described::Base} available, iterate over each of `resolutions`,
+    # updating them from the {Described::Base}. As soon as a {Resolution} 
+    # succeeds, return it. If none do, raise.
+    # 
+    # @private
+    # 
+    # @param [::Array<Resolution>] resolutions
+    #   The {Resolution} instances to update and check for 
+    #   {Resolution#resolved?}.
+    # 
+    # @return [Resolution]
+    #   The first {Resolution#resolved?} instance.
+    # 
+    # @raise [Resolution::AllFailedError]
+    #   When subject resolution fails.
+    # 
+    def update_until_resolved! resolutions
+      @head.call.each.
+        # Skip any descriptions that are resolving - including ourself - 
+        # because in order to resolve our subject, we will need to resolve
+        # theirs too, and if they are resolving, using them can create a 
+        # resolution loop
+        reject( &:resolving? ).
+        each { |described|
+          resolutions.each { |resolution|
+            resolution.update! described
+            return resolution if resolution.resolved?
+          }
+        }
+      
+      # If we didn't find a successful resolution and return it then we
+      # have failed
+      raise Resolution::AllFailedError.new "Unable to resolve", self,
+        resolutions: resolutions
+    end # #update_until_resolved!
+    
   public # end private *****************************************************
-  
   
 end # class Base
 

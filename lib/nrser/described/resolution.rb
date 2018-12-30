@@ -98,6 +98,10 @@ class Resolution
   #   If the parameter values don't satisfy their types.
   #   
   def initialize from:, described:
+    logger.trace "Constructing resolution",
+      for_described: described,
+      from: from
+    
     @from = t( From ).check! from
     @described = t( Base ).check! described
     
@@ -475,6 +479,17 @@ class Resolution
   end
   
   
+  def values
+    @values.transform_values { |value|
+      if value.is_a? Described::Base
+        value.subject
+      else
+        value
+      end
+    }
+  end
+  
+  
   def subject
     return @subject if instance_variable_defined? :@subject
     
@@ -484,7 +499,9 @@ class Resolution
         resolution: self
     end
     
-    from.init_block.call **@values
+    @subject = from.init_block.call **values
+    
+    @subject
   end
   
 end # class Resolution

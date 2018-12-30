@@ -69,40 +69,78 @@ module Scope
   # @return [Object]
   # 
   def resolve_const name
-    names = name.split '::'
+    const_name = Meta::Names::Const.new name
     
-    # Trigger a built-in NameError exception including the ill-formed constant in the message.
-    Object.const_get(camel_cased_word) if names.empty?
-
-    # Remove the first blank element in case of '::ClassName' notation.
-    starting_point = if names.size > 1 && names.first.empty?
-      names.shift
-      ::Object
+    # Trigger a built-in NameError exception including the ill-formed constant
+    # in the message.
+    Object.const_get( const_name ) if const_name.segments.empty?
+    
+    starting_points = if const_name.absolute?
+      [ ::Object ]
     else
-      scope
+      [ scope, ::Object ]
     end
-
-    names.inject(starting_point) do |constant, name|
-      if constant == Object
-        constant.const_get(name)
-      else
-        candidate = constant.const_get(name)
-        next candidate if constant.const_defined?(name, false)
-        next candidate unless Object.const_defined?(name)
-
-        # Go down the ancestors to check if it is owned directly. The check
-        # stops when we reach Object or the end of ancestors tree.
-        constant = constant.ancestors.inject(constant) do |const, ancestor|
-          break const    if ancestor == Object
-          break ancestor if ancestor.const_defined?(name, false)
-          const
-        end
-
-        # owner is in Object, so raise
-        constant.const_get(name, false)
+    
+    starting_points.each do |starting_point|
+      begin
+        return resolve_const_from const_name, starting_point
+      rescue NameError => error
+        # pass
       end
-    end
+    end # starting_points.each
+    
+    raise NameError.new \
+      "Unable to resolve constant {#{ const_name }}"
   end # #resolve_const
+  
+  
+  private
+  # ========================================================================
+    
+    def resolve_const_from const_name, starting_point
+      const_name.
+        segments.
+        reduce starting_point do |constant, const_name_segment|
+          candidate = constant.const_get const_name_segment
+          
+          # If the constant is {::Object} then we're good to continue with the 
+          # candidate (since we don't have to think about inheritance..?)
+          next candidate if constant == ::Object
+          
+          # If the candidate was a constant in the constant *itself* (not inherited)
+          # then we're good
+          next candidate if constant.const_defined?( const_name_segment, false )
+          
+          # Also... if the candidate is *not* a constant defined in {::Object}
+          # then we're gonna use it..?
+          next candidate unless ::Object.const_defined?( const_name_segment )
+          
+          # So... now we know it's defined in {::Object}..?
+          
+          # Go down the ancestors to check if it is owned directly. The check
+          # stops when we reach Object or the end of ancestors tree.
+          constant = constant.ancestors.reduce constant do |constant, ancestor|
+            # If we've iterated ancestors until we hit {::Object}, so assign the
+            # current constant
+            break constant if ancestor == ::Object
+            
+            # We found an ancestor that has the const, so assign that
+            break ancestor if ancestor.const_defined?( const_name_segment, false )
+            
+            # Just keep going with the current constant. If this is the end of the
+            # ancestors, and we never found the constant or hit {::Object} then this
+            # value - which *is* the same as the constant before we started - will 
+            # be stuck back in constant
+            constant
+          end
+          
+          # "owner is in Object, so raise" - huh? I don't get that... does this 
+          # **always** raise? Is all the work up there just to do this?
+          constant.const_get const_name_segment, false
+        end # reduce
+    end # #resolve_const_from
+  
+  public # end private *****************************************************
   
   
   # Helper that resolves a constant, first from the {#scope}, then globally, and

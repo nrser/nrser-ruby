@@ -4,18 +4,11 @@
 # Requirements
 # =======================================================================
 
-# Stdlib
-# -----------------------------------------------------------------------
-
-# Deps
-# -----------------------------------------------------------------------
-
 # Project / Package
 # -----------------------------------------------------------------------
 
-
-# Refinements
-# =======================================================================
+# Using names when resolving methods
+require 'nrser/meta/names'
 
 
 # Namespace
@@ -34,42 +27,61 @@ module Decorate
   
   # Resolve a method name to a reference object.
   # 
-  # @example
-  #   class A
+  # @param [#to_s] name
+  #   The method name, preferably prefixed with `.` or `#` to indicate if it's
+  #   a singleton or class method.
+  # 
+  # @param [nil | :singleton | :class | :instance | #to_sym ] default_type
+  #   Identifies singleton/instance methods when the name doesn't.
+  #   
+  #   `:singleton` and `:class` mean the same thing.
+  #   
+  #   Tries to convert values to symbols before matching them.
+  #   
+  #   If `nil`, `name:` **MUST** identify the method type by prefix.
+  # 
+  # @return [ ::Method | ::UnboundMethod ]
+  #   The method object.
+  # 
+  # @raise [NRSER::ArgumentError]
+  #   
+  # 
   def resolve_method name:, default_type: nil
-    string_name = name.to_s
-    
-    unless  default_type.nil? ||
-            default_type == :instance ||
-            default_type == :singleton ||
-            default_type == :class
-      raise NRSER::ArgumentError.new \
-        "`default_type:` param must be `nil`, `:instance`, `:singleton` or",
-        "`:class`, found", default_type
-    end
-  
-    if string_name.start_with? '#'
-      instance_method string_name[ 1..-1 ]
-    elsif string_name.start_with? '.'
-      method string_name[ 1..-1 ]
-    else
-      case default_type
+    case name
+    when Meta::Names::Method::Bare
+      case default_type&.to_sym
       when nil
         raise NRSER::ArgumentError.new \
           "When `default_type:` param is `nil` `name:` must start with '.'",
           "or '#'",
-          name: string_name
-      when :instance
-        instance_method string_name
+          name: name
+          
       when :singleton, :class
-        method string_name
+        method name
+        
+      when :instance
+        instance_method name
+        
       else
-        raise NRSER::UnreachableError.new \
-          "Should not be possible given preceding checks of ",
-          "`default_type: param`"
+        raise NRSER::ArgumentError.new \
+          "`default_type:` param must be `nil`, `:instance`, `:singleton` or",
+          "`:class`, found", default_type.inspect,
+          name: name,
+          default_type: default_type
+        
       end
-    end
-  end
+    
+    when Meta::Names::Method::Singleton
+      method Meta::Names::Method::Singleton.new( name ).bare_name
+    
+    when Meta::Names::Method::Instance
+      instance_method Meta::Names::Method::Instance.new( name ).bare_name
+    
+    else
+      raise NRSER::ArgumentError.new \
+        "`name:` does not look like a method name:", name.inspect
+    end 
+  end # #resolve_method
   
   
   def decorate *decorators, target

@@ -395,6 +395,11 @@ class Patterned < ::String
   end # .new
   
   
+  def self.=== value
+    value.is_a?( self ) || pattern =~ value
+  end
+  
+  
   # Instance Methods
   # ========================================================================
   

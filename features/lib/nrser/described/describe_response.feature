@@ -16,7 +16,7 @@ Feature: Describe a method's response
     
     Then the response is equal to "String"
   
-  
+  @focus
   Scenario: (2)  Using implicit ("it(s)") language
     
     This is functionally the same as scenario (1), but uses "it(s)" to build the

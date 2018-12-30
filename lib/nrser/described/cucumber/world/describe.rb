@@ -136,6 +136,7 @@ module Describe
             const_get( described_name.to_s.camelize ).
             new \
               **( kwds || {} ),
+              head: -> { self.described },
               parent: @described
         }
   end # #describe
