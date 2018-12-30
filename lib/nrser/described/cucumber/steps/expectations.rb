@@ -62,6 +62,12 @@ module Expectations
     Step "it is equal to {value}" do |value|
       expect_it.to eq value
     end
+    
+    
+  IT_IS_NOT_EQUAL_TO = \
+    Step "it is NOT equal to {value}" do |value|
+      expect_it.not_to eq value
+    end
   
   
   X_IS_EQUAL_TO_INLINE = \
