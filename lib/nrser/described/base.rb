@@ -216,7 +216,7 @@ class Base
   
   
   def get_subject descriptions
-    resolve_subject!( descriptions) unless resolved?
+    resolve_subject!( descriptions ) unless resolved?
     subject
   end
   
