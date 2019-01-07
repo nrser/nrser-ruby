@@ -45,7 +45,7 @@ module  World
 # 
 module Describe
   
-  # Instance Methods
+  # Constants
   # ========================================================================
   
   # Shortcut to {NRSER::Meta::Names}.
@@ -54,6 +54,9 @@ module Describe
   # 
   Names = NRSER::Meta::Names
   
+  
+  # Instance Methods
+  # ========================================================================
   
   # @!group Accessing Descriptions Instance Methods
   # --------------------------------------------------------------------------
@@ -172,10 +175,10 @@ module Describe
   #     
   def describe *args
     described = t.match args,
-      t.tuple( NRSER::Described::Base ),
+      t.Tuple( NRSER::Described::Base ),
         ->( (described) ) { described },
       
-      ( t.tuple( t.Label ) | t.tuple( t.Label, t.Kwds ) ),
+      ( t.Tuple( t.Label ) | t.Tuple( t.Label, t.Kwds ) ),
         ->( (described_name, kwds) ) {
           NRSER::Described.
             const_get( described_name.to_s.camelize ).
