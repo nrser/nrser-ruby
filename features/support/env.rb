@@ -27,3 +27,8 @@ require 'nrser/core_ext/string/squiggle'
 Pry.config.should_load_rc = false
 
 NRSER::Log.setup_for_cucumber!
+
+
+After &->( scenario ) do
+  binding.pry if scenario.failed?
+end
