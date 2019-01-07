@@ -46,13 +46,10 @@ module Methods
   
   
   X_METHOD = \
-    Step "the {described_name}(')(s) method {method_name}" \
-    do |described_name, method_name|
+    Step "the {described}(')(s) method {method_name}" \
+    do |described, method_name|
       describe :method,
-        subject: described.
-          find_by_human_name!( described_name ).
-          subject.
-          method( method_name.bare_name )
+        subject: described.subject.method( method_name.bare_name )
     end
 
   

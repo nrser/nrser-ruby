@@ -68,7 +68,52 @@ module Describe
   #   hierarchy).
   #   
   def described
-    @described
+    described_collection.last
+  end
+  
+  
+  def described_collection
+    @described_collection ||= []
+  end
+  
+  
+  # @todo Document each_described method.
+  # 
+  # @param [type] arg_name
+  #   @todo Add name param description.
+  # 
+  # @return [return_type]
+  #   @todo Document return value.
+  # 
+  def each_described &block
+    described_collection.reverse_each &block
+  end # #each_described
+  
+  
+  def touch_described described
+    described_collection.delete described
+    described_collection << described
+  end
+  
+  
+  def find_described_by_human_name human_name, touch: true
+    each_described.find { |described|
+      if described.class.human_names.include? human_name
+        touch_described( described ) if touch
+        true
+      end
+    }
+  end
+  
+  
+  def find_described_by_human_name! human_name
+    find_described_by_human_name( human_name ).tap { |described|
+      if described.nil?
+        raise NRSER::NotFoundError.new \
+          "Could not find described instance in parent tree with human name",
+          human_name.inspect
+      end
+    }
   end
   
   
@@ -116,19 +161,9 @@ module Describe
   #     Newly set {#described}.
   #     
   def describe *args
-    @described = t.match args,
+    described = t.match args,
       t.tuple( NRSER::Described::Base ),
-        ->( (described) ) {
-          unless described.parent.equal? @described
-            raise NRSER::ArgumentError.new \
-              "A constructed", NRSER::Described::Base, "was passed as the sole",
-              "argument, but it's parent is not the current {#described}",
-              new_described: described,
-              current_described: @described
-          end
-          
-          described
-        },
+        ->( (described) ) { described },
       
       ( t.tuple( t.Label ) | t.tuple( t.Label, t.Kwds ) ),
         ->( (described_name, kwds) ) {
@@ -136,9 +171,13 @@ module Describe
             const_get( described_name.to_s.camelize ).
             new \
               **( kwds || {} ),
-              head: -> { self.described },
-              parent: @described
+              each_described: ->( &block ) { each_described &block }
+              # parent: @described
         }
+    
+    described_collection << described
+    
+    described
   end # #describe
   
   # @!endgroup Accessing Descriptions Instance Methods # *********************

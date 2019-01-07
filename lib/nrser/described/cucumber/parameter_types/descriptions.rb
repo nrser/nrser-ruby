@@ -46,7 +46,7 @@ module Descriptions
     patterns:       DESCRIBED_NAME,
     type:           NRSER::Described::Base,
     transformer:    ->( string ) {
-      described.find_by_human_name! string
+      find_described_by_human_name! string
     }
     
   

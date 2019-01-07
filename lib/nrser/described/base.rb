@@ -202,8 +202,8 @@ class Base
   # ========================================================================
   
   # Instantiate a new `Base`.
-  def initialize parent: nil, head:, **kwds
-    @head = head
+  def initialize parent: nil, each_described:, **kwds
+    @each_described = each_described
     @parent = parent
     @resolved = nil
     @resolving = false
@@ -221,17 +221,6 @@ class Base
   
   # Instance Methods
   # ========================================================================
-  
-  def find_by_human_name! human_name
-    return self if self.class.human_names.include?( human_name )
-    
-    return parent.find_by_human_name!( human_name ) unless parent.nil?
-    
-    raise NRSER::NotFoundError.new \
-      "Could not find described instance in parent tree with human name",
-      human_name.inspect
-  end
-  
   
   def subject
     resolve_subject! unless instance_variable_defined? :@subject
@@ -402,7 +391,7 @@ class Base
     #   When subject resolution fails.
     # 
     def update_until_resolved! resolutions
-      @head.call.each.
+      @each_described.call.
         # Skip any descriptions that are resolving - including ourself - 
         # because in order to resolve our subject, we will need to resolve
         # theirs too, and if they are resolving, using them can create a 

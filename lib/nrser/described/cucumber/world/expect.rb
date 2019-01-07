@@ -48,7 +48,7 @@ module Expect
   # @return [RSpec::Expectations::ExpectationTarget]
   # 
   def expect_described human_name
-    expect described.find_by_human_name!( human_name ).subject
+    expect find_described_by_human_name!( human_name ).subject
   end
   
 end # module Expect
