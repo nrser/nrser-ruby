@@ -27,7 +27,7 @@ module Expect
   # @return [RSpec::Expectations::ExpectationTarget]
   # 
   def expect_it
-    expect described.subject
+    expect subject
   end
   
   
@@ -48,7 +48,8 @@ module Expect
   # @return [RSpec::Expectations::ExpectationTarget]
   # 
   def expect_described human_name
-    expect find_described_by_human_name!( human_name ).subject
+    expect \
+      find_described_by_human_name!( human_name ).get_subject( descriptions )
   end
   
 end # module Expect

@@ -462,12 +462,12 @@ class Resolution
   end
   
   
-  def update! described
+  def update! described, descriptions
     check_resolving! __method__, described
     
     @resolvable_types.each do |name, type|
       if type.test? described
-        add_candidate! name, described.subject,
+        add_candidate! name, described.get_subject( descriptions ),
           method: __method__,
           source: described
       end

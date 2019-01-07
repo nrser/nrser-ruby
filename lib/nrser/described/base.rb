@@ -184,28 +184,11 @@ class Base
   end # .human_names
   
   
-  # Attributes
-  # ========================================================================
-  
-  # The next described instance up the hierarchy from this one.
-  # 
-  # @return [nil]
-  #   When this instance is a root.
-  # 
-  # @return [Base]
-  #   When this instance is not a root.
-  #     
-  attr_reader :parent
-  
-  
   # Construction
   # ========================================================================
   
   # Instantiate a new `Base`.
-  def initialize parent: nil, each_described:, **kwds
-    @each_described = each_described
-    @parent = parent
-    @resolved = nil
+  def initialize **kwds
     @resolving = false
     
     if kwds.key? :subject
@@ -223,8 +206,18 @@ class Base
   # ========================================================================
   
   def subject
-    resolve_subject! unless instance_variable_defined? :@subject
+    # resolve_subject! unless instance_variable_defined? :@subject
+    unless instance_variable_defined? :@subject
+      raise "Not resolved"
+    end
+    
     @subject
+  end
+  
+  
+  def get_subject descriptions
+    resolve_subject!( descriptions) unless resolved?
+    subject
   end
   
   
@@ -239,16 +232,6 @@ class Base
   end
   
   
-  def each &block
-    if block.nil?
-      enum_for __method__
-    else
-      yield self
-      parent.each &block if !parent.nil?
-    end
-  end
-  
-  
   # Is this description inside it's {#resolve_subject!} method?
   # 
   # We need to know when picking descriptions to attempt to resolve against
@@ -258,6 +241,15 @@ class Base
   # 
   def resolving?
     @resolving
+  end
+  
+  
+  # Has the {#subject} been resolved?
+  # 
+  # @return [Boolean]
+  # 
+  def resolved?
+    instance_variable_defined? :@subject
   end
   
   
@@ -333,7 +325,7 @@ class Base
     # @raise [Resolution::AllFailedError]
     #   When subject resolution fails.
     # 
-    def resolve_subject!
+    def resolve_subject! descriptions
       # Protect from re-entry while resolving. This helps catching resolution
       # loops by being clear about what happen and providing a cleaner stack
       # trace than the stack overflow likely to happen otherwise.
@@ -363,7 +355,7 @@ class Base
         # 
         self.resolution = \
           resolutions.find( &:resolved? ) ||
-            update_until_resolved!( resolutions )
+            update_until_resolved!( resolutions, descriptions )
         
         nil
       ensure
@@ -390,8 +382,8 @@ class Base
     # @raise [Resolution::AllFailedError]
     #   When subject resolution fails.
     # 
-    def update_until_resolved! resolutions
-      @each_described.call.
+    def update_until_resolved! resolutions, descriptions
+      descriptions.
         # Skip any descriptions that are resolving - including ourself - 
         # because in order to resolve our subject, we will need to resolve
         # theirs too, and if they are resolving, using them can create a 
@@ -399,7 +391,7 @@ class Base
         reject( &:resolving? ).
         each { |described|
           resolutions.each { |resolution|
-            resolution.update! described
+            resolution.update! described, descriptions
             return resolution if resolution.resolved?
           }
         }

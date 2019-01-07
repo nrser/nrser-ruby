@@ -49,7 +49,7 @@ module Methods
     Step "the {described}(')(s) method {method_name}" \
     do |described, method_name|
       describe :method,
-        subject: described.subject.method( method_name.bare_name )
+        subject: subject.method( method_name.bare_name )
     end
 
   

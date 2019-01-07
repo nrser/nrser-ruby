@@ -77,6 +77,11 @@ module Describe
   end
   
   
+  def subject
+    described.get_subject descriptions
+  end
+  
+  
   # @todo Document each_described method.
   # 
   # @param [type] arg_name
@@ -88,6 +93,11 @@ module Describe
   def each_described &block
     described_collection.reverse_each &block
   end # #each_described
+  
+  
+  def descriptions
+    each_described.to_a
+  end
   
   
   def touch_described described
@@ -169,10 +179,7 @@ module Describe
         ->( (described_name, kwds) ) {
           NRSER::Described.
             const_get( described_name.to_s.camelize ).
-            new \
-              **( kwds || {} ),
-              each_described: ->( &block ) { each_described &block }
-              # parent: @described
+            new **( kwds || {} )
         }
     
     described_collection << described

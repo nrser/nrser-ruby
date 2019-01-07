@@ -72,13 +72,13 @@ module Expectations
   
   X_IS_EQUAL_TO_INLINE = \
     Step "the {described} is equal to {value}" do |described, value|
-      expect( described.subject ).to eq value
+      expect( subject ).to eq value
     end
 
   
   X_IS_EQUAL_TO_SRC = \
     Step "the {described} is equal to:" do |described, string|
-      expect( described.subject ).to eq eval( string )
+      expect( subject ).to eq eval( string )
     end
 
   
@@ -113,13 +113,13 @@ module Expectations
   THE_X_HAS_ATTR_THAT_IS_A = \
     Step "the {described} has a(n) {method_name} attribute that is a(n) {class}" \
     do |described, method_name, cls|
-      expect( described.subject ).to have_attributes \
+      expect( subject ).to have_attributes \
         method_name => be_a( cls )
     end
   
   Step "the {described} has a {value} key with value {value}" \
   do |described, key, value|
-    expect( described.subject ).to include key => value
+    expect( subject ).to include key => value
   end
 
 end # module Expectations
