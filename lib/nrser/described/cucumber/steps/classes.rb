@@ -56,7 +56,8 @@ module Classes
       class_name = re.
         join( 'class (', NRSER::Meta::Names::Const.pattern, ')' ).
         match( string )[ 1 ]
-      describe_class class_name
+      
+      describe :class, subject: resolve_class( class_name )
     end
   
 end # module Classes

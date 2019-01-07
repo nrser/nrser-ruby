@@ -50,7 +50,7 @@ module Modules
       module_name = NRSER::Regexps::Composed.
         join( 'module (', NRSER::Meta::Names::Const.pattern, ')' ).
         match( source )[ 1 ]
-      describe_module module_name
+      describe :module, subject: resolve_module( module_name )
     end
   
 end # module Modules

@@ -186,58 +186,120 @@ module Describe
   # @!group Describe Helper Instance Methods
   # --------------------------------------------------------------------------
   
-  def describe_class class_name
-    describe :class, subject: resolve_class( class_name )
-  end
-  
-  
-  def describe_module module_name
-    describe :module, subject: resolve_module( module_name )
-  end
-  
-  
-  def describe_method identifier
-    Names.match identifier,
-      Names::Method::Explicit::Singleton, ->( name ) {
-        const = resolve_const name.receiver_name
-        method = const.method name.bare_name
+  # Helper to intuitively describe singleton or instance methods by name.
+  # 
+  # @see NRSER::Described::Method
+  # @see NRSER::Described::InstanceMethod
+  # @see NRSER::Meta::Names::Method
+  #
+  # @param [#to_s] name
+  #
+  #   In simple terms, the method's name, which can be:
+  #
+  #   1.  "Bare", like `"f"`.
+  #
+  #   2.  "Implicitly" indicate that it is a singleton or instance method of
+  #       whatever is already being described with `.` or `#` prefixes like
+  #       `".f"` or `"#f"`.
+  #
+  #   3.  "Explicitly" identify a singleton method of a constant ({::Module},
+  #       {::Class} or any old {::Object}) or an instance method of a {::Class}
+  #       or {::Module} constant, like `"A::B.f"` or `"A::B#f"`.
+  #
+  #   In technical terms, an object with string representation (via `#to_s`)
+  #   that conforms to the pattern of one of the concrete subclasses of
+  #   {NRSER::Meta::Names::Method}.
+  #
+  # @return [NRSER::Described::Method | NRSER::Described::InstanceMethod]
+  #   The newly created description instance.
+  #
+  # @raise [TypeError]
+  #   If `name` does not match the pattern of one of the concrete subclasses
+  #   of {NRSER::Meta::Names::Method}.
+  #
+  def describe_method name
+    Names.match name,
+      Names::Method::Explicit::Singleton, ->( method_name ) {
+        const = resolve_const method_name.receiver_name
+        method = const.method method_name.bare_name
         
         describe :method, subject: method
       },
       
-      Names::Method::Explicit::Instance, ->( name ) {
-        const = resolve_const name.receiver_name
-        unbound_method = const.instance_method name.bare_name
+      Names::Method::Explicit::Instance, ->( method_name ) {
+        const = resolve_const method_name.receiver_name
+        unbound_method = const.instance_method method_name.bare_name
         
         describe :instance_method, subject: unbound_method
       },
       
-      Names::Method::Singleton, ->( name ) {
-        describe :method, name: name.bare_name
+      Names::Method::Singleton, ->( method_name ) {
+        describe :method, name: method_name.bare_name
       },
       
-      Names::Method::Instance, ->( name ) {
-        describe :instance_method, name: name.bare_name
+      Names::Method::Instance, ->( method_name ) {
+        describe :instance_method, name: method_name.bare_name
       },
       
-      NRSER::Meta::Names::Method::Bare, ->( bare_name ) {
-        describe :method, name: bare_name
+      NRSER::Meta::Names::Method::Bare, ->( method_name ) {
+        describe :method, name: method_name.bare_name
       }
-  end
+  end # #describe_method
   
   
+  # Helper to describe a single parameter's value by name.
+  # 
+  # If parameters are currently being described, adds this name and value
+  # combination. Otherwise, creates a new {NRSER::Described::Parameters}
+  # with this name and value set.
+  # 
+  # @example Set the value of a positional parameter
+  #   describe_param 'a', 1
+  # 
+  # @example Set the value of a keyword parameter
+  #   describe_param 'k:', 1
+  # 
+  # @example Set the value of the block paramter
+  #   describe_param '&block', -> { 1 }
+  # 
+  # @see NRSER::Described::Parameters
+  # @see NRSER::Meta::Names::Param
+  # 
+  # @param [#to_s] name
+  #   The name of the parameter, in format to match the pattern of one of the 
+  #   concrete subclasses of {NRSER::Meta::Names::Param}.
+  # 
+  # @param [::Object] value
+  #   The parameter's value.
+  # 
+  # @return [NRSER::Described::Parameters]
+  #   The parameters description instance the value was set in.
+  # 
+  # @raise [TypeError]
+  #   If `name` does not match the pattern of one of the concrete subclasses
+  #   of {NRSER::Meta::Names::Param}.
+  # 
   def describe_param name, value
     if described.is_a? NRSER::Described::Parameters
       described[ name ] = value
+      described
     else
       describe :parameters,
         subject: NRSER::Meta::Params.new( named: { name => value } )
     end
-  end
+  end # #describe_param
   
   
+  # Describe parameters positionally, like you would using `#send`, accept that
+  # the last value is passed as the block if it is a {Wrappers::Block}.
+  # 
+  # @param [::Array<::Object>] values
+  #   Parameter values.
+  # 
+  # @return [NRSER::Described::Parameters]
+  #   The parameters description.
+  # 
   def describe_positional_params values
-    
     # Handle the last entry being a `&...` expression, which is interpreted as 
     # the block parameter
     if values[ -1 ].is_a? Wrappers::Block
@@ -250,7 +312,7 @@ module Describe
     
     describe :parameters,
       subject: NRSER::Meta::Params.new( args: args, block: block )
-  end
+  end # #describe_positional_params
   
   # @!endgroup Describe Helper Instance Methods # ****************************
   
