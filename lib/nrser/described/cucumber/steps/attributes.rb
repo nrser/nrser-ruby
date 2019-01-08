@@ -34,9 +34,17 @@ module Attributes
   # Steps
   # ==========================================================================
   
-  Step "the attribute {method_name}" do |method_name|
-    describe :attribute, name: method_name.bare_name
-  end
+  IMPLICIT_ATTRIBUTE = \
+    Step "the attribute {method_name}" do |method_name|
+      describe :attribute, name: method_name.bare_name
+    end
+  
+  
+  HAS_ATTRIBUTE = \
+    Step "the {described} has a {method_name} attribute" \
+    do |described, method_name|
+      describe :attribute, object: described, name: method_name.bare_name
+    end
   
 end # module Attributes
 

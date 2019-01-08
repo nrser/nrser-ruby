@@ -4,9 +4,12 @@ Feature: Reference decorator and decorated methods by name
   {Symbol} or {String} instances. The referenced methods may be instance or 
   singleton (class) methods, as long as they are unambiguous.
   
+  Background:
+    Given I require "nrser/decorate"
+  
   Scenario: Instance methods referenced by "bare" name
     
-    When using {NRSER::Decorate#decorate}, methods that are referenced by "bare"
+    Using {NRSER::Decorate#decorate}, methods that are referenced by "bare"
     name - {String} or {Symbol} without a preceeding '.' or '#' to indicate
     that they are singleton or instance methods - are assumed to be instance
     methods.
@@ -37,7 +40,7 @@ Feature: Reference decorator and decorated methods by name
     
   Scenario: Singleton methods referenced by "bare" name
     
-    When using {NRSER::Decorate#decorate_singleton}, methods that are referenced
+    Using {NRSER::Decorate#decorate_singleton}, methods that are referenced
     by "bare" name - {String} or {Symbol} without a preceeding '.' or '#' to
     indicate that they are singleton or instance methods - are assumed to be
     singleton methods.
@@ -56,7 +59,7 @@ Feature: Reference decorator and decorated methods by name
           "Hi from A.f!"
         end
         
-        decorate_singleton :decorator, :f
+        decorate :decorator, :f, default_type: :singleton
         
       end
       """

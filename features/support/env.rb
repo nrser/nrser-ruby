@@ -30,5 +30,5 @@ NRSER::Log.setup_for_cucumber!
 
 
 After &->( scenario ) do
-  binding.pry if scenario.failed?
+  # binding.pry if scenario.failed?
 end

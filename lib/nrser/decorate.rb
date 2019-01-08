@@ -49,6 +49,8 @@ module Decorate
   def resolve_method name:, default_type: nil
     case name
     when Meta::Names::Method::Bare
+      bare_name = Meta::Names::Method::Bare.new name
+      
       case default_type&.to_sym
       when nil
         raise NRSER::ArgumentError.new \
@@ -57,10 +59,10 @@ module Decorate
           name: name
           
       when :singleton, :class
-        method name
+        method bare_name
         
       when :instance
-        instance_method name
+        instance_method bare_name
         
       else
         raise NRSER::ArgumentError.new \
@@ -84,11 +86,15 @@ module Decorate
   end # #resolve_method
   
   
-  def decorate *decorators, target
+  def decorate *decorators, target, default_type: nil
     
     name, method_ref = case target
     when ::String, ::Symbol
-      [ target, resolve_method( name: target, default_type: :instance ) ]
+      [
+        target,
+        resolve_method( name: target,
+                        default_type: ( default_type || :instance ) )
+      ]
     when ::UnboundMethod
       [ target.name, target ]
     else
@@ -97,11 +103,22 @@ module Decorate
         "found", target
     end
     
+    if default_type.nil?
+      default_type = if method_ref.is_a?( ::Method )
+        :singleton
+      else
+        :instance
+      end
+    end
+    
     decorated = \
       decorators.reverse_each.reduce method_ref do |decorated, decorator|
         case decorator
         when ::Symbol, ::String
-          decorator = resolve_method decorator
+          decorator = \
+            resolve_method \
+              name: decorator,
+              default_type: default_type
         when Class
           unless decorator.methods.include? :call
             decorator = decorator.new
@@ -124,7 +141,7 @@ module Decorate
     send definer, name do |*args, &block|
       decorated.call self, *args, &block
     end
-  end
+  end # decorate
   
   
   class Decoration

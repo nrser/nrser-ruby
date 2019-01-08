@@ -30,6 +30,13 @@ module  Cucumber
 module  Steps
 
 
+# Refinements
+# =======================================================================
+
+require 'nrser/refinements/regexps'
+using NRSER::Regexps
+
+
 # Definitions
 # =======================================================================
 
@@ -51,11 +58,12 @@ module Classes
   
     
   A_CLASS = \
-    Step "a class:" do |string|
-      scope.class_eval string
+    Step "a class:" do |source|
+      scope.module_eval source, '(given class source)', 1
+      
       class_name = re.
         join( 'class (', NRSER::Meta::Names::Const.pattern, ')' ).
-        match( string )[ 1 ]
+        match( source )[ 1 ]
       
       describe :class, subject: resolve_class( class_name )
     end

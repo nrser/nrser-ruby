@@ -35,10 +35,25 @@ module  Steps
 
 module Helpers
   
+  def register_rb_step_definition_method
+    @register_rb_step_definition_method ||= \
+      ::Cucumber::Glue::Dsl.
+        instance_method( :register_rb_step_definition ).
+        bind( self )
+  end
+  
+  
   def Step *args, &block
-    ::Cucumber::Glue::Dsl.
-      instance_method( :register_rb_step_definition ).
-      bind( self ).call *args, &block
+    register_rb_step_definition_method.call *args do |*yielded|
+      begin
+        instance_exec *yielded, &block
+      rescue SystemExit
+        raise
+      rescue Exception => error
+        binding.pry if ENV[ 'NRSER_PRY' ].n_x.truthy?
+        raise
+      end
+    end
   end
   
 end # module Helpers

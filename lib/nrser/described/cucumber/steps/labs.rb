@@ -23,7 +23,8 @@ module  Steps
 # Definitions
 # =======================================================================
 
-# New, unorganized and experimental shit.
+# New, unorganized and experimental shit. To enable, require this in your
+# `features/support/env.rb` file or equivalent.
 # 
 module Labs
   
@@ -35,11 +36,6 @@ module Labs
   
   # Steps
   # ==========================================================================
-    
-  Step "the {described} has a {method_name} attribute" \
-  do |described, method_name|
-    describe :attribute, object: described, name: method_name.bare_name
-  end
   
 end # module Labs
 

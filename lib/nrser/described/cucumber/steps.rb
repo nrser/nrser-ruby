@@ -11,6 +11,7 @@
 require_relative './steps/attributes'
 require_relative './steps/classes'
 require_relative './steps/errors'
+require_relative './steps/etc'
 require_relative './steps/expectations'
 require_relative './steps/methods'
 require_relative './steps/modules'
