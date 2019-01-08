@@ -33,6 +33,9 @@ require_relative './resolution'
 # {Resolution#resolve_subject!} raises {Resolution::AllFailedError}
 require_relative './resolution/all_failed_error'
 
+# {Resolution#resolve!} raises {Resolution::UnresolvedError}
+require_relative './resolution/unresolved_error'
+
 
 # Refinements
 # =======================================================================
@@ -205,22 +208,38 @@ class Base
   # Instance Methods
   # ========================================================================
   
+  # Get the subject.
+  # 
+  # @note
+  #   Raises unless `@subject` has already been set, either at construction
+  #   or via a successful {#resolve}. **Only use when you expect the subject
+  #   to already be present** 
+  # 
+  # @return [::Object]
+  # 
+  # @raise [Resolution::UnresolvedError]
+  #   When `@subject` has not been defined (see note).
+  # 
   def subject
-    # resolve_subject! unless instance_variable_defined? :@subject
     unless instance_variable_defined? :@subject
-      raise "Not resolved"
+      raise Resolution::UnresolvedError.new self: self
     end
     
     @subject
   end
   
   
-  def get_subject descriptions
-    resolve_subject!( descriptions ) unless resolved?
-    subject
-  end
-  
-  
+  # Set the {#subject}. Checks that it has not already been set and that it
+  # conforms to {.subject_type}.
+  # 
+  # @param [::Object] subject
+  # 
+  # @return [::Object]
+  #   `subject` parameter.
+  # 
+  # @raise [NRSER::Types::CheckError]
+  #   If type check fails.
+  # 
   def subject= subject
     if instance_variable_defined? :@subject
       raise NRSER::ConflictError.new \
@@ -229,6 +248,25 @@ class Base
     end
     
     @subject = self.class.subject_type.check! subject
+  end
+  
+  
+  # Resolve {#subject} against a {Hierarchy}, unless already {#resolved?}.
+  # 
+  # Details in {resolve_subject!} (which is called when {#resolved?} returns
+  # `false`).
+  # 
+  # @param [Hierarchy] hierarchy
+  #   Description hierarchy to resolve against.
+  # 
+  # @return [Base] self
+  # 
+  # @raise
+  #   If there is an error 
+  # 
+  def resolve! hierarchy
+    resolve_subject!( hierarchy ) unless resolved?
+    self
   end
   
   
@@ -325,11 +363,11 @@ class Base
     # @raise [Resolution::AllFailedError]
     #   When subject resolution fails.
     # 
-    def resolve_subject! descriptions
+    def resolve_subject! hierarchy
       # Protect from re-entry while resolving. This helps catching resolution
       # loops by being clear about what happen and providing a cleaner stack
       # trace than the stack overflow likely to happen otherwise.
-      if @resolving
+      if resolving?
         raise NRSER::UnreachableError.new \
           "Subject resolution loop!",
           described: self
@@ -355,7 +393,7 @@ class Base
         # 
         self.resolution = \
           resolutions.find( &:resolved? ) ||
-            update_until_resolved!( resolutions, descriptions )
+            update_until_resolved!( resolutions, hierarchy )
         
         nil
       ensure
@@ -382,8 +420,8 @@ class Base
     # @raise [Resolution::AllFailedError]
     #   When subject resolution fails.
     # 
-    def update_until_resolved! resolutions, descriptions
-      descriptions.
+    def update_until_resolved! resolutions, hierarchy
+      hierarchy.
         # Skip any descriptions that are resolving - including ourself - 
         # because in order to resolve our subject, we will need to resolve
         # theirs too, and if they are resolving, using them can create a 
@@ -391,7 +429,7 @@ class Base
         reject( &:resolving? ).
         each { |described|
           resolutions.each { |resolution|
-            resolution.update! described, descriptions
+            resolution.update! described, hierarchy
             return resolution if resolution.resolved?
           }
         }

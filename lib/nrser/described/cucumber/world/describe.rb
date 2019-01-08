@@ -18,8 +18,6 @@ require 'active_support/core_ext/string/inflections'
 
 require 'nrser/described'
 
-require 'nrser/described/hierarchy'
-
 
 # Refinements
 # =======================================================================
@@ -85,68 +83,37 @@ module Describe
   
   
   def subject
-    described.get_subject descriptions
+    described.resolve!( hierarchy ).subject
   end
   
   
-  # Set {#described} to a new {NRSER::Described::Base} instance whose
-  # parent is the current {#described}.
+  # Construct a new described using the name of the class and keyword 
+  # parameters and add it to the {#hierarchy}.
   # 
-  # @overload describe described
-  #   Describe an already constructed {NRSER::Described::Base}.
+  # @note
+  #   I think this is the preferred form of the method, as it will let me 
+  #   thin out some of the `#describe_...` methods that don't do anything
+  #   more than this.
   #   
-  #   @note
-  #     I think this is kind-of legacy at this point, preferring the second
-  #     form that avoids having to properly provide the `parent` at every
-  #     construction site.
-  #   
-  #   @param [NRSER::Described::Base] described
-  #     The new description.
-  #     
-  #     Check that the {NRSER::Described::Base#parent} is the current
-  #     {#described}.
-  #   
-  #   @return [NRSER::Described::Base]
-  #     Newly set {#described}.
+  # @example
+  #   describe :object, subject: "whatever"
   # 
-  # @overload describe described_name, **kwds
-  #   Construct a new described using the name of the class and keyword 
-  #   parameters.
+  # @param [::String | ::Symbol] described_name
+  #   Which class to construct.
+  # 
+  # @param [Hash<Symbol, Object>] kwds
+  #   Keyword parameters to pass to the described class' constructor.
   #   
-  #   @note
-  #     I think this is the preferred form of the method, as it will let me 
-  #     thin out some of the `#describe_...` methods that don't do anything
-  #     more than this.
-  #     
-  #   @example
-  #     describe :object, subject: "whatever"
+  #   Don't put `parent:` in here; it's added automatically.
   #   
-  #   @param [::String | ::Symbol] described_name
-  #     Which class to construct.
+  # @return [NRSER::Described::Base]
+  #   Newly created and set {#described}.
   #   
-  #   @param [Hash<Symbol, Object>] kwds
-  #     Keyword parameters to pass to the described class' constructor.
-  #     
-  #     Don't put `parent:` in here; it's added automatically.
-  #     
-  #   @return [NRSER::Described::Base]
-  #     Newly set {#described}.
-  #     
-  def describe *args
-    described = t.match args,
-      t.Tuple( NRSER::Described::Base ),
-        ->( (described) ) { described },
-      
-      ( t.Tuple( t.Label ) | t.Tuple( t.Label, t.Kwds ) ),
-        ->( (described_name, kwds) ) {
-          NRSER::Described.
-            const_get( described_name.to_s.camelize ).
-            new **( kwds || {} )
-        }
-    
-    hierarchy << described
-    
-    described
+  def describe described_name, **kwds
+    NRSER::Described.
+      const_get( described_name.to_s.camelize ).
+      new( **kwds ).
+      tap &hierarchy.method( :add )
   end # #describe
   
   # @!endgroup Accessing Descriptions Instance Methods # *********************

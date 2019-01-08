@@ -49,7 +49,10 @@ module Expect
   # 
   def expect_described human_name
     expect \
-      hierarchy.find_by_human_name!( human_name ).get_subject( hierarchy )
+      hierarchy.
+        find_by_human_name!( human_name ).
+        resolve!( hierarchy ).
+        subject
   end
   
 end # module Expect
