@@ -28,7 +28,14 @@ class Instance < Base
   # Config
   # ========================================================================
   
+  # TODO  *Should* be possible to make this enforce that {#subject} is an
+  #       instance of `#values[ :class_ ]`..? Would be sweet...
+  #       
   subject_type ::Object
+  
+  from class_: Class, params: Parameters do |class_:, params:|
+    params.call class_.method( :new )
+  end
   
 end # class Callable
 

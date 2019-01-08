@@ -335,8 +335,11 @@ class Resolution
       # Bail if there are still names with no candidates
       return unless no_candidates.empty?
       
-      # Create a working copy of `@candidates` to mutate
-      candidates = @candidates.transform_values &:dup
+      # Create a working copy of `@candidates` to mutate, discarding candidates
+      # for the same value that have equal {Candidate#value}
+      candidates = @candidates.transform_values { |list|
+        list.uniq { |candidate| candidate.value }
+      }
       
       # And a hash to store hopefully resolved values
       resolved_values = {}

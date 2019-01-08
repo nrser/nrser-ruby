@@ -187,12 +187,29 @@ class Base
   end # .human_names
   
   
+  # Attributes
+  # ========================================================================
+  
+  # The {Resolution} used to set {#subject}, if any.
+  # 
+  # @return [nil]
+  #   Either:
+  #   
+  #   1.  
+  # 
+  # @return [Resolution]
+  #   The resolution used to set {#subject}.
+  #     
+  attr_reader :resolution
+  
+  
   # Construction
   # ========================================================================
   
   # Instantiate a new `Base`.
   def initialize **kwds
     @resolving = false
+    @resolution = nil
     
     if kwds.key? :subject
       self.subject = kwds[ :subject ]

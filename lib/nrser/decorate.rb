@@ -144,6 +144,11 @@ module Decorate
   end # decorate
   
   
+  def decorate_singleton *args
+    decorate *args, default_type: :singleton
+  end
+  
+  
   class Decoration
     attr_reader :decorator
     attr_reader :decorated

@@ -7,8 +7,18 @@
 # Project / Package
 # -----------------------------------------------------------------------
 
+# Using {NRSER::Meta::Names::Const.pattern}
+require 'nrser/meta/names'
+
 # Extending in {Helpers}
 require_relative './helpers'
+
+
+# Refinements
+# =======================================================================
+
+require 'nrser/refinements/regexps'
+using NRSER::Regexps
 
 
 # Namespace
@@ -20,10 +30,17 @@ module  Cucumber
 module  Steps
 
 
+# Refinements
+# =======================================================================
+
+require 'nrser/refinements/regexps'
+using NRSER::Regexps
+
+
 # Definitions
 # =======================================================================
 
-module Responses
+module Instances
   
   # Mixins
   # ==========================================================================
@@ -34,39 +51,12 @@ module Responses
   # Steps
   # ==========================================================================
   
-  CALL_IT_WITH_NO_PARAMETERS, CALL_THE_METHOD_WITH_NO_PARAMETERS = \
-    [
-      "I call it with no parameters",
-      "I call the method with no parameters"
-    ].map do |template|
-      Step template do
-        describe :response, params: Meta::Params.new
-      end
-    end
-
-  CALL_IT, CALL_THE_METHOD = \
-    [
-      "I call it( with the parameters)",
-      "I call the method( with the parameters)"
-    ].map do |template|
-      Step template do
-        describe :response
-      end
-    end
-
-  CALL_METHOD_NAME = \
-    Step "I call {method_name}( with the parameters)" do |method_name|
-      describe_method method_name
-      describe :response
+  TODO = \
+    Step "I create a new instance of {class} with no parameters" do |class_|
+      describe :instance, class_: class_, params: Meta::Params.new
     end
   
-  CALL_METHOD_NAME_WITH_NO_PARAMETERS = \
-    Step "I call {method_name} with no parameters" do |method_name|
-      describe_method method_name
-      describe :response, params: Meta::Params.new
-    end
-  
-end # module Responses
+end # module Instances
 
 # /Namespace
 # =======================================================================

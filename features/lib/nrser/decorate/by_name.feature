@@ -33,9 +33,10 @@ Feature: Reference decorator and decorated methods by name
       end
       """
     
-    When I create a new instance of `A`
-    And I call `f`
-    Then it responds with "A#decorator called f and it said: Hi from A#f!"
+    When I create a new instance of {A} with no parameters
+    And I call `f` with no parameters
+    
+    Then the response is equal to "A#decorator called f and it said: Hi from A#f!"
     
     
   Scenario: Singleton methods referenced by "bare" name
@@ -59,11 +60,10 @@ Feature: Reference decorator and decorated methods by name
           "Hi from A.f!"
         end
         
-        decorate :decorator, :f, default_type: :singleton
+        decorate_singleton :decorator, :f
         
       end
       """
     
-    When I create a new instance of `A`
-    And I call `f`
-    Then it responds with "A.decorator called f and it said: Hi from A.f!"
+    And I call {A.f} with no parameters
+    Then the response is equal to "A.decorator called f and it said: Hi from A.f!"
