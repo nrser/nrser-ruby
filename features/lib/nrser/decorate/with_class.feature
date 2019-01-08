@@ -1,6 +1,7 @@
 Feature: Decorate with a {Class}
   
   Background:
+    
     Given I require 'nrser/decorate'
   
   
