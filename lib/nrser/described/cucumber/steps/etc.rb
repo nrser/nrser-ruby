@@ -39,6 +39,18 @@ module Etc
       require string
     end
   
+  EVAL = \
+    Step "I evaluate:" do |source|
+      scope.module_eval source, "(given eval src)", 1
+    end
+  
+  EVAL_IN = \
+    Step "I evaluate the following in the class {class}:" do |class_, source|
+      class_.
+        # resolve!( hierarchy ).
+        class_eval source, "(#{ class_.name }.class_eval src)", 1
+    end
+  
 end # module Etc
 
 # /Namespace
