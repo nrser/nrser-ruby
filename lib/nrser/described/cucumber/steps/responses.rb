@@ -62,8 +62,15 @@ module Responses
   
   CALL_METHOD_NAME_WITH_NO_PARAMETERS = \
     Step "I call {method_name} with no parameters" do |method_name|
+      # TODO  This *should* work, but it doesn't yet...
+      # describe :response, 
+      #   params: Meta::Params.new,
+      #   callable: describe_method( method_name )
+      
+      # So we do this...
       describe_method method_name
-      describe :response, params: Meta::Params.new
+      describe :response, 
+        params: Meta::Params.new
     end
   
 end # module Responses
