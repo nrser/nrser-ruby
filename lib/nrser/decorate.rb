@@ -47,9 +47,11 @@ module Decorate
   #   
   # 
   def resolve_method name:, default_type: nil
-    case name.to_s
+    name_string = name.to_s # .gsub( /\A\@\@/, '.' ).gsub( /\A\@/, '#' )
+    
+    case name_string
     when Meta::Names::Method::Bare
-      bare_name = Meta::Names::Method::Bare.new name
+      bare_name = Meta::Names::Method::Bare.new name_string
       
       case default_type&.to_sym
       when nil
@@ -74,10 +76,10 @@ module Decorate
       end
     
     when Meta::Names::Method::Singleton
-      method Meta::Names::Method::Singleton.new( name ).bare_name
+      method Meta::Names::Method::Singleton.new( name_string ).bare_name
     
     when Meta::Names::Method::Instance
-      instance_method Meta::Names::Method::Instance.new( name ).bare_name
+      instance_method Meta::Names::Method::Instance.new( name_string ).bare_name
     
     else
       raise NRSER::ArgumentError.new \
@@ -88,15 +90,19 @@ module Decorate
   
   def decorate *decorators, target, default_type: nil
     
+    if decorators.empty?
+      raise NRSER::ArgumentError.new "Must provide at least one decorator"
+    end
+    
     method_ref = case target
     when ::String, ::Symbol
       resolve_method  name: target,
                       default_type: ( default_type || :instance )
-    when ::UnboundMethod
+    when ::UnboundMethod, ::Method
       target
     else
       raise NRSER::ArgumentError.new \
-        "`target` (last arg) must be String, Symbol or UnboundMethod",
+        "`target` (last arg) must be String, Symbol, Method or UnboundMethod",
         "found", target
     end
     
@@ -110,25 +116,41 @@ module Decorate
     
     decorated = \
       decorators.reverse_each.reduce method_ref do |decorated, decorator|
+        
+        # Resolve `decorator` to a `#call`-able if needed
         case decorator
         when ::Symbol, ::String
-          decorator = \
-            resolve_method \
-              name: decorator,
-              default_type: default_type
-        when Class
+          decorator = resolve_method  name: decorator,
+                                      default_type: default_type
+                                      
+        when ::Method, ::UnboundMethod
+          # pass, it's already good to go
+          
+        when ::Class
           unless decorator.methods.include? :call
             decorator = decorator.new
           end
-        end
+          
+        else
+          raise TypeError.new \
+            "Expected `decorator` to be one of",
+            ::String,
+            ::Symbol,
+            ::Method,
+            ::UnboundMethod,
+            ::Class,
+            "but found", decorator
+          
+        end # case decorator
         
         Decoration.new decorator: decorator, decorated: decorated
-      end
+        
+      end # reduce
     
     definer = case method_ref
-    when UnboundMethod
+    when ::UnboundMethod
       :define_method
-    when Method
+    when ::Method
       :define_singleton_method
     else
       raise NRSER::TypeError.new \
@@ -161,7 +183,7 @@ module Decorate
       when Decoration
         # decorated.method( :call ).curry receiver
         ->( *a, &b ) { decorated.call receiver, *a, &b }
-      when UnboundMethod 
+      when ::UnboundMethod 
         decorated.bind receiver
       when Symbol
         receiver.method decorated
@@ -169,8 +191,7 @@ module Decorate
         decorated
       end
       
-      
-      decorator = if self.decorator.is_a? UnboundMethod
+      decorator = if self.decorator.is_a? ::UnboundMethod
         self.decorator.bind receiver
       else
         self.decorator
