@@ -18,6 +18,8 @@ require 'active_support/core_ext/string/inflections'
 
 require 'nrser/described'
 
+require 'nrser/described/hierarchy/array'
+
 
 # Refinements
 # =======================================================================
@@ -71,12 +73,12 @@ module Describe
   #   hierarchy).
   #   
   def described
-    hierarchy.last
+    hierarchy.current
   end
   
   
   def hierarchy
-    @hierarchy ||= Hierarchy.new
+    @hierarchy ||= Hierarchy::Array.new
   end
   
   alias_method :descriptions, :hierarchy
