@@ -151,3 +151,27 @@ Feature: Reference decorator and decorated methods by name
           Hi from A#instance_target
         END
       """
+
+  @focus
+  Scenario: (5) *Implicit* instance method names
+    
+    You can use *implicit* instance method names as well, prefixing them with
+    '#' like '#instance_decorator'. It doesn't work to decorate a singleton
+    method with an instance one, for what should hopefully be obvious reasons,
+    but I can show a usage just for completeness/kicks.
+    
+    Given I evaluate the following in the class {A}:
+      """ruby
+        decorate '.singleton_decorator', '#instance_target'
+      """
+    
+    When I create a new instance of {A} with no parameters
+    And I call `instance_target` with no parameters
+    
+    Then the response is equal to:
+      """ruby
+        <<~END
+          A.singleton_decorator called instance_target and it said:
+          Hi from A#instance_target
+        END
+      """

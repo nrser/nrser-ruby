@@ -47,7 +47,7 @@ module Decorate
   #   
   # 
   def resolve_method name:, default_type: nil
-    case name
+    case name.to_s
     when Meta::Names::Method::Bare
       bare_name = Meta::Names::Method::Bare.new name
       
@@ -88,15 +88,12 @@ module Decorate
   
   def decorate *decorators, target, default_type: nil
     
-    name, method_ref = case target
+    method_ref = case target
     when ::String, ::Symbol
-      [
-        target,
-        resolve_method( name: target,
-                        default_type: ( default_type || :instance ) )
-      ]
+      resolve_method  name: target,
+                      default_type: ( default_type || :instance )
     when ::UnboundMethod
-      [ target.name, target ]
+      target
     else
       raise NRSER::ArgumentError.new \
         "`target` (last arg) must be String, Symbol or UnboundMethod",
@@ -138,9 +135,10 @@ module Decorate
         "Expected {UnboundMethod} or {Method}, found", method_ref
     end
     
-    send definer, name do |*args, &block|
+    send definer, method_ref.name do |*args, &block|
       decorated.call self, *args, &block
     end
+    
   end # decorate
   
   
