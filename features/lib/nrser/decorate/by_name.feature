@@ -54,7 +54,7 @@ Feature: Reference decorator and decorated methods by name
   Scenario: (1) *Bare* names default to instance methods with `#decorate`
     
     Using {NRSER::Decorate#decorate}, methods that are referenced by "bare"
-    name - {String} or {Symbol} without a preceeding '.' or '#' to indicate
+    name - {String} or {Symbol} without a preceding '.' or '#' to indicate
     that they are singleton or instance methods - are assumed to be instance
     methods.
     
