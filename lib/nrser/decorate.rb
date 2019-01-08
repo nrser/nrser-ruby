@@ -132,14 +132,17 @@ module Decorate
           end
           
         else
-          raise TypeError.new \
-            "Expected `decorator` to be one of",
-            ::String,
-            ::Symbol,
-            ::Method,
-            ::UnboundMethod,
-            ::Class,
-            "but found", decorator
+          unless decorator.respond_to? :call
+            raise TypeError.new \
+              "Expected `decorator` to be one of",
+              ::String,
+              ::Symbol,
+              ::Method,
+              ::UnboundMethod,
+              ::Class,
+              "`#call`",
+              "but found", decorator
+          end
           
         end # case decorator
         
