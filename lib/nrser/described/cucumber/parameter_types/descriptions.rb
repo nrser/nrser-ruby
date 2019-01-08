@@ -46,7 +46,7 @@ module Descriptions
     patterns:       DESCRIBED_NAME,
     type:           NRSER::Described::Base,
     transformer:    ->( string ) {
-      find_described_by_human_name! string
+      hierarchy.find_by_human_name! string
     }
     
   

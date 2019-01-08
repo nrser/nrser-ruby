@@ -18,6 +18,8 @@ require 'active_support/core_ext/string/inflections'
 
 require 'nrser/described'
 
+require 'nrser/described/hierarchy'
+
 
 # Refinements
 # =======================================================================
@@ -71,62 +73,19 @@ module Describe
   #   hierarchy).
   #   
   def described
-    described_collection.last
+    hierarchy.last
   end
   
   
-  def described_collection
-    @described_collection ||= []
+  def hierarchy
+    @hierarchy ||= Hierarchy.new
   end
+  
+  alias_method :descriptions, :hierarchy
   
   
   def subject
     described.get_subject descriptions
-  end
-  
-  
-  # @todo Document each_described method.
-  # 
-  # @param [type] arg_name
-  #   @todo Add name param description.
-  # 
-  # @return [return_type]
-  #   @todo Document return value.
-  # 
-  def each_described &block
-    described_collection.reverse_each &block
-  end # #each_described
-  
-  
-  def descriptions
-    each_described.to_a
-  end
-  
-  
-  def touch_described described
-    described_collection.delete described
-    described_collection << described
-  end
-  
-  
-  def find_described_by_human_name human_name, touch: true
-    each_described.find { |described|
-      if described.class.human_names.include? human_name
-        touch_described( described ) if touch
-        true
-      end
-    }
-  end
-  
-  
-  def find_described_by_human_name! human_name
-    find_described_by_human_name( human_name ).tap { |described|
-      if described.nil?
-        raise NRSER::NotFoundError.new \
-          "Could not find described instance in parent tree with human name",
-          human_name.inspect
-      end
-    }
   end
   
   
@@ -185,7 +144,7 @@ module Describe
             new **( kwds || {} )
         }
     
-    described_collection << described
+    hierarchy << described
     
     described
   end # #describe
