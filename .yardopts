@@ -1,13 +1,14 @@
---output-dir ./site
---markup-provider commonmarker
+--load ./support/yard/setup.rb
 --markup markdown
---tag pure:"Pure Function"
---tag status:"Status"
+--markup-provider commonmarker
+--output-dir ./site
 --plugin yard-commonmarker
---plugin yard-link_stdlib
 --plugin yard-cucumber
+--plugin yard-link_stdlib
 --private
 --protected
+--tag pure:"Pure Function"
+--tag status:"Status"
 lib/**/*.rb
 features/**/*.feature
 features/**/*.rb
