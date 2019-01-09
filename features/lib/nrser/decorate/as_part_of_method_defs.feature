@@ -83,7 +83,6 @@ Feature: Decorate as part of method definitions
       END
       """
       
-      
   
   Scenario: (2) Decorate a singleton method with another
     
