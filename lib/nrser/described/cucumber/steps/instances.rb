@@ -51,9 +51,52 @@ module Instances
   # Steps
   # ==========================================================================
   
-  TODO = \
-    Step "I create a new instance of {class} with no parameters" do |class_|
-      describe :instance, class_: class_, params: Meta::Params.new
+  CREATE_A_NEW_INSTANCE,
+  CONSTRUCT_AN_INSTANCE = \
+    [
+      "I create a new instance of {class}",
+      "I construct an instance of {class}",
+    ].map do |template|
+      Step template do |class_|
+        describe :instance, class_: class_
+      end
+    end
+  
+  
+  CREATE_A_NEW_INSTANCE_OF_THE_CLASS,
+  CONSTRUCT_AN_INSTANCE_OF_THE_CLASS = \
+    [
+      "I create a new instance of the {described}",
+      "I construct an instance of the {described}",
+    ].map do |template|
+      Step template do |described|
+        describe :instance, class_: described.resolve!( hierarchy ).subject
+      end
+    end
+  
+  
+  CREATE_A_NEW_INSTANCE_OF_THE_CLASS_FROM,
+  CONSTRUCT_AN_INSTANCE_OF_THE_CLASS_FROM = \
+    [
+      "I create a new instance of the {described} from {values}",
+      "I construct an instance of the {described} from {values}",
+    ].map do |template|
+      Step template do |described, values|
+        describe_positional_params values
+        describe :instance, class_: described.resolve!( hierarchy ).subject
+      end
+    end
+  
+  
+  CREATE_A_NEW_INSTANCE_WITH_NO_PARAMETERS,
+  CONSTRUCT_AN_INSTANCE_WITH_NO_PARAMETERS = \
+    [
+      "I create a new instance of {class} with no parameters",
+      "I construct an instance of {class} with no parameters",
+    ].map do |template|
+      Step template do |class_|
+        describe :instance, class_: class_, params: Meta::Params.new
+      end
     end
   
 end # module Instances

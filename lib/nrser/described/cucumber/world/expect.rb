@@ -47,12 +47,12 @@ module Expect
   # 
   # @return [RSpec::Expectations::ExpectationTarget]
   # 
-  def expect_described human_name
-    expect \
-      hierarchy.
-        find_by_human_name!( human_name ).
-        resolve!( hierarchy ).
-        subject
+  def expect_described described
+    if described.is_a? ::String
+      described = hierarchy.find_by_human_name! described
+    end
+    
+    expect described.resolve!( hierarchy ).subject
   end
   
 end # module Expect

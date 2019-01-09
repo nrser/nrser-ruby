@@ -40,6 +40,17 @@ module Expectations
     end
   
   
+  X_IS_AN_INSTANCE_OF_THE_Y = \
+    Step "the {described} is an instance of the {described}" \
+    do |described_object, described_class|
+      expect_described( described_object ).
+        to be_a described_class.resolve!( hierarchy ).subject
+      
+      # Need to touch the object again since it's the subject
+      hierarchy.touch described_object
+    end
+  
+  
   IT_IS_A = \
     Step "it is a(n) {class}" do |cls|
       expect_it.to be_a cls
@@ -91,14 +102,14 @@ module Expectations
   IT_HAS_ATTR_EQUAL_TO = \
     Step "it has a(n) {method_name} attribute equal to {value}" \
     do |method_name, value|
-      expect_it.to have_attributes method_name => value
+      expect_it.to have_attributes method_name.bare_name => value
     end
 
   
   IT_HAS_ATTR_THAT_IS = \
     Step "it has a(n) {method_name} attribute that is {value}" \
     do |method_name, value|
-      expect_it.to have_attributes method_name => be( value )
+      expect_it.to have_attributes method_name.bare_name => be( value )
     end
 
   
@@ -106,7 +117,7 @@ module Expectations
     Step "it has a(n) {method_name} attribute that is a(n) {class}" \
     do |method_name, cls|
       expect_it.to have_attributes \
-        method_name => be_a( cls )
+        method_name.bare_name => be_a( cls )
     end
   
   
@@ -114,7 +125,7 @@ module Expectations
     Step "the {described} has a(n) {method_name} attribute that is a(n) {class}" \
     do |described, method_name, cls|
       expect( subject ).to have_attributes \
-        method_name => be_a( cls )
+        method_name.bare_name => be_a( cls )
     end
   
   Step "the {described} has a {value} key with value {value}" \
