@@ -1,3 +1,56 @@
-#!/usr/bin/env bash
+#!/usr/bin/env ruby
 
-bundle exec yard "$@"
+require 'shellwords'
+require 'fileutils'
+require 'pathname'
+require 'pry'
+
+# ROOT = File.expand_path '../..', __dir__
+ROOT = Pathname.new( '../..' ).expand_path __dir__
+
+if ARGV.length != 1 || ARGV[0] != 'clean'
+  # Normal shim path
+  exec %{bundle exec yard #{ Shellwords.join ARGV }}
+end
+
+
+puts "Cleaning up the yard..."
+
+def report string, &block
+  $stdout.write '  ' + string + '...'
+  begin
+    block.call
+  rescue Exception => error
+    puts "FAILED"
+    raise
+  else
+    puts "DONE"
+  end
+end
+
+class Pathname
+  alias_method :og_to_s, :to_s
+  
+  def to_s
+    directory? ? og_to_s + '/' : og_to_s
+  end
+
+  def to_rel_s
+    rel_s = relative_path_from( ROOT ).to_s
+    rel_s.start_with?( '../' ) ? to_s : "./#{ rel_s }"
+  end
+end
+
+yardoc_path = ROOT.join '.yardoc'
+
+report "Removing #{ yardoc_path.to_rel_s }" do
+  if yardoc_path.exist?
+    FileUtils.remove_entry_secure yardoc_path
+  else
+    $stdout.write "Already absent..."
+  end
+end
+
+report "Restarting directory-local Loc'd sites" do
+  `locd site restart #{ ROOT.to_rel_s } --log-level=warn`
+end
