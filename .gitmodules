@@ -5,3 +5,6 @@
 	path = dev/packages/gems/yard-cucumber
 	url = git@github.com:nrser/yard-cucumber.git
 	branch = nrser
+[submodule "dev/packages/gems/yard"]
+	path = dev/packages/gems/yard
+	url = git@github.com:nrser/yard.git

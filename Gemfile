@@ -11,5 +11,9 @@ gem 'yard-cucumber', path: "./dev/packages/gems/yard-cucumber"
 #   git: 'https://github.com/nrser/yard-cucumber.git',
 #   branch: 'nrser-fix-94'
 
+# Use local checkout of `nrser/yard` so I can play with stuff (not planning on
+# making any permentant changes, but Git helps to track things)
+gem 'yard', path: './dev/packages/gems/yard'
+
 # Specify your gem's dependencies in nrser.gemspec
 gemspec
