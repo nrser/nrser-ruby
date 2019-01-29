@@ -3,7 +3,7 @@
 --markup-provider commonmarker
 --output-dir ./site
 --plugin yard-commonmarker
---plugin yard-cucumber
+--plugin yard-nrser-cucumber
 --plugin yard-link_stdlib
 --private
 --protected
