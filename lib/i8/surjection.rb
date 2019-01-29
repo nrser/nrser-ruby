@@ -7,7 +7,7 @@
 
 # Project / Package
 # -----------------------------------------------------------------------
-require 'nrser/labs/i8'
+require 'i8'
 
 
 # HACK

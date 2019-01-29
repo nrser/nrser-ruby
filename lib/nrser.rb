@@ -70,7 +70,6 @@ require_relative './nrser/log'
 # Then everything else...
 require_relative './nrser/char'
 require_relative './nrser/errors'
-require_relative './nrser/gem_ext/hamster'
 require_relative './nrser/no_arg'
 require_relative './nrser/message'
 require_relative './nrser/shortcuts'

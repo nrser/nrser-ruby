@@ -4,66 +4,53 @@
 # Requirements
 # =======================================================================
 
-# Stdlib
-# ----------------------------------------------------------------------------
+### Deps ###
 
-require 'set'
+require "hamster"
 
-# Deps
-# -----------------------------------------------------------------------
-
-require 'hamster'
+### Project / Package ###
 
 require 'nrser/ext/tree'
+
+require_relative "./to_mutable"
 
 
 # Namespace
 # =======================================================================
 
-module  Hamster
+module  I8
 
 
 # Definitions
 # =======================================================================
 
-class SortedSet
+class Hash < ::Hamster::Hash
+
+  include NRSER::Ext::Tree
   
   # Instance Methods
   # ========================================================================
   
   def to_mutable
-    each_with_object( ::SortedSet[] ) { |member, set|
-      set << Hamster.to_mutable( member )
+    each_with_object( {} ) { |(key, value), hash|
+      hash[ ::I8.to_mutable key ] = ::I8.to_mutable value
     }
-  end
-  
-  
-  def to_mutable_array
-    each_with_object( [] ) { |member, array|
-      array << Hamster.to_mutable( member )
-    }
-  end
-  
-  
-  def to_h
-    each_with_object( {} ) { |member, hash| hash[member] = true }
   end
   
   
   def as_json options = nil
-    to_mutable_array.to_json options
-    # { '$set' => to_h.as_json( options ) }
+    to_h.as_json options
   end
   
   
   def to_yaml *args, &block
     to_mutable.to_yaml *args, &block
   end
-  
+
 end # class Hash
 
 
 # /Namespace
 # =======================================================================
 
-end # module Hamster
+end # module I8

@@ -4,25 +4,28 @@
 # Requirements
 # =======================================================================
 
-# Deps
-# -----------------------------------------------------------------------
+### Deps ###
 
-require 'hamster'
+require "hamster"
+
+### Project / Package ###
 
 require 'nrser/ext/tree'
+
+require_relative "./to_mutable"
 
 
 # Namespace
 # =======================================================================
 
-module  Hamster
+module  I8
 
 
 # Definitions
 # =======================================================================
 
-class Vector
-  
+class Vector < ::Hamster::Vector
+
   include NRSER::Ext::Tree
   
   # Instance Methods
@@ -30,7 +33,7 @@ class Vector
   
   def to_mutable
     each_with_object( [] ) { |entry, array|
-      array << Hamster.to_mutable( entry )
+      array << ::I8.to_mutable( entry )
     }
   end
   
@@ -44,10 +47,10 @@ class Vector
     to_mutable.to_yaml *args, &block
   end
   
-end # class Hash
+end # class Vector
 
 
 # /Namespace
 # =======================================================================
 
-end # module Hamster
+end # module I8

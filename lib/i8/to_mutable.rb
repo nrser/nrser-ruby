@@ -1,14 +1,19 @@
+# encoding: UTF-8
+# frozen_string_literal: true
+
+# Requirements
+# =======================================================================
+
+## Stdlib ##
+
 require 'set'
 
-require 'hamster'
-require_relative './hamster/hash'
-require_relative './hamster/vector'
-require_relative './hamster/set'
-require_relative './hamster/sorted_set'
 
-module Hamster
-  # def self.regrow each_pair: ::Hash, each_index: ::Array, each:
-  
+# Definitions
+# =======================================================================
+
+module I8
+
   def self.to_mutable obj
     if obj.respond_to? :to_mutable
       obj.to_mutable
@@ -33,4 +38,5 @@ module Hamster
     end
   end # .to_mutable
   
-end
+end # module I8
+

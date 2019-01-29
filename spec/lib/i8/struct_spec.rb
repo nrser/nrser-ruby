@@ -1,4 +1,4 @@
-require 'nrser/labs/i8/struct'
+require 'i8/struct'
 
 require 'nrser/refinements/types'
 using NRSER::Types

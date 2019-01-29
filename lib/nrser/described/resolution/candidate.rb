@@ -8,7 +8,7 @@
 # -----------------------------------------------------------------------
 
 # {Candidate} is a {I8::Struct}
-require 'nrser/labs/i8/struct'
+require 'i8/struct'
 
 
 # Refinements

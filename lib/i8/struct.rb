@@ -7,7 +7,7 @@
 # Project / Package
 # -----------------------------------------------------------------------
 require 'nrser/errors/argument_error'
-require 'nrser/labs/i8'
+require 'i8'
 
 require_relative './struct/hash'
 require_relative './struct/vector'

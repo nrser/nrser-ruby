@@ -1,4 +1,4 @@
-require 'nrser/labs/i8'
+require 'i8'
 
 SPEC_FILE(
   spec_path:        __FILE__,
@@ -6,7 +6,7 @@ SPEC_FILE(
 ) do
   
   SETUP %{
-    Converting Hamsters to regular structures with their `#to_mutable`
+    Converting I8 to regular structures with their `#to_mutable`
   }.squish do
     
     it %{ gets immutable objects nested inside mutable ones } do
@@ -68,7 +68,7 @@ SPEC_FILE(
   end # setup
   
   
-  CLASS Hamster::Hash do
+  CLASS I8::Hash do
     describe_instance x: 1, y: 2, z: 3 do
       describe_method :to_mutable do
         CALLED do
@@ -79,7 +79,7 @@ SPEC_FILE(
   end
   
   
-  CLASS Hamster::Vector do
+  CLASS I8::Vector do
     describe_instance [1, 2, 3] do
       describe_method :to_mutable do
       CALLED do
@@ -90,7 +90,7 @@ SPEC_FILE(
   end
   
   
-  CLASS Hamster::Set do
+  CLASS I8::Set do
     describe_instance [1, 2, 3] do
       INSTANCE_METHOD :to_mutable do
         CALLED do
@@ -101,7 +101,7 @@ SPEC_FILE(
   end
   
   
-  CLASS Hamster::SortedSet do
+  CLASS I8::SortedSet do
     describe_instance [1, 2, 3] do
       INSTANCE_METHOD :to_mutable do
         CALLED do
