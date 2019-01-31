@@ -9,12 +9,21 @@ require 'nrser/refinements/types'
 using NRSER::Types
 
 
+# Namespace
+# ============================================================================
+
+module  NRSER
+module  Char
+
+
 # Definitions
 # =======================================================================
 
-# Lil' structure with useful info and methods for special characters.
+# Utility class whose instances help substitute alpha-numeric ASCII characters 
+# (`a-z`, `A-Z`, `0-9`) for stylized unicode versions that also exist as 
+# runs of code points, like the "math" characters.
 # 
-class NRSER::Char::AlphaNumericSub
+class AlphaNumericSub
 
   # Attributes
   # ======================================================================
@@ -163,7 +172,7 @@ class NRSER::Char::AlphaNumericSub
       t.list( t.utf8_char? ).check \
         args.slice( :sub_a, :sub_A, :sub_0 ).values
       
-      t.hash_?( keys: t.utf8_char, values: t.utf8_char ).check exceptions
+      t.Hash?( keys: t.utf8_char, values: t.utf8_char ).check exceptions
       
       if args.all?( &:nil? )
         raise ArgumentError.new,
@@ -183,6 +192,8 @@ class NRSER::Char::AlphaNumericSub
   # Instance Methods
   # ======================================================================
   
+  # Return a {String} with alpha-numeric characters substituted.
+  # 
   def sub src
     dest = src.dup
     
@@ -215,8 +226,17 @@ class NRSER::Char::AlphaNumericSub
   end
   
   
+  # Return a string of all substitutions.
+  # 
   def demo
     sub ['a'..'z', 'A'..'Z', '0'..'9'].map { |_| _.to_a.join }.join
   end
   
-end # class NRSER::Char::Special
+end # class AlphaNumericSub
+
+
+# /Namespace
+# ============================================================================
+
+end # module Char
+end # module NRSER
