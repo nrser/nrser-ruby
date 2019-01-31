@@ -17,6 +17,9 @@ require 'active_support/core_ext/string/filters'
 # Project / Package
 # ------------------------------------------------------------------------
 
+# Using in {Exception#format_backtrace}
+require "nrser/meta/backtrace_cleaner"
+
 
 # Namespace
 # ========================================================================
@@ -29,6 +32,21 @@ module  Ext
 # ========================================================================
 
 module Exception
+  
+  def self.backtrace_cleaner
+    @backtrace_cleaner
+  end
+  
+  
+  def self.backtrace_cleaner= instance_or_kwds
+    @backtrace_cleaner = \
+      if instance_or_kwds.is_a? ActiveSupport::BacktraceCleaner
+        instance_or_kwds
+      else
+        NRSER::Meta::BacktraceCleaner.new **instance_or_kwds
+      end
+  end
+  
 
   # Method I use in the REPL to quickly get a "raised" version of a newly
   # created {::Exception} (one that will have a non-`nil` 
@@ -46,7 +64,7 @@ module Exception
   rescue ::Exception => error
     error
   end
-
+  
 
   # Format {::Exception#backtrace} for use in {#format}. Handles the case where
   # backtrace is `nil` (which it will be if it has never been raised).
@@ -65,8 +83,22 @@ module Exception
   # 
   # @return [String]
   # 
-  def format_backtrace line_prefix: '  '
-    if backtrace
+  def format_backtrace  line_prefix: '  ',
+                        cleaner: nil
+    if (backtrace = self.backtrace)
+      cleaner = case cleaner
+      when nil
+        Ext::Exception.backtrace_cleaner
+      when ActiveSupport::BacktraceCleaner
+        cleaner
+      when ::Hash
+        NRSER::Meta::BacktraceCleaner.new **cleaner
+      end
+      
+      if cleaner
+        backtrace = cleaner.clean backtrace
+      end
+      
       line_prefix + backtrace.join( "\n#{ line_prefix }" )
     else
       "#{ line_prefix }(NO BACKTRACE)"
@@ -102,8 +134,9 @@ module Exception
   # 
   # @return [String]
   # 
-  def format
-    "#{ to_s } (#{ self.class }):\n#{ n_x.format_backtrace }"
+  def format backtrace_cleaner: nil
+    backtrace_s = n_x.format_backtrace cleaner: backtrace_cleaner
+    "#{ to_s } (#{ self.class }):\n#{ backtrace_s }"
   end
   
 end # module Exception

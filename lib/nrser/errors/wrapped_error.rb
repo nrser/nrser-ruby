@@ -52,6 +52,13 @@ class WrappedError < ::StandardError
   attr_reader :cause
   
   
+  # Optional backtrace cleaner to use when formatting the {#cause}.
+  # 
+  # @return [ActiveSupport::BacktraceCleaner?]
+  #     
+  attr_reader :backtrace_cleaner
+  
+  
   # Constructor
   # ======================================================================
   
@@ -60,7 +67,7 @@ class WrappedError < ::StandardError
   # @param [Exception] cause
   #   The error to wrap.
   # 
-  def initialize *message, cause:, **kwds
+  def initialize *message, cause:, backtrace_cleaner: nil, **kwds
     unless cause.is_a? Exception
       raise NRSER::TypeError.new \
         "`cause` for {NRSER::WrappedError} must be an {Exception}, found",
@@ -69,6 +76,7 @@ class WrappedError < ::StandardError
     end
   
     @cause = cause
+    @backtrace_cleaner = backtrace_cleaner
     
     # Pass to {NRSER::NicerError#initialize}
     super *message, **kwds
@@ -79,7 +87,10 @@ class WrappedError < ::StandardError
   # ========================================================================
 
   def default_details
-    "Cause: " +  cause.n_x.format.n_x.indent( 4, skip_first_line: true )
+    "Cause:\n" +  \
+      cause.
+        n_x.format( backtrace_cleaner: backtrace_cleaner ).
+        n_x.indent( 4, skip_first_line: false )
   end
 
   
