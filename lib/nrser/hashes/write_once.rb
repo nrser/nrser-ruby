@@ -7,7 +7,7 @@
 # Project / Package
 # -----------------------------------------------------------------------
 
-require 'nrser/labs/stash'
+require_relative './stash'
 
 
 # Namespace

@@ -127,10 +127,22 @@ module Expectations
       expect( subject ).to have_attributes \
         method_name.bare_name => be_a( cls )
     end
+    
+  THE_DESCRIBED_HAS_ATTRIBUTE_THAT_IS_A = \
+    Step "the {described} has a(n) {method_name} attribute that is {value}" \
+    do |described, method_name, value|
+      expect_described( described ).to have_attributes \
+        method_name.bare_name => be( value )
+    end
   
   Step "the {described} has a {value} key with value {value}" \
   do |described, key, value|
-    expect( subject ).to include key => value
+    expect_described( described ).to include key => value
+  end
+  
+  Step "it has a {value} key with value {value}" \
+  do |key, value|
+    expect_it.to include key => value
   end
 
 end # module Expectations

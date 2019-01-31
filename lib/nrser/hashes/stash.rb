@@ -22,9 +22,8 @@ module  Hashes
 # ============================================================================
 
 # Abstract generalization of {ActiveSupport::HashWithIndifferentAccess}.
-# Extends {Hash} and provides simple hooks for handling keys and values
+# Extends {::Hash} and provides simple hooks for handling keys and values
 # on write.
-# 
 # 
 class Stash < ::Hash
   
@@ -50,6 +49,11 @@ class Stash < ::Hash
   
   # @!group Internal Interface
   # --------------------------------------------------------------------------
+  # 
+  # **WARNING!!!**  This group **MUST** come first! It uses {.alias_method} to
+  #                 copy the existing implementations of {#[]=}, {#update},
+  #                 and {#key?} from {::Hash}.
+  #                 
   
   # Save {Hash#[]=} as {#_raw_put} for directly writing keys and values.
   # 

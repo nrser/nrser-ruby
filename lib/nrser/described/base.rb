@@ -210,10 +210,14 @@ class Base
   def initialize **kwds
     @resolving = false
     @resolution = nil
+    @resolved = false
+    
+    @error = nil
     
     if kwds.key? :subject
       self.subject = kwds[ :subject ]
       kwds.delete :subject
+      @resolved = true
     end
     
     kwds.each do |name, value|
@@ -224,6 +228,19 @@ class Base
   
   # Instance Methods
   # ========================================================================
+  
+  
+  def subject?
+    check_resolved!
+    instance_variable_defined? :@subject
+  end
+  
+  
+  def error?
+    check_resolved!
+    !@error.nil?
+  end
+  
   
   # Get the subject.
   # 
@@ -238,12 +255,23 @@ class Base
   #   When `@subject` has not been defined (see note).
   # 
   def subject
-    unless instance_variable_defined? :@subject
-      raise Resolution::UnresolvedError.new self: self
+    check_resolved!
+  
+    unless @error.nil?
+      raise NRSER::WrappedError.new \
+        "Tried to access {#subject}, but subject instantiation caused an error",
+        cause: @error
     end
     
     @subject
   end
+  
+  
+  def error
+    check_resolved!
+    @error
+  end
+  
   
   
   # Set the {#subject}. Checks that it has not already been set and that it
@@ -265,6 +293,22 @@ class Base
     end
     
     @subject = self.class.subject_type.check! subject
+  end
+  
+  
+  def error= error
+    unless @error.nil?
+      raise NRSER::ConflictError.new \
+        "Error already set to", @error,
+        self: self
+    end
+    
+    unless error.is_a? Exception
+      raise NRSER::TypeError.new \
+        "`error` parameter must be an", Exception, "instance, found ", error
+    end
+    
+    @error = error
   end
   
   
@@ -304,7 +348,12 @@ class Base
   # @return [Boolean]
   # 
   def resolved?
-    instance_variable_defined? :@subject
+    @resolved
+  end
+  
+  
+  def check_resolved!
+    raise Resolution::UnresolvedError.new( self: self ) unless resolved?
   end
   
   
@@ -339,7 +388,13 @@ class Base
       
       RESOLUTION_TYPE.check! resolution
       
-      self.subject = resolution.subject
+      if resolution.subject?
+        self.subject = resolution.subject
+      else
+        self.error = resolution.error
+      end
+      
+      @resolved = true
       @resolution = resolution
     end # #resolution=
       

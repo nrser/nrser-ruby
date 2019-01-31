@@ -7,8 +7,8 @@
 # Project / Package
 # -----------------------------------------------------------------------
 
-# Extending {Base}
-require_relative './base'
+# Extending {Object}
+require_relative './object'
 
 
 # Refinements
@@ -30,7 +30,7 @@ module  Described
 
 # @todo doc me!
 # 
-class Attribute < Base
+class Attribute < Object
   
   # Config
   # ========================================================================

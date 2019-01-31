@@ -24,6 +24,8 @@ require_relative './hermann'
   cls.send :include, NRSER::Described::Cucumber::Hermann
 end
 
+# World NRSER::Described::Cucumber::World::Logger
+World NRSER::Log::Mixin
 World NRSER::Described::Cucumber::World::Describe
 World NRSER::Described::Cucumber::World::Expect
 World NRSER::Described::Cucumber::World::Scope

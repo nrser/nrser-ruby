@@ -352,7 +352,6 @@ class ParameterType < ::Cucumber::CucumberExpressions::ParameterType
         # we have no idea what it will return and we **need** a `type:`
         # keyword to be provided
         unless transformer == DEFAULT_TRANSFORMER
-          binding.pry
           raise NRSER::ArgumentError.new \
             "When providing a custom `transformer:` {::Proc} you **MUST**",
             "provide a `type:` keyword as well"

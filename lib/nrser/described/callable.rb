@@ -13,7 +13,7 @@
 # Project / Package
 # -----------------------------------------------------------------------
 
-# Extending {Base}
+# Extending {Object}
 require_relative './base'
 
 
@@ -36,7 +36,7 @@ module  Described
 
 # @todo doc me
 # 
-class Callable < Base
+class Callable < Object
   
   # Config
   # ========================================================================

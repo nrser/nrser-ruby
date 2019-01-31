@@ -34,6 +34,13 @@ class Array
   include Hierarchy
   
   
+  # Access to the underlying storage, for debugging purposes.
+  # 
+  # @return [attr_type]
+  #     
+  attr_reader :storage
+  
+  
   # Construction
   # ========================================================================
   

@@ -43,7 +43,7 @@ module Declare
   end
   
   
-  def def_parameter_type name:, **kwds
+  def def_parameter_type name:, use_for_snippets: false, **kwds
     name = name.to_sym unless name.is_a?( ::Symbol )
   
     if parameter_types.key? name
@@ -53,9 +53,11 @@ module Declare
         attempted_definition: { name: name, **kwds }
     end
     
-    ParameterType.new( name: name, **kwds ).tap { |parameter_type|
-      parameter_types[ name ] = parameter_type
-    }
+    ParameterType.new(
+      name: name,
+      use_for_snippets: use_for_snippets,
+      **kwds
+    ).tap { |parameter_type| parameter_types[ name ] = parameter_type }
   end
   
 end # module Declare  

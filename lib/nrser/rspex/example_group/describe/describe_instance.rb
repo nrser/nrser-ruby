@@ -25,7 +25,6 @@ def describe_instance *constructor_args, &body
   constructor_args = Args *constructor_args
 
   constructor = -> {
-    # binding.pry
     described_class.new *constructor_args # *described_constructor_args
   }
 

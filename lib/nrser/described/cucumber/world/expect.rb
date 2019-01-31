@@ -17,6 +17,18 @@ module  World
 # Helper method mixins for creating RSpec expectations from the descriptions.
 # 
 module Expect
+
+  def expect *args, &block
+    if block
+      super( *args ) { |*block_args, &block_block|
+        hierarchy.resolve_all!
+        block.call *block_args, &block_block
+      }
+    else
+      hierarchy.resolve_all!
+      super( *args )
+    end
+  end
   
   # Create an RSpec expectation for {#described}'s {Base#subject}.
   # 

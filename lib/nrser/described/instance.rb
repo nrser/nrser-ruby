@@ -7,8 +7,8 @@
 # Project / Package
 # -----------------------------------------------------------------------
 
-# Extending {Base}
-require_relative './base'
+# Extending {Object}
+require_relative "./object"
 
 
 # Namespace
@@ -23,7 +23,7 @@ module  Described
 
 # @todo doc me!
 # 
-class Instance < Base
+class Instance < Object
   
   # Config
   # ========================================================================

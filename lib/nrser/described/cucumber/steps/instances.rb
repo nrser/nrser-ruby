@@ -63,8 +63,8 @@ module Instances
     end
   
   
-  CREATE_A_NEW_INSTANCE_OF_THE_CLASS,
-  CONSTRUCT_AN_INSTANCE_OF_THE_CLASS = \
+  CREATE_A_NEW_INSTANCE_OF_THE_DESCRIBED,
+  CONSTRUCT_AN_INSTANCE_OF_THE_DESCRIBED = \
     [
       "I create a new instance of the {described}",
       "I construct an instance of the {described}",
@@ -75,8 +75,8 @@ module Instances
     end
   
   
-  CREATE_A_NEW_INSTANCE_OF_THE_CLASS_FROM,
-  CONSTRUCT_AN_INSTANCE_OF_THE_CLASS_FROM = \
+  CREATE_A_NEW_INSTANCE_OF_THE_DESCRIBED_FROM,
+  CONSTRUCT_AN_INSTANCE_OF_THE_DESCRIBED_FROM = \
     [
       "I create a new instance of the {described} from {values}",
       "I construct an instance of the {described} from {values}",
@@ -96,6 +96,20 @@ module Instances
     ].map do |template|
       Step template do |class_|
         describe :instance, class_: class_, params: Meta::Params.new
+      end
+    end
+  
+    
+  CREATE_A_NEW_INSTANCE_OF_THE_DESCRIBED_WITH_NO_PARAMETERS,
+  CONSTRUCT_AN_INSTANCE_OF_THE_DESCRIBED_WITH_NO_PARAMETERS = \
+    [
+      "I create a new instance of the {described} with no parameters",
+      "I construct an instance of the {described} with no parameters",
+    ].map do |template|
+      Step template do |described|
+        describe :instance,
+          class_: described.resolve!( hierarchy ).subject,
+          params: Meta::Params.new
       end
     end
   

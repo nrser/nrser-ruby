@@ -7,6 +7,9 @@
 # Project / Package
 # -----------------------------------------------------------------------
 
+# Extends {Object}
+require_relative "./object"
+
 # Describes {Callable}
 require_relative './callable'
 
@@ -31,7 +34,7 @@ module  Described
 # Definitions
 # =======================================================================
 
-class Response < Base
+class Response < Object
 
   # Config
   # ========================================================================

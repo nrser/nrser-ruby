@@ -166,6 +166,14 @@ module Hierarchy
   end
   
   
+  def resolve_all!
+    return if @all_resolved
+    each { |described| described.resolve! self }
+    @all_resolved = true
+    nil
+  end
+  
+  
   # Essentially, find the first description that's an instance of a 
   # {Described::Base} subclass by matching one of it's {Base.human_names}.
   # 

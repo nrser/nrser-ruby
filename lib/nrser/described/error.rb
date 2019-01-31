@@ -7,11 +7,8 @@
 # Project / Package
 # -----------------------------------------------------------------------
 
-# Describes {Callable}
-require_relative './callable'
-
-# Describes {Params}
-require_relative './parameters'
+# Describes {Response}
+require_relative './response'
 
 
 # Refinements
@@ -38,18 +35,8 @@ class Error < Base
   
   subject_type ::Exception
   
-  from callable: Callable, params: Parameters do |callable:, params:|
-    begin
-      response = params.call callable
-    rescue Exception => error
-      error
-    else
-      raise NRSER::RuntimeError.new \
-        "Expected", Callable, "to raise, but responded",
-        response: response,
-        callable: callable,
-        parameters: parameters
-    end
+  from error_: Response do |error_:|
+    error_
   end
   
 end # class Response

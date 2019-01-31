@@ -115,6 +115,10 @@ class Resolution
     # Flag to throw when we've successfully resolved
     @resolved = false
     
+    # Flag to flip when we have evaluated {#from}'s {From#init_block}, meaning 
+    # that either `@subject` or `@error` is not available.
+    @evaluated = false
+    
     # Where the final values go
     @values = {}
     
@@ -175,14 +179,18 @@ class Resolution
         
         value = described.instance_variable_get ivar_name
         
+        # Does the value (which may be `nil`) satisfy the type?
         if type.test? value
-          # The value (which may be `nil`) satisfies the type, so use it.
+          # It does, so use it!
           @values[ name ] = value
+          
+        # Otherwise, if `value` *wasn't* `nil`, we need to check if `nil`
+        # satisfies the `type` (it may be an optional parameter indicated by a
+        # `t.Maybe` type or similar)
         elsif !value.nil? && type.test?( nil )
-          # Otherwise, if `value` *wasn't* `nil`, we need to check if `nil`
-          # satisfies the `type` (it may be an optional parameter indicated by a
-          # `t.Maybe` type or similar)
+          # `nil` satisfies, so us it.
           @values[ name ] = nil
+        
         else
           # We're done - we can never successfully resolve because neither
           # `described@<name>` (which may be `nil`) or `nil` satisfies `type`,
@@ -452,6 +460,23 @@ class Resolution
       nil
     end # #failed!
     
+    
+    def evaluate!
+      return if evaluated?
+      
+      check_resolved!
+      
+      begin
+        @subject = from.init_block.call **values
+      rescue ::Exception => error
+        @error = error
+      end
+      
+      @evaluated = true
+      
+      nil
+    end
+    
   public # end private *****************************************************
   
   
@@ -465,14 +490,32 @@ class Resolution
   end
   
   
+  def check_resolved!
+    raise Resolution::UnresolvedError.new( self: self ) unless resolved?
+  end
+  
+  
+  def evaluated?
+    @evaluated
+  end
+  
+  
   def update! described, hierarchy
     check_resolving! __method__, described
     
     @resolvable_types.each do |name, type|
       if type.test? described
-        add_candidate! name, described.resolve!( hierarchy ).subject,
-          method: __method__,
-          source: described
+        described.resolve! hierarchy
+        
+        if described.subject?
+          add_candidate! name, described.subject,
+            method: __method__,
+            source: described
+        else
+          add_candidate! name, described.error,
+            method: __method__,
+            source: described
+        end
       end
     end
     
@@ -485,7 +528,7 @@ class Resolution
   def values
     @values.transform_values { |value|
       if value.is_a? Described::Base
-        value.subject
+        value.subject? ? value.subject : value.error
       else
         value
       end
@@ -493,18 +536,42 @@ class Resolution
   end
   
   
+  def subject?
+    evaluate!
+    instance_variable_defined? :@subject
+  end
+  
+  
+  def error?
+    evaluate!
+    instance_variable_defined? :@error
+  end
+  
+  
   def subject
-    return @subject if instance_variable_defined? :@subject
+    evaluate!
     
-    unless resolved?
-      raise NRSER::RuntimeError.new \
-        self.class, "must be {#resolved?} to get {#subject}",
-        resolution: self
+    unless subject?
+      raise NRSER::WrappedError.new \
+        "Tried to access {#subject}, but subject instantiation caused an error",
+        cause: @error
     end
     
-    @subject = from.init_block.call **values
-    
     @subject
+  end
+  
+  
+  def error
+    evaluate!
+    
+    unless error?
+      raise NRSER::ConflictError.new \
+        "Tried to access {#error}, but subject instantiation succeeded",
+        subject: @subject,
+        self: self
+    end
+    
+    @error
   end
   
 end # class Resolution
