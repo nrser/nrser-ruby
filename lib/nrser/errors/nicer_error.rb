@@ -204,7 +204,7 @@ module NicerError
   
   
   def details
-    @details
+    @details || default_details
   end
   
   
