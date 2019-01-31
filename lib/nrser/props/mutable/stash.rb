@@ -1,8 +1,9 @@
 # encoding: UTF-8
 # frozen_string_literal: true
 
-# TODO  I don't know if this ever worked...? Looks like it was supposed to be 
-#       mutable prop'd object support backed by an {NRSER::Stash} instance.
+# TODO  I don't know if this ever worked...? Looks like it was supposed to be
+#       mutable prop'd object support backed by an {NRSER::Hashes::Stash}
+#       instance.
 
 # Requirements
 # =======================================================================
@@ -45,7 +46,7 @@ module NRSER::Props::Mutable::Stash
   # ======================================================================
   
   def self.included base
-    unless base < NRSER::Stash
+    unless base < NRSER::Hashes::Stash
       raise "This class is only for including in {Hash} subclasses!"
     end
     
@@ -105,7 +106,7 @@ module NRSER::Props::Mutable::Stash
     
     
     # Override {NRSER::Props::InstanceMethods#to_data} to handle non-prop
-    # values in the {NRSER::Stash}.
+    # values in the {NRSER::Hashes::Stash}.
     # 
     # @param [Boolean] only_props
     #   When `true` only prop values will be added to the data hash.
@@ -189,7 +190,7 @@ module NRSER::Props::Mutable::Stash
     
     
     # Need to patch `#merge` since {NRSER::Props::InstanceMethods} defines
-    # it, which overrides {NRSER::Stash#merge}, so we just put it back.
+    # it, which overrides {NRSER::Hashes::Stash#merge}, so we just put it back.
     # 
     def merge other_hash = {}, &block
       dup.update other_hash, &block

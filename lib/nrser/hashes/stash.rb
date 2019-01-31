@@ -11,6 +11,13 @@ require "active_support/core_ext/hash/keys"
 require "active_support/core_ext/hash/reverse_merge"
 
 
+# Namespace
+# =======================================================================
+
+module  NRSER
+module  Hashes
+
+
 # Definitions
 # ============================================================================
 
@@ -19,7 +26,7 @@ require "active_support/core_ext/hash/reverse_merge"
 # on write.
 # 
 # 
-class NRSER::Stash < ::Hash
+class Stash < ::Hash
   
   # Construction
   # ==========================================================================
@@ -369,4 +376,11 @@ class NRSER::Stash < ::Hash
     _new_hash
   end
   
-end
+end # class Stash
+
+
+# /Namespace
+# =======================================================================
+
+end # module Hashes
+end # module NRSER
