@@ -12,6 +12,9 @@ require 'pathname'
 # Project / Package
 # ------------------------------------------------------------------------
 
+# Need {NRSER::Ext::String#start_with?} in {Pathname#start_with?}
+require_relative "./string"
+
 # Submodules
 require_relative './pathname/subpath'
 
@@ -76,7 +79,7 @@ module Pathname
   #   `true` if the {::Pathname} starts with any of the prefixes.
   # 
   def start_with? *prefixes
-    to_s.start_with? *prefixes.map { |prefix|
+    to_s.n_x.start_with? *prefixes.map { |prefix|
       if Pathname === prefix
         prefix.to_s
       else
@@ -157,7 +160,7 @@ module Pathname
   def to_rel base_dir: ::Pathname.getwd, dot_slash: false
     rel = relative_path_from base_dir
     
-    if dot_slash && !rel.start_with?( /\.\.?\// )
+    if dot_slash && !rel.n_x.start_with?( /\.\.?\// )
       ::Pathname.new File.join( '.', rel )
     else
       rel
@@ -171,7 +174,7 @@ module Pathname
   # @return (see .to_rel)
   # 
   def to_dot_rel **kwds
-    to_rel **kwds, dot_slash: true
+    n_x.to_rel **kwds, dot_slash: true
   end # #to_dot_rel
   
   
@@ -183,7 +186,7 @@ module Pathname
   # @return [String]
   # 
   def to_rel_s **kwds
-    to_rel( **kwds ).to_s
+    n_x.to_rel( **kwds ).to_s
   end
   
   
@@ -193,7 +196,7 @@ module Pathname
   # @return (see .to_rel_s)
   # 
   def to_dot_rel_s **kwds
-    to_rel_s( **kwds, dot_slash: true ).to_s
+    n_x.to_rel_s( **kwds, dot_slash: true ).to_s
   end
 
 

@@ -69,15 +69,15 @@ module String
   #   `true` if `self` starts with *any* of the `prefixes`.
   # 
   def start_with? *prefixes
-    unless prefixes.any? { |x| Regexp === x }
+    unless prefixes.any? { |x| ::Regexp === x }
       return super( *prefixes )
     end
   
     prefixes.any? { |prefix|
       case prefix
-      when Regexp
+      when ::Regexp
         unless prefix.source.start_with? '\A', '^'
-          prefix = Regexp.new( "\\A#{ prefix.source }", prefix.options )
+          prefix = ::Regexp.new( "\\A#{ prefix.source }", prefix.options )
         end
         
         prefix =~ self
