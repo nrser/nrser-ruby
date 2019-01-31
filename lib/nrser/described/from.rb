@@ -7,7 +7,8 @@
 # Project / Package
 # -----------------------------------------------------------------------
 
-require 'i8/struct'
+require 'i8'
+require 'nrser/props/immutable/instance_variables'
 
 
 # Refinements
@@ -27,9 +28,27 @@ module  Described
 # Definitions
 # =======================================================================
 
-class From < I8::Struct.new \
-              types:    t.Hash( keys: t.Symbol, values: t.Type ),
-              init_block: t.IsA( Proc )
+class From < I8::Hash
+  
+  include NRSER::Props::Immutable::InstanceVariables
+  
+  
+  # @!attribute [r] types
+  #   @todo Doc types property...
+  #   
+  #   @return [PropRubyType]
+  #   
+  prop  :types,
+        type: t.Hash( keys: t.Symbol, values: t.Type )
+  
+  
+  # @!attribute [r] init_block
+  #   @todo Doc init_block property...
+  #   
+  #   @return [PropRubyType]
+  #   
+  prop  :init_block,
+        type: t.IsA( Proc )
   
   # @todo Document type_for method.
   # 
@@ -48,7 +67,9 @@ class From < I8::Struct.new \
   end # .type_for
   
   def initialize types:, init_block:
-    super(
+    super()
+    
+    initialize_props(
       types:      types.
                     map { |k, v| [ k.to_sym, self.class.type_for( v ) ] }.
                     to_h,
