@@ -296,6 +296,9 @@ module NicerError
   end
   
   
+  # Language Integration Instance Methods
+  # --------------------------------------------------------------------------
+  
   # Get the message or the extended message.
   # 
   # @note
@@ -333,6 +336,30 @@ module NicerError
       message + "\n\n" + extended_message
     else
       message
+    end
+  end
+  
+  
+  # Language Integration Instance Methods
+  # --------------------------------------------------------------------------
+  
+  def pretty_print pp
+    pp.group(1, "{#{self.class}", "}") do
+      pp.breakable ' '
+      pp.seplist(
+        [ [ 'message', to_s( extended: false ) ],
+          ( context.empty? ? nil : [ 'context', context ] ),
+        ].compact,
+        nil
+      ) do |(name, val)|
+        pp.group do
+          pp.text "#{ name }: "
+          pp.group(1) do
+            pp.breakable ''
+            val.pretty_print(pp)
+          end
+        end
+      end
     end
   end
   

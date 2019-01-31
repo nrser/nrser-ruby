@@ -512,6 +512,8 @@ class Resolution
             method: __method__,
             source: described
         else
+          binding.pry
+          
           add_candidate! name, described.error,
             method: __method__,
             source: described
@@ -572,6 +574,38 @@ class Resolution
     end
     
     @error
+  end
+  
+  
+  # Language Integration Instance Methods
+  # --------------------------------------------------------------------------
+  
+  def pretty_print pp
+    pp.group(1, "{#{self.class}", "}") do
+      pp.breakable ' '
+      pp.seplist(
+        instance_variables.sort.
+          map { |var_name|
+            [ var_name.to_s[ 1..-1 ], instance_variable_get( var_name ) ]
+          }.
+          reject { |(name, value)|
+            name != 'resolved' &&
+            name != 'evaluated' &&
+            ( value.nil? ||
+              value == false ||
+              ( value.respond_to?( :empty? ) && value.empty? ) )
+          },
+        nil
+      ) do |(name, val)|
+        pp.group do
+          pp.text "#{ name }: "
+          pp.group(1) do
+            pp.breakable ''
+            val.pretty_print(pp)
+          end
+        end
+      end
+    end
   end
   
 end # class Resolution

@@ -514,6 +514,40 @@ class Base
     
   public # end private *****************************************************
   
+  
+  # Language Integration Instance Methods
+  # --------------------------------------------------------------------------
+  
+  def pretty_print pp
+    pp.group(1, "{#{self.class}", "}") do
+      pp.group(1, "<", ">") do
+        self.class.subject_type.pretty_print pp
+      end
+      pp.breakable ' '
+      pp.seplist(
+        instance_variables.sort.
+          map { |var_name|
+            [ var_name.to_s[ 1..-1 ], instance_variable_get( var_name ) ]
+          }.
+          reject { |(name, value)|
+            name != 'resolved' &&
+            ( value.nil? ||
+              value == false ||
+              ( value.respond_to?( :empty? ) && value.empty? ) )
+          },
+        nil
+      ) do |(name, val)|
+        pp.group do
+          pp.text "#{ name }: "
+          pp.group(1) do
+            pp.breakable ''
+            val.pretty_print(pp)
+          end
+        end
+      end
+    end
+  end
+  
 end # class Base
 
 
