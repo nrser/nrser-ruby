@@ -512,8 +512,6 @@ class Resolution
             method: __method__,
             source: described
         else
-          binding.pry
-          
           add_candidate! name, described.error,
             method: __method__,
             source: described
