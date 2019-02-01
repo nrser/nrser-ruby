@@ -7,8 +7,9 @@
 # Project / Package
 # -----------------------------------------------------------------------
 
-# Describes {Response}
+# Describes {Response}, {Instance}
 require_relative './response'
+require_relative './instance'
 
 
 # Refinements
@@ -35,8 +36,17 @@ class Error < Base
   
   subject_type ::Exception
   
-  from error_: Response do |error_:|
-    error_
+    
+  # TODO  
+  # from From::ErrorOf[ Response ]
+  from error: From::ErrorOf[ Response ] do |error:|
+    error
+  end
+  
+  # TODO
+  # from From::ErrorOf[ Instance ]
+  from error: From::ErrorOf[ Instance ] do |error:|
+    error
   end
   
 end # class Response

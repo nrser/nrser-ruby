@@ -42,6 +42,6 @@ end
 
 After &->( scenario ) do
   if scenario.failed?
-    binding.pry
+    # binding.pry
   end
 end

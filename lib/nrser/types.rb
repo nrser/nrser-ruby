@@ -301,6 +301,7 @@ require_relative './types/booleans'
 # Requires `booleans`
 require_relative './types/responds'
 
+require_relative './types/classes'
 require_relative './types/numbers'
 require_relative './types/strings'
 require_relative './types/symbols'

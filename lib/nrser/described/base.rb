@@ -24,9 +24,6 @@ require 'nrser/log'
 # {Base.Names} provides shortcut to {NRSER::Meta::Names}
 require 'nrser/meta/names'
 
-# Using {From} in {Base.from}
-require_relative './from'
-
 # Using {Resolution} in {Base#resolve_subject!}
 require_relative './resolution'
 
@@ -92,23 +89,23 @@ class Base
   # @return [From]
   #   The new {From} instance.
   # 
-  def self.from **types, &init_block
+  def self.from **match_extractors, &init_block
+    # Need to require here to prevent {Base} -> {From} -> {Base} loop
+    require_relative './from'
+  
     @from ||= []
     
-    if types.empty?
+    if match_extractors.empty?
       unless init_block.nil?
         raise NRSER::ArgumentError.new \
-          "Must provide `types` when declaring a {From}"
+          "Must provide `name`/{MatchExtractor} pairs when declaring a {From}"
       end
       
       return @from
     end
     
     From.
-      new(
-        types: types,
-        init_block: init_block,
-      ).
+      new( match_extractors: match_extractors, init_block: init_block, ).
       tap { |from| @from << from }
   end
   
@@ -203,10 +200,21 @@ class Base
   attr_reader :resolution
   
   
+  # 
+  # 
+  # @return [I8::Hash<Symbol, Object>]
+  #     
+  attr_reader :inputs
+  
+  
   # Construction
   # ========================================================================
   
   # Instantiate a new `Base`.
+  # 
+  # @param [Hash<Symbol, Object>] values
+  #   
+  # 
   def initialize **kwds
     @resolving = false
     @resolution = nil
@@ -220,9 +228,8 @@ class Base
       @resolved = true
     end
     
-    kwds.each do |name, value|
-      instance_variable_set "@#{ name }", value
-    end
+    @inputs = I8::Hash[ kwds ]
+    
   end # #initialize
   
   

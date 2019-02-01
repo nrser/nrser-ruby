@@ -23,9 +23,11 @@ module  Types
 # response type are members.
 # 
 # @example Type whose members have non-empty string names.
-#   type =  Types:Respond.new \
+#   named = Types:Respond.new \
 #             to: :name,
 #             with: Types.non_empty_str
+# 
+# 
 # 
 class Respond < Type
   
@@ -145,6 +147,7 @@ end # class Responds
 #   @return [Respond]
 #   
 def_type        :Respond,
+  aliases:     [ :Responds, ],
   default_name: false,
   parameterize: [ :to, :with, :publicly ],
 &->( to:, with:, publicly: true, **options ) do

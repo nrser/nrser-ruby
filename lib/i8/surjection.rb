@@ -10,17 +10,6 @@
 require 'i8'
 
 
-# HACK
-class Object
-  def if proc_able, &block
-    block.call( self ) if proc_able.to_proc.call( self )
-  end
-
-  def unless proc_able, &block
-    block.call( self ) unless proc_able.to_proc.call( self )
-  end
-end
-
 # Namespace
 # ========================================================================
 

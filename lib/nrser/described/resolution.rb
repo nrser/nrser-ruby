@@ -23,11 +23,6 @@ require 'nrser/errors/nicer_error'
 # Mixing logging in
 require 'nrser/log'
 
-# {Resolution}s track value candidates in {Candidate} instances
-require_relative './resolution/candidate'
-
-require_relative './from'
-
 
 # Refinements
 # =======================================================================
@@ -66,6 +61,24 @@ class Resolution
   attr_reader :from
   
   
+  # Map fo {Symbol} names to {Future} instances (that are now or will in the
+  # future be fulfilled by {Described::Base#subject} or {Described::Base#error}
+  # values) that are currently resolved for those names.
+  #
+  # @return [Hash<Symbol, Future>]
+  #
+  attr_reader :resolved_futures
+  
+  
+  # Map of input name {Symbol}s to {Array}s of {Future} instances that could
+  # become that input's {#resolved_future}, and hence it's future full-resolved
+  # member of {#values}.
+  # 
+  # @return [Hash<Symbol, Array<Future>>]
+  #     
+  attr_reader :candidates
+  
+  
   # The described instance to resolve a {Base#subject} for.
   # 
   # @return [Base]
@@ -84,6 +97,9 @@ class Resolution
   attr_reader :failed_because
   
   
+  # Construction
+  # ==========================================================================
+  
   # Construct a new {Resolution} for resolving the subject for a {Base} instance
   # and one of the {From} instances in the {Base} class' {Base.from} array.
   # 
@@ -98,6 +114,8 @@ class Resolution
   #   If the parameter values don't satisfy their types.
   #   
   def initialize from:, described:
+    require_relative './from'
+    
     logger.trace "Constructing resolution",
       for_described: described,
       from: from
@@ -112,47 +130,35 @@ class Resolution
     # *Why* did we fail?
     @failed_because = nil
     
-    # Flag to throw when we've successfully resolved
+    # Flag to throw when we've successfully resolved all the name keys in 
+    # `from`'s {From#match_extractors} to {Future} instances in
+    # {#resolved_futures}
     @resolved = false
     
     # Flag to flip when we have evaluated {#from}'s {From#init_block}, meaning 
-    # that either `@subject` or `@error` is not available.
+    # that either `@subject` or `@error` is then available.
     @evaluated = false
     
     # Where the final values go
-    @values = {}
+    # Hash<Symbol, Future>
+    @resolved_futures = {}
     
     # Where value {Candidate} instances go
     @candidates = Hash.new { |hash, name| hash[ name ] = [] }
-    
-    # Split the {From#types} into:
-    #
-    # 1.  `@ivar_only_types` - "Instance-variable-only" types that can *only*
-    #     take values from the instance variable of the same name in
-    #     `described`.
-    #     
-    # 2.  `@resolvable_types` - Types whose values can come from `described`
-    #     instance variables (which get first priority) *or* from subjects up
-    #     the ancestor chain.
-    #     
-    @ivar_only_types, @resolvable_types = \
-      from.types.
-        partition { |name, type| name.to_s.start_with? '@' }.
-        map { |array| array.to_h.freeze }
     
     # Update from {#described}'s instance variables
     init_update_from_described!
   end
   
   
-  private
+  protected
   # ========================================================================
     
     # Initialization helper to set values an candidates from {#described}'s
     # instance variables (the names and the {NRSER::Described::Base}
     # instance was initialized with, besides it's `@parent`).
     # 
-    # @private
+    # @protected
     # 
     # @return [nil]
     #   Mutates the instance.
@@ -173,72 +179,187 @@ class Resolution
       #   Check if {Resolution} instances have {#failed?} after initialization
       #   to avoid doing any additional unnecessary work on their behalf.
       #
-      @ivar_only_types.each do |ivar_name, type|
-        # Get the regular name by chopping off the '@' prefix
-        name = ivar_name.to_s[ 1..-1 ].to_sym
-        
-        value = described.instance_variable_get ivar_name
-        
-        # Does the value (which may be `nil`) satisfy the type?
-        if type.test? value
-          # It does, so use it!
-          @values[ name ] = value
+      updated = from.
+        match_extractors.
+        map { |name, match_extractor|
           
-        # Otherwise, if `value` *wasn't* `nil`, we need to check if `nil`
-        # satisfies the `type` (it may be an optional parameter indicated by a
-        # `t.Maybe` type or similar)
-        elsif !value.nil? && type.test?( nil )
-          # `nil` satisfies, so us it.
-          @values[ name ] = nil
+          t.match match_extractor,
+            
+            From::InputValue, -> {
+              # if match_extractor.match? described.inputs[ name ]
+              #   add_value!  name,
+              #               match_extractor.extract( described.inputs[ name ] ),
+              #               source: __method__
+              if (future = match_extractor.futurize( described.inputs[ name ] ))
+                @inputs[ name ] = future
+                true
+              
+              else
+                # We're done - we can never successfully resolve because neither
+                # `described`'s construction input for `name` (which may be `nil`)
+                # or `nil` satisfies the match extractor, and we have nowhere else
+                # to get anything for it from.
+                #
+                # Mark the instance as un-resolvable and bail out.
+                failed! "{#described} instance variables doesn't satisfy",
+                        "construction-input-only type (and `nil` doesn't either)",
+                        name: name,
+                        value: value,
+                        type: type
+                return
+              end # begin / rescue
+            },
+            
+            From::Resolvable, ->{ 
+              if described.inputs.key?( name )
+                if (future = match_extractor.futurize( described ))
+                  add_candidate! name, future
+                  true
+                end
+              end
+            }
+            
+        }.
+        any?
         
-        else
-          # We're done - we can never successfully resolve because neither
-          # `described@<name>` (which may be `nil`) or `nil` satisfies `type`,
-          # and we have nowhere else to get anything for it from.
-          #
-          # Mark the instance as un-resolvable and bail out.
-          failed! "{#described} instance variables doesn't satisfy",
-                  "instance-variable-only type (and `nil` doesn't either)",
-                  name: name,
-                  value: value,
-                  type: type
-          return
-        end
-        
-        nil
-      end # @ivar_only_types.each
-      
-      # Now swing through the resolvable types and see if {#described} has
-      # instance variable values that satisfy them. If so, those values will 
-      # become candidates.
-      @resolvable_types.each do |name, type|
-        ivar_name = "@#{ name }"
-        
-        if described.instance_variable_defined? ivar_name
-          value = described.instance_variable_get ivar_name
-          
-          # If the `type` represents a {Base} subclass then we want to check the
-          # value against that subclass' {Base.subject_type} as well, since 
-          # {#described}'s instance variables will be actual values, not 
-          # described instances with {Base#subject} values.
-          # 
-          # TODO  This seems to work, but it's kind-of funky... could probably 
-          #       use some improvement.
-          # 
-          if (  type.is_a?( t::IsA ) && Base.subclass?( type.mod ) &&
-                type.mod.subject_type.test?( value ) ) ||
-                type.test?( value )
-            add_candidate! name, value, method: __method__, source: ivar_name
-          end
-        end
-      end # @resolvable_types.each
-      
-      # See if we got it already
-      try_to_resolve!
+      # If we updated the state at all, see if we got it already
+      try_to_resolve! if updated
       
       nil
+    end # init_update_from_described!
+  
+  public # end protected *****************************************************
+  
+  
+  # Instance Methods
+  # ==========================================================================
+  
+  # @!group Public State Query Instance Methods
+  # --------------------------------------------------------------------------
+  # 
+  # Instance methods for checking the state of the resolution.
+  # 
+  # **WARNING** Some methods trigger side-effects and/or raise if called from
+  #             the wrong state!
+  # 
+  
+  # Is it no longer possible for this resolution to succeed?
+  #
+  # This is an expected state for some of a description's resolutions, because
+  # for descriptions with more than one {Described::Base.from}, it is unlikely
+  # that the necessary input values and description hierarchy are always
+  # available for all {From}s, and many times the associated {Resolution}
+  # instances can figure that out quickly and get out of the way by failing.
+  #
+  # Resolutions may fail during construction: if the {#described} is missing
+  # input values that the {#from} needs that can not be resolved from the
+  # hierarchy ({Described::Method}'s `name` input falls in this category).
+  #
+  # It is hence important to check the failed state immediately after
+  # constructing a {Resolution} in order to filter out early failures.
+  # 
+  # @return [Boolean]
+  #
+  def failed?
+    @failed
+  end
+  
+  
+  def resolved?
+    @resolved
+  end
+  
+  
+  def evaluated?
+    @evaluated
+  end
+  
+  
+  def fulfilled?
+    @fulfilled
+  end
+  
+  
+  def subject?
+    evaluate!
+    instance_variable_defined? :@subject
+  end
+  
+  
+  def error?
+    evaluate!
+    instance_variable_defined? :@error
+  end
+  
+  # @!endgroup Public State Query Instance Methods # *************************
+  
+  
+  # @!group Public State Assertion Instance Methods
+  # --------------------------------------------------------------------------
+  
+  # @return [self]
+  # 
+  # @raise [Resolution::UnresolvedError]
+  #   If the resolution has not been {#resolved?}.
+  # 
+  def check_resolved!
+    raise Resolution::UnresolvedError.new( self: self ) unless resolved?
+    self
+  end
+  
+  
+  def check_fulfilled!
+    raise "Not fulfilled!" unless fulfilled?
+    self
+  end
+  
+  # @!endgroup Public State Assertion Instance Methods # *********************
+  
+  
+  # @!group Public Resolution Data Access Methods
+  # --------------------------------------------------------------------------
+  
+  def values
+    @values ||= begin
+      check_resolved!
+      check_fulfilled!
+      
+      resolved_futures.transform_values &:value
+    end    
+  end
+  
+  
+  def subject
+    evaluate!
+    
+    unless subject?
+      raise NRSER::WrappedError.new \
+        "Tried to access {#subject}, but subject instantiation caused an error",
+        cause: @error
     end
     
+    @subject
+  end
+  
+  
+  def error
+    evaluate!
+    
+    unless error?
+      raise NRSER::ConflictError.new \
+        "Tried to access {#error}, but subject instantiation succeeded",
+        subject: @subject,
+        self: self
+    end
+    
+    @error
+  end
+  
+  # @!endgroup Public Resolution Data Access Methods # ***********************
+  
+  
+  protected
+  # ========================================================================
     
     # Create a {Candidate} and add it to `@candidates`, checking that it makes
     # sense to do so.
@@ -246,7 +367,7 @@ class Resolution
     # @note
     #   This is the **ONLY** way the list of candidates should be manipulated.
     # 
-    # @private
+    # @protected
     # 
     # @param [::Symbol] name
     #   The key in {#from}'s {From#types} that `value` is a candidate for.
@@ -269,33 +390,32 @@ class Resolution
     #   be useful in errors (passed to {#check_resolving!} along with the other
     #   parameters).
     # 
-    # @return [Candidate]
-    #   The newly constructed {Candidate} instance, which has been added to 
-    #   `@candidates`.
+    # @return [Future]
+    #   The {Future} that was added to {#candidates}.
     # 
-    def add_candidate! name, value, source:, **context
-      check_resolving! __method__, name, value, source: source, **context
+    def add_candidate! name, future #, source:, **context
+      check_resolving! __method__, future #, value, source: source, **context
       
-      unless @resolvable_types.key? name
+      unless from.match_extractors.key? name
         raise KeyError.new \
-          "name #{ name.inspect } is not a resolvable type"
+          "name #{ name.inspect } is not match extractor name in {#from}"
       end
       
-      if @values.key? name
+      if resolved_futures.key? name
         raise NRSER::ConflictError.new \
-          "Type", name, "already resolved to value", @values[ name ]
+          "Type", name, "already resolved to value ", values[ name ].inspect
       end
       
-      Candidate.
-        new( value: value, source: source.to_s ).
-        tap { |candidate| @candidates[ name ] << candidate }
+      @candidates[ name ] << future
+      
+      future
     end
     
     
     # Called before doing something that only make sense if the {Resolution}
     # is in the process of resolving (like adding a candidate value for a type).
     # 
-    # @private
+    # @protected
     # 
     # @return [nil]
     #   If everything's ok.
@@ -329,34 +449,37 @@ class Resolution
     
     # Attempt to resolve the `@candidates` to `@values`.
     # 
-    # @private
+    # @protected
     # 
     # @return [nil]
     #   Mutates the instance, in particular potentially chaning the {#resolved?}
     #   state.
     # 
-    def try_to_resolve!
+    def try_to_resolve! hierarchy: nil
       check_resolving! __method__
-            
-      no_candidates = @resolvable_types.keys - @candidates.keys
       
-      # Bail if there are still names with no candidates
-      return unless no_candidates.empty?
+      # Bail if there are still names with no candidates or values
+      return if from.match_extractors.keys.any? { |name|
+        !@candidates.key?( name ) && !resolved_futures.key?( name )
+      }
       
       # Create a working copy of `@candidates` to mutate, discarding candidates
       # for the same value that have equal {Candidate#value}
-      candidates = @candidates.transform_values { |list|
-        list.uniq { |candidate| candidate.value }
+      candidates = @candidates.transform_values { |futures|
+        futures.uniq &:uniq_id
       }
       
-      # And a hash to store hopefully resolved values
-      resolved_values = {}
+      # And a hash to store hopefully resolved {Future} instance that have
+      # or will have the values we need.
+      new_resolved_futures = {}
       
       # The whole goal is to empty out that `candidates` hash, bailing out of
       # the entire method (without having mutated any instance variables) if
       # we run into problems
       until candidates.empty?
-      
+        
+        # Create a hash of candidates names to single {Candidate} for *only*
+        # names that have a single {Candidate}.
         unique_candidates = \
           candidates.
             select { |name, entries| entries.count == 1 }.
@@ -378,23 +501,23 @@ class Resolution
         # is the same count as the {::Hash} of unique candidates. And I sort 
         # of think that works...
         # 
-        return if unique_candidates.count != unique_candidates.
-            values.
-            map { |c| c.value.object_id }.
-            to_set.
-            count
+        return if unique_candidates.count != \
+                    unique_candidates.
+                      values.
+                      uniq( &:uniq_id ).
+                      count
         
         # Remove all the unique names from the working copy
         unique_candidates.keys.each { |name| candidates.delete name }
         
-        # Remove those candidates from any other names and store their values
+        # Remove those candidates from any other names and store their futures
         # in the new ones hash
-        unique_candidates.each do |name, unique_candidate|
-          resolved_values[ name ] = unique_candidate.value
+        unique_candidates.each do |name, unique_future|
+          new_resolved_futures[ name ] = unique_future
           
-          candidates.each do |name, entries|
-            entries.reject! do |candidate|
-              candidate.value.equal? unique_candidate.value
+          candidates.each do |name, other_futures|
+            other_futures.reject! do |other_future|
+              other_future == unique_future
             end
             
             # If this completely emptied the candidates list, then we give up.
@@ -409,7 +532,7 @@ class Resolution
             # respectively, but when they're removed there will be nothing left
             # for `n_3`.
             # 
-            return if entries.empty?
+            return if other_futures.empty?
           end # candidates.each
         end # unique_candidates.each
         
@@ -418,19 +541,33 @@ class Resolution
       end # until candidates.empty?
       
       # Shit... this should mean we've actually done it!
-      # 
-      # So, `resolved_values` should have the same amount of entries as
-      # `@resolvable_types`
-      unless resolved_values.count == @resolvable_types.count
+      
+      # To check, each `name` in `from.match_extractors` should appear in 
+      # *exclusively either* `new_resolved_futures` or `resolved_futures`
+      unless from.match_extractors.keys.all? { |name|
+        if new_resolved_futures.key?( name )
+          !resolved_futures.key?( name )
+        else
+          resolved_futures.key?( name )
+        end
+      }
         raise NRSER::RuntimeError.new \
-          "Logic failure...  counts don't match",
-          resolved_values:  resolved_values,
-          resolvable_types:   @resolvable_types
+          "Logic failure...  some names in both...",
+          new_resolved_futures:   new_resolved_futures,
+          resolved_futures:       resolved_futures
       end
       
       # Now just assign and flag the state!
-      @values.merge! resolved_values
+      resolved_futures.merge! new_resolved_futures
       @resolved = true 
+      
+      if hierarchy
+        resolved_futures.each do |name, future|
+          future.fulfill! hierarchy
+        end
+        
+        @fulfilled = true
+      end
       
       nil
     end # #try_to_resolve!
@@ -439,7 +576,7 @@ class Resolution
     # Change to a *failed* state. From which there is no going back. This is
     # called when we know we will never succeed.
     # 
-    # @private
+    # @protected
     # 
     # @param [Array] description
     #   Entries to be merged into a {::String} description.
@@ -447,7 +584,7 @@ class Resolution
     # @param [Hash<Symbol, Object>] context
     #   Names and values of relevant information.
     # 
-    # @return [nil]
+    # @return [self]
     #   
     def failed! *description, **context
       @failed = true
@@ -457,121 +594,103 @@ class Resolution
         }.join( ' ' ),
         context
       ]
-      nil
+      
+      self
     end # #failed!
     
     
+    # Evaluate the {From#init_block} of {#from} against {#values}, setting 
+    # {#subject} if it succeeds, and {#error} if it fails.
+    # 
+    # Guards by checking and setting the {#evaluated?} state, so repeated calls
+    # have no effect.
+    # 
+    # @private
+    # 
+    # @return [self]
+    # 
     def evaluate!
-      return if evaluated?
-      
-      check_resolved!
+      return self if evaluated?
       
       begin
-        @subject = from.init_block.call **values
+        subject = from.init_block.call( **values )
       rescue ::Exception => error
         @error = error
+      else
+        # If the type check raises it does **NOT** mean that the description
+        # failed in an acceptable way that should set {#error} - init blocks
+        # not returning a satisfactory type is a logic error, not something
+        # to be tested for
+        @subject = described.class.subject_type.check! subject
       end
       
       @evaluated = true
       
-      nil
-    end
+      self
+    end # #evaluate!
     
-  public # end private *****************************************************
-  
-  
-  def failed?
-    @failed
-  end
-  
-  
-  def resolved?
-    @resolved
-  end
-  
-  
-  def check_resolved!
-    raise Resolution::UnresolvedError.new( self: self ) unless resolved?
-  end
-  
-  
-  def evaluated?
-    @evaluated
-  end
+  public # end protected *****************************************************
   
   
   def update! described, hierarchy
     check_resolving! __method__, described
     
-    @resolvable_types.each do |name, type|
-      if type.test? described
-        described.resolve! hierarchy
-        
-        if described.subject?
-          add_candidate! name, described.subject,
-            method: __method__,
-            source: described
-        else
-          add_candidate! name, described.error,
-            method: __method__,
-            source: described
-        end
-      end
-    end
+    # Maybe... this would allow us to avoid passing `hierarchy` to 
+    # {#try_to_resolve!}, but it also might end up with us doing more work than
+    # necessary or even desired resolving futures that we won't have any need 
+    # of..?
+    # 
+    # TODO  If not, we def want to resolve any pending futures *before* we 
+    #       start to iterate through the `hierarchy` for the case where we 
+    #       have all the inputs already filled out from construction but
+    #       some need to be resolved in order for this instance to resolve.
+    # 
+    # resolve_futures! hierarchy
     
-    try_to_resolve!
+    # 
+    updated = from.
+        match_extractors.
+        # Select only resolvable match extractors that we don't already have
+        # set input futures for (since we always want to use the constructor
+        # inputs)
+        select { |name, match_extractor|
+          match_extractor.is_a?( From::Resolvable ) &&
+            !resolved_futures.key?( name )
+        }.
+        # See if it makes sense to add a candidate {Future} for each extractor,
+        # mapping to `true` if we do add one, so we can tell we updated, and
+        # `nil` otherwise.
+        map { |name, match_extractor|
+          # See if we have a potential match, allowing us to skip descriptions
+          # that have nothing to do with our needs
+          if match_extractor.match? described
+            # Ok, we're interested in this one! Resolve it so we can deal with 
+            # the value directly 
+            described.resolve! hierarchy
+            
+            # If we can construct a {Future} from the description, then add
+            # it as a candidate
+            if (future = match_extractor.futurize( described ))
+              add_candidate! name, future
+              # Evaluate the block to `true` to signal that we have updated
+              # state and will want to try to resolve
+              true
+            end
+          end
+        }.
+        # See if any of the above blocks added a candidate, the result of which
+        # gets assigned to `updated`
+        any?
     
-    nil
-  end
-  
-  
-  def values
-    @values.transform_values { |value|
-      if value.is_a? Described::Base
-        value.subject? ? value.subject : value.error
-      else
-        value
-      end
-    }
-  end
-  
-  
-  def subject?
-    evaluate!
-    instance_variable_defined? :@subject
-  end
-  
-  
-  def error?
-    evaluate!
-    instance_variable_defined? :@error
-  end
-  
-  
-  def subject
-    evaluate!
+    # Attempt to resolve, this time providing the {Hierarchy}, which will allow
+    # any futures to be resolved.
+    try_to_resolve!( hierarchy: hierarchy ) if updated
     
-    unless subject?
-      raise NRSER::WrappedError.new \
-        "Tried to access {#subject}, but subject instantiation caused an error",
-        cause: @error
-    end
-    
-    @subject
-  end
-  
-  
-  def error
-    evaluate!
-    
-    unless error?
-      raise NRSER::ConflictError.new \
-        "Tried to access {#error}, but subject instantiation succeeded",
-        subject: @subject,
-        self: self
-    end
-    
-    @error
+    # Allow for chaining... though I have considered returning a boolean to 
+    # indicate if an update happen or not... but I'm not using that, and I don't
+    # know why I continue to create unused APIs like that... I guess for that
+    # future case where it might be useful...
+    self
   end
   
   

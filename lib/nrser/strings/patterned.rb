@@ -300,8 +300,14 @@ class Patterned < ::String
   def self.to_type
     require 'nrser/types'
     
-    NRSER::Types.When( pattern ) |
-      NRSER::Types.Respond( to: :to_s, with: pattern )
+    if abstract?
+      t.Union *realizations, name: safe_name
+    else
+      t.Union \
+        NRSER::Types.When( pattern ),
+        NRSER::Types.Respond( to: :to_s, with: pattern ),
+        name: safe_name
+    end
   end
   
   # @!endgroup {NRSER::Types} Integration Singleton Methods # ****************
