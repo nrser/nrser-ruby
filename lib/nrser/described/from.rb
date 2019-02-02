@@ -265,7 +265,7 @@ class From
   def pretty_print pp
     pp.group(1, "{#{self.class}", "}") do
       pp.breakable ' '
-      pp.seplist(types, nil) do |key, val|
+      pp.seplist(match_extractors, nil) do |key, val|
         pp.group do
           key.pretty_print(pp)
           pp.text ' => '

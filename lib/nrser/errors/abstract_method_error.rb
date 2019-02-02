@@ -7,6 +7,7 @@
 # Project / Package
 # -----------------------------------------------------------------------
 
+require 'nrser/log'
 require 'nrser/core_ext/object/lazy_var'
 
 require_relative './not_implemented_error'

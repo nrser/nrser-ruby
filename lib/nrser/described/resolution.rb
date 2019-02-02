@@ -23,6 +23,9 @@ require 'nrser/errors/nicer_error'
 # Mixing logging in
 require 'nrser/log'
 
+# Mixing in my custom pretty printing
+require 'nrser/support/pp'
+
 
 # Refinements
 # =======================================================================
@@ -47,6 +50,24 @@ class Resolution
   # ========================================================================
   
   include NRSER::Log::Mixin
+  
+  include NRSER::Support::PP
+  
+  
+  # Config
+  # ============================================================================
+  
+  pretty_print_config \
+    ivars: false,
+    methods: {
+      always:   [ :resolved?, :evaluated? ],
+      present:  [ :candidates,
+                  :described,
+                  :failed?,
+                  :failed_because,
+                  :from,
+                  :resolved_futures, ]
+    }
   
   
   # Attributes
@@ -196,16 +217,17 @@ class Resolution
               
               else
                 # We're done - we can never successfully resolve because neither
-                # `described`'s construction input for `name` (which may be `nil`)
-                # or `nil` satisfies the match extractor, and we have nowhere else
-                # to get anything for it from.
+                # `described`'s construction input for `name` (which may be
+                # `nil`) or `nil` satisfies the match extractor, and we have
+                # nowhere else to get anything for it from.
                 #
                 # Mark the instance as un-resolvable and bail out.
                 failed! "{#described} instance variables doesn't satisfy",
-                        "construction-input-only type (and `nil` doesn't either)",
+                        "construction-input-only type (and `nil` doesn't",
+                        "either)",
                         name: name,
-                        value: value,
-                        type: type
+                        value: described.inputs[ name ],
+                        match_extractor: match_extractor
                 return
               end # begin / rescue
             },
@@ -691,39 +713,7 @@ class Resolution
     # know why I continue to create unused APIs like that... I guess for that
     # future case where it might be useful...
     self
-  end
-  
-  
-  # Language Integration Instance Methods
-  # --------------------------------------------------------------------------
-  
-  def pretty_print pp
-    pp.group(1, "{#{self.class}", "}") do
-      pp.breakable ' '
-      pp.seplist(
-        instance_variables.sort.
-          map { |var_name|
-            [ var_name.to_s[ 1..-1 ], instance_variable_get( var_name ) ]
-          }.
-          reject { |(name, value)|
-            name != 'resolved' &&
-            name != 'evaluated' &&
-            ( value.nil? ||
-              value == false ||
-              ( value.respond_to?( :empty? ) && value.empty? ) )
-          },
-        nil
-      ) do |(name, val)|
-        pp.group do
-          pp.text "#{ name }: "
-          pp.group(1) do
-            pp.breakable ''
-            val.pretty_print(pp)
-          end
-        end
-      end
-    end
-  end
+  end # #update!
   
 end # class Resolution
 

@@ -10,6 +10,9 @@
 # {Candidate} is a {I8::Struct}
 require 'i8/struct'
 
+# Mixing in my custom pretty printing support
+require "nrser/support/pp"
+
 
 # Refinements
 # =======================================================================
@@ -35,16 +38,22 @@ class   Resolution
 # 
 class Future
   
-  # Constants
+  # Mixins
   # ==========================================================================
   
+  # Mix in my custom pretty printing support
+  include NRSER::Support::PP
   
-  # Singleton Methods
-  # ==========================================================================
+  
+  # Config
+  # ============================================================================
+  
+  pretty_print_config \
+    methods: { always: [ :described?, :fulfilled? ] }
+  
   
   # Attributes
   # ==========================================================================
-  
   
   # TODO document `method_name` attribute.
   # 
@@ -99,11 +108,11 @@ class Future
   end
   
   
-  def value?
+  def fulfilled?
     instance_variable_defined? :@value
   end
   
-  alias_method :fulfilled?, :value?
+  alias_method :value?, :fulfilled?
   
   
   def value
