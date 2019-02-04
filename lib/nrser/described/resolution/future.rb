@@ -78,6 +78,10 @@ class Future
         
       @method_name = \
         t.In( Set[ :subject, :error ] ).check! kwds.delete( :method_name )
+      
+      if @described.resolved?
+        @value = @described.public_send @method_name
+      end
     else
       unless kwds.key? :value
         raise ArgumentError.new \

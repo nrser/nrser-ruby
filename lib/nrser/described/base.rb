@@ -508,8 +508,10 @@ class Base
         reject( &:resolving? ).
         each { |described|
           resolutions.each { |resolution|
-            resolution.update! described, hierarchy
-            return resolution if resolution.resolved?
+            unless resolution.failed?
+              resolution.update! described, hierarchy
+              return resolution if resolution.resolved?
+            end
           }
         }
       

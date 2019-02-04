@@ -301,9 +301,9 @@ class Patterned < ::String
     require 'nrser/types'
     
     if abstract?
-      t.Union *realizations, name: safe_name
+      NRSER::Types.Union *realizations, name: safe_name
     else
-      t.Union \
+      NRSER::Types.Union \
         NRSER::Types.When( pattern ),
         NRSER::Types.Respond( to: :to_s, with: pattern ),
         name: safe_name

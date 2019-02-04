@@ -212,7 +212,7 @@ class Resolution
               #               match_extractor.extract( described.inputs[ name ] ),
               #               source: __method__
               if (future = match_extractor.futurize( described.inputs[ name ] ))
-                @inputs[ name ] = future
+                @resolved_futures[ name ] = future
                 true
               
               else
@@ -234,7 +234,8 @@ class Resolution
             
             From::Resolvable, ->{ 
               if described.inputs.key?( name )
-                if (future = match_extractor.futurize( described ))
+                if (  future =
+                        match_extractor.futurize( described.inputs[ name ] ) )
                   add_candidate! name, future
                   true
                 end
@@ -245,7 +246,9 @@ class Resolution
         any?
         
       # If we updated the state at all, see if we got it already
-      try_to_resolve! if updated
+      if updated
+        try_to_resolve!
+      end
       
       nil
     end # init_update_from_described!
@@ -461,8 +464,9 @@ class Resolution
             args: args,
             block: block,
           },
-          from: from,
-          described: described
+          resolution: self
+          # from: from,
+          # described: described
       end
       
       nil
@@ -580,10 +584,13 @@ class Resolution
       end
       
       # Now just assign and flag the state!
-      resolved_futures.merge! new_resolved_futures
+      @resolved_futures.merge! new_resolved_futures
       @resolved = true 
       
-      if hierarchy
+      if resolved_futures.values.all?( &:value? )
+        @fulfilled = true
+      
+      elsif hierarchy
         resolved_futures.each do |name, future|
           future.fulfill! hierarchy
         end

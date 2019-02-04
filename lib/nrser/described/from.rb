@@ -119,8 +119,8 @@ class From
         nil
         
       end
-    rescue
-      binding.pry
+    rescue Exception => error
+      raise error
     end
     
   end # class InputValue
@@ -258,25 +258,6 @@ class From
     )
   end
   
-  
-  # Language Integration Instance Methods
-  # --------------------------------------------------------------------------
-  
-  def pretty_print pp
-    pp.group(1, "{#{self.class}", "}") do
-      pp.breakable ' '
-      pp.seplist(match_extractors, nil) do |key, val|
-        pp.group do
-          key.pretty_print(pp)
-          pp.text ' => '
-          pp.group(1) do
-            pp.breakable ''
-            val.pretty_print(pp)
-          end
-        end
-      end
-    end
-  end
   
 end # class From
 
