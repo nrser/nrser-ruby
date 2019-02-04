@@ -18,6 +18,9 @@ require 'active_support/core_ext/object/blank'
 # Using {::String#truncate}
 require 'active_support/core_ext/string/filters'
 
+#### Sub-Tree ####
+require_relative "./config/ivars"
+
 
 # Namespace
 # =======================================================================
@@ -31,11 +34,28 @@ module PP
 # =======================================================================
   
 class Config
+
+  # Attributes
+  # ==========================================================================
   
-  def initialize
-    @ivars = true
-    @methods = []
+  # Instance variables config/processor, if any (`false` means don't add any
+  # instance variables at all).
+  # 
+  # @return [false | IVars]
+  #     
+  attr_reader :ivars
+  
+  
+  # Construction
+  # ==========================================================================
+  
+  def initialize ivars: true, methods: false
+    update! ivars: ivars, methods: methods
   end
+  
+  
+  # Instance Methods
+  # ==========================================================================
   
   def update! **kwds
     set_ivars!( kwds[ :ivars ] ) if kwds.key?( :ivars )
@@ -49,13 +69,19 @@ class Config
   #       NRSER::Support::PP::Config.new.set_ivars! \
   #           
   def set_ivars! arg
-    case arg
-    when true, false, :always, :never, :present
-      @ivars = arg
+    @ivars = case arg
+    when false, :never
+      # If we're not going to include them at all, don't even bother creating
+      # an {IVars} instance.
+      false
+    when true, :always, :present
+      # Simple mode
+      IVars.make mode: arg
     when ::Hash
-      @ivars = IVars.new(  )
+      # Full config
+      IVars.make **arg
     end
-  end
+  end # #set_ivars!
   
   
   def set_methods! arg
@@ -91,60 +117,6 @@ class Config
   end # #method_value_for
   
   
-  def ivar_value_for instance, ivar_name
-    instance_variable_get ivar_name
-  rescue Exception => error
-    ErrorString.new( "getting ivar #{ ivar_name }", error )
-  end
-  
-  
-  def values_for_ivars instance, add_to: []
-    add_to.tap do |values|
-      case @ivars
-      
-      when true, :always
-        pretty_print_instance_variables.each do |ivar_name|
-          values << [ ivar_name, ivar_value_for( instance, ivar_name ) ]
-        end
-        
-      when ::Array
-        @ivars.each do |ivars_entry|
-        
-          case ivars_entry
-          
-          when ::String, ::Symbol
-            values << [ ivars_entry,
-                        ivar_value_for( instance, ivars_entry ) ]
-            
-          when ::Array
-            begin
-              ivar_name, ivar_mode = ivars_entry
-            rescue Exception => error
-              # Can't do much here except log it or some shit
-            else
-              case ivar_mode
-              when false, :never
-                # pass
-              when true, :always
-                values << [ ivar_name,
-                            ivar_value_for( instance, ivar_name ) ]
-              when :present
-                value = ivar_value_for instance, ivar_name 
-                values << [ ivar_name, value ] if value.present?
-              end
-            end # begin; destructure name/mode; rescue
-            
-          else
-            # TODO  Log an error?
-          end # case ivars_entry
-          
-        end # @ivars.each
-      
-      end # case @ivars
-    end # add_to.tap
-  end # #values_for_ivars
-  
-  
   def values_for_methods instance, add_to: []
     add_to.tap do |values|
       @methods.each do |(method_name, include_when)|
@@ -161,7 +133,7 @@ class Config
   
   def values_for instance, add_to: []
     add_to.tap do |values|
-      values_for_ivars instance, add_to: values
+      ivars.values_for( instance, add_to: values ) if ivars
       values_for_methods instance, add_to: values
     end # [].tap |values|
   end # #values_for

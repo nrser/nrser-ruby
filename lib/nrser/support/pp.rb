@@ -18,6 +18,9 @@ require 'active_support/core_ext/object/blank'
 # Using {::String#truncate}
 require 'active_support/core_ext/string/filters'
 
+#### Sub-Tree ####
+require_relative "./pp/config"
+
 
 # Namespace
 # =======================================================================
@@ -52,161 +55,16 @@ module PP
       false
     end
   end
-  
-  class Config
-    
-    def initialize
-      @ivars = true
-      @methods = []
-    end
-    
-    def update! **kwds
-      set_ivars!( kwds[ :ivars ] ) if kwds.key?( :ivars )
-      set_methods!( kwds[ :methods ] ) if kwds.key?( :methods )
-      self
-    end
-    
-    
-    # @example
-    #   
-    #       NRSER::Support::PP::Config.new.set_ivars! \
-    #           
-    def set_ivars! arg
-      case arg
-      when true, false, :always, :never, :present
-        @ivars = arg
-      when ::Hash
-        @ivars = []
-        
-        if arg.key? :always
-        end
-        
-      end
-    end
-    
-    
-    def set_methods! arg
-      @methods = []
-      
-      if arg != false
-        
-        if arg.key? :always
-          @methods += \
-            arg[ :always ].
-              map { |method_name| [ method_name.to_sym, :always ] }
-        end
-        
-        if arg.key? :present
-          @methods += \
-            arg[ :present ].
-              map { |method_name| [ method_name.to_sym, :present ] }
-        end
-        
-        @methods.sort!
-      end
-      
-      self
-    end # #methods=
-    
-    
-    def method_value_for instance, method_name
-      instance.send method_name
-      
-    rescue Exception => error
-      ErrorString.new "calling `.#{ method_name }`", error
-      
-    end # #method_value_for
-    
-    
-    def ivar_value_for instance, ivar_name
-      instance_variable_get ivar_name
-    rescue Exception => error
-      ErrorString.new( "getting ivar #{ ivar_name }", error )
-    end
-    
-    
-    def values_for_ivars instance, add_to: []
-      add_to.tap do |values|
-        case @ivars
-        
-        when true, :always
-          pretty_print_instance_variables.each do |ivar_name|
-            values << [ ivar_name, ivar_value_for( instance, ivar_name ) ]
-          end
-          
-        when ::Array
-          @ivars.each do |ivars_entry|
-          
-            case ivars_entry
-            
-            when ::String, ::Symbol
-              values << [ ivars_entry,
-                          ivar_value_for( instance, ivars_entry ) ]
-              
-            when ::Array
-              begin
-                ivar_name, ivar_mode = ivars_entry
-              rescue Exception => error
-                # Can't do much here except log it or some shit
-              else
-                case ivar_mode
-                when false, :never
-                  # pass
-                when true, :always
-                  values << [ ivar_name,
-                              ivar_value_for( instance, ivar_name ) ]
-                when :present
-                  value = ivar_value_for instance, ivar_name 
-                  values << [ ivar_name, value ] if value.present?
-                end
-              end # begin; destructure name/mode; rescue
-              
-            else
-              # TODO  Log an error?
-            end # case ivars_entry
-            
-          end # @ivars.each
-        
-        end # case @ivars
-      end # add_to.tap
-    end # #values_for_ivars
-    
-    
-    def values_for_methods instance, add_to: []
-      add_to.tap do |values|
-        @methods.each do |(method_name, include_when)|
-          value = method_value_for instance, method_name
-          
-          if  include_when == :always ||
-              ( include_when == :present && value.present? )
-            values << [ method_name, value ]
-          end
-        end # @methods.each_with_object
-      end # add_to.tap
-    end
-    
-    
-    def values_for instance, add_to: []
-      add_to.tap do |values|
-        values_for_ivars instance, add_to: values
-        values_for_methods instance, add_to: values
-      end # [].tap |values|
-    end # #values_for
-    
-  end # class Config
-  
 
   module ClassMethods
     def pretty_print_config **kwds
-      @pretty_print_config ||= Config.new
-      
-      @pretty_print_config.update!( **kwds ) unless kwds.empty?
+      if instance_variable_defined? :@pretty_print_config
+        @pretty_print_config.update!( **kwds ) unless kwds.empty?
+      else
+        @pretty_print_config ||= Config.new **kwds
+      end
       
       @pretty_print_config
-    end
-  
-    def pretty_print_methods= **kwds
-      pretty_print_config.methods = kwds
     end
   end # module ClassMethods
   
@@ -253,8 +111,12 @@ module PP
   # 
   # <https://github.com/ruby/ruby/blob/v2_3_7/lib/pp.rb#L309>
   # 
-  # 
   # [Ruby 2.0.0 PP::ObjectMixin]: https://docs.ruby-lang.org/en/2.0.0/PP/ObjectMixin.html
+  # 
+  # This work is targeted at the Pry REPL/debugger, which from what I can tell
+  # uses it's {Pry::ColorPrinter} extension:
+  # 
+  # <https://github.com/pry/pry/blob/v0.12.2/lib/pry/color_printer.rb>
   # 
   # @see https://ruby-doc.org/stdlib-2.3.7/libdoc/prettyprint/rdoc/PrettyPrint.html
   # @see https://ruby-doc.org/stdlib-2.3.7/libdoc/pp/rdoc/PP.html
@@ -289,14 +151,34 @@ module PP
           
           pp.group 1 do
             pp.breakable ''
-            val.pretty_print(pp)
+            # val.pretty_print(pp)
+            pp.pp val
           end # group
           
         end # group
       end # seplist
       
     end # group
+    
+  rescue Exception => error
+    pp.text "!!! ERROR #{ error } !!!"
   end # #pretty_print
+  
+  
+  # def blah pp, obj
+  #   id = obj.object_id
+  #   if pp.check_inspect_key id
+  #     obj.pretty_print_cycle pp
+  #     return
+  #   end
+    
+  #   pp.push_inspect_key id
+    
+  #   obj.pretty_print pp
+    
+  #   pp.pop_inspect_key id
+    
+  # end
   
 end # module PP
 
