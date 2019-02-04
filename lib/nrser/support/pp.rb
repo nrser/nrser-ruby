@@ -151,7 +151,6 @@ module PP
           
           pp.group 1 do
             pp.breakable ''
-            # val.pretty_print(pp)
             pp.pp val
           end # group
           
@@ -163,22 +162,6 @@ module PP
   rescue Exception => error
     pp.text "!!! ERROR #{ error } !!!"
   end # #pretty_print
-  
-  
-  # def blah pp, obj
-  #   id = obj.object_id
-  #   if pp.check_inspect_key id
-  #     obj.pretty_print_cycle pp
-  #     return
-  #   end
-    
-  #   pp.push_inspect_key id
-    
-  #   obj.pretty_print pp
-    
-  #   pp.pop_inspect_key id
-    
-  # end
   
 end # module PP
 
