@@ -9,5 +9,7 @@ gem 'yard-nrser-cucumber', path: "./dev/packages/gems/yard-nrser-cucumber"
 # making any permentant changes, but Git helps to track things)
 gem 'yard', path: './dev/packages/gems/yard'
 
+gem 'yard-doctest', path: './dev/packages/gems/yard-doctest'
+
 # Specify your gem's dependencies in nrser.gemspec
 gemspec

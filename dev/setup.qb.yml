@@ -33,6 +33,13 @@
     version: v3.0.0
   
   tasks:
+    - name: >-
+        Install brews
+      homebrew:
+        name:
+          # Using ripgrep to find files with `# doctest: true` line in 
+          # `//dev/bin/doctest`
+          - rg
   
     - name: >-
         Install gems
