@@ -10,6 +10,7 @@
 --protected
 --tag pure:"Pure Function"
 --tag status:"Status"
+--tag immutable:"Immutable"
 lib/**/*.rb
 features/**/*.feature
 features/**/*.rb
