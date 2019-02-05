@@ -14,7 +14,20 @@
       "env": {
         "VSCODE_RUBY_DEBUG": "TRUE",
       }
-    }
+    },
+    
+    {
+      "name": "Cucumber Focus-file",
+      "type": "Ruby",
+      "request": "launch",
+      "program": "${workspaceRoot}/dev/bin/cucumber",
+      "args": [ "--fail-fast", "${file}", "--tags", "@focus" ],
+      "useBundler": true,
+      "env": {
+        "VSCODE_RUBY_DEBUG": "TRUE",
+      }
+    },
+    
     {
       "name": "Cucumber",
       "type": "Ruby",
