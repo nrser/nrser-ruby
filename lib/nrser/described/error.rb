@@ -39,13 +39,13 @@ class Error < Base
     
   # TODO  
   # from From::ErrorOf[ Response ]
-  from error: From::ErrorOf[ Response ] do |error:|
+  subject_from error: SubjectFrom::ErrorOf[ Response ] do |error:|
     error
   end
   
   # TODO
   # from From::ErrorOf[ Instance ]
-  from error: From::ErrorOf[ Instance ] do |error:|
+  subject_from error: SubjectFrom::ErrorOf[ Instance ] do |error:|
     error
   end
   

@@ -65,7 +65,7 @@ class Resolution
                   :described,
                   :failed?,
                   :failed_because,
-                  :from,
+                  :subject_from,
                   :resolved_futures, ]
     }
   
@@ -73,13 +73,13 @@ class Resolution
   # Attributes
   # ========================================================================
   
-  # The {From} instance entry in the {#described} instance class' {Base.from}
-  # that defines the resolution specification {From#types} and subject creation
-  # block {From#init_block}.
-  # 
-  # @return [From]
-  #     
-  attr_reader :from
+  # The {SubjectFrom} instance entry in the {#described} instance class'
+  # {Base.subject_from} that defines the resolution specification
+  # {SubjectFrom#parameters} and subject creation block {SubjectFrom#block}.
+  #
+  # @return [SubjectFrom]
+  #
+  attr_reader :subject_from
   
   
   # Map fo {Symbol} names to {Future} instances (that are now or will in the
@@ -122,26 +122,27 @@ class Resolution
   # ==========================================================================
   
   # Construct a new {Resolution} for resolving the subject for a {Base} instance
-  # and one of the {From} instances in the {Base} class' {Base.from} array.
-  # 
-  # @param [From] from 
-  #   The {From} instance this resolution is for (an entry from the `described:`
-  #   value's {Base.from}).
-  # 
+  # and one of the {SubjectFrom} instances in the {Base} class'
+  # {Base.subject_from} array.
+  #
+  # @param [SubjectFrom] subject_from
+  #   The {SubjectFrom} instance this resolution is for
+  #   (an entry from the `described:` value's {Base.subject_from}).
+  #
   # @param [Base] described
   #   The described instance to resolve from.
-  # 
+  #
   # @raise [NRSER::Types::CheckError]
   #   If the parameter values don't satisfy their types.
-  #   
-  def initialize from:, described:
-    require_relative './from'
+  #
+  def initialize subject_from:, described:
+    require_relative './subject_from'
     
     logger.trace "Constructing resolution",
       for_described: described,
-      from: from
+      subject_from: subject_from
     
-    @from = t( From ).check! from
+    @subject_from = t( SubjectFrom ).check! subject_from
     @described = t( Base ).check! described
     
     # A flag we throw via a call to {#failed!} when we know we can never 
@@ -152,12 +153,13 @@ class Resolution
     @failed_because = nil
     
     # Flag to throw when we've successfully resolved all the name keys in 
-    # `from`'s {From#match_extractors} to {Future} instances in
+    # `subject_from`'s {SubjectFrom#parameters} to {Future} instances in
     # {#resolved_futures}
     @resolved = false
     
-    # Flag to flip when we have evaluated {#from}'s {From#init_block}, meaning 
-    # that either `@subject` or `@error` is then available.
+    # Flag to flip when we have evaluated {#subject_from}'s 
+    # {SubjectFrom#init_block}, meaning that either `@subject` or `@error` is 
+    # then available.
     @evaluated = false
     
     # Where the final values go
@@ -200,18 +202,18 @@ class Resolution
       #   Check if {Resolution} instances have {#failed?} after initialization
       #   to avoid doing any additional unnecessary work on their behalf.
       #
-      updated = from.
-        match_extractors.
-        map { |name, match_extractor|
+      updated = subject_from.
+        parameters.
+        map { |name, parameter|
           
-          t.match match_extractor,
+          t.match parameter,
             
-            From::InputValue, -> {
-              # if match_extractor.match? described.inputs[ name ]
+            SubjectFrom::InitOnly, -> {
+              # if parameter.match? described.inputs[ name ]
               #   add_value!  name,
-              #               match_extractor.extract( described.inputs[ name ] ),
+              #               parameter.extract( described.inputs[ name ] ),
               #               source: __method__
-              if (future = match_extractor.futurize( described.inputs[ name ] ))
+              if (future = parameter.futurize( described.inputs[ name ] ))
                 @resolved_futures[ name ] = future
                 true
               
@@ -227,15 +229,15 @@ class Resolution
                         "either)",
                         name: name,
                         value: described.inputs[ name ],
-                        match_extractor: match_extractor
+                        parameter: parameter
                 return
               end # begin / rescue
             },
             
-            From::Resolvable, ->{ 
+            SubjectFrom::Resolvable, ->{ 
               if described.inputs.key?( name )
                 if (  future =
-                        match_extractor.futurize( described.inputs[ name ] ) )
+                        parameter.futurize( described.inputs[ name ] ) )
                   add_candidate! name, future
                   true
                 end
@@ -271,18 +273,19 @@ class Resolution
   # Is it no longer possible for this resolution to succeed?
   #
   # This is an expected state for some of a description's resolutions, because
-  # for descriptions with more than one {Described::Base.from}, it is unlikely
-  # that the necessary input values and description hierarchy are always
-  # available for all {From}s, and many times the associated {Resolution}
-  # instances can figure that out quickly and get out of the way by failing.
+  # for descriptions with more than one {Described::Base.subject_from}, it is
+  # unlikely that the necessary input values and description hierarchy are
+  # always available for all {SubjectFrom}s, and many times the associated
+  # {Resolution} instances can figure that out quickly and get out of the way by
+  # failing.
   #
   # Resolutions may fail during construction: if the {#described} is missing
-  # input values that the {#from} needs that can not be resolved from the
-  # hierarchy ({Described::Method}'s `name` input falls in this category).
+  # input values that the {#subject_from} needs that can not be resolved from
+  # the hierarchy ({Described::Method}'s `name` input falls in this category).
   #
   # It is hence important to check the failed state immediately after
   # constructing a {Resolution} in order to filter out early failures.
-  # 
+  #
   # @return [Boolean]
   #
   def failed?
@@ -395,7 +398,8 @@ class Resolution
     # @protected
     # 
     # @param [::Symbol] name
-    #   The key in {#from}'s {From#types} that `value` is a candidate for.
+    #   The key in {#subject_from}'s {SubjectFrom#types} that `value` is a 
+    #   candidate for.
     #   
     #   **MUST** also be a key in `@resolvable_types`: only resolvable types
     #   can have candidates because name/type pairs partitioned into 
@@ -421,9 +425,10 @@ class Resolution
     def add_candidate! name, future #, source:, **context
       check_resolving! __method__, future #, value, source: source, **context
       
-      unless from.match_extractors.key? name
+      unless subject_from.parameters.key? name
         raise KeyError.new \
-          "name #{ name.inspect } is not match extractor name in {#from}"
+          "name #{ name.inspect } is not match extractor name in " + "
+          {#subject_from}"
       end
       
       if resolved_futures.key? name
@@ -465,8 +470,6 @@ class Resolution
             block: block,
           },
           resolution: self
-          # from: from,
-          # described: described
       end
       
       nil
@@ -485,7 +488,7 @@ class Resolution
       check_resolving! __method__
       
       # Bail if there are still names with no candidates or values
-      return if from.match_extractors.keys.any? { |name|
+      return if subject_from.parameters.keys.any? { |name|
         !@candidates.key?( name ) && !resolved_futures.key?( name )
       }
       
@@ -568,9 +571,9 @@ class Resolution
       
       # Shit... this should mean we've actually done it!
       
-      # To check, each `name` in `from.match_extractors` should appear in 
+      # To check, each `name` in `from.parameters` should appear in 
       # *exclusively either* `new_resolved_futures` or `resolved_futures`
-      unless from.match_extractors.keys.all? { |name|
+      unless subject_from.parameters.keys.all? { |name|
         if new_resolved_futures.key?( name )
           !resolved_futures.key?( name )
         else
@@ -628,8 +631,8 @@ class Resolution
     end # #failed!
     
     
-    # Evaluate the {From#init_block} of {#from} against {#values}, setting 
-    # {#subject} if it succeeds, and {#error} if it fails.
+    # Evaluate the {SubjectFrom#init_block} of {#subject_from} against {#values}, 
+    # setting {#subject} if it succeeds, and {#error} if it fails.
     # 
     # Guards by checking and setting the {#evaluated?} state, so repeated calls
     # have no effect.
@@ -642,7 +645,7 @@ class Resolution
       return self if evaluated?
       
       begin
-        subject = from.init_block.call( **values )
+        subject = subject_from.block.call( **values )
       rescue ::Exception => error
         @error = error
       else
@@ -677,29 +680,29 @@ class Resolution
     # resolve_futures! hierarchy
     
     # 
-    updated = from.
-        match_extractors.
+    updated = subject_from.
+        parameters.
         # Select only resolvable match extractors that we don't already have
         # set input futures for (since we always want to use the constructor
         # inputs)
-        select { |name, match_extractor|
-          match_extractor.is_a?( From::Resolvable ) &&
+        select { |name, parameter|
+          parameter.is_a?( SubjectFrom::Resolvable ) &&
             !resolved_futures.key?( name )
         }.
         # See if it makes sense to add a candidate {Future} for each extractor,
         # mapping to `true` if we do add one, so we can tell we updated, and
         # `nil` otherwise.
-        map { |name, match_extractor|
+        map { |name, parameter|
           # See if we have a potential match, allowing us to skip descriptions
           # that have nothing to do with our needs
-          if match_extractor.match? described
+          if parameter.match? described
             # Ok, we're interested in this one! Resolve it so we can deal with 
             # the value directly 
             described.resolve! hierarchy
             
             # If we can construct a {Future} from the description, then add
             # it as a candidate
-            if (future = match_extractor.futurize( described ))
+            if (future = parameter.futurize( described ))
               add_candidate! name, future
               # Evaluate the block to `true` to signal that we have updated
               # state and will want to try to resolve

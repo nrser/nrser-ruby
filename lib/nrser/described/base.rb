@@ -75,7 +75,7 @@ class Base
   # Singleton Methods
   # ========================================================================
   
-  # Shortcut to {NRSER::Meta::Names} to make {.from} declarations more 
+  # Shortcut to {NRSER::Meta::Names} to make {.subject_from} declarations more 
   # concise.
   # 
   # @return [::Module]
@@ -86,28 +86,69 @@ class Base
   end
   
   
-  # @return [From]
-  #   The new {From} instance.
+  # @overload subject_from
+  #   Get the {SubjectFrom} instances for this description class,
+  #   which represent the available ways to create {#subject} values for 
+  #   this class' instances.
+  #   
+  #   @return [::Array<SubjectFrom>]
+  #     The declared {SubjectFrom} instances for this class.
   # 
-  def self.from **match_extractors, &init_block
+  # @overload subject_from **parameters, &block
+  #   Declare a new way to create {#subject} values for instances of this class.
+  #   
+  #   @example
+  #     class D < Described::Base
+  #       
+  #       subject_type ... # Type that `block` will return
+  #       
+  #       subject_from \
+  #         object: Described::Object,
+  #         name: ::String \
+  #       do |object:, name:|
+  #         # Create subject for {D} from `object` and `name`...
+  #       end
+  #       
+  #       # ...
+  #     end
+  #   
+  #   @param [::Hash<Symbol, Object>] parameters
+  #     Essentially a keyword-name to type-spec map for what can be fed into 
+  #     the `block` to produce a {#subject}.
+  #     
+  #     See {SubjectFrom#initialize} for details (this {::Hash} is just provided
+  #     as it's `parameters:` keyword).
+  #     
+  #   @param [::Proc<**parameters -> SUBJECT>] block
+  #     Block that accepts parameter keywords and values and returns a 
+  #     {#subject} for instances of this class.
+  #   
+  #   @return [SubjectFrom]
+  #     The new {SubjectFrom} instance.
+  # 
+  def self.subject_from **parameters, &block
     # Need to require here to prevent {Base} -> {From} -> {Base} loop
-    require_relative './from'
+    require_relative './subject_from'
   
-    @from ||= []
+    @subject_from ||= []
     
-    if match_extractors.empty?
-      unless init_block.nil?
+    if parameters.empty?
+      unless block.nil?
         raise NRSER::ArgumentError.new \
-          "Must provide `name`/{MatchExtractor} pairs when declaring a {From}"
+          "Must provide `name`/{SubjectFrom::Parameter} pairs when",
+          "declaring a {SubjectFrom}"
       end
       
-      return @from
+      return @subject_from
     end
     
-    From.
-      new( match_extractors: match_extractors, init_block: init_block, ).
-      tap { |from| @from << from }
+    SubjectFrom.
+      new( parameters: parameters, block: block, ).
+      tap { |subject_from| @subject_from << subject_from }
   end
+  
+  # FIXME Temp! Until refactor...
+  singleton_class.send :alias_method, :from, :subject_from
   
   
   def self.subject_type *args
@@ -408,19 +449,19 @@ class Base
     
     # Set `@subject` from the first successful {Resolution}.
     #
-    # A {Resolution} is created for each {.from} entry, all referencing this
-    # instance. 
+    # A {Resolution} is created for each {.subject_from} entry, all referencing
+    # this instance. 
     #
     # If any resolution is {Resolution#resolved?} from this instance's instance
     # variables, the {Resolution#subject} of first one (in order returned by
-    # {.from}) is assigned to `@subject`.
+    # {.subject_from}) is assigned to `@subject`.
     #
     # Otherwise, the described instances in {#each_ancestor} (if any) are
     # walked, and the first one to successfully {Resolution#resolved?} has it's
     # {Resolution#subject} assigned to `@subject`.
     #
     # If no {Resolution} resolves a {ResolutionError} is raised.
-    # 
+    #
     # @private
     # 
     # @note
@@ -461,8 +502,10 @@ class Base
         
         # Construct resolution instances for each of the {From} instances 
         # declared on the class
-        resolutions = self.class.from.
-          map { |from| Resolution.new from: from, described: self }
+        resolutions = self.class.subject_from.
+          map { |subject_from|
+            Resolution.new subject_from: subject_from, described: self
+          }
         
         # Set the resolution:
         # 
