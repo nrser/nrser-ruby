@@ -181,8 +181,6 @@ class Resolution
     # instance variables (the names and the {NRSER::Described::Base}
     # instance was initialized with, besides it's `@parent`).
     # 
-    # @protected
-    # 
     # @return [nil]
     #   Mutates the instance.
     # 
@@ -395,8 +393,6 @@ class Resolution
     # @note
     #   This is the **ONLY** way the list of candidates should be manipulated.
     # 
-    # @protected
-    # 
     # @param [::Symbol] name
     #   The key in {#subject_from}'s {SubjectFrom#types} that `value` is a 
     #   candidate for.
@@ -445,8 +441,6 @@ class Resolution
     # Called before doing something that only make sense if the {Resolution}
     # is in the process of resolving (like adding a candidate value for a type).
     # 
-    # @protected
-    # 
     # @return [nil]
     #   If everything's ok.
     # 
@@ -477,8 +471,6 @@ class Resolution
     
     
     # Attempt to resolve the `@candidates` to `@values`.
-    # 
-    # @protected
     # 
     # @return [nil]
     #   Mutates the instance, in particular potentially chaning the {#resolved?}
@@ -607,8 +599,6 @@ class Resolution
     
     # Change to a *failed* state. From which there is no going back. This is
     # called when we know we will never succeed.
-    # 
-    # @protected
     # 
     # @param [Array] description
     #   Entries to be merged into a {::String} description.

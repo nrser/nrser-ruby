@@ -418,8 +418,6 @@ class IVars
     # @note
     #   Called during **print-time**, so it should *never* raise!
     # 
-    # @protected
-    # 
     # @param [Object] instance
     #   The object to get the variable value from.
     # 
@@ -443,8 +441,6 @@ class IVars
     #
     # Used internally, and scoped as *protected* pretty much just to keep the
     # public API simple; don't mutate the instance state or do anything funky.
-    #
-    # @protected
     # 
     # @param [Array<Array<(Symbol, Object)>>] values
     #   Array of `[ name, value ]` pair arrays to add to.
@@ -649,8 +645,6 @@ class IVars::Except < IVars
     # `instance.pretty_print_instance_variables`.
     # 
     # This method takes care of merging and sorting the names if needed.
-    #
-    # @protected
     #
     # @return [Enumerable<Symbol>]
     #   Sorted names of instance variables to get.
