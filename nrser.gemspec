@@ -35,7 +35,10 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'hamster', '~> 3.0'
   
   # Much better logging
-  spec.add_dependency 'semantic_logger', '~> 4.2'
+  # 
+  # TODO  4.4 breaks {NRSER::Log}, need to figure that out. For the moment, just
+  #       say we need less than that.
+  spec.add_dependency 'semantic_logger', '>= 4.2', '< 4.4'
 
   # With much more awesome printing!
   spec.add_dependency 'awesome_print', '~> 1.8'
