@@ -145,7 +145,7 @@ module PP
     pp.group 1, "{#{self.class}", "}" do
       pp.breakable ' '
       
-      pp.seplist pretty_print_values,  nil do |(name, val)|
+      pp.seplist pretty_print_values, nil do |(name, val)|
         pp.group do
           pp.text "#{ name }: "
           

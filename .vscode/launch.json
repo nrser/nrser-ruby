@@ -29,6 +29,18 @@
     },
     
     {
+      "name": "Cucumber Last Failed File",
+      "type": "Ruby",
+      "request": "launch",
+      "program": "${workspaceRoot}/dev/bin/cucumber",
+      "args": [ "--fail-fast", "--last-failed-file" ],
+      "useBundler": true,
+      "env": {
+        "VSCODE_RUBY_DEBUG": "TRUE",
+      }
+    },
+    
+    {
       "name": "Cucumber",
       "type": "Ruby",
       "request": "launch",

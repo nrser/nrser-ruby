@@ -7,6 +7,9 @@
 # Project / Package
 # -----------------------------------------------------------------------
 
+# Mixing in my custom pretty printing support
+require "nrser/support/pp"
+
 # {SubjectFrom} is immutable
 require 'nrser/props/immutable/instance_variables'
 
@@ -112,6 +115,27 @@ class SubjectFrom
     )
   end
   
+  # Language Integration Instance Methods
+  # --------------------------------------------------------------------------
+  
+  def pretty_print pp
+    pp.group 1, "{#{self.class}", "}" do
+      pp.breakable ' '
+      
+      pp.seplist parameters.sort, nil do |(name, value)|
+        pp.group do
+          pp.text "#{ name }: "
+          
+          pp.group 1 do
+            pp.breakable ''
+            pp.pp value
+          end # group
+          
+        end # group
+      end # seplist
+      
+    end # group
+  end # #pretty_print
   
 end # class SubjectFrom
 

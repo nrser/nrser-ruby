@@ -7,6 +7,9 @@
 # Project / Package
 # -----------------------------------------------------------------------
 
+# Extends {Object}
+require_relative "./object"
+
 # Describes {Response}, {Instance}
 require_relative './response'
 require_relative './instance'
@@ -29,7 +32,7 @@ module  Described
 # Definitions
 # =======================================================================
 
-class Error < Base
+class Error < Object
 
   # Config
   # ========================================================================

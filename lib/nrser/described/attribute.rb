@@ -37,7 +37,7 @@ class Attribute < Object
   
   subject_type ::Object
   
-  from object: Object, :@name => self.Names::Method do |object:, name:|
+  from object: Object, name: self.Names::Method do |object:, name:|
     object.public_send name
   end
   

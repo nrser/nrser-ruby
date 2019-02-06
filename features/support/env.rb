@@ -4,14 +4,16 @@
 # Requirements
 # =======================================================================
 
-# Deps
-# -----------------------------------------------------------------------
+### Stdlib ###
 
-# Debug with `binding.pry`
+require 'thread'
+
+### Deps ###
+
+# Debug with `binding.pry
 require 'pry'
 
-# Project / Package
-# -----------------------------------------------------------------------
+### Project / Package ###
 
 require 'nrser'
 
@@ -40,8 +42,65 @@ unless ENV[ "FULL_TRACES" ].truthy?
     { rel_paths: true, silence_gems: true }
 end
 
+
+
+$semaphore = Mutex.new
+
+module Cucumber::StatusFile
+  PATH = NRSER::ROOT.join 'tmp', '.cucumber_status.yaml'
+  SEMAPHORE = Mutex.new
+  
+  def self.run_id
+    Process.pid
+  end
+  
+  
+  def self.new
+    {
+      "run_id" => run_id,
+      "failures" => [],
+    }
+  end
+  
+  
+  def self.read
+    status = YAML.load PATH.read
+    
+    if status[ "run_id" ] == run_id
+      status
+    else
+      new
+    end
+  rescue
+    new
+  end
+  
+  
+  def self.write &block
+    SEMAPHORE.synchronize {
+      status = read
+      result = block.call status
+      PATH.write YAML.dump( status )
+      result
+    }
+  end
+  
+  
+  def self.add_failure file_path
+    write do |status|
+      status[ "failures" ] << file_path
+      status[ "failures" ].uniq!
+    end
+  end
+  
+end # module Cucumber::StatusFile
+
+
 After &->( scenario ) do
   if scenario.failed?
-    # binding.pry
+    file_path = scenario.
+      instance_variable_get( :@test_case ).
+      location.file
+    Cucumber::StatusFile.add_failure file_path
   end
 end
