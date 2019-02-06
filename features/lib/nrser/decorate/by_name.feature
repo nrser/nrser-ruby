@@ -152,7 +152,6 @@ Feature: Reference decorator and decorated methods by name
         END
       """
 
-  @focus
   Scenario: (5) *Implicit* instance method names
     
     You can use *implicit* instance method names as well, prefixing them with
