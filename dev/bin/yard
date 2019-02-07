@@ -8,10 +8,10 @@ require 'pry'
 # ROOT = File.expand_path '../..', __dir__
 ROOT = Pathname.new( '../..' ).expand_path __dir__
 
-if ARGV.length != 1 || ARGV[0] != 'clean'
+# if ARGV.length != 1 || ARGV[0] != 'clean'
   # Normal shim path
   exec %{bundle exec yard #{ Shellwords.join ARGV }}
-end
+# end
 
 
 puts "Cleaning up the yard..."
