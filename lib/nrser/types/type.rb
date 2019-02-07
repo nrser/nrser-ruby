@@ -388,9 +388,9 @@ class Type
   
   
   # Load a value of this type from a string representation by passing
-  # `string` to the {@from_s} {Proc}.
+  # `string` to the `@from_s` {Proc}.
   # 
-  # Checks the value {@from_s} returns with {#check!} before returning it, so
+  # Checks the value `@from_s` returns with {#check!} before returning it, so
   # you know it satisfies this type.
   # 
   # Realizing classes **should not** need to override this - they can define
