@@ -6,6 +6,7 @@
 --plugin yard-nrser-cucumber
 --plugin yard-link_stdlib
 --plugin yard-doctest
+--plugin yard-clean
 --private
 --protected
 --tag pure:"Pure Function"

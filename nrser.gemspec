@@ -83,6 +83,9 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency 'yard-link_stdlib', '~> 0.1.0'
   
+  # Add my `yard clean` command
+  spec.add_development_dependency 'yard-clean', '~> 0.1.0'
+  
   # Nicer REPL experience
   spec.add_development_dependency "pry", '~> 0.12.2'
 
