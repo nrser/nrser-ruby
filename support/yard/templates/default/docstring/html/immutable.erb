@@ -1,4 +1,8 @@
 <div class="note abstract">
-  <strong>This <%= object.type %> is immutable.</strong>
+  <% if object.type == :class %>
+    <strong>Instances of this class are immutable.</strong>
+  <% else %>
+    <strong>This <%= object.type %> is immutable.</strong>
+  <% end %>
   <%= htmlify_line object.tag(:immutable).text %>
 </div>
