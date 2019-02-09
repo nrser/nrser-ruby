@@ -55,6 +55,14 @@ class Stash < ::Hash
   #                 and {#key?} from {::Hash}.
   #                 
   
+  # Save {::Hash#[]} as {#_raw_get} for directly reading keys.
+  # 
+  # @!visibility protected
+  # 
+  alias_method :_raw_get, :[]
+  protected :_raw_get
+  
+  
   # Save {Hash#[]=} as {#_raw_put} for directly writing keys and values.
   # 
   # @!visibility protected
@@ -117,7 +125,7 @@ class Stash < ::Hash
   # @return [*]
   #   The key to use internally.
   # 
-  def convert_key key
+  def convert_key key, **options
     key
   end
   
@@ -196,7 +204,7 @@ class Stash < ::Hash
   # 
   def update other_hash, &block
     other_hash.to_hash.each_pair do |key, value|
-      key = convert_key key
+      key = convert_key key, for: :write
       if block && _raw_key?( key )
         value = yield key, _raw_get( key ), value
       end
@@ -215,17 +223,14 @@ class Stash < ::Hash
   #   hash.key?(:key)  # => true
   #   hash.key?('key') # => true
   def key? key
-    _raw_key? convert_key( key )
+    _raw_key? convert_key( key, for: :read )
   end
 
-  alias_method :include?, :key?
-  alias_method :has_key?, :key?
-  alias_method :member?, :key?
-
+  def include? key; key? key; end
+  def has_key? key; key? key; end
+  def member? key;  key? key; end
   
-  alias_method :_raw_get, :[]
-  
-  # Same as <tt>Hash#[]</tt> where the key passed as argument can be
+  # Same as {::Hash#[]} where the key passed as argument can be
   # either a string or a symbol:
   #
   #   counters = ActiveSupport::HashWithIndifferentAccess.new
@@ -235,10 +240,10 @@ class Stash < ::Hash
   #   counters[:foo]  # => 1
   #   counters[:zoo]  # => nil
   def [] key
-    _raw_get convert_key( key )
+    _raw_get convert_key( key, for: :read )
   end
 
-  # Same as <tt>Hash#fetch</tt> where the key passed as argument can be
+  # Same as {::Hash#fetch} where the key passed as argument can be
   # either a string or a symbol:
   #
   #   counters = ActiveSupport::HashWithIndifferentAccess.new
@@ -249,10 +254,10 @@ class Stash < ::Hash
   #   counters.fetch(:bar) { |key| 0 } # => 0
   #   counters.fetch(:zoo)           # => KeyError: key not found: "zoo"
   def fetch key, *extras
-    super convert_key(key), *extras
+    super convert_key( key, for: :read ), *extras
   end
   
-  # Same as <tt>Hash#dig</tt> where the key passed as argument can be
+  # Same as {::Hash#dig} where the key passed as argument can be
   # either a string or a symbol:
   #
   #   counters = ActiveSupport::HashWithIndifferentAccess.new
@@ -262,12 +267,12 @@ class Stash < ::Hash
   #   counters.dig(:foo, :bar)       # => 1
   #   counters.dig(:zoo)             # => nil
   def dig *args
-    args[0] = convert_key( args[0] ) if args.size > 0
+    args[0] = convert_key( args[0], for: :read ) if args.size > 0
     super *args
   end
   
 
-  # Same as <tt>Hash#default</tt> where the key passed as argument can be
+  # Same as {::Hash#default} where the key passed as argument can be
   # either a string or a symbol:
   #
   #   hash = ActiveSupport::HashWithIndifferentAccess.new(1)
@@ -278,7 +283,7 @@ class Stash < ::Hash
   #   hash.default('foo')            # => 'foo'
   #   hash.default(:foo)             # => 'foo'
   def default(*args)
-    super(*args.map { |arg| convert_key(arg) })
+    super(*args.map { |arg| convert_key( arg, for: :read ) })
   end
 
   # Returns an array of the values at the specified indices:
@@ -288,7 +293,7 @@ class Stash < ::Hash
   #   hash[:b] = 'y'
   #   hash.values_at('a', 'b') # => ["x", "y"]
   def values_at(*indices)
-    indices.collect { |key| self[convert_key(key)] }
+    indices.collect { |key| self[ convert_key( key, for: :read ) ] }
   end
 
   # Returns a shallow copy of the hash.
@@ -336,8 +341,8 @@ class Stash < ::Hash
   end
 
   # Removes the specified key from the hash.
-  def delete(key)
-    super(convert_key(key))
+  def delete key
+    super( convert_key( key, for: :write ) )
   end
 
   # def stringify_keys!; self end

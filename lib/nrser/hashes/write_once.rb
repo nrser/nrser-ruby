@@ -7,6 +7,8 @@
 # Project / Package
 # -----------------------------------------------------------------------
 
+require 'nrser/errors/key_error'
+
 require_relative './stash'
 
 
@@ -20,23 +22,43 @@ module  Hashes
 # Definitions
 # =======================================================================
 
-# @todo document WriteOnce class.
+# A {::Hash} where keys can not be over-written.
+# 
+# @see requirements::features::lib::nrser::hashes::write_once Features
+# 
 class WriteOnce < Stash
   
-  # Instance Methods
-  # ========================================================================
-  
-  def put key, value
-    if key? key
-      raise NRSER::KeyError,
-        "Key", key, "already set",
-        key: key,
-        current_value: self[ key ],
-        provided_value: value
+  # Defines the actual functionality, so it can be mixed-and-matched with other
+  # mixins for {Stash}.
+  # 
+  module Mixin
+    
+    def convert_key key, **options
+      if options[ :for ] == :write && key?( key )
+        raise NRSER::KeyError.new \
+          "Key", key, "already set",
+          key: key,
+          current_value: self[ key ]
+      end
+      
+      super( key )
     end
     
-    super( key, value )
-  end
+    def put key, value
+      if key? key
+        raise NRSER::KeyError.new \
+          "Key", key, "already set",
+          key: key,
+          current_value: self[ key ],
+          provided_value: value
+      end
+      
+      super( key, value )
+    end
+    
+  end # module Mixin
+  
+  include Mixin
   
 end # class WriteOnce
 
