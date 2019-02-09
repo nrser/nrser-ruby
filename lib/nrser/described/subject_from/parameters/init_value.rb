@@ -8,7 +8,7 @@
 # -----------------------------------------------------------------------
 
 # Need to construct {Future}s
-require_relative '../resolution/future'
+require_relative '../../resolution/future'
 
 # Extends {Parameter}
 require_relative "./parameter"
@@ -35,7 +35,7 @@ class   SubjectFrom
 
 # @immutable
 # 
-class InitOnly < Parameter
+class InitValue < Parameter
   
   prop :type, type: t.Type
   
@@ -101,7 +101,7 @@ class InitOnly < Parameter
     end
   end
   
-end # class InitOnly
+end # class InitValue
 
 
 # /Namespace

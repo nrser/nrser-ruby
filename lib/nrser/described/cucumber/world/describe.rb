@@ -228,16 +228,17 @@ module Describe
   end # #describe_param
   
   
-  # Describe parameters positionally, like you would using `#send`, accept that
-  # the last value is passed as the block if it is a {Wrappers::Block}.
+  # Construct a {Meta::Params} from positional argument values, taking account
+  # of the last value potentially being a {Wrappers::Block} that indicates it
+  # is the block parameter.
   # 
   # @param [::Array<::Object>] values
   #   Parameter values.
   # 
-  # @return [NRSER::Described::Parameters]
-  #   The parameters description.
+  # @return [Meta::Params]
+  #   The new parameters object.
   # 
-  def describe_positional_params values
+  def params_for_positional_values values
     # Handle the last entry being a `&...` expression, which is interpreted as 
     # the block parameter
     if values[ -1 ].is_a? Wrappers::Block
@@ -248,8 +249,22 @@ module Describe
       block = nil
     end
     
+    Meta::Params.new( args: args, block: block )
+  end # #params_for_positional_values
+  
+  
+  # Describe parameters positionally, like you would using `#send`, accept that
+  # the last value is passed as the block if it is a {Wrappers::Block}.
+  # 
+  # @param [::Array<::Object>] values
+  #   Parameter values.
+  # 
+  # @return [NRSER::Described::Parameters]
+  #   The parameters description.
+  # 
+  def describe_positional_params values
     describe :parameters,
-      subject: NRSER::Meta::Params.new( args: args, block: block )
+      subject: params_for_positional_values( values )
   end # #describe_positional_params
   
   # @!endgroup Describe Helper Instance Methods # ****************************

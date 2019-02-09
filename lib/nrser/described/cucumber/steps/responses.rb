@@ -76,8 +76,8 @@ module Responses
   CALL_METHOD_NAME_WITH_PARAMETERS = \
     Step "I call {method_name} with {values}" do |method_name, values|
       describe_method method_name
-      describe_positional_params values
-      describe :response
+      # describe_positional_params values
+      describe :response, params: params_for_positional_values( values )
     end
   
 end # module Responses

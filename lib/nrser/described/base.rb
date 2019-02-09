@@ -21,6 +21,9 @@ require 'active_support/core_ext/string/inflections'
 # Mixing logging in
 require 'nrser/log'
 
+# Mixing in my custom pretty printing support
+require "nrser/support/pp"
+
 # {Base.Names} provides shortcut to {NRSER::Meta::Names}
 require 'nrser/meta/names'
 
@@ -60,16 +63,30 @@ module  Described
 # 
 class Base
 
+  # Constants
+  # ========================================================================
+  
+  RESOLUTION_TYPE = t.IsA( Resolution ) & t.Attributes( :resolved? => true )
+
   # Mixins
   # ========================================================================
   
   include NRSER::Log::Mixin
   
+  # Mix in my custom pretty printing support
+  include NRSER::Support::PP
   
-  # Constants
-  # ========================================================================
   
-  RESOLUTION_TYPE = t.IsA( Resolution ) & t.Attributes( :resolved? => true )
+  # Config
+  # ==========================================================================
+  
+  pretty_print_config \
+    ivars: {
+      mode: :present,
+      except: {
+        :@resolved => :always,
+      }
+    }
   
   
   # Singleton Methods
@@ -151,6 +168,33 @@ class Base
   singleton_class.send :alias_method, :from, :subject_from
   
   
+  # Get or declare the {Types::Type} of {#subject}s for instances of this class.
+  # 
+  # @overload self.subject_type
+  #   Get the {Types::Type} of {#subject}s for instances this class.
+  #   
+  #   @return [nil]
+  #     No subject type declared.
+  #   
+  #   @return [Types::Type]
+  #     This class' subject type.
+  #   
+  # @overload self.subject_type type
+  #   Declare the {Types::Type} of {#subject}s for instance of this class.
+  #   
+  #   This method is indented to be used durning subclass definition. Once
+  #   the subject type has been set for a subclass, attempting to set it again
+  #   will raise an error.
+  #   
+  #   @param [Object] type
+  #     Type that instance's {#subject} must satisfy.
+  #     
+  #     If `type` is not a {Types::Type}, it will be made into one with 
+  #     {Types.make}.
+  #   
+  #   @return [Type]
+  #     The set type.
+  # 
   def self.subject_type *args
     case args.length
     when 0
@@ -176,6 +220,11 @@ class Base
     
     @subject_type
   end # .subject_type
+  
+  
+  def self.error_type
+    t.IsA ::Exception
+  end
   
   
   def self.subclass? object
@@ -233,7 +282,12 @@ class Base
   # @return [nil]
   #   Either:
   #   
-  #   1.  
+  #   1.  The description didn't need to {#resolve!} because it was provided
+  #       a {#subject} in {#initialize}.
+  #       
+  #   2.  The description has not been successfully {#resolve!}ed.
+  # 
+  # You can check {#resolved?} to tell what's up.
   # 
   # @return [Resolution]
   #   The resolution used to set {#subject}.
@@ -241,11 +295,14 @@ class Base
   attr_reader :resolution
   
   
+  # Name/value map provided as keyword arguments at construction. Used as the
+  # first place to look for values when {#resolve!}-ing.
   # 
+  # @immutable Frozen
   # 
-  # @return [I8::Hash<Symbol, Object>]
+  # @return [::Hash<::Symbol, ::Object>]
   #     
-  attr_reader :inputs
+  attr_reader :init_values
   
   
   # Construction
@@ -253,8 +310,24 @@ class Base
   
   # Instantiate a new `Base`.
   # 
-  # @param [Hash<Symbol, Object>] values
+  # @overload initialize subject:
+  #   Construct an instance that is already {#resolved?} to a {#subject}.
   #   
+  #   @param [::Object] subject
+  #     Value to set as the {#subject} (using {#subject=}).
+  #   
+  #   @raise [ArgumentError{subject: ::Object, other_kwds: ::Hash<Symbol, ::Object>}]
+  #     If any keyword arguments besides `subject:` are passed.
+  #   
+  #   @raise [Types::CheckError]
+  #     If `subject` doesn't satisfy {.subject_type}, see {#subject=}.
+  # 
+  # @overload subject **init_values
+  #   Construct an instance with the provided {#init_values} to use during 
+  #   resolution.
+  #   
+  #   @param [::Hash<::Symbol, ::Object>] init_values
+  #     Name/value pairs to set as {#init_values}.
   # 
   def initialize **kwds
     @resolving = false
@@ -266,10 +339,18 @@ class Base
     if kwds.key? :subject
       self.subject = kwds[ :subject ]
       kwds.delete :subject
+      
+      unless kwds.empty?
+        raise ArgumentError.new \
+          "Can't provide additional keyword args with `subject:`",
+          subject: subject,
+          other_kwds: kwds
+      end
+      
       @resolved = true
     end
     
-    @inputs = I8::Hash[ kwds ]
+    @init_values = kwds.freeze
     
   end # #initialize
   
@@ -330,7 +411,7 @@ class Base
   # @return [::Object]
   #   `subject` parameter.
   # 
-  # @raise [NRSER::Types::CheckError]
+  # @raise [Types::CheckError]
   #   If type check fails.
   # 
   def subject= subject
@@ -565,40 +646,6 @@ class Base
     end # #update_until_resolved!
     
   public # end private *****************************************************
-  
-  
-  # Language Integration Instance Methods
-  # --------------------------------------------------------------------------
-  
-  def pretty_print pp
-    pp.group(1, "{#{self.class}", "}") do
-      pp.group(1, "<", ">") do
-        self.class.subject_type.pretty_print pp
-      end
-      pp.breakable ' '
-      pp.seplist(
-        instance_variables.sort.
-          map { |var_name|
-            [ var_name.to_s[ 1..-1 ], instance_variable_get( var_name ) ]
-          }.
-          reject { |(name, value)|
-            name != 'resolved' &&
-            ( value.nil? ||
-              value == false ||
-              ( value.respond_to?( :empty? ) && value.empty? ) )
-          },
-        nil
-      ) do |(name, val)|
-        pp.group do
-          pp.text "#{ name }: "
-          pp.group(1) do
-            pp.breakable ''
-            val.pretty_print(pp)
-          end
-        end
-      end
-    end
-  end
   
 end # class Base
 

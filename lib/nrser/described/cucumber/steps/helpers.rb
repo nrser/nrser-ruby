@@ -48,7 +48,7 @@ module Helpers
   #
   def Step pattern, options = {}, &body
     # If we want be Pryin' then wrap the body to rescue shit
-    proc = if ENV[ 'NRSER_PRY' ].n_x.truthy?
+    proc = if  true # ENV[ 'NRSER_PRY' ].n_x.truthy?
       ->( *values ) {
         begin
           instance_exec *values, &body

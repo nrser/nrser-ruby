@@ -17,7 +17,7 @@ require 'nrser/props/immutable/instance_variables'
 require_relative './base'
 
 # Need {Parameter} for the prop types
-require_relative "./subject_from/parameter"
+require_relative "./subject_from/parameters"
 
 
 # Refinements

@@ -91,12 +91,12 @@ class Resolution
   attr_reader :resolved_futures
   
   
-  # Map of input name {Symbol}s to {Array}s of {Future} instances that could
-  # become that input's {#resolved_future}, and hence it's future full-resolved
-  # member of {#values}.
-  # 
+  # Map of name {Symbol}s from {SubjectFrom#parameters}'s keys to {Array}s of
+  # {Future} instances that could become that parameter's {#resolved_future},
+  # and hence provide that parameter's fully-resolved member of {#values}.
+  #
   # @return [Hash<Symbol, Array<Future>>]
-  #     
+  #
   attr_reader :candidates
   
   
@@ -206,36 +206,32 @@ class Resolution
           
           t.match parameter,
             
-            SubjectFrom::InitOnly, -> {
-              # if parameter.match? described.inputs[ name ]
-              #   add_value!  name,
-              #               parameter.extract( described.inputs[ name ] ),
-              #               source: __method__
-              if (future = parameter.futurize( described.inputs[ name ] ))
+            SubjectFrom::InitValue, -> {
+              if (future = parameter.futurize( described.init_values[ name ] ))
                 @resolved_futures[ name ] = future
                 true
               
               else
                 # We're done - we can never successfully resolve because neither
-                # `described`'s construction input for `name` (which may be
+                # `described`'s init values for `name` (which may be
                 # `nil`) or `nil` satisfies the match extractor, and we have
                 # nowhere else to get anything for it from.
                 #
                 # Mark the instance as un-resolvable and bail out.
                 failed! "{#described} instance variables doesn't satisfy",
-                        "construction-input-only type (and `nil` doesn't",
-                        "either)",
+                        "type for *init-only* parameter", name, 
+                        "(and `nil` doesn't either)",
                         name: name,
-                        value: described.inputs[ name ],
+                        value: described.init_values[ name ],
                         parameter: parameter
                 return
               end # begin / rescue
             },
             
             SubjectFrom::Resolvable, ->{ 
-              if described.inputs.key?( name )
+              if described.init_values.key?( name )
                 if (  future =
-                        parameter.futurize( described.inputs[ name ] ) )
+                        parameter.futurize( described.init_values[ name ] ) )
                   add_candidate! name, future
                   true
                 end
@@ -272,14 +268,16 @@ class Resolution
   #
   # This is an expected state for some of a description's resolutions, because
   # for descriptions with more than one {Described::Base.subject_from}, it is
-  # unlikely that the necessary input values and description hierarchy are
+  # unlikely that the necessary init values and description hierarchy are
   # always available for all {SubjectFrom}s, and many times the associated
   # {Resolution} instances can figure that out quickly and get out of the way by
   # failing.
   #
   # Resolutions may fail during construction: if the {#described} is missing
-  # input values that the {#subject_from} needs that can not be resolved from
-  # the hierarchy ({Described::Method}'s `name` input falls in this category).
+  # init-only values that the {#subject_from} needs (which can not be resolved 
+  # from the hierarchy).
+  # 
+  # {Described::Method}'s `name` subject parameter is an example of this.
   #
   # It is hence important to check the failed state immediately after
   # constructing a {Resolution} in order to filter out early failures.
@@ -664,7 +662,7 @@ class Resolution
     # 
     # TODO  If not, we def want to resolve any pending futures *before* we 
     #       start to iterate through the `hierarchy` for the case where we 
-    #       have all the inputs already filled out from construction but
+    #       have all the values already filled out from construction but
     #       some need to be resolved in order for this instance to resolve.
     # 
     # resolve_futures! hierarchy
@@ -673,8 +671,9 @@ class Resolution
     updated = subject_from.
         parameters.
         # Select only resolvable match extractors that we don't already have
-        # set input futures for (since we always want to use the constructor
-        # inputs)
+        # resolved futures for (since we always want to use the 
+        # {Described::Base#init_values} provided to the description at 
+        # construction).
         select { |name, parameter|
           parameter.is_a?( SubjectFrom::Resolvable ) &&
             !resolved_futures.key?( name )
