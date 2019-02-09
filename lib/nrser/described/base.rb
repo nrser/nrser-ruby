@@ -511,21 +511,88 @@ class Base
   end
   
   
-  # Resolve {#subject} against a {Hierarchy}, unless already {#resolved?}.
-  # 
-  # Details in {resolve_subject!} (which is called when {#resolved?} returns
-  # `false`).
+  # Resolve {#subject} or {#error} against a {Hierarchy}, unless already
+  # {#resolved?}.
+  #
+  # Details...
+  # --------------------------------------------------------------------------
+  #
+  # A {Resolution} is created for each {.subject_from} entry, all referencing
+  # this instance. 
+  #
+  # If any resolution is {Resolution#resolved?} purely from this instance's
+  # {#init_values}, the first one to do so (in order returned by
+  # {.subject_from}) is assigned to {#resolution=}, causing it's
+  # {Resolution#subject} or {Resolution#error} to become available as {#subject}
+  # or #{error}, depending on if it's {SubjectFrom#block} succeeded or not.
+  #
+  # Otherwise, the described instances in `hierarchy` (if any) are walked,
+  # and {Resolution#update!} is called on each {Resolution}, until a resolution
+  # resolves, which is then sent to {#resolution=}, filling in {#subject} or
+  # {#error} as mentioned above.
+  #
+  # If no {Resolution} resolves a {ResolutionError} is raised.
   # 
   # @param [Hierarchy] hierarchy
   #   Description hierarchy to resolve against.
   # 
-  # @return [Base] self
+  # @return [Base]
+  #   Returns `self` for chaining.
   # 
-  # @raise
-  #   If there is an error 
+  # @raise [Resolution::AllFailedError]
+  #   When subject resolution fails.
+  # 
+  # @raise [UnreachableError]
+  #   Inside the main block `@resolving` is set to `true`, and if the method is
+  #   re-entered during this time an {UnreachableError} is raised.
+  #   
+  #   This helps catch resolution loops when developing and preventing stack 
+  #   overflow by bailing out with a more descriptive error.
   # 
   def resolve! hierarchy
-    resolve_subject!( hierarchy ) unless resolved?
+    return self if resolved?
+    
+    # Protect from re-entry while resolving. This helps catching resolution
+    # loops by being clear about what happen and providing a cleaner stack
+    # trace than the stack overflow likely to happen otherwise.
+    if resolving?
+      raise UnreachableError.new "Subject resolution loop!", described: self
+    end
+    
+    # Ensure around the rest of the the method to make sure we set 
+    # `@resolving` to `false` when exiting.
+    begin
+      # Set the resolving flag so that neither this described nor any others
+      # attempt to resolve from it while it is resolving.
+      @resolving = true
+      
+      # Construct resolution instances for each of the {From} instances 
+      # declared on the class
+      resolutions = self.class.subject_from.map { |subject_from|
+        Resolution.new(
+          subject_from: subject_from,
+          described: self,
+          # hierarchy: hierarchy
+        )
+      }
+      
+      # Set the resolution:
+      # 
+      # 1.  If any of the resolutions was already able to resolve, use that.
+      # 2.  Otherwise, call {#update_until_resolved!} to update from the 
+      #     description hierarchy or raise.
+      # 
+      self.resolution = \
+        resolutions.find( &:resolved? ) ||
+          update_until_resolved!( resolutions, hierarchy )
+      
+      nil
+    ensure
+      # Set `@resolving` to false when exiting the method regardless of
+      # what happen
+      @resolving = false
+    end
+    
     self
   end
   
@@ -603,85 +670,6 @@ class Base
       @resolved = true
       @resolution = resolution
     end # #resolution=
-      
-    
-    # Set `@subject` from the first successful {Resolution}.
-    #
-    # A {Resolution} is created for each {.subject_from} entry, all referencing
-    # this instance. 
-    #
-    # If any resolution is {Resolution#resolved?} from this instance's instance
-    # variables, the {Resolution#subject} of first one (in order returned by
-    # {.subject_from}) is assigned to `@subject`.
-    #
-    # Otherwise, the described instances in {#each_ancestor} (if any) are
-    # walked, and the first one to successfully {Resolution#resolved?} has it's
-    # {Resolution#subject} assigned to `@subject`.
-    #
-    # If no {Resolution} resolves a {ResolutionError} is raised.
-    #
-    # @private
-    # 
-    # @note
-    #   Called in {#subject} to define `@subject` if needed so it can be
-    #   returned.
-    #   
-    #   Either:
-    #   
-    #   1.  Sets `@subject` and `@resolution` variables **or**
-    #   2.  Raises.
-    #   
-    #   Presumably only called once. However, **does *not* check that `@subject`
-    #   and `@resolution` are 
-    #
-    #
-    # @return [nil]
-    #   When method has mutated `self` by setting `@subject` and `@resolution`.
-    # 
-    # @raise [Resolution::AllFailedError]
-    #   When subject resolution fails.
-    # 
-    def resolve_subject! hierarchy
-      # Protect from re-entry while resolving. This helps catching resolution
-      # loops by being clear about what happen and providing a cleaner stack
-      # trace than the stack overflow likely to happen otherwise.
-      if resolving?
-        raise NRSER::UnreachableError.new \
-          "Subject resolution loop!",
-          described: self
-      end
-      
-      # Ensure around the rest of the the method to make sure we set 
-      # `@resolving` to `false` when exiting.
-      begin
-        # Set the resolving flag so that neither this described nor any others
-        # attempt to resolve from it while it is resolving.
-        @resolving = true
-        
-        # Construct resolution instances for each of the {From} instances 
-        # declared on the class
-        resolutions = self.class.subject_from.
-          map { |subject_from|
-            Resolution.new subject_from: subject_from, described: self
-          }
-        
-        # Set the resolution:
-        # 
-        # 1.  If any of the resolutions was already able to resolve, use that.
-        # 2.  Otherwise, call {#update_until_resolved!} to update from the 
-        #     description hierarchy or raise.
-        # 
-        self.resolution = \
-          resolutions.find( &:resolved? ) ||
-            update_until_resolved!( resolutions, hierarchy )
-        
-        nil
-      ensure
-        # Set `@resolving` to false when exiting the method regardless of
-        # what happen
-        @resolving = false
-      end
-    end # #resolve_subject!
     
     
     # For each {Described::Base} available, iterate over each of `resolutions`,

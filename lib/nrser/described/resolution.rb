@@ -44,6 +44,51 @@ module  Described
 # Definitions
 # =======================================================================
 
+# A {Resolution} instance takes a {Described::Base} instance ({#described})
+# and *one* of it's {SubjectFrom} instances ({#subject_from}) and figures out
+# how to assemble the values needed by the {SubjectFrom#parameters} so it can
+# call it's {SubjectFrom#block}, producing either a {#subject} (if the block
+# responds) or {#error} (if the block raises).
+# 
+# When a {Described::Base} instance is {Described::Base#resolve!}-ing, it 
+# creates a {Resolution} for each of it's {Described::Base.subject_from}.
+# 
+# {Resolution} collect values as well as other {Described::Base} instances that
+# resolve to the desired values and wrap them both in {Resolution::Future}
+# instances, with the understanding that some of the {Described::Base} will
+# need to resolve against the {Hierarchy} before they can produce the desired
+# {Described::Base#subject} or {Described::Base#error} values.
+# 
+# The {Resolution::Future} instances are stored in {#resolved_futures}, keyed
+# by the same name their {SubjectFrom::Parameter} is keyed in the
+# {SubjectFrom#parameters} hash of {#subject_from}.
+# 
+# When {#resolved_futures} has a value for each parameter key, and all of those
+# futures are {Resolution::Future#fulfilled?}, then the {Resolution} can 
+# create a {#values} hash to feed into the {SubjectFrom#block} of 
+# {#subject_from}, completing the resolution.
+# 
+# The first thing a {Resolution} does when it is constructed is go through the
+# {Described::Base#init_values} of the {#described} instance, and pull whatever
+# it can from there (it's assumed that if a value is provided to a description
+# at construction, it is always meant to be used).
+# 
+# If it satisfies all of the {SubjectFrom#parameters} from the init values, and
+# all those values are available at the time (any {Described::Base} are 
+# {Described::Base#resolved?}), then the resolution will {#evaluate!} and be
+# finished ({#resolved?}, {#fulfilled?} and {#evaluated?} will **all** be 
+# `true`).
+# 
+# If there are parameters that are {SubjectFrom::InitOnly} instances that can
+# **not** be satisfied by {#described}'s init values, then the resolution will
+# **fail** at that time ({#failed?} will be `true`, and {#failed_because} will
+# be non-`nil`).
+# 
+# If neither of these occur, the resolution will be in a {#resolving?} state,
+# and will require further {#update!} to resolve, fulfill and evaluate.
+# 
+# Hence it is important to check the state of resolutions after construction.
+# 
 class Resolution
   
   # Mixins
@@ -135,7 +180,7 @@ class Resolution
   # @raise [NRSER::Types::CheckError]
   #   If the parameter values don't satisfy their types.
   #
-  def initialize subject_from:, described:
+  def initialize subject_from:, described: #, hierarchy:
     require_relative './subject_from'
     
     logger.trace "Constructing resolution",
@@ -144,6 +189,7 @@ class Resolution
     
     @subject_from = t( SubjectFrom ).check! subject_from
     @described = t( Base ).check! described
+    # @hierarchy = t( Hierarchy ).check! hierarchy
     
     # A flag we throw via a call to {#failed!} when we know we can never 
     # resolve
@@ -289,8 +335,20 @@ class Resolution
   end
   
   
+  # Has this instance set a {Resolution::Future} instance in {#resolved_futures}
+  # for each of the {SubjectFrom#parameters} in its {#subject_from}?
+  # 
+  # 
+  # 
+  # @return [Boolean]
+  # 
   def resolved?
     @resolved
+  end
+  
+  
+  def resolving?
+    !( failed? || resolved? )
   end
   
   
@@ -650,6 +708,16 @@ class Resolution
     end # #evaluate!
     
   public # end protected *****************************************************
+  
+  
+  
+  def fulfill_futures hierarchy
+    resolved_futures.each do |future|
+      future.fulfill! hierarchy
+    end
+    
+    self
+  end
   
   
   def update! described, hierarchy
