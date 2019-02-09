@@ -33,7 +33,7 @@ class Instance < Object
   #       
   subject_type ::Object
   
-  from class_: Class, params: Parameters do |class_:, params:|
+  subject_from class_: Class, params: Parameters do |class_:, params:|
     params.call class_.method( :new )
   end
   

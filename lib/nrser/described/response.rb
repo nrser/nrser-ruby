@@ -41,7 +41,7 @@ class Response < Object
   
   subject_type ::Object
   
-  from callable: Callable, params: Parameters do |callable:, params:|
+  subject_from callable: Callable, params: Parameters do |callable:, params:|
     params.call callable
   end
   

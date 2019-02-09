@@ -153,9 +153,6 @@ class Base
       tap { |subject_from| @subject_from << subject_from }
   end
   
-  # FIXME Temp! Until refactor...
-  singleton_class.send :alias_method, :from, :subject_from
-  
   
   # Get or declare the {Types::Type} of {#subject}s for instances of this class.
   # 

@@ -40,7 +40,7 @@ class Method < Callable
   
   subject_type ::Method
   
-  from instance: Instance, unbound_method: UnboundMethod \
+  subject_from instance: Instance, unbound_method: UnboundMethod \
   do |instance:, unbound_method:|
     unbound_method.bind instance
   end
@@ -50,7 +50,7 @@ class Method < Callable
   # end
   
   
-  from object: Object, name: Meta::Names::Method do |object:, name:|
+  subject_from object: Object, name: Meta::Names::Method do |object:, name:|
     object.method name
   end
   

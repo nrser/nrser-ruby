@@ -37,7 +37,7 @@ class Attribute < Object
   
   subject_type ::Object
   
-  from object: Object, name: Meta::Names::Method do |object:, name:|
+  subject_from object: Object, name: Meta::Names::Method do |object:, name:|
     object.public_send name
   end
   
