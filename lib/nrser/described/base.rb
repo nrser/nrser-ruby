@@ -214,6 +214,15 @@ class Base
   end # .subject_type
   
   
+  # Support getting the {Types::Type} that {#error} will produce (companion to
+  # {.subject_type}).
+  # 
+  # @todo
+  #   Maybe this will be refine-able in the future, but for now just returns
+  #   a {Types::IsA} around {::Exception} for all description classes.
+  # 
+  # @return [Types::Type]
+  # 
   def self.error_type
     t.IsA ::Exception
   end
