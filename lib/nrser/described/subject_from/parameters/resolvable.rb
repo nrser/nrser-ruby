@@ -174,18 +174,23 @@ class Resolvable < Parameter
   # Language Integration Instance Methods
   # --------------------------------------------------------------------------
   
-  # Override to produce a more compact pretty-print output.
+  # A short string summary of the instance.
+  # 
+  # @return [::String]
+  # 
+  def to_s
+    "#{ self.class }[ #{ described_class.to_s } ]"
+  end
+  
+  
+  # Override to just use {#to_s}, which is nice, short, and has what you need
+  # to know.
   # 
   # @param [::PP] pp
   # @return [nil]
   # 
   def pretty_print pp
-    pp.group 1, "#{ self.class }[", "]" do
-      pp.breakable " "
-      pp.text described_class.to_s
-      pp.breakable " "
-    end
-    
+    pp.text to_s
     nil
   end
   
