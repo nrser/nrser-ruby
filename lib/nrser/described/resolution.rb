@@ -761,7 +761,7 @@ class Resolution
         # failed in an acceptable way that should set {#error} - init blocks
         # not returning a satisfactory type is a logic error, not something
         # to be tested for
-        @subject = described.class.subject_type.check! subject
+        @subject = described.check_subject_type! subject, resolution: self
       end
       
       # Mark that we've successfully evaluated

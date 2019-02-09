@@ -39,6 +39,8 @@ require_relative './resolution/all_failed_error'
 # {Resolution#resolve!} raises {Resolution::UnresolvedError}
 require_relative './resolution/unresolved_error'
 
+require_relative './errors/subject_type_error'
+
 
 # Refinements
 # =======================================================================
@@ -475,7 +477,7 @@ class Base
       raise ConflictError.new "Subject already set to", @subject, self: self
     end
     
-    @subject = self.class.subject_type.check! subject
+    @subject = check_subject_type! subject
   end
   
   
@@ -627,6 +629,16 @@ class Base
   # 
   def check_resolved!
     raise Resolution::UnresolvedError.new( self: self ) unless resolved?
+  end
+  
+  
+  def check_subject_type! subject, resolution: nil
+    self.class.subject_type.check! subject do
+      raise SubjectTypeError.new \
+        described: self,
+        subject: subject,
+        resolution: resolution
+    end
   end
   
   

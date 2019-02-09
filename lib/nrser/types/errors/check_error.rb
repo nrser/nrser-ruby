@@ -20,18 +20,20 @@ class NRSER::Types::CheckError < NRSER::TypeError
   # Attributes
   # ========================================================================
   
-  # The type that was checked against.
-  # 
-  # @return [NRSER::Types::Type]
+  # @!attribute [r] type
+  #   The type that was checked against.
+  #   
+  #   @return [NRSER::Types::Type]
   #     
-  attr_reader :type
+  def_context_delegator keys: :type, presence_predicate: false
   
   
-  # The value that failed the type check.
-  # 
-  # @return [*]
+  # @!attribute [r] value
+  #   The value that failed the type check.
+  #   
+  #   @return [::Object]
   #     
-  attr_reader :value
+  def_context_delegator keys: :value, presence_predicate: false
   
   
   # Constructor
@@ -39,21 +41,19 @@ class NRSER::Types::CheckError < NRSER::TypeError
   
   # Construct a `NicerError`.
   # 
-  # @param [*] value
+  # @param [::Object] value
   #   The {#value} that failed the check.
   # 
   # @param [NRSER::Types::Type] type
   #   The type that was checked.
   # 
-  # @param details: (see NRSER::NicerError#initialize)
+  # @param details (see NRSER::NicerError#initialize)
   # 
   # @param [Hash] kwds
   #   See {NRSER::NicerError#initialize}
   # 
   def initialize *message, value:, type:, details: nil, **kwds
-    @value = value
-    @type = type
-    
+    # TODO  What's up w this shit? 2019.02.10
     if details.is_a?( Proc ) && details.arity != 0
       orig_details = details
       details = -> { orig_details.call type: type, value: value }
