@@ -32,7 +32,7 @@
 # Project / Package
 # -----------------------------------------------------------------------
 
-require 'nrser/sys/unix'
+require_relative './unix'
 
 
 # Refinements
@@ -43,6 +43,7 @@ require 'nrser/sys/unix'
 # =======================================================================
 
 module  NRSER
+module  Sys
 module  Terminal
 
 
@@ -135,4 +136,5 @@ end
 # =======================================================================
 
 end # module Terminal
+end # module Sys
 end # module NRSER
