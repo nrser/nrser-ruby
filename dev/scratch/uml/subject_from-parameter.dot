@@ -1,0 +1,39 @@
+digraph G {
+  compound = true
+  fontname = "Bitstream Vera Sans"
+  fontsize = 8
+
+  node [
+    fontname = "Bitstream Vera Sans"
+    fontsize = 8
+    shape = "record"
+  ]
+
+  edge [
+    fontname = "Bitstream Vera Sans"
+    fontsize = 8
+  ]
+  
+
+  DescribedBase [
+    shape = "record"
+    label = "{Described::Base|.subject_from → \[ SubjectFrom \]}"
+  ]
+  
+  
+  SubjectFrom [
+    shape = "record"
+    label = "{SubjectFrom|<parameters> #parameters → \{ Symbol ⇒ Parameter \}|#block → λ(**parameters → Described::Base.subject_type)}"
+  ]
+  
+
+  Parameter [
+    shape = "record"
+    label = "{Parameter}"
+  ]
+
+  "DescribedBase":f0 -> "SubjectFrom":f0
+  "SubjectFrom":parameters
+   -> Parameter;
+
+}
