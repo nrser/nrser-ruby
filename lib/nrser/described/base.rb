@@ -27,6 +27,9 @@ require "nrser/support/pp"
 # {Base.Names} provides shortcut to {NRSER::Meta::Names}
 require 'nrser/meta/names'
 
+# Mixing in `Class#subclass?`
+require 'nrser/ext/class/subclass'
+
 # Using {Resolution} in {Base#resolve_subject!}
 require_relative './resolution'
 
@@ -75,6 +78,9 @@ class Base
   
   # Mix in my custom pretty printing support
   include NRSER::Support::PP
+  
+  # Mix in `Class#subclass?`
+  extend NRSER::Ext::Class
   
   
   # Config
@@ -210,11 +216,6 @@ class Base
   
   def self.error_type
     t.IsA ::Exception
-  end
-  
-  
-  def self.subclass? object
-    object.is_a?( ::Class ) && object < self
   end
   
   
