@@ -92,17 +92,6 @@ class Base
   # Singleton Methods
   # ========================================================================
   
-  # Shortcut to {NRSER::Meta::Names} to make {.subject_from} declarations more 
-  # concise.
-  # 
-  # @return [::Module]
-  #   {NRSER::Meta::Names}
-  # 
-  def self.Names
-    NRSER::Meta::Names
-  end
-  
-  
   # @overload subject_from
   #   Get the {SubjectFrom} instances for this description class,
   #   which represent the available ways to create {#subject} values for 

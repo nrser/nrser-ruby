@@ -50,7 +50,7 @@ class Method < Callable
   # end
   
   
-  from object: Object, name: self.Names::Method do |object:, name:|
+  from object: Object, name: Meta::Names::Method do |object:, name:|
     object.method name
   end
   
