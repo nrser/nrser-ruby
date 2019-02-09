@@ -69,7 +69,16 @@ class Base
   # Constants
   # ========================================================================
   
+  # The {Types::Type} of objects that can be set as {#resolution} - boils down
+  # to {Resolution} instances that are {Resolution#resolved?}.
+  # 
+  # @todo
+  #   Should also check that they describe this..?
+  # 
+  # @return [Types::Type]
+  # 
   RESOLUTION_TYPE = t.IsA( Resolution ) & t.Attributes( :resolved? => true )
+  
 
   # Mixins
   # ========================================================================
@@ -354,36 +363,56 @@ class Base
   # Instance Methods
   # ========================================================================
   
-  
+  # Does this instance have a {#subject}? 
+  # 
+  # @note
+  #   Must be {#resolve!}-ed first, or this method will raise.
+  # 
+  # @return [Boolean]
+  # 
+  # @raise [Resolution::UnresolvedError]
+  #   If this instance is not {#resolved?}.
+  # 
   def subject?
     check_resolved!
     instance_variable_defined? :@subject
   end
   
-  
+  # Does this instance have an {#error}? 
+  # 
+  # @note
+  #   Must be {#resolve!}-ed first, or this method will raise.
+  # 
+  # @return [Boolean]
+  # 
+  # @raise [Resolution::UnresolvedError]
+  #   If this instance is not {#resolved?}.
+  # 
   def error?
     check_resolved!
     !@error.nil?
   end
   
   
-  # Get the subject.
+  # Get the resolved subject.
   # 
   # @note
-  #   Raises unless `@subject` has already been set, either at construction
-  #   or via a successful {#resolve}. **Only use when you expect the subject
-  #   to already be present** 
+  #   Must be {#resolve!}-ed first, or this method will raise.
   # 
   # @return [::Object]
   # 
   # @raise [Resolution::UnresolvedError]
-  #   When `@subject` has not been defined (see note).
+  #   If this instance is not {#resolved?}.
+  # 
+  # @raise [WrappedError<::Exception>]
+  #   If this instance resolved to an {#error} instead of a {#subject}, that
+  #   {#error} will be wrapped and raised.
   # 
   def subject
     check_resolved!
   
     unless @error.nil?
-      raise NRSER::WrappedError.new \
+      raise WrappedError.new \
         "Tried to access {#subject}, but subject instantiation caused an error",
         cause: @error
     end
@@ -392,11 +421,39 @@ class Base
   end
   
   
+  # Get the resolved error - the {::Exception} that was raised when 
+  # instantiating the {#subject} during resolution (if any).
+  # 
+  # @note
+  #   In particular, this is any error raised by calling {SubjectFrom#block}
+  #   on the resolved {SubjectFrom} instance (which is always one of 
+  #   {.subject_from}).
+  #   
+  #   These errors represent "expected errors" - those that happen when applying
+  #   the operations that description instances describe, and hence are the
+  #   errors that tests want to handle and verify.
+  #   
+  #   Errors that happen outside of that particular situation are errors in 
+  #   the library logic or configuration, and do **not** become {#error} 
+  #   values; they are generally allowed to bubble-up so the developer can 
+  #   attend to them.
+  # 
+  # @note
+  #   Must be {#resolve!}-ed first, or this method will raise.
+  # 
+  # @return [nil]
+  #   This instance successfully resolved to a {#subject}.
+  # 
+  # @return [::Exception]
+  #   The error raised 
+  # 
+  # @raise [Resolution::UnresolvedError]
+  #   If this instance is not {#resolved?}.
+  # 
   def error
     check_resolved!
     @error
   end
-  
   
   
   # Set the {#subject}. Checks that it has not already been set and that it
@@ -407,33 +464,50 @@ class Base
   # @return [::Object]
   #   `subject` parameter.
   # 
+  # @raise [ConflictError]
+  #   If the subject has already been set.
+  # 
   # @raise [Types::CheckError]
   #   If type check fails.
   # 
   def subject= subject
     if instance_variable_defined? :@subject
-      raise NRSER::ConflictError.new \
-        "Subject already set to", @subject,
-        self: self
+      raise ConflictError.new "Subject already set to", @subject, self: self
     end
     
     @subject = self.class.subject_type.check! subject
   end
   
   
+  # Set the {#error}. Checks that it has not already been set and that it
+  # conforms to {.error_type}.
+  # 
+  # @todo
+  #   I'm not really sure *why* this is public, except that {#subject=} is...
+  #   
+  #   {#initialize} doesn't accept `error:`, and I don't know if it should or
+  #   will.
+  #   
+  #   I don't think it's used outside of this file, and don't know why it would
+  #   need to be...
+  # 
+  # @param [::Exception] error
+  # 
+  # @return [::Exception]
+  #   `error` parameter.
+  #
+  # @raise [ConflictError]
+  #   If the error has already been set.
+  # 
+  # @raise [Types::CheckError]
+  #   If type check fails.
+  # 
   def error= error
     unless @error.nil?
-      raise NRSER::ConflictError.new \
-        "Error already set to", @error,
-        self: self
+      raise ConflictError.new "Error already set to", @error, self: self
     end
     
-    unless error.is_a? Exception
-      raise NRSER::TypeError.new \
-        "`error` parameter must be an", Exception, "instance, found ", error
-    end
-    
-    @error = error
+    @error = self.class.error_type.check! error
   end
   
   
@@ -477,6 +551,13 @@ class Base
   end
   
   
+  # Check that this instance has been {#resolve!}-ed.
+  # 
+  # @return [nil]
+  # 
+  # @raise [Resolution::UnresolvedError]
+  #   If this instance is not {#resolved?}.
+  # 
   def check_resolved!
     raise Resolution::UnresolvedError.new( self: self ) unless resolved?
   end
