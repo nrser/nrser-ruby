@@ -304,7 +304,7 @@ class Type
         else
           on_error.call type: self, value: value
         end
-      rescue StandardError => error
+      rescue ::StandardError => error
         error
       end
       
