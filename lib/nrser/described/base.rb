@@ -572,7 +572,7 @@ class Base
         Resolution.new(
           subject_from: subject_from,
           described: self,
-          # hierarchy: hierarchy
+          hierarchy: hierarchy,
         )
       }
       

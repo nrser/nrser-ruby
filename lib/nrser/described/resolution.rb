@@ -44,51 +44,58 @@ module  Described
 # Definitions
 # =======================================================================
 
-# A {Resolution} instance takes a {Described::Base} instance ({#described})
-# and *one* of it's {SubjectFrom} instances ({#subject_from}) and figures out
-# how to assemble the values needed by the {SubjectFrom#parameters} so it can
-# call it's {SubjectFrom#block}, producing either a {#subject} (if the block
+# Resolutions are internal objects used by descriptions to resolve their
+# subjects or errors.
+#
+#
+# Gory Details
+# ----------------------------------------------------------------------------
+#
+# A {Resolution} instance takes a {Described::Base} instance (see {#described})
+# and *one* of it's {SubjectFrom} instances (see {#subject_from}) and figures
+# out how to assemble the values needed by the {SubjectFrom#parameters} so it
+# can call it's {SubjectFrom#block}, producing either a {#subject} (if the block
 # responds) or {#error} (if the block raises).
-# 
-# When a {Described::Base} instance is {Described::Base#resolve!}-ing, it 
+#
+# When a {Described::Base} instance is {Described::Base#resolve!}-ing, it
 # creates a {Resolution} for each of it's {Described::Base.subject_from}.
-# 
+#
 # {Resolution} collect values as well as other {Described::Base} instances that
 # resolve to the desired values and wrap them both in {Resolution::Future}
-# instances, with the understanding that some of the {Described::Base} will
-# need to resolve against the {Hierarchy} before they can produce the desired
+# instances, with the understanding that some of the {Described::Base} will need
+# to resolve against the {Hierarchy} before they can produce the desired
 # {Described::Base#subject} or {Described::Base#error} values.
-# 
-# The {Resolution::Future} instances are stored in {#resolved_futures}, keyed
-# by the same name their {SubjectFrom::Parameter} is keyed in the
+#
+# The {Resolution::Future} instances are stored in {#resolved_futures}, keyed by
+# the same name their {SubjectFrom::Parameter} is keyed by in the
 # {SubjectFrom#parameters} hash of {#subject_from}.
-# 
-# When {#resolved_futures} has a value for each parameter key, and all of those
-# futures are {Resolution::Future#fulfilled?}, then the {Resolution} can 
-# create a {#values} hash to feed into the {SubjectFrom#block} of 
-# {#subject_from}, completing the resolution.
-# 
-# The first thing a {Resolution} does when it is constructed is go through the
+#
+# When {#resolved_futures} has a value for each parameter key, then the
+# resolution can create a {#values} hash to feed into the {SubjectFrom#block} of
+# {#subject_from}, completing the process.
+#
+# ### Construction *May* Be Completion ###
+#
+# The first thing a resolution does when it is constructed is go through the
 # {Described::Base#init_values} of the {#described} instance, and pull whatever
 # it can from there (it's assumed that if a value is provided to a description
 # at construction, it is always meant to be used).
-# 
-# If it satisfies all of the {SubjectFrom#parameters} from the init values, and
-# all those values are available at the time (any {Described::Base} are 
-# {Described::Base#resolved?}), then the resolution will {#evaluate!} and be
-# finished ({#resolved?}, {#fulfilled?} and {#evaluated?} will **all** be 
-# `true`).
-# 
+#
+# If it satisfies all of the {SubjectFrom#parameters} from the init values, then
+# the resolution will {#evaluate!} and be finished ({#resolved?} and
+# {#evaluated?} will **both** be `true`).
+#
 # If there are parameters that are {SubjectFrom::InitOnly} instances that can
 # **not** be satisfied by {#described}'s init values, then the resolution will
 # **fail** at that time ({#failed?} will be `true`, and {#failed_because} will
-# be non-`nil`).
-# 
+# be non-`nil`), because there will be no way to successfully resolve down the
+# line, no matter what {#update!} is called with.
+#
 # If neither of these occur, the resolution will be in a {#resolving?} state,
-# and will require further {#update!} to resolve, fulfill and evaluate.
-# 
+# and will require further {#update!} to resolve and evaluate.
+#
 # Hence it is important to check the state of resolutions after construction.
-# 
+#
 class Resolution
   
   # Mixins
@@ -176,11 +183,15 @@ class Resolution
   #
   # @param [Base] described
   #   The described instance to resolve from.
+  # 
+  # @param [Hierarchy] hierarchy
+  #   The current description hierarchy, which is used to fulfill the 
+  #   {Resolution::Future}s.
   #
   # @raise [NRSER::Types::CheckError]
   #   If the parameter values don't satisfy their types.
   #
-  def initialize subject_from:, described: #, hierarchy:
+  def initialize subject_from:, described:, hierarchy:
     require_relative './subject_from'
     
     logger.trace "Constructing resolution",
@@ -189,19 +200,10 @@ class Resolution
     
     @subject_from = t( SubjectFrom ).check! subject_from
     @described = t( Base ).check! described
-    # @hierarchy = t( Hierarchy ).check! hierarchy
+    @hierarchy = t( Hierarchy ).check! hierarchy
     
-    # A flag we throw via a call to {#failed!} when we know we can never 
-    # resolve
-    @failed = false
-    
-    # *Why* did we fail?
+    # *Why* did we fail? When this is non-`nil`, we are in the {#failed?} state
     @failed_because = nil
-    
-    # Flag to throw when we've successfully resolved all the name keys in 
-    # `subject_from`'s {SubjectFrom#parameters} to {Future} instances in
-    # {#resolved_futures}
-    @resolved = false
     
     # Flag to flip when we have evaluated {#subject_from}'s 
     # {SubjectFrom#init_block}, meaning that either `@subject` or `@error` is 
@@ -288,9 +290,7 @@ class Resolution
         any?
         
       # If we updated the state at all, see if we got it already
-      if updated
-        try_to_resolve!
-      end
+      try_to_resolve! if updated
       
       nil
     end # init_update_from_described!
@@ -331,43 +331,71 @@ class Resolution
   # @return [Boolean]
   #
   def failed?
-    @failed
+    !@failed_because.nil?
   end
   
   
   # Has this instance set a {Resolution::Future} instance in {#resolved_futures}
   # for each of the {SubjectFrom#parameters} in its {#subject_from}?
   # 
-  # 
-  # 
   # @return [Boolean]
   # 
   def resolved?
-    @resolved
+    !failed? && resolved_futures.count == subject_from.parameters.count
   end
   
   
+  # Has this instance neither {#failed?} nor {#resolved?}
+  # 
+  # @return [Boolean]
+  # 
   def resolving?
     !( failed? || resolved? )
   end
   
   
+  # Has this instance {#evaluate!}-ed, meaning that either {#subject} or 
+  # {#error} is now available?
+  # 
+  # @return [Boolean]
+  # 
   def evaluated?
     @evaluated
   end
   
   
-  def fulfilled?
-    @fulfilled
-  end
-  
-  
+  # Did this instance resolve to a {#subject} value (opposed to an {#error})?
+  # 
+  # @note
+  #   In order to find out, **this method evaluates the resolution**, which will
+  #   raise if it is not yet {#resolved?}.
+  #   
+  #   If you are not sure if the resolution has resolved and are not rescuing
+  #   the error, use something like:
+  #   
+  #       resolution.resolved? && resolution.subject?
+  # 
+  # @return [Boolean]
+  # 
   def subject?
     evaluate!
     instance_variable_defined? :@subject
   end
   
   
+  # Did this instance resolve to an {#error} value (opposed to a {#subject})?
+  # 
+  # @note
+  #   In order to find out, **this method evaluates the resolution**, which will
+  #   raise if it is not yet {#resolved?}.
+  #   
+  #   If you are not sure if the resolution has resolved and are not rescuing
+  #   the error, use something like:
+  #   
+  #       resolution.resolved? && resolution.error?
+  # 
+  # @return [Boolean]
+  # 
   def error?
     evaluate!
     instance_variable_defined? :@error
@@ -379,19 +407,15 @@ class Resolution
   # @!group Public State Assertion Instance Methods
   # --------------------------------------------------------------------------
   
+  # Raise unless {#resolved?}.
+  # 
   # @return [self]
   # 
-  # @raise [Resolution::UnresolvedError]
+  # @raise [UnresolvedError]
   #   If the resolution has not been {#resolved?}.
   # 
   def check_resolved!
-    raise Resolution::UnresolvedError.new( self: self ) unless resolved?
-    self
-  end
-  
-  
-  def check_fulfilled!
-    raise "Not fulfilled!" unless fulfilled?
+    raise UnresolvedError.new( self: self ) unless resolved?
     self
   end
   
@@ -401,21 +425,49 @@ class Resolution
   # @!group Public Resolution Data Access Methods
   # --------------------------------------------------------------------------
   
+  # The keyword arguments {::Hash} that will be provided to the 
+  # {SubjectFrom#block} of {#subject_from} to obtain the {#subject} or {#error}.
+  # 
+  # @return [::Hash<Symbol, ::Object>]
+  # 
+  # @raise [UnresolvedError]
+  #   If this instance is not {#resolved?}.
+  # 
   def values
     @values ||= begin
       check_resolved!
-      check_fulfilled!
+      
+      # Make sure all the futures are fulfilled
+      resolved_futures.values.each { |future| future.fulfill! @hierarchy }
       
       resolved_futures.transform_values &:value
     end    
   end
   
   
+  # The evaluated subject (response value from the {SubjectFrom#block} property
+  # of {#subject_from} with {#values}).
+  # 
+  # @note
+  #   Accessing this attribute causes evaluation (see {#evaluate!}), and will
+  #   hence raise if the instance is not {#resolved?}.
+  #   
+  #   It will *also* raise if evaluation resulted in an {#error} instead.
+  # 
+  # @return [::Object]
+  # 
+  # @raise [UnresolvedError]
+  #   If this instance is not {#resolved?}.
+  # 
+  # @raise [WrappedError<{cause: #error}>]
+  #   If evaluation produced an {#error} value instead of a subject. {#error}
+  #   will be the {WrappedError#cause}.
+  # 
   def subject
     evaluate!
     
     unless subject?
-      raise NRSER::WrappedError.new \
+      raise WrappedError.new \
         "Tried to access {#subject}, but subject instantiation caused an error",
         cause: @error
     end
@@ -424,14 +476,31 @@ class Resolution
   end
   
   
+  # The evaluation error (raised when calling the {SubjectFrom#block} property
+  # of {#subject_from} with {#values}).
+  # 
+  # @note
+  #   Accessing this attribute causes evaluation (see {#evaluate!}), and will
+  #   hence raise if the instance is not {#resolved?}.
+  #   
+  #   It will *also* raise if evaluation resulted in a {#subject} instead.
+  # 
+  # @return [::Object]
+  # 
+  # @raise [UnresolvedError]
+  #   If this instance is not {#resolved?}.
+  # 
+  # @raise [ConflictError<{subject: #subject, resolution: self}>]
+  #   If evaluation produced a {#subject} value instead of an error.
+  # 
   def error
     evaluate!
     
     unless error?
-      raise NRSER::ConflictError.new \
+      raise ConflictError.new \
         "Tried to access {#error}, but subject instantiation succeeded",
         subject: @subject,
-        self: self
+        resolution: self
     end
     
     @error
@@ -500,7 +569,7 @@ class Resolution
     # @return [nil]
     #   If everything's ok.
     # 
-    # @raise [NRSER::ConflictError]
+    # @raise [ConflictError]
     #   If everything is **not** ok. The error's `#context` includes a lot of 
     #   useful information for figuring out where it all went wrong.
     # 
@@ -512,7 +581,7 @@ class Resolution
       end
       
       if state
-        raise NRSER::ConflictError.new \
+        raise ConflictError.new \
           self.class, "has already", state,
           attempted_call: {
             method_name: method_name,
@@ -532,7 +601,7 @@ class Resolution
     #   Mutates the instance, in particular potentially chaning the {#resolved?}
     #   state.
     # 
-    def try_to_resolve! hierarchy: nil
+    def try_to_resolve!
       check_resolving! __method__
       
       # Bail if there are still names with no candidates or values
@@ -636,18 +705,6 @@ class Resolution
       
       # Now just assign and flag the state!
       @resolved_futures.merge! new_resolved_futures
-      @resolved = true 
-      
-      if resolved_futures.values.all?( &:value? )
-        @fulfilled = true
-      
-      elsif hierarchy
-        resolved_futures.each do |name, future|
-          future.fulfill! hierarchy
-        end
-        
-        @fulfilled = true
-      end
       
       nil
     end # #try_to_resolve!
@@ -665,7 +722,6 @@ class Resolution
     # @return [self]
     #   
     def failed! *description, **context
-      @failed = true
       @failed_because = [
         description.map { |value|
           value.is_a?( ::String ) ? value : value.inspect
@@ -677,18 +733,24 @@ class Resolution
     end # #failed!
     
     
-    # Evaluate the {SubjectFrom#init_block} of {#subject_from} against {#values}, 
-    # setting {#subject} if it succeeds, and {#error} if it fails.
+    # Evaluate the {SubjectFrom#init_block} of {#subject_from} against 
+    # {#values}, setting {#subject} if it succeeds, and {#error} if it fails.
     # 
     # Guards by checking and setting the {#evaluated?} state, so repeated calls
     # have no effect.
     # 
-    # @private
+    # Also calls {#check_resolved!} to make sure we have resolved before it 
+    # tries to evaluate.
     # 
     # @return [self]
     # 
+    # @raise [ConflictError]
+    #   If this resolution is not {#resolved?}.
+    # 
     def evaluate!
       return self if evaluated?
+      
+      check_resolved!
       
       begin
         subject = subject_from.block.call( **values )
@@ -702,6 +764,7 @@ class Resolution
         @subject = described.class.subject_type.check! subject
       end
       
+      # Mark that we've successfully evaluated
       @evaluated = true
       
       self
@@ -710,35 +773,14 @@ class Resolution
   public # end protected *****************************************************
   
   
-  
-  def fulfill_futures hierarchy
-    resolved_futures.each do |future|
-      future.fulfill! hierarchy
-    end
-    
-    self
-  end
-  
-  
   def update! described, hierarchy
     check_resolving! __method__, described
     
-    # Maybe... this would allow us to avoid passing `hierarchy` to 
-    # {#try_to_resolve!}, but it also might end up with us doing more work than
-    # necessary or even desired resolving futures that we won't have any need 
-    # of..?
-    # 
-    # TODO  If not, we def want to resolve any pending futures *before* we 
-    #       start to iterate through the `hierarchy` for the case where we 
-    #       have all the values already filled out from construction but
-    #       some need to be resolved in order for this instance to resolve.
-    # 
-    # resolve_futures! hierarchy
-    
-    # 
+    # `updated` should be set to `true` if we actually did any updating in this
+    # flow, see the `.any?` at the end and notes throughout.
     updated = subject_from.
         parameters.
-        # Select only resolvable match extractors that we don't already have
+        # Select only resolvable parameters that we don't already have
         # resolved futures for (since we always want to use the 
         # {Described::Base#init_values} provided to the description at 
         # construction).
@@ -773,7 +815,7 @@ class Resolution
     
     # Attempt to resolve, this time providing the {Hierarchy}, which will allow
     # any futures to be resolved.
-    try_to_resolve!( hierarchy: hierarchy ) if updated
+    try_to_resolve! if updated
     
     # Allow for chaining... though I have considered returning a boolean to 
     # indicate if an update happen or not... but I'm not using that, and I don't

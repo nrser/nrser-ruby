@@ -53,8 +53,6 @@ module  Described
 #   definitions using the {Described::Base.subject_from} method.
 #
 class SubjectFrom
-  class ExtractError < StandardError; end
-  
   
   # Mixins
   # ==========================================================================
@@ -65,11 +63,12 @@ class SubjectFrom
   # Properties
   # =====================================================================
   
-  # Principle Properties
-  # ---------------------------------------------------------------------
-  
-  # @!attribute [r] types
-  #   @todo Doc types property...
+  # @!attribute [r] parameters
+  #   Information about the parameters needed to call {#block}.
+  #   
+  #   Keys are the {Symbol}s that will be used as keywords when calling {#block},
+  #   and values are {Parameter} instances describing what objects are suitable
+  #   for those keywords.
   #   
   #   @return [Hash<Symbol, Parameter>]
   #   
@@ -77,32 +76,35 @@ class SubjectFrom
         type: t.Hash( keys: t.Symbol, values: Parameter )
   
   
-  # @!attribute [r] init_block
-  #   @todo Doc init_block property...
+  # @!attribute [r] block
+  #   The function that transforms values for the {#parameters} into the
+  #   {Described::Base#subject}.
   #   
-  #   @return [PropRubyType]
+  #   Will be called with a keyword arguments hash with each key {Symbol} from
+  #   {#parameters} mapped to it's value.
+  #   
+  #   When this block raises, the {Described::Base} gets an 
+  #   {Described::Base#error} values *instead* of a subject.
+  #   
+  #   @return [::Proc<(**VALUES)->SUBJECT)>]
   #   
   prop  :block,
-        type: t.IsA( Proc )
+        type: t.IsA( ::Proc )
   
   
-  # @todo Document type_for method.
+  # Construction
+  # ==========================================================================
+  
+  # Construct a new {SubjectFrom}.
   # 
-  # @param [type] arg_name
-  #   @todo Add name param description.
+  # @param [Hash<#to_sym, ::Object>] parameters
+  #   Map to assign to {#parameters}, calling `#to_sym` on the keys and 
+  #   passing values to {Parameter.from} to produce the necessary types.
   # 
-  # @return [return_type]
-  #   @todo Document return value.
+  # @param [::Proc<(**VALUES)->SUBJECT)>]
+  #   Function to turn values for {#parameters} into description subjects,
+  #   see {#block}.
   # 
-  def self.type_for value
-    if Described::Base.subclass? value
-      t.IsA value
-    else
-      t.make value
-    end
-  end # .type_for
-  
-  
   def initialize parameters:, block:
     initialize_props(
       parameters: parameters.
@@ -115,9 +117,19 @@ class SubjectFrom
     )
   end
   
+  
+  # Instance Methods
+  # ==========================================================================
+  
   # Language Integration Instance Methods
   # --------------------------------------------------------------------------
   
+  # Override to just pretty-print the {#parameters}, since we can't print
+  # much useful about the {#block}.
+  # 
+  # @param [::PP] pp
+  # @return [nil]
+  # 
   def pretty_print pp
     pp.group 1, "{#{self.class}", "}" do
       pp.breakable ' '
@@ -135,6 +147,8 @@ class SubjectFrom
       end # seplist
       
     end # group
+    
+    nil
   end # #pretty_print
   
 end # class SubjectFrom
