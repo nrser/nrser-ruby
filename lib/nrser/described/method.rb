@@ -54,6 +54,8 @@ class Method < Callable
     object.method name
   end
   
+  subject_from 
+  
 end # class Callable
 
 

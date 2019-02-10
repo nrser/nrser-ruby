@@ -80,7 +80,7 @@ module Pathname
   # 
   def start_with? *prefixes
     to_s.n_x.start_with? *prefixes.map { |prefix|
-      if Pathname === prefix
+      if ::Pathname === prefix
         prefix.to_s
       else
         prefix

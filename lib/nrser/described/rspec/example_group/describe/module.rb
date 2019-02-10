@@ -1,6 +1,7 @@
 # encoding: UTF-8
 # frozen_string_literal: true
 
+
 # Namespace
 # =======================================================================
 
@@ -14,18 +15,13 @@ module  Describe
 # Definitions
 # ========================================================================
 
-# Describe an attribute of the parent subject.
-# 
-# @return [void]
-# 
-def describe_attribute name, **metadata, &body
-  DESCRIBE :attribute,
-    name: Meta::Names::Method.from( name ).bare_name,
+def MODULE mod, *description, **metadata, &body
+  DESCRIBE :module,
+    subject: mod,
+    description: description,
+    metadata: metadata,
     &body
-end # #describe_attribute
-
-# BOLDER name
-alias_method :ATTRIBUTE, :describe_attribute
+end # #MODULE
 
 
 # /Namespace

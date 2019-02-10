@@ -5,6 +5,7 @@
 # =======================================================================
 
 module  NRSER
+module  Described
 module  RSpec
 module  ExampleGroup
 module  Describe
@@ -13,20 +14,15 @@ module  Describe
 # Definitions
 # ========================================================================
 
-# Describe a "use case".
+# Describe an attribute of the parent subject.
 # 
 # @return [void]
 # 
-def describe_case *description, where: {}, **metadata, &body
-  describe_x \
-    *description,
-    type: :case,
-    bindings: where,
-    metadata: metadata,
+def ATTRIBUTE name, **metadata, &body
+  DESCRIBE :attribute,
+    name: Meta::Names::Method.from( name ).bare_name,
     &body
-end # #describe_case
-
-alias_method :CASE, :describe_case
+end # #ATTRIBUTE
 
 
 # /Namespace
@@ -35,4 +31,5 @@ alias_method :CASE, :describe_case
 end # module Describe
 end # module ExampleGroup
 end # module RSpec
+end # module Described
 end # module NRSER

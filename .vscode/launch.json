@@ -18,6 +18,7 @@
       "useBundler": true,
       "env": {
         "VSCODE_RUBY_DEBUG": "TRUE",
+        "NO_RSPEC": "TRUE",
       }
     },
     
@@ -35,6 +36,7 @@
       "useBundler": true,
       "env": {
         "VSCODE_RUBY_DEBUG": "TRUE",
+        "NO_RSPEC": "TRUE",
       }
     },
     

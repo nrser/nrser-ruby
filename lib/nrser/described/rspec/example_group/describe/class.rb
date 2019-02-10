@@ -1,7 +1,6 @@
 # encoding: UTF-8
 # frozen_string_literal: true
 
-
 # Namespace
 # =======================================================================
 
@@ -14,18 +13,23 @@ module  Describe
 
 # Definitions
 # ========================================================================
-
-def describe_module mod, *description, **metadata, &body
-  DESCRIBE :module,
-    subject: mod,
+  
+# Describe a {::Class}.
+# 
+# @return [void]
+# 
+def CLASS   klass,
+            *description,
+            **metadata,
+            &body
+  DESCRIBE \
+    :class,
+    subject: klass,
     description: description,
     metadata: metadata,
     &body
-end # #describe_module
-
-# Short name
-alias_method :MODULE, :describe_module
-
+end # #CLASS
+  
 
 # /Namespace
 # ========================================================================

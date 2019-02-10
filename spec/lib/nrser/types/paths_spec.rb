@@ -1,6 +1,8 @@
 SPEC_FILE(
   spec_path: __FILE__,
-  source_file: 'nrser/types/paths.rb',
+  # TODO  Incorporate this into the `METHOD` example groups to override the
+  #       not-useful source location they get due to dynamic method generator?
+  # source_file: 'nrser/types/paths.rb',
   module: NRSER::Types,
 ) do
 

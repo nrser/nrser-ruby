@@ -2,7 +2,9 @@ require 'nrser/core_ext/hash/keys'
 
 SPEC_FILE(
   spec_path: __FILE__,
-  source_file: 'nrser/core_ext/hash/keys.rb',
+  # TODO  Incorporate this into the `METHOD` example groups to override the
+  #       not-useful source location they get due to dynamic method generator?
+  # source_file: 'nrser/core_ext/hash/keys.rb',
 ) do
   
   EACH *[

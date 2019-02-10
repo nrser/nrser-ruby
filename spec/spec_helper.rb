@@ -22,6 +22,9 @@ require 'pry'
 require 'nrser'
 require 'nrser/refinements/types'
 
+# Using {String#~} to squish string blocks
+require 'nrser/core_ext/string/squiggle'
+
 unless ENV[ "NO_RSPEX" ]
   require 'nrser/rspex'
 end

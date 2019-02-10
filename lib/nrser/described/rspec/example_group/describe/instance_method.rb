@@ -14,7 +14,7 @@ module  Describe
 # Definitions
 # ========================================================================
 
-def describe_instance_method method,
+def INSTANCE_METHOD method,
                     *description,
                     **metadata,
                     &body
@@ -39,9 +39,7 @@ def describe_instance_method method,
         DESCRIBE :instance_method, *description, name: method_name, &body
       }
   end
-end # #describe_method
-
-alias_method :INSTANCE_METHOD, :describe_instance_method
+end # #INSTANCE_METHOD
 
 
 # /Namespace

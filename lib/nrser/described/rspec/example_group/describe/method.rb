@@ -28,10 +28,10 @@ module  Describe
 # 
 # @return [void]
 # 
-def describe_method method,
-                    *description,
-                    **metadata,
-                    &body
+def METHOD  method,
+            *description,
+            **metadata,
+            &body
   
   case method
   when ::Method
@@ -54,9 +54,7 @@ def describe_method method,
         DESCRIBE :method, name: method_name.bare_name, &body
       }
   end
-end # #describe_method
-
-alias_method :METHOD, :describe_method
+end # #METHOD
 
 
 # /Namespace

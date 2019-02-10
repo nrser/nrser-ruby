@@ -36,14 +36,14 @@ module  Describe
 # 
 # @return [void]
 # 
-def describe_called_with *args, **kwds, &body
+def RESPONSE_TO *args, **kwds, &body
   params = Meta::Params.new args: args, kwds: kwds
   DESCRIBE :response, params: params, &body
-end # #describe_called_with
+end # #RESPONSE_TO
 
 
 # New / bold name
-alias_method :CALLED_WITH, :describe_called_with
+alias_method :CALLED_WITH, :RESPONSE_TO
 
 
 # Version of {#describe_called_with} for when you have no arguments.
@@ -54,13 +54,13 @@ alias_method :CALLED_WITH, :describe_called_with
 # 
 # @return [void]
 # 
-def describe_called &body
-  describe_called_with &body
+def RESPONSE &body
+  RESPONSE_TO &body
 end
 
 
 # new / bold name
-alias_method :CALLED, :describe_called
+alias_method :CALLED, :RESPONSE
   
   
 # /Namespace

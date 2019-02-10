@@ -15,6 +15,7 @@ require 'nrser/errors/argument_error'
 # =======================================================================
 
 module  NRSER
+module  Described
 module  RSpec
 module  ExampleGroup
 module  Describe
@@ -137,13 +138,12 @@ def describe_x  *description,
   
 end # #describe_x
 
-alias_method :describe_x_type, :describe_x
-
 
 # /Namespace
 # ========================================================================
 
-end # module Describe
-end # module ExampleGroup
-end # module RSpec
-end # module NRSER
+end # module  Describe
+end # module  ExampleGroup
+end # module  RSpec
+end # module  Described
+end # module  NRSER

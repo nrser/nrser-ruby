@@ -6,6 +6,7 @@
 # =======================================================================
 
 module  NRSER
+module  Described
 module  RSpec
 module  ExampleGroup
 module  Describe
@@ -17,7 +18,7 @@ module  Describe
 def dive_x current, *rest, **kwds, &body
   type, data = current
   
-  method_name = "describe_#{ type }"
+  method_name = type.to_s.upcase
   
   block = if rest.empty?
     body
@@ -58,11 +59,11 @@ end
 # 
 # @return (see #describe_x)
 # 
-def describe_spec_file  *description,
-                        spec_path:,
-                        bind_subject: true,
-                        **metadata,
-                        &body
+def SPEC_FILE   *description,
+                spec_path:,
+                bind_subject: true,
+                **metadata,
+                &body
   
   if metadata[:description]
     unless description.empty?
@@ -96,7 +97,8 @@ def describe_spec_file  *description,
   describe_x_body = if chain.empty?
     body
   else
-    -> { dive_x *chain, bind_subject: bind_subject, &body }
+    # -> { dive_x *chain, bind_subject: bind_subject, &body }
+    -> { dive_x *chain, &body }
   end
 
   rel_path = Pathname.new( spec_path ).n_x.to_dot_rel_s
@@ -112,15 +114,14 @@ def describe_spec_file  *description,
     },
     &describe_x_body
   
-end # #describe_spec_file
-
-alias_method :SPEC_FILE, :describe_spec_file
+end # #SPEC_FILE
 
 
 # /Namespace
 # ========================================================================
 
-end # module Describe
-end # module ExampleGroup
-end # module RSpec
-end # module NRSER
+end # module  Describe
+end # module  ExampleGroup
+end # module  RSpec
+end # module  Described
+end # module  NRSER
