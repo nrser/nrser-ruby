@@ -99,29 +99,29 @@ SPEC_FILE(
       # as well as via the `#x` and `#y` attribute reader methods that
       # {NRSER::Props} creates:
       
-      describe_attribute :x do
+      ATTRIBUTE :x do
         it { is_expected.to be x }
       end
       
-      describe_attribute :y do
+      ATTRIBUTE :y do
         it { is_expected.to be y }
       end
       
       # Converting to an array should be equal to `[[:x, x], [:y, y]]`:
       
-      describe_attribute :to_a do
+      ATTRIBUTE :to_a do
         it { is_expected.to include [:x, x], [:y, y] }
       end
       
       # We should get a regular hash out of `#to_h`
       
-      describe_attribute :to_h do
+      ATTRIBUTE :to_h do
         it { is_expected.to eq x: x, y: y }
       end
       
       # We should see our custom `#to_s` value
       
-      describe_attribute :to_s do
+      ATTRIBUTE :to_s do
         it { is_expected.to eq "(#{ x }, #{ y })" }
       end
       

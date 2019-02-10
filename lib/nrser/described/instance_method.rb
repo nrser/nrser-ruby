@@ -4,17 +4,14 @@
 # Requirements
 # =======================================================================
 
-# Stdlib
-# -----------------------------------------------------------------------
-
-# Deps
-# -----------------------------------------------------------------------
-
 # Project / Package
 # -----------------------------------------------------------------------
 
-# Extending {Object}
-require_relative './base'
+# Extending {Callable}
+require_relative './callable'
+
+# Describes {Instance}
+require_relative './instance'
 
 
 # Refinements
@@ -34,16 +31,20 @@ module  Described
 # Definitions
 # =======================================================================
 
-# @todo doc me
+# @todo doc me!
 # 
-class Callable < Object
+class InstanceMethod < Callable
   
   # Config
   # ========================================================================
   
-  subject_type t.RespondTo( :call )
+  subject_type ::UnboundMethod
   
-end # class Callable
+  subject_from module_: Module, name: Meta::Names::Method do |module_:, name:|
+    module_.instance_method name
+  end
+  
+end # class InstanceMethod
 
 
 # /Namespace

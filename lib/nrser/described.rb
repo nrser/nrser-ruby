@@ -10,6 +10,9 @@
 # Deps
 # -----------------------------------------------------------------------
 
+# Using {::String#camelize}
+require 'active_support/core_ext/string/inflections'
+
 # Using {::Class#descendants}
 require 'active_support/core_ext/class/subclasses'
 
@@ -24,11 +27,15 @@ require_relative './described/base'
 require_relative './described/class'
 require_relative './described/error'
 require_relative './described/hierarchy'
+require_relative './described/instance_method'
 require_relative './described/method'
 require_relative './described/module'
 require_relative './described/object'
 require_relative './described/response'
 
+
+require 'nrser/refinements/types'
+using NRSER::Types
 
 
 # Namespace
@@ -49,6 +56,32 @@ module Described
       full: full,
       options: options
   end
+  
+  
+  def self.class_name_for name_ish
+    camelized = name_ish.to_s.camelize
+    
+    prefix = "#{ self.name }::"
+    
+    unless camelized.start_with? prefix
+      camelized = prefix + camelized
+    end
+    
+    camelized
+  end
+  
+  
+  def self.class_for_name! class_name
+    t.SubclassOf( Base ).check! const_get( class_name_for class_name )
+  end
+  
+  
+  def self.class_for_name class_name
+    class_for_name! class_name
+  rescue Types::CheckError => error
+    nil
+  end
+  
 end # module Described
 
 

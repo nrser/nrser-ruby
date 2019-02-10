@@ -15,6 +15,7 @@ require_relative './kwds'
 # =======================================================================
 
 module  NRSER
+module  Described
 module  RSpec
 module  Format
 
@@ -138,4 +139,5 @@ end
 
 end # module  Format
 end # module  RSpec
+end # module  Described
 end # module  NRSER

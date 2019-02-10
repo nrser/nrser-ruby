@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+export NO_RSPEX=1
+rspec --require ./spec/support/described.rb "$@"

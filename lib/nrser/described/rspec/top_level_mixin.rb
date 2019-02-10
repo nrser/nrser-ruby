@@ -33,7 +33,7 @@ module TopLevelMixin
   # 
   def self.included base
     # Make the example group extensions available at the top-level
-    include ExampleGroup::Describe
+    base.send :include, ExampleGroup::Describe
   end
 
   

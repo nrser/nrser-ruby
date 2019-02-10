@@ -13,7 +13,7 @@
 # Project / Package
 # -----------------------------------------------------------------------
 
-require_relative "./object"
+require_relative "./module"
 
 
 # Namespace
@@ -27,7 +27,7 @@ module  Described
 # =======================================================================
 
 # @todo document {Class} class.
-class Class < Object
+class Class < Module
   subject_type ::Class
 end # class Class
 

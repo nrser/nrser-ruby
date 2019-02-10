@@ -1,11 +1,14 @@
 # encoding: UTF-8
 # frozen_string_literal: true
 
+require 'nrser/meta/names'
+
 
 # Namespace
 # =======================================================================
 
 module  NRSER
+module  Described
 module  RSpec
 module  ExampleGroup
 module  Describe
@@ -27,78 +30,30 @@ module  Describe
 # 
 def describe_method method,
                     *description,
-                    bind_subject: nil,
                     **metadata,
                     &body
+  
   case method
-  when Method
-    method_name = method.name
-    subject_block = -> { method }
-    bind_subject = true
-    name_string = NRSER::RSpec::Format.md_code_quote \
-      "#{ method.receiver }.#{ method.name }"
-  
-  when Symbol, String
-    method_name = method
-
-    # Due to legacy, we only auto-bind if the name is a symbol
-    # 
-    # TODO  Get rid of this
-    # 
-    bind_subject = method_name.is_a?( Symbol ) if bind_subject.nil?
-
-    subject_block = if bind_subject
-      -> { super().method method_name }
-    end
-
-    name_prefix = if  self.respond_to?( :metadata ) &&
-                      self.metadata.key?( :constructor_args )
-      '#'
-    else
-      '.'
-    end
-  
-    method = if self.try( :metadata )
-      getter = if self.metadata.key?( :constructor_args )
-        :instance_method
-      else
-        :method
-      end
-      
-      target = self.metadata[:class] || self.metadata[:module]
-      
-      if target
-        begin
-          target.public_send getter, method_name
-        rescue
-          nil
-        end
-      end
-    end
-  
-    name_string = NRSER::RSpec::Format.md_code_quote \
-      "#{ name_prefix }#{ method_name }"
+  when ::Method
+    DESCRIBE :method, subject: method, &body
   
   else
-    raise NRSER::TypeError.new \
-      "Expected Method, Symbol or String for `method_name`, found",
-      method_name
-    
-  end # case method_arg
-  
-  # Create the RSpec example group context
-  describe_x \
-    name_string,
-    NRSER::Meta::Source::Location.new( method ),
-    *description,
-    type: :method,
-    metadata: {
-      **metadata,
-      method_name: method_name,
-    },
-    bind_subject: bind_subject,
-    subject_block: subject_block,
-    &body
+    Meta::Names.match method,
+      Meta::Names::Method::Explicit::Singleton, ->( method_name ) {
+        const = method_name.receiver_name.constantize
+        method = const.method method_name.bare_name
+        
+        DESCRIBE :method, subject: method, &body
+      },
+      
+      Meta::Names::Method::Singleton, ->( method_name ) {
+        DESCRIBE :method, name: method_name.bare_name, &body
+      },
+      
+      Meta::Names::Method::Bare, ->( method_name ) {
+        DESCRIBE :method, name: method_name.bare_name, &body
+      }
+  end
 end # #describe_method
 
 alias_method :METHOD, :describe_method
@@ -110,4 +65,5 @@ alias_method :METHOD, :describe_method
 end # module Describe
 end # module ExampleGroup
 end # module RSpec
+end # module Described
 end # module NRSER

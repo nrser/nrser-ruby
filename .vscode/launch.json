@@ -5,6 +5,22 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "RSpec Described - Next Failure",
+      "type": "Ruby",
+      "request": "launch",
+      "program": "${workspaceRoot}/dev/bin/rspec",
+      "args": [
+        "--require",
+        "${workspaceRoot}/spec/support/described.rb",
+        "--next-failure",
+      ],
+      "useBundler": true,
+      "env": {
+        "VSCODE_RUBY_DEBUG": "TRUE",
+      }
+    },
+    
+    {
       "name": "Cucumber File",
       "type": "Ruby",
       "request": "launch",

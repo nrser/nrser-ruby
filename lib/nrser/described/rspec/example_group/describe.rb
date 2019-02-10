@@ -8,34 +8,37 @@
 # Project / Package
 # ------------------------------------------------------------------------
 
+require 'nrser/described/hierarchy/node'
+
 # Sub-tree
-require_relative './describe/describe_attribute'
-require_relative './describe/describe_bound_to'
-require_relative './describe/describe_called_with'
-require_relative './describe/describe_case'
+# require_relative './describe/describe_attribute'
+# require_relative './describe/describe_bound_to'
+# require_relative './describe/describe_called_with'
+# require_relative './describe/describe_case'
 require_relative './describe/describe_class'
-require_relative './describe/describe_each'
-require_relative './describe/describe_group'
-require_relative './describe/describe_instance_method'
-require_relative './describe/describe_instance'
-require_relative './describe/describe_message'
+# require_relative './describe/describe_each'
+# require_relative './describe/describe_group'
+# require_relative './describe/describe_instance_method'
+# require_relative './describe/describe_instance'
+# require_relative './describe/describe_message'
 require_relative './describe/describe_method'
-require_relative './describe/describe_module'
-require_relative './describe/describe_response_to'
-require_relative './describe/describe_section'
-require_relative './describe/describe_sent_to'
-require_relative './describe/describe_setup'
-require_relative './describe/describe_source_file'
-require_relative './describe/describe_spec_file'
-require_relative './describe/describe_subject'
-require_relative './describe/describe_when'
-require_relative './describe/describe_x'
+# require_relative './describe/describe_module'
+# require_relative './describe/describe_response_to'
+# require_relative './describe/describe_section'
+# require_relative './describe/describe_sent_to'
+# require_relative './describe/describe_setup'
+# require_relative './describe/describe_source_file'
+# require_relative './describe/describe_spec_file'
+# require_relative './describe/describe_subject'
+# require_relative './describe/describe_when'
+# require_relative './describe/describe_x'
 
 
 # Namespace
 # ========================================================================
 
 module  NRSER
+module  Described
 module  RSpec
 module  ExampleGroup
 
@@ -59,12 +62,74 @@ module  ExampleGroup
 # Methods are defined in separate source files for organization's sake.
 # 
 module Describe
+  
+  def self.description_for described
+    type = described.class.name.demodulize.underscore
+    
+    content = if described.resolved?
+      described.subject
+    else
+      described
+    end
+    
+    Described::RSpec::Format.description content, type: type
+  end
+  
+  
+  def hierarchy
+    metadata[ :hierarchy ] || super()
+  rescue
+    nil
+  end
+  
+  
+  def described
+    hierarchy.current
+  end
+  
+  
+  
+  def DESCRIBE  described_class_name,
+                description: nil,
+                metadata: {},
+                **kwds,
+                &body
+    described = \
+      NRSER::Described.
+        class_for_name( described_class_name ).
+        new( **kwds )
+    
+    hierarchy = if self.hierarchy
+      self.hierarchy.add described
+    else
+      Hierarchy::Node.new described
+    end
+    
+    begin
+      described.resolve! hierarchy
+    rescue
+    end
+    
+    describe(
+      Describe.description_for( described ),
+      **metadata,
+      described: described,
+      hierarchy: hierarchy,
+    ) do
+      subject {
+        described.resolve!( hierarchy ).subject
+      }
+      
+      module_exec &body
+    end
+  end
 end # module Describe
 
 
 # /Namespace
 # ========================================================================
 
-end # module ExampleGroup
-end # module RSpec
-end # module NRSER
+end # module  ExampleGroup
+end # module  RSpec
+end # module  Described
+end # module  NRSER

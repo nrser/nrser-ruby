@@ -8,19 +8,19 @@ SPEC_FILE(
   shared_examples described_class do |valid:, file:, line:|
     it { is_expected.to be_a( described_class ) }
     
-    describe_attribute :valid? do
+    ATTRIBUTE :valid? do
       it { is_expected.to be valid }
     end # Attribute valid? Description
     
-    describe_attribute :file do
+    ATTRIBUTE :file do
       it { is_expected.to eq file }
     end # Attribute file Description
     
-    describe_attribute :line do
+    ATTRIBUTE :line do
       it { is_expected.to eq line }
     end # Attribute line Description
     
-    describe_attribute :to_s do
+    ATTRIBUTE :to_s do
       it { is_expected.to eq "#{ file || '???' }:#{ line || '???' }" }
     end # Attribute to_s Description
     
@@ -34,11 +34,11 @@ SPEC_FILE(
       end # called with 1
     end # Method [] Description
     
-    describe_attribute :to_a do
+    ATTRIBUTE :to_a do
       it { is_expected.to eq [file, line] }
     end # Attribute to_a Description
     
-    describe_attribute :to_h do
+    ATTRIBUTE :to_h do
       it { is_expected.to be_a Hash }
       it { is_expected.to eq( {file: file, line: line}.compact ) }
     end # Attribute to_h Description

@@ -19,17 +19,13 @@ module  Describe
 # 
 def describe_attribute symbol, **metadata, &body
   symbol = symbol.to_sym
-
-  describe_x \
-    NRSER::RSpec::Format.md_code_quote( "##{ symbol }" ),
-    type: :attribute,
-    metadata: {
-      **metadata,
-      attribute_name: symbol,
-    },
-    subject_block: -> {
-      super().public_send symbol
-    },
+  
+  described = 
+  
+  describe_described \
+    :attribute,
+    name: symbol,
+    metadata: metadata,
     &body
 end # #describe_attribute
 

@@ -30,6 +30,7 @@ require_relative './format/kwds'
 # ============================================================================
 
 module  NRSER
+module  Described
 module  RSpec
 
 
@@ -107,7 +108,7 @@ module Format
   
   
   def self.italic string
-    public_send "#{ RSpec.configuration.x_style }_#{ __method__ }", string
+    public_send "#{ ::RSpec.configuration.x_style }_#{ __method__ }", string
   end
   
   singleton_class.send :alias_method, :i, :italic
@@ -129,7 +130,7 @@ module Format
   
   
   def self.bold string
-    public_send "#{ RSpec.configuration.x_style }_#{ __method__ }", string
+    public_send "#{ ::RSpec.configuration.x_style }_#{ __method__ }", string
   end
   
   singleton_class.send :alias_method, :b, :bold
@@ -137,7 +138,7 @@ module Format
   
   def self.rspec_syntax_highlighter
     @rspec_syntax_highlighter ||= \
-      RSpec::Core::Formatters::SyntaxHighlighter.new RSpec.configuration
+      ::RSpec::Core::Formatters::SyntaxHighlighter.new ::RSpec.configuration
   end
   
   
@@ -177,7 +178,7 @@ module Format
   def self.prepend_type type, description
     return description if type.nil?
     
-    prefixes = RSpec.configuration.x_type_prefixes
+    prefixes = ::RSpec.configuration.x_type_prefixes
     
     prefix = pastel.magenta(
       prefixes[type] || i( type.to_s.upcase.gsub('_', ' ') )
@@ -239,7 +240,7 @@ module Format
             
           when NRSER::Meta::Source::Location
             if part.valid?
-              "(#{ Pathname.new( part.file ).n_x.to_dot_rel_s. }:#{ part.line })"
+              "(#{ Pathname.new( part.file ).n_x.to_dot_rel_s }:#{ part.line })"
             else
               ''
             end
@@ -252,10 +253,10 @@ module Format
           
           when NRSER::Message
             [part.symbol, part.args].
-              map( &NRSER::RSpec.method( :short_s ) ).join( ', ' )
+              map( &method( :short_s ) ).join( ', ' )
             
           else
-            NRSER::RSpec.short_s part
+            short_s part
             
           end
         end
@@ -275,4 +276,5 @@ end # module Format
 # =======================================================================
 
 end # module RSpec
+end # module  Described
 end # module NRSER

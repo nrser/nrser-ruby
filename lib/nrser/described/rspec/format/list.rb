@@ -6,6 +6,7 @@
 # =======================================================================
 
 module  NRSER
+module  Described
 module  RSpec
 module  Format
 
@@ -39,6 +40,7 @@ end
 # /Namespace
 # =======================================================================
 
-end # module Format
-end # module RSpec
-end # module NRSER
+end # module  Format
+end # module  RSpec
+end # module  Described
+end # module  NRSER

@@ -221,6 +221,31 @@ module Hierarchy
   end
   
   
+  def find_by_class class_, touch: true
+    find do |described|
+      if described.is_a? class_
+        touch( described ) if touch
+        true
+      end
+    end
+  end
+  
+  
+  def find_by_class_name class_name
+    find_by_class Described.class_for_name( class_name )
+  end
+  
+  
+  def find_by_class_name! class_name
+    find_by_class_name( class_name ).tap do |described|
+      if described.nil?
+        raise NRSER::NotFoundError.new \
+          "Could not find described class with name", class_name.inspect
+      end
+    end
+  end
+  
+  
 end # module Hierarchy
 
 

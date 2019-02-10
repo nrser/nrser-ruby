@@ -24,6 +24,7 @@ require_relative './example_group/overrides'
 # =======================================================================
 
 module  NRSER
+module  Described
 module  RSpec
 
 
@@ -51,4 +52,5 @@ end # module ExampleGroup
 # ========================================================================
 
 end # module RSpec
+end # module  Described
 end # module NRSER

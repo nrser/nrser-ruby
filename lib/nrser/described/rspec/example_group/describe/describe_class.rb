@@ -5,6 +5,7 @@
 # =======================================================================
 
 module  NRSER
+module  Described
 module  RSpec
 module  ExampleGroup
 module  Describe
@@ -19,23 +20,13 @@ module  Describe
 # 
 def describe_class  klass,
                     *description,
-                    bind_subject: true,
                     **metadata,
                     &body
-  subject_block = if bind_subject
-    -> { klass }
-  end
-  
-  describe_x \
-    NRSER::RSpec::Format.md_code_quote( klass.name ),
-    klass.source_location,
-    *description,
-    type: :class,
-    metadata: {
-      **metadata,
-      class: klass,
-    },
-    subject_block: subject_block,
+  DESCRIBE \
+    :class,
+    subject: klass,
+    description: description,
+    metadata: metadata,
     &body
 end # #describe_class
 
@@ -48,4 +39,5 @@ alias_method :CLASS, :describe_class
 end # module Describe
 end # module ExampleGroup
 end # module RSpec
+end # module Described
 end # module NRSER

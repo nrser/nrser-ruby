@@ -17,6 +17,7 @@ require_relative './example/logger'
 # ========================================================================
 
 module  NRSER
+module  Described
 module  RSpec
 
 
@@ -29,7 +30,7 @@ module Example
   include Logger
   
   def described_class
-    self.class.metadata[:class] || super
+    self.class.hierarchy.find_by_class Described::Class
   end
 
 
@@ -55,7 +56,7 @@ module Example
   # @return [void]
   # 
   def self.included base
-    base.extend NRSER::RSpec::ExampleGroup::Overrides
+    base.extend Described::RSpec::ExampleGroup::Overrides
   end
   
 end # module Example
@@ -64,5 +65,6 @@ end # module Example
 # /Namespace
 # ========================================================================
 
-end # module RSpec
-end # module NRSER
+end # module  RSpec
+end # module  Described
+end # module  NRSER

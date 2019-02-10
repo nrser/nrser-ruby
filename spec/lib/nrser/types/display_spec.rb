@@ -39,7 +39,7 @@ SPEC_FILE(
         if col_name.start_with? '#'
           method_name = col_name[1..-1].to_sym
 
-          describe_attr method_name do
+          ATTRIBUTE method_name do
             it { is_expected.to eq value }
           end
         end

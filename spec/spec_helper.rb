@@ -21,7 +21,10 @@ require 'pry'
 # -----------------------------------------------------------------------
 require 'nrser'
 require 'nrser/refinements/types'
-require 'nrser/rspex'
+
+unless ENV[ "NO_RSPEX" ]
+  require 'nrser/rspex'
+end
 
 # Local Tree
 # ----------------------------------------------------------------------------

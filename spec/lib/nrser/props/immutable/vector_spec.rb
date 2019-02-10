@@ -99,24 +99,24 @@ describe NRSER::Props::Immutable::Vector do
       # as well as via the `#x` and `#y` attribute reader methods that
       # {NRSER::Props} creates:
       
-      describe_attribute :x do
+      ATTRIBUTE :x do
         it { is_expected.to be x }
       end
       
-      describe_attribute :y do
+      ATTRIBUTE :y do
         it { is_expected.to be y }
       end
       
       # Converting to an array should be equal to `[x, y]`:
       
-      describe_attribute :to_a do
+      ATTRIBUTE :to_a do
         it { is_expected.to eq [x, y] }
       end
       
       # However, {NRSER::Props} *overrides* `#to_h` to provide a {Hash} of
       # the props by name, so that will behave differently
       
-      describe_attribute :to_h do
+      ATTRIBUTE :to_h do
         it { is_expected.to eq x: x, y: y }
       end
       

@@ -6,6 +6,7 @@
 # =======================================================================
 
 module  NRSER
+module  Described
 module  RSpec
 module  ExampleGroup
 
@@ -223,6 +224,7 @@ end # module Logger
 # /Namespace
 # =======================================================================
 
-end # module ExampleGroup
-end # module RSpec
-end # module NRSER
+end # module  ExampleGroup
+end # module  RSpec
+end # module  Described
+end # module  NRSER

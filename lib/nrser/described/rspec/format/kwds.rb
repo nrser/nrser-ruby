@@ -14,6 +14,7 @@ require_relative './list'
 # =======================================================================
 
 module  NRSER
+module  Described
 module  RSpec
 module  Format
 
@@ -45,4 +46,5 @@ end
 
 end # module  Format
 end # module  RSpec
+end # module  Described
 end # module  NRSER

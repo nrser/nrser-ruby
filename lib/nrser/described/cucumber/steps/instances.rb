@@ -86,6 +86,19 @@ module Instances
         describe :instance, class_: described.resolve!( hierarchy ).subject
       end
     end
+    
+    
+  CREATE_A_NEW_INSTANCE_FROM,
+  CONSTRUCT_AN_INSTANCE_FROM = \
+    [
+      "I create a new instance of {class} from {values}",
+      "I construct an instance of {class} from {values}",
+    ].map do |template|
+      Step template do |described, values|
+        describe_positional_params values
+        describe :instance, class_: described.resolve!( hierarchy ).subject
+      end
+    end
   
   
   CREATE_A_NEW_INSTANCE_WITH_NO_PARAMETERS,
