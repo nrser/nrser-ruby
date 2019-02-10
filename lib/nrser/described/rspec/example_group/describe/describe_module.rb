@@ -6,6 +6,7 @@
 # =======================================================================
 
 module  NRSER
+module  Described
 module  RSpec
 module  ExampleGroup
 module  Describe
@@ -14,16 +15,11 @@ module  Describe
 # Definitions
 # ========================================================================
 
-def describe_module mod, bind_subject: true, **metadata, &body
-  describe_x \
-    mod,
-    type: :module,
-    metadata: {
-      module: mod,
-      **metadata,
-    },
-    bind_subject: bind_subject,
-    subject_block: -> { mod },
+def describe_module mod, *description, **metadata, &body
+  DESCRIBE :module,
+    subject: mod,
+    description: description,
+    metadata: metadata,
     &body
 end # #describe_module
 
@@ -37,4 +33,5 @@ alias_method :MODULE, :describe_module
 end # module Describe
 end # module ExampleGroup
 end # module RSpec
+end # module Described
 end # module NRSER

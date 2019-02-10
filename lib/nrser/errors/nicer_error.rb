@@ -5,14 +5,16 @@
 # Requirements
 # ========================================================================
 
-# Stdlib
-# ------------------------------------------------------------------------
+### Stdlib ###
 
 # Using {PP.pp} as default dumper.
 require 'pp'
 
-# Project / Package
-# ------------------------------------------------------------------------
+### Deps ###
+
+require 'active_support/core_ext/string/indent'
+
+### Project / Package ###
 
 require 'nrser/core_ext/object/lazy_var'
 

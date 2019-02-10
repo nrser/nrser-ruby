@@ -7,11 +7,11 @@
 # Project / Package
 # -----------------------------------------------------------------------
 
-# Extending {Callable}
-require_relative './callable'
+# Extending {Object}
+require_relative './object'
 
-# Describes {Instance}
-require_relative './instance'
+# Describes {Module}
+require_relative './module'
 
 
 # Refinements
@@ -33,7 +33,7 @@ module  Described
 
 # @todo doc me!
 # 
-class InstanceMethod < Callable
+class InstanceMethod < Object
   
   # Config
   # ========================================================================

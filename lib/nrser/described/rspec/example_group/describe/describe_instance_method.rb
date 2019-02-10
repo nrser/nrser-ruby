@@ -5,6 +5,7 @@
 # =======================================================================
 
 module  NRSER
+module  Described
 module  RSpec
 module  ExampleGroup
 module  Describe
@@ -13,33 +14,31 @@ module  Describe
 # Definitions
 # ========================================================================
 
-def describe_instance_method name,
+def describe_instance_method method,
                     *description,
-                    bind_subject: true,
                     **metadata,
                     &body
-
-  subject_block = -> {
-    super_subject = super()
+  
+  case method
+  when ::UnboundMethod
+    DESCRIBE :instance_method, *description, subject: method, &body
     
-    if super_subject.is_a? Module
-      super_subject.instance_method name
-    else
-      super_subject.method name
-    end
-  }
-
-  describe_x \
-    "##{ name }",
-    *description,
-    type: :instance_method,
-    bind_subject: bind_subject,
-    subject_block: subject_block,
-    metadata: {
-      **metadata,
-      instance_method_name: name,
-    },
-    &body
+  else
+    Meta::Names.match method,
+      Meta::Names::Method::Explicit::Instance, ->( method_name ) {
+        const = method_name.receiver_name.constantize
+        unbound_method = const.instance_method method_name.bare_name
+        DESCRIBE :instance_method, *description, subject: unbound_method, &body
+      },
+      
+      Meta::Names::Method::Instance, ->( method_name ) {
+        DESCRIBE :instance_method, *description, name: method_name.bare_name, &body
+      },
+      
+      Meta::Names::Method::Bare, ->( method_name ) {
+        DESCRIBE :instance_method, *description, name: method_name, &body
+      }
+  end
 end # #describe_method
 
 alias_method :INSTANCE_METHOD, :describe_instance_method
@@ -48,7 +47,8 @@ alias_method :INSTANCE_METHOD, :describe_instance_method
 # /Namespace
 # ========================================================================
 
-end # module Describe
-end # module ExampleGroup
-end # module RSpec
-end # module NRSER
+end # module  Describe
+end # module  ExampleGroup
+end # module  RSpec
+end # module  Described
+end # module  NRSER

@@ -44,6 +44,11 @@ module Example
   end
   
   
+  def hierarchy
+    self.class.hierarchy
+  end
+  
+  
   # HACK HACK HACK-ITY HACK
   # 
   # Hook used to `#extend` `base` with

@@ -47,16 +47,6 @@ module  World
 # 
 module Describe
   
-  # Constants
-  # ========================================================================
-  
-  # Shortcut to {NRSER::Meta::Names}.
-  # 
-  # @return [::Module]
-  # 
-  Names = NRSER::Meta::Names
-  
-  
   # Instance Methods
   # ========================================================================
   
@@ -156,30 +146,30 @@ module Describe
   #   of {NRSER::Meta::Names::Method}.
   #
   def describe_method name
-    Names.match name,
-      Names::Method::Explicit::Singleton, ->( method_name ) {
+    Meta::Names.match name,
+      Meta::Names::Method::Explicit::Singleton, ->( method_name ) {
         const = resolve_const method_name.receiver_name
         method = const.method method_name.bare_name
         
         describe :method, subject: method
       },
       
-      Names::Method::Explicit::Instance, ->( method_name ) {
+      Meta::Names::Method::Explicit::Instance, ->( method_name ) {
         const = resolve_const method_name.receiver_name
         unbound_method = const.instance_method method_name.bare_name
         
         describe :instance_method, subject: unbound_method
       },
       
-      Names::Method::Singleton, ->( method_name ) {
+      Meta::Names::Method::Singleton, ->( method_name ) {
         describe :method, name: method_name.bare_name
       },
       
-      Names::Method::Instance, ->( method_name ) {
+      Meta::Names::Method::Instance, ->( method_name ) {
         describe :instance_method, name: method_name.bare_name
       },
       
-      NRSER::Meta::Names::Method::Bare, ->( method_name ) {
+      Meta::NRSER::Meta::Names::Method::Bare, ->( method_name ) {
         describe :method, name: method_name.bare_name
       }
   end # #describe_method

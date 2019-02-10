@@ -6,6 +6,7 @@
 # =======================================================================
 
 module  NRSER
+module  Described
 module  RSpec
 module  ExampleGroup
 module  Describe
@@ -35,18 +36,9 @@ module  Describe
 # 
 # @return [void]
 # 
-def describe_called_with *args, &body
-  args = RSpec::Format::Args.new args
-
-  subject_block = -> { super().call *args }
-  
-  describe_x Args(*args),
-    type: :called_with,
-    metadata: {
-      called_with_args: args,
-    },
-    subject_block: subject_block,
-    &body
+def describe_called_with *args, **kwds, &body
+  params = Meta::Params.new args: args, kwds: kwds
+  DESCRIBE :response, params: params, &body
 end # #describe_called_with
 
 
@@ -77,4 +69,5 @@ alias_method :CALLED, :describe_called
 end # module Describe
 end # module ExampleGroup
 end # module RSpec
+end # module Described
 end # module NRSER

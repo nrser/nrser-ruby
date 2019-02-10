@@ -5,6 +5,7 @@
 # =======================================================================
 
 module  NRSER
+module  Described
 module  RSpec
 module  ExampleGroup
 module  Describe
@@ -21,30 +22,9 @@ module  Describe
 # 
 # @return [void]
 # 
-def describe_instance *constructor_args, &body
-  constructor_args = Args *constructor_args
-
-  constructor = -> {
-    described_class.new *constructor_args # *described_constructor_args
-  }
-
-  subject_block = if metadata[ :instance_method_name ]
-    -> {
-        described_class.
-          new( *constructor_args ).
-          method( self.class.metadata[ :instance_method_name ] )
-      }
-  else
-    -> { described_class.new *constructor_args }
-  end
-
-  describe_x ".new", constructor_args,
-    type: :instance,
-    metadata: {
-      constructor_args: constructor_args,
-    },
-    subject_block: subject_block,
-    &body
+def describe_instance *args, **kwds, &body
+  params = Meta::Params.new args: args, kwds: kwds
+  DESCRIBE :instance, params: params, &body
 end # #describe_instance
 
 alias_method :INSTANCE, :describe_instance
@@ -53,7 +33,8 @@ alias_method :INSTANCE, :describe_instance
 # /Namespace
 # ========================================================================
 
-end # module Describe
-end # module ExampleGroup
-end # module RSpec
-end # module NRSER
+end # module  Describe
+end # module  ExampleGroup
+end # module  RSpec
+end # module  Described
+end # module   NRSER

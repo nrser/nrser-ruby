@@ -11,18 +11,18 @@
 require 'nrser/described/hierarchy/node'
 
 # Sub-tree
-# require_relative './describe/describe_attribute'
+require_relative './describe/describe_attribute'
 # require_relative './describe/describe_bound_to'
-# require_relative './describe/describe_called_with'
+require_relative './describe/describe_called_with'
 # require_relative './describe/describe_case'
 require_relative './describe/describe_class'
 # require_relative './describe/describe_each'
 # require_relative './describe/describe_group'
-# require_relative './describe/describe_instance_method'
-# require_relative './describe/describe_instance'
+require_relative './describe/describe_instance_method'
+require_relative './describe/describe_instance'
 # require_relative './describe/describe_message'
 require_relative './describe/describe_method'
-# require_relative './describe/describe_module'
+require_relative './describe/describe_module'
 # require_relative './describe/describe_response_to'
 # require_relative './describe/describe_section'
 # require_relative './describe/describe_sent_to'
@@ -66,7 +66,7 @@ module Describe
   def self.description_for described
     type = described.class.name.demodulize.underscore
     
-    content = if described.resolved?
+    content = if described.resolved? && described.subject?
       described.subject
     else
       described
@@ -88,7 +88,6 @@ module Describe
   end
   
   
-  
   def DESCRIBE  described_class_name,
                 description: nil,
                 metadata: {},
@@ -105,9 +104,12 @@ module Describe
       Hierarchy::Node.new described
     end
     
+    # *Try* to resolve to description. It may fail if it needs others that will
+    # be defined further inside, but many (most?) will succeed at this point,
+    # which lets us contribute nicer description strings for the output
     begin
       described.resolve! hierarchy
-    rescue
+    rescue Described::Resolution::AllFailedError => error
     end
     
     describe(
@@ -117,7 +119,7 @@ module Describe
       hierarchy: hierarchy,
     ) do
       subject {
-        described.resolve!( hierarchy ).subject
+        described.resolve!( self.hierarchy ).subject
       }
       
       module_exec &body

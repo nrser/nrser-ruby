@@ -5,6 +5,24 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "RSpec - active spec file only",
+      "type": "Ruby",
+      "request": "launch",
+      "program": "${workspaceRoot}/dev/bin/rspec",
+      "args": [
+        "--require",
+        "${workspaceRoot}/spec/support/described.rb",
+        "--fail-fast",
+        "${file}",
+      ],
+      "useBundler": true,
+      "env": {
+        "VSCODE_RUBY_DEBUG": "TRUE",
+      }
+    },
+    
+    
+    {
       "name": "RSpec Described - Next Failure",
       "type": "Ruby",
       "request": "launch",
@@ -19,6 +37,7 @@
         "VSCODE_RUBY_DEBUG": "TRUE",
       }
     },
+    
     
     {
       "name": "Cucumber File",

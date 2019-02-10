@@ -94,6 +94,7 @@ class Node
   #   @return [Hierarchy] self
   # 
   def each &block
+    return enum_for( __method__ ) if block.nil?
     block.call @described
     @parent.each( &block ) if @parent
   end

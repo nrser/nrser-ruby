@@ -16,6 +16,11 @@ require_relative './callable'
 # Describes {Params}
 require_relative './parameters'
 
+# Describes {Instance}
+require_relative './instance'
+
+# Describes {InstanceMethod}
+require_relative './instance_method'
 
 # Refinements
 # =======================================================================
@@ -43,6 +48,14 @@ class Response < Object
   
   subject_from callable: Callable, params: Parameters do |callable:, params:|
     params.call callable
+  end
+  
+  subject_from \
+    instance: Instance,
+    instance_method: InstanceMethod,
+    params: Parameters \
+  do |instance:, instance_method:, params:|
+    params.call instance_method.bind( instance )
   end
   
 end # class Response
