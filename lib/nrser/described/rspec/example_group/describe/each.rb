@@ -2,17 +2,11 @@
 # frozen_string_literal: true
 
 
-# Refinements
-# ========================================================================
-
-require 'nrser/refinements/sugar'
-using NRSER::Sugar
-
-
 # Namespace
 # =======================================================================
 
 module  NRSER
+module  Described
 module  RSpec
 module  ExampleGroup
 module  Describe
@@ -29,7 +23,7 @@ module  Describe
 # 
 # @return (see #describe_x)
 # 
-def describe_each *lists, **metadata, &body
+def EACH *lists, **metadata, &body
   names = body.parameters.map { |(type, symbol)| symbol }
 
   description = names.map { |name| "{ #{ name } }" }.join( ' × ' )
@@ -53,15 +47,14 @@ def describe_each *lists, **metadata, &body
       end
     end
   end
-end # #describe_instance
-
-alias_method :EACH, :describe_each
+end # #EACH
 
 
 # /Namespace
 # ========================================================================
 
-end # module Describe
-end # module ExampleGroup
-end # module RSpec
-end # module NRSER
+end # module  Describe
+end # module  ExampleGroup
+end # module  RSpec
+end # module  Described
+end # module  NRSER

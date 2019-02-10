@@ -169,7 +169,7 @@ module Describe
         describe :instance_method, name: method_name.bare_name
       },
       
-      Meta::NRSER::Meta::Names::Method::Bare, ->( method_name ) {
+      Meta::Names::Method::Bare, ->( method_name ) {
         describe :method, name: method_name.bare_name
       }
   end # #describe_method

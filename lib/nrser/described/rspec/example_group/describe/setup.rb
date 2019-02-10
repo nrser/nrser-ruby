@@ -6,6 +6,7 @@
 # =======================================================================
 
 module  NRSER
+module  Described
 module  RSpec
 module  ExampleGroup
 module  Describe
@@ -21,15 +22,13 @@ module  Describe
 # 
 # @return [void]
 # 
-def describe_setup *description, **metadata, &body
+def SETUP *description, **metadata, &body
   describe_x \
     *description,
     type: :setup,
     metadata: metadata,
     &body
-end # #describe_setup
-
-alias_method :SETUP, :describe_setup
+end # #SETUP
 
 
 # /Namespace
@@ -38,4 +37,5 @@ alias_method :SETUP, :describe_setup
 end # module Describe
 end # module ExampleGroup
 end # module RSpec
+end # module Described
 end # module NRSER

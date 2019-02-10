@@ -5,14 +5,14 @@ SPEC_FILE(
   method: :dedent,
 ) do
   
-  describe_section "Newline literals in HEREDOCs" do
+  CASE "Newline literals in HEREDOCs" do
   # ========================================================================
     
     subject do
       super().call input
     end
     
-    describe_group "when a HEREDOC has a with literal \\n" do
+    WHEN "when a HEREDOC has a with literal \\n" do
     # ========================================================================
       
       let :input do
@@ -35,7 +35,7 @@ SPEC_FILE(
     # ************************************************************************
     
     
-    describe_group "when the HEREDOC uses $/ instead of \\n" do
+    WHEN "when the HEREDOC uses $/ instead of \\n" do
       let :input do
         <<-END
           <%= headline %>
@@ -52,9 +52,9 @@ SPEC_FILE(
         expect( subject.lines.first ).to match /\A\S+/
       end
       
-    end # Group "when the HEREDOC uses $/ instead of \\n" Description
+    end # WHEN "when the HEREDOC uses $/ instead of \\n" Description
     
-  end # section Newline literals in HEREDOCs
+  end # CASE Newline literals in HEREDOCs
   # ************************************************************************
   
 end # SPEC_FILE

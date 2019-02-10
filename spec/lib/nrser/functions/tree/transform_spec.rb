@@ -1,7 +1,7 @@
-describe "NRSER.transform" do
+METHOD "NRSER.transform" do
   subject { NRSER.transform tree, source }
   
-  describe_section "Simple Examples" do
+  CASE "Simple Examples" do
   # ========================================================================
     
     describe "value swap in {x: 'ex', y: 'why?'}" do
@@ -83,11 +83,11 @@ describe "NRSER.transform" do
     end # arrays in tree
     
     
-  end # section simple examples
+  end # CASE simple examples
   # ************************************************************************
   
   
-  describe_section "Real-World Examples" do
+  CASE "Real-World Examples" do
   # ========================================================================
     
     describe "Address" do
@@ -149,7 +149,7 @@ describe "NRSER.transform" do
       
     end # Address
     
-  end # section Real-World Examples
+  end # CASE Real-World Examples
   # ************************************************************************
   
   

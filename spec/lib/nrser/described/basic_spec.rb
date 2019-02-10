@@ -1,3 +1,6 @@
+
+if ENV[ 'NO_RSPEX' ]
+
 MODULE NRSER::Described do
 
   CLASS NRSER::Described::Base do
@@ -34,4 +37,6 @@ CLASS ::Array do
       end
     end
   end
+end
+
 end

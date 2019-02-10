@@ -139,12 +139,12 @@ SPEC_FILE(
       end
       
       
-      describe_case "From an `{x: Integer, y: Integer}` literal `Hash`" do
+      CASE "From an `{x: Integer, y: Integer}` literal `Hash`" do
       # ------------------------------------------------------------------------
         
         # Let the `source` be the {Hash} `{x: 1, y: 2}`.
         
-        describe_when source: {x: 1, y: 2} do
+        WHEN source: {x: 1, y: 2} do
           
           # Now we should be able to construct a point. Test that it behaves
           # like we defined above:
@@ -155,7 +155,7 @@ SPEC_FILE(
       end
       
       
-      describe_case "From a `Hamster::Hash[x: Integer, y: Integer]`" do
+      CASE "From a `Hamster::Hash[x: Integer, y: Integer]`" do
       # --------------------------------------------------------------------
       # 
       # All that `#initialize` cares about is that it can access the `source`
@@ -163,7 +163,7 @@ SPEC_FILE(
       # index by looking for `#each_pair` and `#each_index`, respectively.
       # 
         
-        describe_when source: Hamster::Hash[x: 1, y: 2] do
+        WHEN source: Hamster::Hash[x: 1, y: 2] do
 
           # Now we should be able to construct a point. Test that it behaves
           # like we defined above:
@@ -172,11 +172,12 @@ SPEC_FILE(
           
         end
       end
-    end # .new - Creating a Point
+      
+    end # SETUP "Creating a Point from `source`"
     # ************************************************************************
     
     
-    describe_section "Deriving a new point from another" do
+    SETUP "Deriving a new point from another" do
     # ========================================================================
     # 
     # Our point instances are immutable, but we can use {Hamster::Vector}'s
@@ -191,7 +192,7 @@ SPEC_FILE(
       
       # and we can play around with a few {Hamster::Vector} methods...
       
-      describe_method :put do
+      METHOD :put do
         
         # Change the value at entry 0 to 2
         
@@ -208,7 +209,7 @@ SPEC_FILE(
       end # Method put Description
       
       
-      describe_method :map do
+      METHOD :map do
         
         # We have to do some manual funkiness here 'cause
         # `describe_called_with` doesn't take a block...
@@ -249,7 +250,7 @@ SPEC_FILE(
       end # Method map Description
       
       
-      describe_section "Adding extra keys and values" do
+      CASE "Adding extra keys and values" do
       # ======================================================================
       # 
       # At the moment, we *can* add *extra* keys and values to the point.
@@ -287,10 +288,10 @@ SPEC_FILE(
           end # called with :z, 3
         end # Method put Description
         
-      end # section Adding extra keys and values
+      end # CASE Adding extra keys and values
       # **********************************************************************
       
-    end # section Deriving a new point from another
+    end # SETUP Deriving a new point from another
     # ************************************************************************
     
   end # Simple 2D Integer Point

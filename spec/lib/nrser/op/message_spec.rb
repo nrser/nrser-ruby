@@ -2,11 +2,11 @@ require 'nrser/refinements/types'
 using NRSER::Types
 
 
-describe NRSER::Message, type: :class do
+CLASS NRSER::Message do
   
-  describe "#to_proc" do
+  INSTANCE_METHOD "#to_proc" do
         
-    describe_section "mapping an Enumerable using &message" do
+    CASE "mapping an Enumerable using &message" do
       subject { ->( message ) { enum.map &message } }
       
       WHEN enum: [ [], [1], [1, 2] ] do
@@ -26,7 +26,7 @@ describe NRSER::Message, type: :class do
   end # #to_proc
   
   
-  describe_section "Refinements" do
+  CASE "Refinements" do
   # ========================================================================
     
     describe "Array#to_message" do
@@ -41,16 +41,18 @@ describe NRSER::Message, type: :class do
               block:  nil
         }
         
-        describe_sent_to x: 'ex', y: 'why?' do
-          it { is_expected.to eq 'ex' }
-        end # sent to x: 1, y: 2
+        METHOD :send_to do
+          CALLED_WITH x: 'ex', y: 'why?' do
+            it { is_expected.to eq 'ex' }
+          end
+        end
         
       end # array: [:fetch, :x]
       
     end # Array#to_message
     
     
-  end # section Refinements
+  end # CASE Refinements
   # ************************************************************************
   
   

@@ -123,7 +123,7 @@ describe NRSER::Props::Immutable::Vector do
     end
     
     
-    describe_section "Creating a Point" do
+    CASE "Creating a Point" do
     # ========================================================================
       
       # Our subject will be a Point2dInt created from a `source` value that we
@@ -216,11 +216,11 @@ describe NRSER::Props::Immutable::Vector do
         it_behaves_like "Point2DInt", source.to_h
         
       end
-    end # section Creating a Point
+    end # CASE Creating a Point
     # ************************************************************************
     
     
-    describe_section "Deriving a new point from another" do
+    CASE "Deriving a new point from another" do
     # ========================================================================
     # 
     # Our point instances are immutable, but we can use {Hamster::Vector}'s
@@ -289,7 +289,7 @@ describe NRSER::Props::Immutable::Vector do
         
       end # Method map Description
       
-    end # section Deriving a new point from another
+    end # CASE Deriving a new point from another
     # ************************************************************************
     
   end # Simple 2D Integer Point

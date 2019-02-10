@@ -48,6 +48,7 @@ def describe_instance *constructor_args, &body
 end # #describe_instance
 
 alias_method :INSTANCE, :describe_instance
+alias_method :INSTANCE_FROM, :describe_instance
 
 
 # /Namespace

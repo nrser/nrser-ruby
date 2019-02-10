@@ -1,14 +1,14 @@
 # Examples
 # =====================================================================
 
-describe_method "NRSER.transformer" do
+METHOD "NRSER.transformer" do
 # ========================================================================
 # 
 # Basically the same {NRSER.transform} tests but using {NRSER.transformer}
 # to build the trees instead of {#sender}, {#chainer}, etc.
 # 
   
-  describe_section "Simple Examples" do
+  CASE "Simple Examples" do
   # ========================================================================
   
     subject { NRSER.transform tree, source }
@@ -98,11 +98,11 @@ describe_method "NRSER.transformer" do
     end # arrays in tree
     
     
-  end # section simple examples
+  end # CASE simple examples
   # ************************************************************************
   
   
-  describe_section "Real-World Examples" do
+  CASE "Real-World Examples" do
   # ========================================================================
     
     describe "Address" do
@@ -164,7 +164,7 @@ describe_method "NRSER.transformer" do
       
     end # Address
     
-  end # section Real-World Examples
+  end # CASE Real-World Examples
   # ************************************************************************
   
   

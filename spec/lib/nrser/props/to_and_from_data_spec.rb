@@ -4,9 +4,9 @@ require 'nrser/props/immutable/hash_variable'
 using NRSER::Types
 
 
-describe NRSER::Props do
+MODULE NRSER::Props do
   
-  describe_section "to and from data" do
+  CASE "to and from data" do
   # ========================================================================
     
     non_empty_str = t.non_empty_str
@@ -24,7 +24,7 @@ describe NRSER::Props do
       end
     }
     
-    describe_group "simple nesting" do
+    WHEN "simple nesting" do
       
       before( :all ) {
         # IMPORTANT!!!  must bind *outside* the class declaration; can't use
@@ -73,10 +73,10 @@ describe NRSER::Props do
         expect( restored.to_data ).to eq data
       end
       
-    end # Group "simple nesting" Description
+    end # WHEN "simple nesting" Description
     
     
-  end # section to and from data
+  end # CASE to and from data
   # ************************************************************************
   
 end
