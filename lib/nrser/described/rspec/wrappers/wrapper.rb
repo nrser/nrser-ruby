@@ -27,6 +27,11 @@ module  Wrappers
 # Definitions
 # =======================================================================
 
+# Basically, a block that's going to be evaluated in a different environment.
+# 
+# In practical use, a block created in an *example group* that can only be 
+# evaluated in an *example*.
+#
 class Wrapper
   def initialize description: nil, &block
     case description
