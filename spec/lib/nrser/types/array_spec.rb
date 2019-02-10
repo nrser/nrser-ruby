@@ -46,13 +46,8 @@ SPEC_FILE(
       },
     },
     
-    and_is_expected: {
-      to: {
-        have_attributes: {
-          class: t::ArrayType,
-          name: 'Array',
-        }
-      }
+    block: -> {
+      it { is_expected.to have_attributes class: t::ArrayType, name: 'Array' }
     }
   
   include_examples 'make type',

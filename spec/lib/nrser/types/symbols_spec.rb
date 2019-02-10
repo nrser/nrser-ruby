@@ -22,12 +22,8 @@ describe "NRSER::Types.non_empty_sym" do
         
       }
     },
-    and_is_expected: {
-      to: {
-        have_attributes: {
-          name: 'NonEmptySymbol'
-        }
-      }
+    block: -> {
+      it { is_expected.to have_attributes name: 'NonEmptySymbol' }
     }
   
 end # NRSER::Types.non_empty_sym

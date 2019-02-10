@@ -42,23 +42,6 @@ using NRSER
 # Helpers
 # =====================================================================
 
-# Merge "expectation" hashes by appending all clauses for each state.
-# 
-# @param [Array<Hash>] expectations
-#   Splat of "expectation" hashes - see the examples.
-# 
-def merge_expectations *expectations
-  Hash.new { |result, state|
-    result[state] = []
-  }.tap { |result|
-    expectations.each { |ex|
-      ex.each { |state, clauses|
-        result[state] += clauses.to_a
-      }
-    }
-  }
-end
-
 class Wrapper
   def initialize description: nil, &block
     case description

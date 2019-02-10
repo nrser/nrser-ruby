@@ -19,18 +19,18 @@ shared_examples "make type" do |  args: [],
                                   rejects: [],
                                   to_data: {},
                                   from_s: nil,
-                                  **expectations |
+                                  block: nil |
   context "#call #{ args.map(&:inspect).join ', ' }" do
     # Load the type into the subject by applying the parent scope subject,
     # which should be the Type maker method that we want to test, to the
     # args we received.
     subject{ super().call *args }
     
-    # Expect that it's a {NRSER::Types::Type} and any other expectations that
-    # may have been passed in.
-    include_examples "expect subject",
-      { to: { be_a: NRSER::Types::Type } },
-      *expectations.values
+    # Expect that it's a {NRSER::Types::Type}
+    it { is_expected.to be_a NRSER::Types::Type }
+    
+    # Evaluate any other expectations or whatever in the `&block`
+    module_exec( &block ) if block
     
     describe "#test" do
       # Make sure it accepts the accepts

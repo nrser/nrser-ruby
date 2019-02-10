@@ -30,12 +30,8 @@ describe "NRSER::Types.length" do
       [1, 2, 3, 4, 5, 6]
     ],
     
-    and_is_expected: {
-      to: {
-        have_attributes: {
-          name: '3to5Type',
-        }
-      }
+    block: -> {
+      it { is_expected.to have_attributes name: '3to5Type' }
     }
     
 end # NRSER::Types.length

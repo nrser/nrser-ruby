@@ -36,12 +36,8 @@ SPEC_FILE(
         Pathname.getwd,
       ],
       
-      and_is_expected: {
-        to: {
-          have_attributes: {
-            name: 'FilePath',
-          }
-        }
+      block: -> {
+        it { is_expected.to have_attributes name: 'FilePath' }
       }
     
     WHEN "custom name" do
@@ -58,13 +54,10 @@ SPEC_FILE(
           Pathname.getwd,
         ],
         
-        and_is_expected: {
-          to: {
-            have_attributes: {
-              name: 'CustomType',
-            }
-          }
+        block: -> {
+          it { is_expected.to have_attributes name: 'CustomType' }
         }
+
     end # WHEN custom name
       
   end # METHOD .dir_path
@@ -81,12 +74,8 @@ SPEC_FILE(
         'hey/ho',
       ],
       
-      and_is_expected: {
-        to: {
-          have_attributes: {
-            name: 'POSIXPathSegment',
-          }
-        }
+      block: -> {
+        it { is_expected.to have_attributes name: 'POSIXPathSegment' }
       }
     
   end # METHOD .path_seg

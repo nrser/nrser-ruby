@@ -42,12 +42,10 @@ describe NRSER::Props do
           describe "prop `#{ name }`" do
             subject { super()[name] }
             
-            include_examples "expect subject", to: {
-              be_a: NRSER::Props::Prop,
-              have_attributes: {
-                source?: false,
-                primary?: true,
-              }
+            it {
+              is_expected.
+                to be_a( NRSER::Props::Prop ).
+                    and( have_attributes source?: false, primary?: true )
             }
           end
         end
@@ -56,12 +54,10 @@ describe NRSER::Props do
       describe "derived (sourced) prop `blah`" do
         subject { super()[:blah] }
         
-        include_examples "expect subject", to: {
-          be_a: NRSER::Props::Prop,
-          have_attributes: {
-            source?: true,
-            primary?: false,
-          }
+        it {
+          is_expected.
+            to  be_a( NRSER::Props::Prop ).
+                and( have_attributes source?: true, primary?: false )
         }
       end # derived (sourced) prop :blah
       

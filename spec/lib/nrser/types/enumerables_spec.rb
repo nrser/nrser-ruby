@@ -27,12 +27,10 @@ SPEC_FILE(
       Set[1, 2, 3],
     ],
     
-    and_is_expected: {
-      to: {
-        have_attributes: {
-          class: t::EnumerableType,
-          name: 'Array<Integer>',
-        }
+    block: -> {
+      it {
+        is_expected.
+          to have_attributes class: t::EnumerableType, name: 'Array<Integer>'
       }
     }
   

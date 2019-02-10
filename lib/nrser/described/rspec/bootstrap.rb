@@ -1,0 +1,29 @@
+##############################################################################
+# Boostrap {NRSER::Described::Rspec} in an RSpec Environment
+# ============================================================================
+# 
+# This file does stuff, including heavily modifying the global environment.
+# 
+# Require it when you're in an `rspec` process.
+# 
+##############################################################################
+
+require_relative '../rspec'
+require_relative './example_group'
+require_relative './example'
+require_relative './shared_examples'
+require_relative './top_level_mixin'
+
+::RSpec.configure do |config|
+  config.extend ExampleGroup
+  config.include Example
+  
+  config.add_setting :x_type_prefixes
+  config.x_type_prefixes = \
+    NRSER::Described::RSpec::PREFIXES
+  
+  config.add_setting :x_style, default: :esc_seq
+end
+
+# Make "describe" methods available at the top-level
+include TopLevelMixin

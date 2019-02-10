@@ -2,7 +2,7 @@
 # =======================================================================
 
 module NRSER; end
-module NRSER::RSpex; end
+module NRSER::RSpec; end
 
 
 # Definitions
@@ -11,7 +11,7 @@ module NRSER::RSpex; end
 # Just a namespace module where I stuck shared examples, with lil' utils to
 # alias them to multiple string and symbol names if you like.
 # 
-module NRSER::RSpex::SharedExamples
+module NRSER::RSpec::SharedExamples
   
   # Module (Class/self) Methods (Helpers)
   # =====================================================================
@@ -61,13 +61,27 @@ module NRSER::RSpex::SharedExamples
   # Shared Example Blocks and Binding
   # =====================================================================
   
+  EXPECT_SUBJECT = ->( *expectations ) do
+    merge_expectations( *expectations ).each { |state, specs|
+      specs.each { |verb, noun|
+        it {
+          # like: is_expected.to(include(noun))
+          is_expected.send state, self.send(verb, noun)
+        }
+      }
+    }
+  end # is expected
+  
+  bind_names EXPECT_SUBJECT, "expect subject"
+  
+  
   # Shared example for a functional method that compares input and output pairs.
   # 
   FUNCTION = ->( mapping: {}, raising: {} ) do
     mapping.each { |args, expected|
       # args = NRSER.as_array args
       
-      # context "called with #{ args.map( &NRSER::RSpex.method( :short_s ) ).join ', ' }" do
+      # context "called with #{ args.map( &NRSER::RSpec.method( :short_s ) ).join ', ' }" do
       #   subject { super().call *args }
       describe_called_with *args do
         
@@ -90,7 +104,7 @@ module NRSER::RSpex::SharedExamples
     raising.each { |args, error|
       args = args.n_x.as_array
       
-      context "called with #{ args.map( &NRSER::RSpex.method( :short_s ) ).join ', ' }" do
+      context "called with #{ args.map( &NRSER::RSpec.method( :short_s ) ).join ', ' }" do
       # it "rejects #{ args.map( &:inspect ).join ', ' }" do
         it { expect { subject.call *args }.to raise_error( *error ) }
       end
@@ -99,4 +113,4 @@ module NRSER::RSpex::SharedExamples
   
   bind_names FUNCTION, 'function', prefix: 'a'
   
-end # module NRSER::RSpex::SharedExamples
+end # module NRSER::RSpec::SharedExamples

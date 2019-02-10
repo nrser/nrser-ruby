@@ -12,3 +12,6 @@ This is meant to make the module reasonably easy to use and extend: at any point
 that you have an object, you should be able to figure out what it means and do
 what you want with it without having to trace implicit meaning through where
 it's been and how it managed to show up there.
+
+[Cucumber]: https://cucumber.io/
+[RSpec]: http://rspec.info/
