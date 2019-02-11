@@ -107,6 +107,7 @@ module Describe
     begin
       self_described.resolve! hierarchy
     rescue Described::Resolution::AllFailedError => error
+      # pass, will need to resolve later...
     end
     
     describe(
@@ -129,7 +130,8 @@ module Describe
       
       module_exec &body
     end
-  end
+  end # DESCRIBE
+  
 end # module Describe
 
 

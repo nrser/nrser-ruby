@@ -26,6 +26,21 @@ class Composed < ::Regexp
   # Singleton Methods
   # ========================================================================
   
+  # Construct a new {Composed} that contains the literal `strings`.
+  # 
+  # @param [::Array<#to_s>] strings
+  #   Strings of things you want treated like strings (via `#to_s`).
+  # 
+  # @param [::String] join
+  #   What to join multiple `strings` with.
+  # 
+  # @return [Composed]
+  # 
+  def self.quoted *strings, join: ' '
+    new quote( strings.map( &:to_s ).join join )
+  end
+  
+  
   def self.to_source object
     case object
     when ::Regexp

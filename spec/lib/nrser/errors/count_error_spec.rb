@@ -5,12 +5,17 @@ class String
   end
 end
 
+
+require 'nrser/refinements/regexps'
+using NRSER::Regexps
+
+
 SPEC_FILE(
   spec_path:        __FILE__,
   class:            NRSER::CountError,
 ) do
   
-  METHOD '#default_message' do
+  INSTANCE_METHOD '#default_message' do
   # ==========================================================================
 
     SETUP "create an", NRSER::CountError,
@@ -49,19 +54,24 @@ SPEC_FILE(
   CASE ~%{ in action } do
   # ==========================================================================
     
-    METHOD [].method( :to_proc ) do
-      CALLED do
-        it do
-          expect { subject }.to raise_error NRSER::CountError,
-            /Can not create getter proc from empty array/; end; end; end
-    
+    INSTANCE [] do
+      
+      INSTANCE_METHOD :'NRSER::Ext::Array#to_proc' do
+        CALLED do
+          it do
+            expect { subject }.to raise_error NRSER::CountError,
+              /Can not create getter proc from empty array/ end end end
+      
 
-    METHOD [].method( :only! ) do
-      CALLED do
-        it do
-          expect { subject }.to raise_error NRSER::CountError, (~%{
-            Array object [] has invalid #count attribute, expected 1, found 0
-          }).to_re; end; end; end
+      INSTANCE_METHOD :'NRSER::Ext::Enumerable#only!' do
+        CALLED do
+          it do
+            expect { subject }.to raise_error NRSER::CountError,
+                re.quoted(  %%Array object [] has invalid #count attribute,%,
+                            %%expected 1, found 0% )
+              end end end
+    
+    end # INSTANCE []
     
   end # CASE in action ************************************************
   

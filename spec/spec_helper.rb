@@ -19,15 +19,14 @@ require 'pry'
 
 # Project / Package
 # -----------------------------------------------------------------------
+
 require 'nrser'
 require 'nrser/refinements/types'
 
+require 'nrser/described/rspec/setup'
+
 # Using {String#~} to squish string blocks
 require 'nrser/core_ext/string/squiggle'
-
-unless ENV[ "NO_RSPEX" ]
-  require 'nrser/rspex'
-end
 
 # Local Tree
 # ----------------------------------------------------------------------------
