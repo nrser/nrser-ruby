@@ -31,7 +31,7 @@ SPEC_FILE(
       end
     }
   
-    describe_method :render do
+    METHOD :render do
       it_behaves_like "function",
         mapping: {
           # No handled nodes

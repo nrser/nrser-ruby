@@ -48,35 +48,36 @@ SPEC_FILE(
     # First, let's look at a working example:
     # 
     
-    subject :point_2d_int do
-      Class.new( Hamster::Hash ) do
-        include NRSER::Props::Immutable::Hash
-        
-        # So that error messages look right. You don't need this in "regularly"
-        # defined classes.
-        def self.name; 'Point2DInt'; end
-        def self.inspect; name; end
-        
-        # It's vital that we include the `key:` keyword argument, and that the
-        # values are non-negative integer indexes for the vector.
-        prop :x, type: t.int
-        prop :y, type: t.int
-        
-        # Just for fun and to show the capabilities, define a `#to_s` to nicely
-        # print the point.
-        def to_s
-          "(#{ x }, #{ y })"
-        end
+    Point2DInt = Class.new( Hamster::Hash ) do
+      include NRSER::Props::Immutable::Hash
+      
+      # So that error messages look right. You don't need this in "regularly"
+      # defined classes.
+      def self.name; 'Point2DInt'; end
+      def self.inspect; name; end
+      
+      # It's vital that we include the `key:` keyword argument, and that the
+      # values are non-negative integer indexes for the vector.
+      prop :x, type: t.int
+      prop :y, type: t.int
+      
+      # Just for fun and to show the capabilities, define a `#to_s` to nicely
+      # print the point.
+      def to_s
+        "(#{ x }, #{ y })"
       end
-    end
+    end # Point2DInt = Class.new ...
+    
     
     # and let's define our expectations for a successfully created point:
     
-    shared_examples "Point2DInt" do |x:, y:|
+    shared_examples Point2DInt do |x:, y:|
       
       # It should be an instance of the class
       
-      it { is_expected.to be_a point_2d_int }
+      it {
+        is_expected.to be_a Point2DInt
+      }
       
       # as well as {Hamster::Vector}!
       
@@ -86,12 +87,12 @@ SPEC_FILE(
       # and it should have the `x` and `y` accessible as hash values via
       # it's `#[]` method:
       
-      describe_method :[] do
-        describe_called_with :x do
+      METHOD :[] do
+        CALLED_WITH :x do
           it { is_expected.to be x }
         end
         
-        describe_called_with :y do
+        CALLED_WITH :y do
           it { is_expected.to be y }
         end
       end # Method [] Description
@@ -125,174 +126,176 @@ SPEC_FILE(
         it { is_expected.to eq "(#{ x }, #{ y })" }
       end
       
-    end
+    end # shared_examples Point2DInt
     
-    
-    SETUP "Creating a Point from `source`" do
-    # ========================================================================
+    CLASS Point2DInt do
       
-      # Our subject will be a Point2dInt created from a `source` value that we
-      # will define for each example.
-      
-      subject do
-        point_2d_int.new source
-      end
-      
-      
-      CASE "From an `{x: Integer, y: Integer}` literal `Hash`" do
-      # ------------------------------------------------------------------------
-        
-        # Let the `source` be the {Hash} `{x: 1, y: 2}`.
-        
-        WHEN source: {x: 1, y: 2} do
-          
-          # Now we should be able to construct a point. Test that it behaves
-          # like we defined above:
-          
-          it_behaves_like "Point2DInt", source
-          
-        end
-      end
-      
-      
-      CASE "From a `Hamster::Hash[x: Integer, y: Integer]`" do
-      # --------------------------------------------------------------------
-      # 
-      # All that `#initialize` cares about is that it can access the `source`
-      # via `#[]` and that it can tell if it should use names or integer
-      # index by looking for `#each_pair` and `#each_index`, respectively.
-      # 
-        
-        WHEN source: Hamster::Hash[x: 1, y: 2] do
-
-          # Now we should be able to construct a point. Test that it behaves
-          # like we defined above:
-          
-          it_behaves_like "Point2DInt", source.to_h
-          
-        end
-      end
-      
-    end # SETUP "Creating a Point from `source`"
-    # ************************************************************************
-    
-    
-    SETUP "Deriving a new point from another" do
-    # ========================================================================
-    # 
-    # Our point instances are immutable, but we can use {Hamster::Vector}'s
-    # methods for deriving new instances to derive new points.
-    # 
-    
-      # Let's create a point subject to start off with
-      
-      subject do
-        point_2d_int.new x: 1, y: 2
-      end
-      
-      # and we can play around with a few {Hamster::Vector} methods...
-      
-      METHOD :put do
-        
-        # Change the value at entry 0 to 2
-        
-        describe_called_with :x, 2 do
-          it_behaves_like "Point2DInt", x: 2, y: 2
-        end # called with 0, 2
-        
-        # Type checking should still be in effect, of course
-        
-        describe_called_with :x, 'hey' do
-          it { expect { subject }.to raise_error TypeError }
-        end # called with 0, 'hey'
-        
-      end # Method put Description
-      
-      
-      METHOD :map do
-        
-        # We have to do some manual funkiness here 'cause
-        # `describe_called_with` doesn't take a block...
-        # 
-        ### TODO
-        #   
-        #   We should be able to handle this by passing a {NRSER::Message}
-        #   to `describe_called_with`, but that's not yet implemented
-        #   (RSpex need s a *lot* of work).
-        #   
-        #       describe_called_with(
-        #         NRSER::Message.new { |value| value + 1 }
-        #       ) do ...
-        #   
-        #   or something like that.
-        #   
-        
-        describe "add 1 to each entry" do
-          subject do
-            super().call { |key, value| [key, value + 1] }
-          end
-          
-          it_behaves_like "Point2DInt", x: 2, y: 3
-        end
-        
-        # Type checking should still be enforced
-        
-        describe "try to turn entries into Strings" do
-          subject do
-            super().call { |key, value| [key, "value: #{ value }"] }
-          end
-          
-          it do
-            expect { subject }.to raise_error TypeError
-          end
-        end # "try to turn entries into Strings"
-        
-      end # Method map Description
-      
-      
-      CASE "Adding extra keys and values" do
+      SETUP "Creating a Point from `source`" do
       # ======================================================================
-      # 
-      # At the moment, we *can* add *extra* keys and values to the point.
-      # 
-      
-        # Let's try adding a `:z` key with value `zee`
         
-        describe_method :put do
-          describe_called_with :z, 'zee' do
-            
-            # It works! And the new point still behaves as expected.
-            
-            it_behaves_like "Point2DInt", x: 1, y: 2
-            
-            # but it *also* has a `:z` key with value `'zee'`, which is not
-            # type checked in any way because it has no corresponding prop
-            
-            it "also has `z: 'zee`" do
-              expect( subject[:z] ).to eq 'zee'
-            end
-            
-            ### TODO
-            #   
-            #   In the future (soon?!), we will have options to configure how
-            #   to handle extra values... thinking:
-            #   
-            #   1.  Allow (what happens now)
-            #   2.  Prohibit (raise an error)
-            #   3.  Discard (just toss them)
-            #   
-            #   Of course, we will still discard derived prop values found in
-            #   the source so that we can always dump and re-load data values.
-            #   
-            
-          end # called with :z, 3
-        end # Method put Description
+        # Our subject will be a Point2DInt created from a `source` value that we
+        # will define for each example.
         
-      end # CASE Adding extra keys and values
+        subject do
+          Point2DInt.new source
+        end
+        
+        
+        CASE "From an `{x: Integer, y: Integer}` literal `Hash`" do
+        # --------------------------------------------------------------------
+          
+          # Let the `source` be the {Hash} `{x: 1, y: 2}`.
+          
+          WHEN source: {x: 1, y: 2} do
+            
+            # Now we should be able to construct a point. Test that it behaves
+            # like we defined above:
+            
+            it_behaves_like Point2DInt, source
+            
+          end
+        end
+        
+        
+        CASE "From a `Hamster::Hash[x: Integer, y: Integer]`" do
+        # --------------------------------------------------------------------
+        # 
+        # All that `#initialize` cares about is that it can access the `source`
+        # via `#[]` and that it can tell if it should use names or integer
+        # index by looking for `#each_pair` and `#each_index`, respectively.
+        # 
+          
+          WHEN source: Hamster::Hash[x: 1, y: 2] do
+
+            # Now we should be able to construct a point. Test that it behaves
+            # like we defined above:
+            
+            it_behaves_like Point2DInt, source.to_h
+            
+          end
+        end
+        
+      end # SETUP "Creating a Point from `source`"
       # **********************************************************************
       
-    end # SETUP Deriving a new point from another
-    # ************************************************************************
+      
+      SETUP "Deriving a new point from another" do
+      # ======================================================================
+      # 
+      # Our point instances are immutable, but we can use {Hamster::Vector}'s
+      # methods for deriving new instances to derive new points.
+      # 
+      
+        # Let's create a point subject to start off with
+        
+        subject do
+          Point2DInt.new x: 1, y: 2
+        end
+        
+        # and we can play around with a few {Hamster::Vector} methods...
+        
+        METHOD :put do
+          
+          # Change the value at entry 0 to 2
+          
+          CALLED_WITH :x, 2 do
+            it_behaves_like Point2DInt, x: 2, y: 2
+          end # called with 0, 2
+          
+          # Type checking should still be in effect, of course
+          
+          CALLED_WITH :x, 'hey' do
+            it { expect { subject }.to raise_error TypeError }
+          end # called with 0, 'hey'
+          
+        end # Method put Description
+        
+        
+        METHOD :map do
+          
+          # We have to do some manual funkiness here 'cause
+          # `CALLED_WITH` doesn't take a block...
+          # 
+          ### TODO
+          #   
+          #   We should be able to handle this by passing a {NRSER::Message}
+          #   to `CALLED_WITH`, but that's not yet implemented
+          #   (RSpex need s a *lot* of work).
+          #   
+          #       CALLED_WITH(
+          #         NRSER::Message.new { |value| value + 1 }
+          #       ) do ...
+          #   
+          #   or something like that.
+          #   
+          
+          describe "add 1 to each entry" do
+            subject do
+              super().call { |key, value| [key, value + 1] }
+            end
+            
+            it_behaves_like Point2DInt, x: 2, y: 3
+          end
+          
+          # Type checking should still be enforced
+          
+          describe "try to turn entries into Strings" do
+            subject do
+              super().call { |key, value| [key, "value: #{ value }"] }
+            end
+            
+            it do
+              expect { subject }.to raise_error TypeError
+            end
+          end # "try to turn entries into Strings"
+          
+        end # Method map Description
+        
+        
+        CASE "Adding extra keys and values" do
+        # ====================================================================
+        # 
+        # At the moment, we *can* add *extra* keys and values to the point.
+        # 
+        
+          # Let's try adding a `:z` key with value `zee`
+          
+          METHOD :put do
+            CALLED_WITH :z, 'zee' do
+              
+              # It works! And the new point still behaves as expected.
+              
+              it_behaves_like Point2DInt, x: 1, y: 2
+              
+              # but it *also* has a `:z` key with value `'zee'`, which is not
+              # type checked in any way because it has no corresponding prop
+              
+              it "also has `z: 'zee`" do
+                expect( subject[:z] ).to eq 'zee'
+              end
+              
+              ### TODO
+              #   
+              #   In the future (soon?!), we will have options to configure how
+              #   to handle extra values... thinking:
+              #   
+              #   1.  Allow (what happens now)
+              #   2.  Prohibit (raise an error)
+              #   3.  Discard (just toss them)
+              #   
+              #   Of course, we will still discard derived prop values found in
+              #   the source so that we can always dump and re-load data values.
+              #   
+              
+            end # called with :z, 3
+          end # Method put Description
+          
+        end # CASE Adding extra keys and values
+        # ********************************************************************
+        
+      end # SETUP Deriving a new point from another
+      # **********************************************************************
     
+    end # CLASS Point2DInt
   end # Simple 2D Integer Point
-end
+end # SPEC_FILE

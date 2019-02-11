@@ -86,7 +86,7 @@ def describe_x  *description,
   if  metadata.key?( :type ) &&
       metadata[:type] != nil &&
       metadata[:type] != type
-    raise NRSER::ArgumentError.new \
+    raise ArgumentError.new \
       "`metadata:` keyword argument may not have a `:type` key that conflicts",
       "with the `type:` keyword argument.",
       type: type,
@@ -95,9 +95,9 @@ def describe_x  *description,
   
   # Add description of the bindings, if we have any and were told to
   unless bindings.empty? || add_binding_desc == false
-    bindings_desc =  NRSER::RSpec::Format.md_code_quote \
+    bindings_desc =  Format.md_code_quote \
       bindings.map { |name, value|
-        "#{ name } = #{ RSpec::Format::Description.string_for value }"
+        "#{ name } = #{ Format::Description.string_for value }"
       }.join( '; ' )
     
     if description.empty?
@@ -107,7 +107,7 @@ def describe_x  *description,
     end
   end
 
-  x_description = RSpec::Format::Description.new *description, type: type
+  x_description = Format::Description.new *description, type: type
   
   # Call up to RSpec's `#describe` method
   describe(

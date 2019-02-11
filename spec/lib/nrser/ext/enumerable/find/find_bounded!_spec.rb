@@ -77,7 +77,7 @@ SPEC_FILE(
   end # when :min and :max bounds args are both provided
 
   CLASS ::Hash do
-    SUBJECT a: 1, b: 2, c: 3 do
+    INSTANCE a: 1, b: 2, c: 3 do
       SETUP ~%{ call `subject.n_x.find_bounded!` with `length` and `&block` } do
         subject do
           super().n_x.find_bounded! length: length, &block
@@ -99,7 +99,7 @@ SPEC_FILE(
   end # CLASS
 
   CLASS ::Set do
-    SUBJECT Set[ 1, 2, 3 ] do
+    INSTANCE Set[ 1, 2, 3 ] do
       SETUP ~%{ call `subject.n_x.find_bounded` with `length` and `&block` } do
 
         subject do

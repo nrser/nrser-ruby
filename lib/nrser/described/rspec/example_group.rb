@@ -17,6 +17,7 @@
 
 # Sub-tree
 require_relative './example_group/describe'
+require_relative './example_group/helpers'
 require_relative './example_group/logger'
 require_relative './example_group/overrides'
 
@@ -37,7 +38,9 @@ module ExampleGroup
   
   # Mix in the describe methods
   include Describe
-
+  
+  include Helpers
+  
   include Logger
 
 

@@ -18,15 +18,18 @@ module  Describe
 # 
 # @return [void]
 # 
-def CLASS   klass,
+def CLASS   class_,
             *description,
             **metadata,
             &body
   DESCRIBE \
     :class,
-    subject: klass,
+    subject: class_,
     description: description,
-    metadata: metadata,
+    metadata: {
+      **metadata,
+      class: class_,
+    },
     &body
 end # #CLASS
   

@@ -84,7 +84,7 @@ class Params
   # Instance Methods
   # ========================================================================
   
-  def call callable
+  def call_args callable
     args = []
     kwds = {}
     
@@ -149,6 +149,7 @@ class Params
       when :keyrest
         # Going to send all the keywords
         kwds = @keyword.dup
+        keyword = {}
       when :block
         # pass, dealt with below
       else
@@ -156,15 +157,26 @@ class Params
       end
     end
     
+    # Add the rest of the keywords in if there are any left, since we want
+    # to send everything
+    unless keyword.empty?
+      kwds.merge! keyword
+    end
         
     logger.trace "Calling",
       args: args,
       kwds: kwds,
-      block: @block
+      block: block
     
     args << kwds unless kwds.empty?
     
-    callable.call *args, &@block
+    args
+  end
+  
+  
+  def call callable
+    call_args = 
+    callable.call *self.call_args( callable ), &block
   end
   
   

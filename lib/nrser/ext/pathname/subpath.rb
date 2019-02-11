@@ -90,7 +90,7 @@ module Pathname
     return !strict if self == abs_other
 
     # Ok, now see if they prefix match
-    abs_other.start_with? self
+    abs_other.n_x.start_with? self
   end # #subpath?
   
 end # module Pathname

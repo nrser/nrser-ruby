@@ -18,6 +18,13 @@ module  NRSER
 module  Described
 
 
+# Refinements
+# ============================================================================
+
+require 'nrser/refinements/types'
+using NRSER::Types
+
+
 # Definitions
 # =======================================================================
 
@@ -33,8 +40,11 @@ class Instance < Object
   #       
   subject_type ::Object
   
-  subject_from class_: Class, params: Parameters do |class_:, params:|
-    params.call class_.method( :new )
+  subject_from \
+    class_: Class, 
+    method_name: t.maybe( Meta::Names::Method::Bare ),
+    params: Parameters do |class_:, method_name:, params:|
+    params.call class_.method( method_name || :new )
   end
   
 end # class Callable

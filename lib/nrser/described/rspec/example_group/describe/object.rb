@@ -14,16 +14,17 @@ module  Describe
 # Definitions
 # ========================================================================
 
-# Describe an attribute of the parent subject.
-# 
+# Describe any {::Object}. Replaces the previous `#SUBJECT` method with
+# something that {Described} already has, though I don't see much use for it.
+#
 # @return [void]
-# 
-def ATTRIBUTE name, **metadata, &body
-  DESCRIBE :attribute,
-    name: Meta::Names::Method.from( name ).bare_name,
+#
+def OBJECT object, **metadata, &body
+  DESCRIBE :object,
+    subject: object,
     metadata: metadata,
     &body
-end # #ATTRIBUTE
+end # #OBJECT
 
 
 # /Namespace

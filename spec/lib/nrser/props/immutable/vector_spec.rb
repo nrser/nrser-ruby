@@ -86,12 +86,12 @@ describe NRSER::Props::Immutable::Vector do
       # and it should have the `x` and `y` accessible as vector entries via
       # it's `#[]` method:
       
-      describe_method :[] do
-        describe_called_with 0 do
+      METHOD :[] do
+        CALLED_WITH 0 do
           it { is_expected.to be x }
         end
         
-        describe_called_with 1 do
+        CALLED_WITH 1 do
           it { is_expected.to be y }
         end
       end # Method [] Description
@@ -235,33 +235,33 @@ describe NRSER::Props::Immutable::Vector do
       
       # and we can play around with a few {Hamster::Vector} methods...
       
-      describe_method :put do
+      METHOD :put do
         
         # Change the value at entry 0 to 2
         
-        describe_called_with 0, 2 do
+        CALLED_WITH 0, 2 do
           it_behaves_like "Point2DInt", x: 2, y: 2
         end # called with 0, 2
         
         # Type checking should still be in effect, of course
         
-        describe_called_with 0, 'hey' do
+        CALLED_WITH 0, 'hey' do
           it { expect { subject }.to raise_error TypeError }
         end # called with 0, 'hey'
         
       end # Method put Description
       
       
-      describe_method :map do
+      METHOD :map do
         
         # We have to do some manual funkiness here 'cause
-        # `describe_called_with` doesn't take a block...
+        # `CALLED_WITH` doesn't take a block...
         # 
         # TODO  We should be able to handle this by passing a {NRSER::Message}
-        #       to `describe_called_with`, but that's not yet implemented
+        #       to `CALLED_WITH`, but that's not yet implemented
         #       (RSpex need s a *lot* of work).
         #       
-        #           describe_called_with(
+        #           CALLED_WITH(
         #             NRSER::Message.new { |value| value + 1 }
         #           ) do ...
         #       

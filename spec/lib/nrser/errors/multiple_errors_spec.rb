@@ -9,7 +9,7 @@ SPEC_FILE(
   class:            NRSER::MultipleErrors,
 ) do
   
-  SECTION ~%{ formatting } do
+  CASE ~%{ formatting } do
   # ==========================================================================
     
     INSTANCE_METHOD :default_message do
@@ -67,7 +67,7 @@ SPEC_FILE(
     end # #default_details
 
     
-  end # SECTION ~%{ formatting } *********************************************
+  end # CASE ~%{ formatting } *********************************************
   
   
 end # SPEC_FILE

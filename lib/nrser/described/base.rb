@@ -642,6 +642,24 @@ class Base
   end
   
   
+  # Language Integration Instance Methods
+  # --------------------------------------------------------------------------
+  
+  def to_s
+    class_name = self.class.name.sub /\ANRSER\:\:/, ''
+    
+    if resolved?
+      if subject?
+        "{#{ class_name } subject: #{ subject.to_s.truncate 32 }}"
+      else
+        "{#{ class_name } error: #{ error.to_s.truncate 32 }}"
+      end
+    else
+      "{#{ class_name } init_values=#{ init_values.inspect.truncate 32 }}"
+    end
+  end
+  
+  
   private
   # ========================================================================
     

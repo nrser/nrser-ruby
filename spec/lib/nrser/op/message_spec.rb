@@ -11,11 +11,11 @@ CLASS NRSER::Message do
       
       WHEN enum: [ [], [1], [1, 2] ] do
         
-        describe_called_with NRSER::Message.new( :length ) do
+        CALLED_WITH NRSER::Message.new( :length ) do
           it { is_expected.to eq [0, 1, 2] }
         end # called with
         
-        describe_called_with NRSER::Message.new( :first ) do
+        CALLED_WITH NRSER::Message.new( :first ) do
           it { is_expected.to eq [nil, 1, 1] }
         end # called with :first
         

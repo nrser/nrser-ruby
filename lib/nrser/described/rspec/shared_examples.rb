@@ -1,8 +1,9 @@
-# Declarations
-# =======================================================================
+# Namespace
+# ============================================================================
 
-module NRSER; end
-module NRSER::RSpec; end
+module  NRSER
+module  Described
+module  RSpec
 
 
 # Definitions
@@ -11,7 +12,7 @@ module NRSER::RSpec; end
 # Just a namespace module where I stuck shared examples, with lil' utils to
 # alias them to multiple string and symbol names if you like.
 # 
-module NRSER::RSpec::SharedExamples
+module SharedExamples
   
   # Module (Class/self) Methods (Helpers)
   # =====================================================================
@@ -83,7 +84,7 @@ module NRSER::RSpec::SharedExamples
       
       # context "called with #{ args.map( &NRSER::RSpec.method( :short_s ) ).join ', ' }" do
       #   subject { super().call *args }
-      describe_called_with *args do
+      CALLED_WITH *args do
         
         it {
           expected = unwrap expected, context: self
@@ -104,7 +105,7 @@ module NRSER::RSpec::SharedExamples
     raising.each { |args, error|
       args = args.n_x.as_array
       
-      context "called with #{ args.map( &NRSER::RSpec.method( :short_s ) ).join ', ' }" do
+      context "called with #{ args.map( &Format.method( :short_s ) ).join ', ' }" do
       # it "rejects #{ args.map( &:inspect ).join ', ' }" do
         it { expect { subject.call *args }.to raise_error( *error ) }
       end
@@ -113,4 +114,12 @@ module NRSER::RSpec::SharedExamples
   
   bind_names FUNCTION, 'function', prefix: 'a'
   
-end # module NRSER::RSpec::SharedExamples
+end # module SharedExamples
+
+
+# /Namespace
+# ========================================================================
+
+end # module  RSpec
+end # module  Described
+end # module  NRSER

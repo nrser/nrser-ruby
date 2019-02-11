@@ -26,12 +26,11 @@ def dive_x current, *rest, **kwds, &body
     -> { dive_x *rest, &body }
   end
   
-  begin
+  # begin
     public_send method_name, data, **kwds, &block
-  rescue NoMethodError => error
-    pp self.methods
-    raise error
-  end
+  # rescue NoMethodError => error
+  #   raise error
+  # end
 end
 
 

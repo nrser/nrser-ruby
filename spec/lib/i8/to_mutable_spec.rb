@@ -1,15 +1,16 @@
 require 'i8'
 
+# Want {NRSER::Ext::Tree#each_branch} available for {::Hash}
+require 'nrser/ext/hash'
+
 SPEC_FILE(
   spec_path:        __FILE__,
   module:           Hamster,
 ) do
   
-  SETUP %{
-    Converting I8 to regular structures with their `#to_mutable`
-  }.squish do
+  SETUP ~%% Converting I8 to regular structures with their `#to_mutable` % do
     
-    it %{ gets immutable objects nested inside mutable ones } do
+    it ~%% gets immutable objects nested inside mutable ones % do
       
       # Because `I8({ x: 1 }) == { x: 1 }` (which is usually probably very nice
       # to have) we have to do more than just compare with `==`.
@@ -20,11 +21,10 @@ SPEC_FILE(
         return false unless actual == expected &&
                             actual.class == expected.class &&
                             actual.eql?( expected ) # This alone is prob
-                                                    # enough...
-        
+                                                    # enough...        
         case expected
         when ::Hash, ::Array
-          expected.each_branch do |key, expected_value|
+          expected.n_x.each_branch do |key, expected_value|
             return false unless class_match( expected_value, actual[key] )
           end
         when ::Set
@@ -69,8 +69,8 @@ SPEC_FILE(
   
   
   CLASS I8::Hash do
-    describe_instance x: 1, y: 2, z: 3 do
-      describe_method :to_mutable do
+    INSTANCE_FROM :[], x: 1, y: 2, z: 3 do
+      METHOD :to_mutable do
         CALLED do
           it { is_expected.to be_a( ::Hash ).and eq( {x: 1, y: 2, z: 3} ) }
         end
@@ -80,9 +80,9 @@ SPEC_FILE(
   
   
   CLASS I8::Vector do
-    describe_instance [1, 2, 3] do
-      describe_method :to_mutable do
-      CALLED do
+    INSTANCE_FROM :[], 1, 2, 3 do
+      METHOD :to_mutable do
+        CALLED do
           it { is_expected.to be_a( ::Array ).and eq [1, 2, 3] }
         end
       end
@@ -91,7 +91,7 @@ SPEC_FILE(
   
   
   CLASS I8::Set do
-    describe_instance [1, 2, 3] do
+    INSTANCE_FROM :[], 1, 2, 3 do
       INSTANCE_METHOD :to_mutable do
         CALLED do
           it { is_expected.to be_a( ::Set ).and eq ::Set[1, 2, 3] }
@@ -102,7 +102,7 @@ SPEC_FILE(
   
   
   CLASS I8::SortedSet do
-    describe_instance [1, 2, 3] do
+    INSTANCE_FROM :[], 1, 2, 3 do
       INSTANCE_METHOD :to_mutable do
         CALLED do
           it { is_expected.to be_a( ::SortedSet ).and eq ::SortedSet[1, 2, 3] }

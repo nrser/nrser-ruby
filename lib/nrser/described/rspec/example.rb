@@ -9,6 +9,7 @@
 # ------------------------------------------------------------------------
 
 # Submodules
+
 require_relative './example/logger'
 
 
@@ -30,7 +31,8 @@ module Example
   include Logger
   
   def described_class
-    self.class.hierarchy.find_by_class Described::Class
+    # self.class.hierarchy.find_by_class Described::Class
+    self.class.described_class
   end
 
 
@@ -44,8 +46,14 @@ module Example
   end
   
   
+  def described
+    self.class.described
+  end
+  
+  
+  # Return an {ExampleHierarchy} 
   def hierarchy
-    self.class.hierarchy
+    ExampleHierarchy.new self
   end
   
   

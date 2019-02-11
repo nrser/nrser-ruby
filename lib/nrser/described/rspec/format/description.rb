@@ -4,8 +4,14 @@
 # Requirements
 # ========================================================================
 
-# Project / Package
-# ------------------------------------------------------------------------
+### Deps ###
+
+# Using {::Module#anonymous?}
+require 'active_support/core_ext/module/anonymous'
+
+### Project / Package ###
+
+require 'nrser/ext/module'
 
 require_relative './list'
 require_relative './kwds'
@@ -78,7 +84,7 @@ class Description < ::String
         "Proc"
 
       else
-        NRSER::RSpec.short_s element
+        Format.short_s element
         
       end
     end

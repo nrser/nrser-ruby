@@ -24,12 +24,12 @@ SPEC_FILE(
       it { is_expected.to eq "#{ file || '???' }:#{ line || '???' }" }
     end # Attribute to_s Description
     
-    describe_method :[] do
-      describe_called_with 0 do
+    METHOD :[] do
+      CALLED_WITH 0 do
         it { is_expected.to eq file }
       end # called with 0
       
-      describe_called_with 1 do
+      CALLED_WITH 1 do
         it { is_expected.to eq line }
       end # called with 1
     end # Method [] Description
@@ -56,7 +56,7 @@ SPEC_FILE(
       }
     
     context "instantiate from source location array" do
-      describe_instance loc do
+      NEW loc do
         it_behaves_like described_class,
           valid: true,
           file: loc[0],
@@ -66,7 +66,7 @@ SPEC_FILE(
     
     
     context "instantiate from prop value hash" do
-      describe_instance file: loc[0], line: loc[1] do
+      NEW file: loc[0], line: loc[1] do
         it_behaves_like described_class,
           valid: true,
           file: loc[0],
@@ -77,7 +77,7 @@ SPEC_FILE(
   
   
   context "`nil` source location" do
-    describe_instance nil do
+    NEW nil do
       it_behaves_like described_class, valid: false, file: nil, line: nil
     end
   end # `nil` source location

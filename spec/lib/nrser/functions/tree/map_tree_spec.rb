@@ -4,7 +4,7 @@ SPEC_FILE \
   method: :map_tree \
 do
   
-  SECTION "Simple Examples" do
+  describe "Simple Examples" do
   # ========================================================================
     
     CASE "Convert all Integers to Strings" do
@@ -50,7 +50,7 @@ do
                 }; end; end; end; end
   
   
-  SECTION "pruning" do
+  describe "pruning" do
     CASE "Convert all Integers to Strings and prune" do
         subject do
           super().call tree, prune: true do |element|

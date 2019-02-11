@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe_method "NRSER.dedent" do
+METHOD "NRSER.dedent" do
   subject { NRSER.method :dedent }
   
   let( :lines ) {

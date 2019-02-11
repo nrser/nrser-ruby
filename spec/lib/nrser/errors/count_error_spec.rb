@@ -46,7 +46,7 @@ SPEC_FILE(
   end # METHOD '#default_message' ********************************************
   
 
-  SECTION ~%{ in action } do
+  CASE ~%{ in action } do
   # ==========================================================================
     
     METHOD [].method( :to_proc ) do
@@ -63,7 +63,7 @@ SPEC_FILE(
             Array object [] has invalid #count attribute, expected 1, found 0
           }).to_re; end; end; end
     
-  end # SECTION in action ************************************************
+  end # CASE in action ************************************************
   
 
 end # SPEC_FILE

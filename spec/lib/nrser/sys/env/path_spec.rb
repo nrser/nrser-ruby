@@ -5,7 +5,7 @@ SPEC_FILE(
   class: NRSER::Sys::Env::Path,
 ) do
   
-  describe_method :from_ENV do
+  METHOD :from_ENV do
     it "loads from ENV['PATH']" do
       expect( subject.call :PATH ).to be_a( described_class )
     end

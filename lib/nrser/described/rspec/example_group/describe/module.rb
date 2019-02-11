@@ -15,11 +15,14 @@ module  Describe
 # Definitions
 # ========================================================================
 
-def MODULE mod, *description, **metadata, &body
+def MODULE module_, *description, **metadata, &body
   DESCRIBE :module,
-    subject: mod,
+    subject: module_,
     description: description,
-    metadata: metadata,
+    metadata: {
+      **metadata,
+      module: module_,
+    },
     &body
 end # #MODULE
 
