@@ -1,11 +1,3 @@
-class String
-  def to_re
-    # Regexp.new Regexp.escape( self )
-    /#{ Regexp.escape( self ) }/
-  end
-end
-
-
 require 'nrser/refinements/regexps'
 using NRSER::Regexps
 
@@ -51,9 +43,8 @@ SPEC_FILE(
   end # METHOD '#default_message' ********************************************
   
 
-  CASE ~%{ in action } do
+  CASE "in action" do
   # ==========================================================================
-    
     INSTANCE [] do
       
       INSTANCE_METHOD :'NRSER::Ext::Array#to_proc' do
@@ -67,13 +58,11 @@ SPEC_FILE(
         CALLED do
           it do
             expect { subject }.to raise_error NRSER::CountError,
-                re.quoted(  %%Array object [] has invalid #count attribute,%,
-                            %%expected 1, found 0% )
+                re.quoted(  "Array object [] has invalid #count attribute,",
+                            "expected 1, found 0" )
               end end end
     
     end # INSTANCE []
-    
   end # CASE in action ************************************************
   
-
 end # SPEC_FILE

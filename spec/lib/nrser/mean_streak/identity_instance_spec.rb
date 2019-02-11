@@ -12,7 +12,7 @@ SPEC_FILE(
   class: NRSER::MeanStreak,
 ) do
   CLASS NRSER::MeanStreak do
-    INSTANCE_FROM do
+    NEW do
       METHOD :render do
         CALLED_WITH "hey" do
           it { is_expected.to eq "hey" }

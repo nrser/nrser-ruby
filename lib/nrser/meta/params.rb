@@ -175,8 +175,9 @@ class Params
   
   
   def call callable
-    call_args = 
     callable.call *self.call_args( callable ), &block
+  rescue ::ArgumentError => error
+    raise
   end
   
   

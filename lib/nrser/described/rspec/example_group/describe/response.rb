@@ -37,7 +37,14 @@ module  Describe
 # @return [void]
 # 
 def RESPONSE_TO *args, **kwds, &body
-  params = Meta::Params.new args: args, kwds: kwds
+  block = nil
+
+  if args[ -1 ].is_a? Wrappers::Block
+    block = args[ -1 ]
+    args = args[ 0..-2 ]
+  end
+  
+  params = Meta::Params.new args: args, kwds: kwds, block: block
   DESCRIBE :response, params: params, &body
 end # #RESPONSE_TO
 

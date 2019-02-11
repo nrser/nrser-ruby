@@ -11,6 +11,7 @@
 ### Project / Package ###
 
 require_relative './wrappers/wrapper'
+require_relative './wrappers/block'
 require_relative './format'
 
 # Namespace
@@ -28,6 +29,31 @@ module  RSpec
 # to make stuff globally available.
 # 
 module TopLevelMixin
+
+  # Constants
+  # ==========================================================================
+  
+  # Make {Wrappers::Wrapper} easier to get to.
+  # 
+  # @see #wrap
+  # @see #unwrap
+  # 
+  # @return [::Class]
+  # 
+  Wrapper = Wrappers::Wrapper
+  
+  
+  # Make {Wrappers::Block} easier to get to.
+  # 
+  # @see #block
+  # 
+  # @return [::Class]
+  # 
+  Block = Wrappers::Block
+  
+  
+  # Singleton Methods
+  # ==========================================================================
   
   # Hook to include other modules.
   # 
@@ -35,10 +61,10 @@ module TopLevelMixin
     # Make the example group extensions available at the top-level
     base.send :include, ExampleGroup::Describe
   end
-
   
-  Wrapper = Wrappers::Wrapper
   
+  # Instance Methods
+  # ==========================================================================
   
   def wrap description = nil, &block
     if block
@@ -57,6 +83,19 @@ module TopLevelMixin
     else
       obj
     end
+  end
+  
+  
+  # Create a new {Wrappers::Block} (that will be recognized as the block
+  # parameter in {Meta::Params}) from `&block`.
+  # 
+  # @param [::Proc] block
+  #   Proc to wrap.
+  # 
+  # @return [Wrappers::Block]
+  # 
+  def block &block
+    Block.new &block
   end
   
   

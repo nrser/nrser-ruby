@@ -70,13 +70,22 @@ module Describe
   end
   
   
+  
   def hierarchy
     metadata[ :hierarchy ]
+  rescue ::NameError => error
+    # NOTE  When included in the top-level there won't be any {#metadata}
+    #       method.
+    nil
   end
   
   
   def described
     metadata[ :described ]
+  rescue ::NameError => error
+    # When included in the top-level there won't be any {#metadata}
+    #       method.
+    nil
   end
   
   

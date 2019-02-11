@@ -75,11 +75,9 @@ SPEC_FILE(
       
       # It should be an instance of the class
       
-      it {
-        is_expected.to be_a Point2DInt
-      }
+      it { is_expected.to be_a Point2DInt }
       
-      # as well as {Hamster::Vector}!
+      # as well as {Hamster::Hash}!
       
       it { is_expected.to be_a Hamster::Hash }
       
@@ -179,7 +177,7 @@ SPEC_FILE(
       # **********************************************************************
       
       
-      SETUP "Deriving a new point from another" do
+      SETUP "Deriving a new point from another", focus: true do
       # ======================================================================
       # 
       # Our point instances are immutable, but we can use {Hamster::Vector}'s
@@ -188,9 +186,11 @@ SPEC_FILE(
       
         # Let's create a point subject to start off with
         
-        subject do
-          Point2DInt.new x: 1, y: 2
-        end
+        # subject do
+        #   Point2DInt.new x: 1, y: 2
+        # end
+        
+        NEW x: 1, y: 2 do
         
         # and we can play around with a few {Hamster::Vector} methods...
         
@@ -230,22 +230,18 @@ SPEC_FILE(
           #   
           
           describe "add 1 to each entry" do
-            subject do
-              super().call { |key, value| [key, value + 1] }
+            CALLED_WITH block { |key, value| [ key, value + 1] } do
+              it_behaves_like Point2DInt, x: 2, y: 3
             end
-            
-            it_behaves_like Point2DInt, x: 2, y: 3
           end
           
           # Type checking should still be enforced
           
           describe "try to turn entries into Strings" do
-            subject do
-              super().call { |key, value| [key, "value: #{ value }"] }
-            end
-            
-            it do
-              expect { subject }.to raise_error TypeError
+            CALLED_WITH block { |key, value| [key, "value: #{ value }"] } do
+              it do
+                expect { subject }.to raise_error TypeError
+              end
             end
           end # "try to turn entries into Strings"
           
@@ -292,6 +288,8 @@ SPEC_FILE(
           
         end # CASE Adding extra keys and values
         # ********************************************************************
+        
+      end # NEW
         
       end # SETUP Deriving a new point from another
       # **********************************************************************
