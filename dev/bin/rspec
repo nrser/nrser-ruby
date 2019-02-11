@@ -2,4 +2,10 @@
 
 require "bundler/setup"
 require 'rspec/core'
+
+unless  ENV[ 'RSPEC_FAIL_FAST' ].to_s.empty? ||
+        ARGV.include?( '--fail-fast' )
+  ARGV << '--fail-fast'
+end
+
 RSpec::Core::Runner.invoke
