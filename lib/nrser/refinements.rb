@@ -9,7 +9,6 @@ NRSER.logger.warn <<~END
   Require specific refinements, like:
   
       require 'nrser/refinements/types'
-      require 'nrser/refinements/sugar'
   
   Thank you, the management.
 END
