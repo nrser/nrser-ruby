@@ -59,7 +59,7 @@ module Enumerable
   #   Final array of merged hashes. Don't depend on order.
   # 
   def merge_by *updates, &merge_key
-    updates.reduce( assoc_by &merge_key ) { |result, update|
+    updates.reduce( n_x.assoc_by &merge_key ) { |result, update|
       result.deep_merge! update.n_x.assoc_by( &merge_key )
     }.values
   end # #merge_by

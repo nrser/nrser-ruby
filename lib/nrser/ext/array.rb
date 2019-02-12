@@ -125,7 +125,7 @@ module Array
   # @return [Proc]
   # 
   def to_sender publicly: true
-    to_message.to_proc publicly: publicly
+    n_x.to_message.to_proc publicly: publicly
   end
   
   
@@ -134,6 +134,11 @@ module Array
   def to_chainer publicly: true
     NRSER.chainer self, publicly: publicly
   end # #to_chainer
+  
+  
+  refine ::Array do
+    prepend Array
+  end
 
 end # class Array
 

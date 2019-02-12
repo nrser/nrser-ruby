@@ -94,6 +94,39 @@ module Describe
   end
   
   
+  # Does this example group define a "custom" (non-described) subject
+  # block?
+  # 
+  # @return [Boolean]
+  # 
+  def custom_subject?
+    self_described.nil? && instance_methods( false ).include?( :subject )
+  end # #custom_subject?
+  
+  
+  # Has there been a "custom" (non-described) subject defined in this example
+  # group or any of its ancestors walking up the nesting tree?
+  # 
+  # This is important because custom subjects can only be accessed from
+  # examples, meaning {Described::Base} instances will have to wait until we
+  # are running the examples to resolve (since they may depend on the values
+  # of the custom subjects).
+  # 
+  # @return [Boolean]
+  # 
+  def custom_subject_in_ancestry?
+    example_group = self
+    
+    while example_group.is_a?( ::Class ) &&
+          example_group < ::RSpec::Core::ExampleGroup
+      return true if example_group.custom_subject?
+      example_group = example_group.superclass
+    end
+    
+    false
+  end # #custom_subject_in_ancestry?
+  
+  
   def DESCRIBE  described_class_name,
                 description: nil,
                 metadata: {},
@@ -113,10 +146,12 @@ module Describe
     # *Try* to resolve to description. It may fail if it needs others that will
     # be defined further inside, but many (most?) will succeed at this point,
     # which lets us contribute nicer description strings for the output
-    begin
-      self_described.resolve! hierarchy
-    rescue Described::Resolution::AllFailedError => error
-      # pass, will need to resolve later...
+    unless custom_subject_in_ancestry?
+      begin
+        self_described.resolve! hierarchy
+      rescue Described::Resolution::AllFailedError => error
+        # pass, will need to resolve later...
+      end
     end
     
     describe(
@@ -128,7 +163,7 @@ module Describe
       @self_described = self_described
       
       subject {
-        self_described.resolve!( ExampleHierarchy.new self )
+        self_described.resolve!( self.hierarchy )
         
         if self_described.subject?
           self_described.subject
@@ -139,7 +174,7 @@ module Describe
       
       module_exec &body
     end
-  end # DESCRIBE
+  end # #DESCRIBE
   
 end # module Describe
 

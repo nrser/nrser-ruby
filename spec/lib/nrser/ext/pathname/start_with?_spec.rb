@@ -4,7 +4,7 @@ SPEC_FILE \
   spec_path:        __FILE__,
   module:           NRSER::Ext::Pathname,
   instance_method:  :start_with? \
-do  
+do
   CASE ~%% {Pathname} `prefixes` % do
     CLASS ::Pathname do
       

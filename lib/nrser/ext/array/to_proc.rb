@@ -55,7 +55,7 @@ module Array
       
     NRSER::Message.new( method_name, *self ).to_proc
   end # #to_proc
-
+  
 end # module Array
 
 

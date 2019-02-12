@@ -14,7 +14,7 @@ SPEC_FILE(
     
     INSTANCE_METHOD :default_message do
 
-      INSTANCE errors: \
+      NEW errors: \
         {
           ArgumentError => 1,
           TypeError     => 2,
@@ -36,7 +36,7 @@ SPEC_FILE(
 
     INSTANCE_METHOD :default_details do
 
-      INSTANCE errors: \
+      NEW errors: \
         {
           ArgumentError => 1,
           TypeError     => 2,

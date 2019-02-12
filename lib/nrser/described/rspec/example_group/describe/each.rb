@@ -42,7 +42,7 @@ def EACH *lists, **metadata, &body
         [ names[ index ], value ]
       }.to_h
 
-      describe_when **bindings do
+      WHEN **bindings do
         module_exec *product, &body
       end
     end

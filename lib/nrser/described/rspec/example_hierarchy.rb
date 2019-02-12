@@ -38,8 +38,9 @@ class ExampleHierarchy
     
     example_group = @example.class
     
-    while example_group < ::RSpec::Core::ExampleGroup
-      if ( example_group_described = example_group.self_described)
+    while example_group.is_a?( ::Class ) &&
+          example_group < ::RSpec::Core::ExampleGroup
+      if (example_group_described = example_group.self_described)
         block.call example_group_described
         
       elsif example_group.instance_methods( false ).include? :subject
@@ -49,8 +50,15 @@ class ExampleHierarchy
           subject = subject_method.bind( @example ).call
         rescue
         else
-          block.call \
-            Described::Object.new( subject: subject )
+          described = case subject
+          when ::Proc, ::Method
+            Described::Callable.new subject: subject
+          else
+            Described::Object.new subject: subject
+          end
+          
+          block.call described
+            
         end
           
       end

@@ -3,7 +3,7 @@ SPEC_FILE(
   class:            NRSER::AttrError,
 ) do
   
-  METHOD '#default_message' do
+  INSTANCE_METHOD '#default_message' do
   # ==========================================================================
 
     SETUP "create an", NRSER::AttrError,

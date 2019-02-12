@@ -88,7 +88,7 @@ module Parameters
         described.block = value
       else
         describe :parameters,
-          subject: NRSER::Meta::Params.new( block: value )
+          subject: NRSER::Meta::Params::Named.new( block: value )
       end
     end
   

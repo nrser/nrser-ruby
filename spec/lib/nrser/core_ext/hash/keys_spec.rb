@@ -1,3 +1,5 @@
+require 'active_support/hash_with_indifferent_access'
+
 require 'nrser/core_ext/hash/keys'
 
 SPEC_FILE(
@@ -12,7 +14,7 @@ SPEC_FILE(
     [ { 'x' => 1, 'y' => 2 }, { x: 1, y: 2} ],
    ] do |klass, source_hash|
 
-    SUBJECT klass[ source_hash ] do
+    OBJECT klass[ source_hash ] do
 
       it do is_expected.to be_a klass end
       
@@ -28,6 +30,6 @@ SPEC_FILE(
         end
       end
 
-    end # SUBJECT
+    end # OBJECT
   end # EACH
 end # SPEC_FILE

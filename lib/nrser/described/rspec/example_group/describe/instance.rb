@@ -24,8 +24,15 @@ def INSTANCE instance, *description, **metadata, &body
 end
 
 
-def NEW *args, **kwds, &body
-  params = Meta::Params.new args: args, kwds: kwds
+def NEW *args, &body
+  block = nil
+
+  if args[ -1 ].is_a? Wrappers::Block
+    block = args[ -1 ]
+    args = args[ 0..-2 ]
+  end
+
+  params = Meta::Params::Simple.new *args, &block
   DESCRIBE :instance,
     params: params, &body
 end
@@ -41,8 +48,16 @@ alias_method :NEW_INSTANCE, :NEW
 # 
 # @return [void]
 # 
-def INSTANCE_FROM method_name, *args, **kwds, &body
-  params = Meta::Params.new args: args, kwds: kwds
+def INSTANCE_FROM method_name, *args, &body
+  block = nil
+
+  if args[ -1 ].is_a? Wrappers::Block
+    block = args[ -1 ]
+    args = args[ 0..-2 ]
+  end
+
+  params = Meta::Params::Simple.new *args, &block
+  
   DESCRIBE :instance,
     method_name: Meta::Names::Method::Bare.new( method_name ),
     params: params, &body

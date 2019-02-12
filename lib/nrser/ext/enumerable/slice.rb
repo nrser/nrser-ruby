@@ -75,7 +75,7 @@ module Enumerable
     if [self, slice].all? { |e|
       e.respond_to?( :length ) && e.respond_to?( :slice )
     }
-      return array_slice? slice, &is_match
+      return n_x.array_slice? slice, &is_match
     end
     
     raise NotImplementedError.new <<~END

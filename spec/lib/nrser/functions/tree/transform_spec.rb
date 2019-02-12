@@ -1,3 +1,7 @@
+require 'nrser/ext/array'
+
+using NRSER::Ext::Array
+
 METHOD "NRSER.transform" do
   subject { NRSER.transform tree, source }
   

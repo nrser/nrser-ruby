@@ -3,6 +3,10 @@ require 'nrser/core_ext/symbol'
 require 'nrser/refinements/types'
 using NRSER::Types
 
+# Using {Array#to_proc}
+require 'nrser/ext/array'
+using NRSER::Ext::Array
+
 
 SPEC_FILE \
   spec_path: __FILE__,
@@ -53,7 +57,9 @@ do
     },
   ]
 
-  subject { data.select( &selector ).map( &[:item] ).to_set }
+  subject {
+    data.select( &selector ).map( &[:item].to_proc ).to_set
+  }
 
   CASE "querying for group membership" do
 

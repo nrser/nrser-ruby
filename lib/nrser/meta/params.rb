@@ -36,9 +36,24 @@ module  Meta
 # Definitions
 # =======================================================================
 
+class Params
+end
+
+class Params::Simple < Params
+  def initialize *args, &block
+    @args = args
+    @block = block
+  end
+  
+  
+  def call callable
+    callable.call *@args, &@block
+  end
+end
+
 
 # @todo document Params class.
-class Params
+class Params::Named < Params
   
   # Mixins
   # ========================================================================
@@ -111,12 +126,19 @@ class Params
         elsif positional.key?( name )
           args << positional.delete( name )
         elsif type == :req
-          raise NRSER::ArgumentError.new \
-            "Argument", name, "at index", index, "is required, but no value",
-            "is available",
-            callable: callable,
-            callable_parameters: callable.parameters,
-            params: self
+          if keyword.empty?
+            raise NRSER::ArgumentError.new \
+              "Argument", name, "at index", index, "is required, but no value",
+              "is available",
+              callable: callable,
+              callable_parameters: callable.parameters,
+              params: self
+          else
+            # Consume the keyword hash as the positional parameter
+            args << keyword
+            keyword = {}
+          end
+
         end
       when :keyreq, :key
         if keyword.key? name
@@ -213,6 +235,7 @@ class Params
   
   
 end # class Params
+
 
 # /Namespace
 # =======================================================================

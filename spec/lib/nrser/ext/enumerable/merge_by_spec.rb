@@ -1,8 +1,8 @@
-require 'nrser/core_ext/enumerable/merge_by'
+require 'nrser/ext/enumerable/merge_by'
 
 SPEC_FILE(
   spec_path: __FILE__,
-  module: Enumerable,
+  module: NRSER::Ext::Enumerable,
   instance_method: :merge_by,
 ) do
     
@@ -37,7 +37,7 @@ SPEC_FILE(
       ]
     }
     
-    subject { current.merge_by update, &[:item_id] }
+    subject { current.n_x.merge_by( update ) { |a| a[ :item_id ] } }
     
     it {
       is_expected.to include(

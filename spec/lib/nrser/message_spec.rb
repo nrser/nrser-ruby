@@ -1,3 +1,5 @@
+require 'nrser/ext/array'
+
 require 'nrser/refinements/types'
 using NRSER::Types
 
@@ -7,6 +9,7 @@ CLASS NRSER::Message do
   INSTANCE_METHOD "#to_proc" do
         
     CASE "mapping an Enumerable using &message" do
+      
       subject { ->( message ) { enum.map &message } }
       
       WHEN enum: [ [], [1], [1, 2] ] do
@@ -31,7 +34,7 @@ CLASS NRSER::Message do
     
     describe "Array#to_message" do
       
-      subject { array.to_message }
+      subject { array.n_x.to_message }
       
       WHEN array: [:fetch, :x] do
         it {

@@ -28,7 +28,7 @@ SPEC_FILE(
         it "includes {I8::Struct}" do
           expect( I8::Struct > subject ).to be true; end
 
-        INSTANCE width: 2, length: 3 do
+        NEW width: 2, length: 3 do
           it { is_expected.
             to have_attributes width: 2, length: 3, area: 6 }; end
       end

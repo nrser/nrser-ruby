@@ -2,8 +2,9 @@ require 'nrser/ext/enumerable/slice'
 
 SPEC_FILE(
   spec_path: __FILE__,
-  module: NRSER::Ext::Enumerable,
-  instance_method: :slice?,
+  # TODO  Fix!!!
+  # module: NRSER::Ext::Enumerable,
+  # instance_method: :slice?,
 ) do
 
   subject do

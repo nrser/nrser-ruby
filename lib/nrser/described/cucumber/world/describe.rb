@@ -213,7 +213,7 @@ module Describe
       described
     else
       describe :parameters,
-        subject: NRSER::Meta::Params.new( named: { name => value } )
+        subject: NRSER::Meta::Params::Named.new( named: { name => value } )
     end
   end # #describe_param
   
@@ -239,7 +239,7 @@ module Describe
       block = nil
     end
     
-    Meta::Params.new( args: args, block: block )
+    Meta::Params::Simple.new *args, &block
   end # #params_for_positional_values
   
   

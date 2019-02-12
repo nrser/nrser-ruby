@@ -177,7 +177,7 @@ SPEC_FILE(
       # **********************************************************************
       
       
-      SETUP "Deriving a new point from another", focus: true do
+      SETUP "Deriving a new point from another" do
       # ======================================================================
       # 
       # Our point instances are immutable, but we can use {Hamster::Vector}'s

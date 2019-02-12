@@ -47,7 +47,7 @@ SPEC_FILE(
     END
 
     expect(
-      binding.erb <<-END
+      binding.n_x.erb <<-END
        dump is:
        
        <%= dump %>
@@ -74,7 +74,7 @@ SPEC_FILE(
     END
     
     expect(
-      binding.erb %{
+      binding.n_x.erb %{
         dump is:
         
             <%= dump %>
