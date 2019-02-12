@@ -10,6 +10,7 @@
       "request": "launch",
       "program": "${workspaceRoot}/dev/bin/rspec",
       "args": [
+        "--force-color",
         "--require",
         "${workspaceRoot}/spec/support/described.rb",
         "--fail-fast",
@@ -29,6 +30,7 @@
       "request": "launch",
       "program": "${workspaceRoot}/dev/bin/rspec",
       "args": [
+        "--force-color",
         "--require",
         "${workspaceRoot}/spec/support/described.rb",
         "--next-failure",
@@ -46,7 +48,10 @@
       "type": "Ruby",
       "request": "launch",
       "program": "${workspaceRoot}/dev/bin/cucumber",
-      "args": [ "--fail-fast", "${file}" ],
+      "args": [
+        "--fail-fast",
+        "${file}"
+      ],
       "useBundler": true,
       "env": {
         "VSCODE_RUBY_DEBUG": "TRUE",
