@@ -1,14 +1,6 @@
 # encoding: UTF-8
 # frozen_string_literal: true
 
-# Requirements
-# =======================================================================
-
-# Project / Package
-# -----------------------------------------------------------------------
-
-require 'nrser/no_arg'
-
 
 # Namespace
 # =======================================================================
@@ -43,14 +35,16 @@ module  Meta
 # The tests in `spec/nrser/class_attrs_spec.rb` provide detailed walk-through
 # of usage and differences from other approaches.
 # 
-module NRSER::Meta::ClassAttrs
+module ClassAttrs
   
   # Class methods to extend the receiver with when {NRSER::Meta::ClassAttrs}
   # is included.
   module ClassMethods
+    MISSING = ::Object.new
+  
     def instance_variable_lookup  name,
-                                  default: NRSER::NO_ARG,
-                                  default_from: NRSER::NO_ARG
+                                  default: MISSING,
+                                  default_from: MISSING
       
       # If it's defined here on self, return that
       if instance_variable_defined? name
@@ -75,10 +69,10 @@ module NRSER::Meta::ClassAttrs
       # Ok, nothing was found.
       
       # See if we can use a default...
-      if default != NRSER::NO_ARG || default_from != NRSER::NO_ARG
+      if  default != MISSING || default_from != MISSING
         # We can use a default.
         # `default` takes precedence.
-        if default != NRSER::NO_ARG
+        if default != MISSING
           default
         else
           send default_from
@@ -95,8 +89,8 @@ module NRSER::Meta::ClassAttrs
     
 
     def class_attr_accessor attr,
-                            default: NRSER::NO_ARG,
-                            default_from: NRSER::NO_ARG,
+                            default: MISSING,
+                            default_from: MISSING,
                             write_once: false
       
       var_name = "@#{ attr }".to_sym
