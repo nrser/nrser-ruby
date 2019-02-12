@@ -8,7 +8,7 @@
 # Project / Package
 # ------------------------------------------------------------------------
 
-require 'nrser/sugar/method_missing_forwarder'
+require 'nrser/meta/method_missing_forwarder'
 
 
 # Namespace
@@ -122,7 +122,7 @@ module DynamicBinding
 
 
   def nrser_ext
-    NRSER::MethodMissingForwarder.new do |name, *args, &block|
+    Meta::MethodMissingForwarder.new do |name, *args, &block|
       nrser_ext_call name, *args, &block
     end
   end

@@ -1,10 +1,11 @@
 # encoding: UTF-8
 # frozen_string_literal: true
 
-# Declarations
-# =======================================================================
+# Namespace
+# ============================================================================
 
-module NRSER; end
+module  NRSER
+module  Meta
 
 
 # Definitions
@@ -13,7 +14,7 @@ module NRSER; end
 # A very simple class that forwards all method calls to the block it was
 # initialized with (via {#method_missing}).
 # 
-class NRSER::MethodMissingForwarder < BasicObject
+class MethodMissingForwarder < ::BasicObject
   
   # Constructor
   # ========================================================================
@@ -48,3 +49,11 @@ class NRSER::MethodMissingForwarder < BasicObject
   end
   
 end # class NRSER::MethodMisser
+
+
+# /Namespace
+# ============================================================================
+
+end # module  Meta
+end # module  NRSER
+
