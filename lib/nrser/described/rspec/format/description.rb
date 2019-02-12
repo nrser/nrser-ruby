@@ -4,17 +4,21 @@
 # Requirements
 # ========================================================================
 
-### Deps ###
-
-# Using {::Module#anonymous?}
-require 'active_support/core_ext/module/anonymous'
-
 ### Project / Package ###
 
-require 'nrser/ext/module'
-
+#### Sub-Tree ####
 require_relative './list'
 require_relative './kwds'
+
+
+# Refinements
+# ============================================================================
+
+require 'nrser/ext/module'
+using NRSER::Ext::Module
+
+require 'nrser/ext/pathname'
+using NRSER::Ext::Pathname
 
 
 # Namespace
@@ -29,29 +33,30 @@ module  Format
 # Definitions
 # =======================================================================
 
-# A {List} that in specific represents arguments to a method.
+# The core string-description-making functionality.
 # 
 class Description < ::String
-  def self.string_for element
-    if element.respond_to? :to_desc
-      desc = element.to_desc
+  
+  def self.string_for raw_element
+    if raw_element.respond_to? :to_desc
+      desc = raw_element.to_desc
       if desc.empty?
         ''
       else
         Format.md_code_quote desc
       end
     else
-      case element
+      case raw_element
       when ::Module
-        mod = element
+        mod = raw_element
         
         name_desc = if mod.anonymous?
-          "(anonymous #{ element.class })"
+          "(anonymous #{ raw_element.class })"
         else
           Format.md_code_quote mod.name
         end
         
-        source_location_string = string_for mod.n_x.source_location
+        source_location_string = string_for mod.source_location
 
         if source_location_string.empty?
           name_desc
@@ -60,22 +65,25 @@ class Description < ::String
         end
         
       when Meta::Source::Location
-        if  element.valid? && 
-            Pathname.getwd.n_x.subpath?( element.file ) &&
-            !Pathname.getwd.join( '.bundle' ).n_x.subpath?( element.file )
-          "#{ Pathname.new( element.file ).n_x.to_dot_rel_s }:#{ element.line }"
+        if  raw_element.valid? && 
+            Pathname.getwd.subpath?( raw_element.file ) &&
+            !Pathname.getwd.join( '.bundle' ).subpath?( raw_element.file )
+          [
+            Pathname.new( raw_element.file ).to_dot_rel_s,
+            raw_element.line
+          ].join ';'
         else
           ''
         end
         
       when ::String
-        element
+        raw_element
       
       when ::Pathname
-        Format.pathname element
+        Format.pathname raw_element
       
       when Message
-        [element.symbol, element.args].
+        [raw_element.symbol, raw_element.args].
           map( &Format.method( :short_s ) ).
           join( ', ' )
       
@@ -84,11 +92,21 @@ class Description < ::String
         "Proc"
 
       else
-        Format.short_s element
+        Format.short_s raw_element
         
       end
     end
-  end
+  end # .string_for
+  
+  
+  def self.prepend_type type, description
+    return description if type.nil?
+    
+    prefix = Format.pastel.magenta \
+      Format.i( type.to_s.upcase.gsub('_', ' ') )
+    
+    "#{ prefix } #{ description }"
+  end # .prepend_type
 
   
   # TODO document `raw_elements` attribute.
@@ -126,7 +144,7 @@ class Description < ::String
     @strings = raw_elements.map { |e| self.class.string_for e }
     @joined = @strings.join( ' ' ).squish
     @type = type
-    super( Format.prepend_type type, Format.mean_streak.render( @joined ) )
+    super( self.class.prepend_type type, Format.mean_streak.render( @joined ) )
   end
 
 

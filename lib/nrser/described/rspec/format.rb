@@ -48,30 +48,19 @@ end # .format
 # String formatting utilities.
 # 
 module Format
-
-  # Constants
-  # =====================================================================
-  
-  # Symbol characters for specific example group types.
-  # 
-  # Sources:
-  # 
-  # -   https://en.wikipedia.org/wiki/Mathematical_operators_and_symbols_in_Unicode
-  # 
-  PREFIXES = {
-    section: '§',
-    group: '•',
-    invocation: '𝑓⟮𝑥⟯',
-  }
-  
   
   def self.short_s value, max = 64
     NRSER.smart_ellipsis value.inspect, max
   end # .short_s
   
   
+  # Get the {Pastel} instance to color with. The instance is enabled depending
+  # on `::RSpec.configuration.color`.
+  # 
+  # @return [Pastel]
+  # 
   def self.pastel
-    @pastel ||= Pastel.new
+    @pastel ||= Pastel.new enabled: ::RSpec.configuration.color
   end
   
   
@@ -175,19 +164,6 @@ module Format
   end
   
   
-  def self.prepend_type type, description
-    return description if type.nil?
-    
-    prefixes = ::RSpec.configuration.x_type_prefixes
-    
-    prefix = pastel.magenta(
-      prefixes[type] || i( type.to_s.upcase.gsub('_', ' ') )
-    )
-    
-    "#{ prefix } #{ description }"
-  end # .format_type
-  
-  
   def self.pathname pn
     if pn.absolute?
       rel = pn.relative_path_from Pathname.getwd
@@ -213,61 +189,6 @@ module Format
   rescue
     pn.inspect
   end
-  
-  
-  def self.description *parts, type: nil
-    parts.
-      flat_map { |part|
-        if part.respond_to? :to_desc
-          desc = part.to_desc
-          if desc.empty?
-            ''
-          else
-            md_code_quote desc
-          end
-        else
-          case part
-          when Module
-            mod = part
-            
-            name_desc = if mod.anonymous?
-              "(anonymous #{ part.class })"
-            else
-              md_code_quote mod.name
-            end
-            
-            [name_desc, description( mod.source_location )]
-            
-          when NRSER::Meta::Source::Location
-            if part.valid?
-              "(#{ Pathname.new( part.file ).n_x.to_dot_rel_s }:#{ part.line })"
-            else
-              ''
-            end
-            
-          when String
-            part
-          
-          when Pathname
-            pathname part
-          
-          when NRSER::Message
-            [part.symbol, part.args].
-              map( &method( :short_s ) ).join( ', ' )
-            
-          else
-            short_s part
-            
-          end
-        end
-      }.
-      join( ' ' ).
-      squish.
-      n_x.
-      thru { |description|
-        prepend_type type, mean_streak.render( description )
-      }
-  end # .description
   
 end # module Format
 

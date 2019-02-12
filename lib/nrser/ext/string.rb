@@ -17,6 +17,7 @@ require 'active_support/core_ext/string/filters'
 require_relative './string/sys/env'
 require_relative './string/format'
 require_relative './string/inflections'
+require_relative './string/looks_like'
 require_relative './string/style'
 require_relative './string/text'
 
@@ -85,6 +86,11 @@ module String
         super( prefix )
       end
     }
+  end
+  
+  
+  refine ::String do
+    prepend String
   end
   
 end # module String

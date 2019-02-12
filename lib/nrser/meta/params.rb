@@ -40,6 +40,21 @@ class Params
 end
 
 class Params::Simple < Params
+  
+  # Positional parameter values.
+  # 
+  # @return [::Array]
+  #     
+  attr_reader :args
+  
+  
+  # Block parameter (if any).
+  # 
+  # @return [::Proc?]
+  #     
+  attr_reader :block
+  
+
   def initialize *args, &block
     @args = args
     @block = block

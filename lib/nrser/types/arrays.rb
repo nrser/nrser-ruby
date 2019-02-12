@@ -11,6 +11,14 @@ require_relative './is_a'
 require_relative './top'
 
 
+# Refinements
+# ============================================================================
+
+# Using {NRSER::Ext::String#looks_like_json_array?}
+require 'nrser/ext/string'
+using NRSER::Ext::String
+
+
 # Namespace
 # ========================================================================
 
@@ -85,7 +93,7 @@ class ArrayType < IsA
   
   def custom_from_s string
     # Does it looks like a JSON array?
-    if NRSER.looks_like_json_array? string
+    if string.looks_like_json_array?
       # It does! Load it
       begin
         return JSON.load( string )

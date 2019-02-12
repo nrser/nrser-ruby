@@ -209,6 +209,11 @@ module Pathname
     directory? ? self : dirname
   end
   
+  
+  refine ::Pathname do
+    prepend Ext::Pathname
+  end
+  
 end # module Pathname
 
 

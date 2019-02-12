@@ -1,8 +1,14 @@
-require 'spec_helper'
+require 'nrser/strings'
 
-describe "NRSER.common_prefix" do
-  it "raises an error if argument is empty" do
-    expect{ NRSER.common_prefix [] }.to raise_error ArgumentError
+SPEC_FILE(
+  spec_path:        __FILE__,
+  method:           'NRSER::Strings.common_prefix',
+) do
+
+  CASE "raises an error if argument is empty" do
+    CALLED_WITH [] do
+      it { expect { subject }.to raise_error ArgumentError }
+    end
   end
 
   it "works on a single string" do
@@ -36,4 +42,5 @@ describe "NRSER.common_prefix" do
     
     expect( NRSER.common_prefix str.lines ).to eq '      '
   end
-end # common_prefix
+
+end # SPEC_FILE

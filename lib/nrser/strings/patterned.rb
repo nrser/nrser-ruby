@@ -4,17 +4,12 @@
 # Requirements
 # =======================================================================
 
-# Stdlib
-# -----------------------------------------------------------------------
-
-# Deps
-# -----------------------------------------------------------------------
+### Deps ###
 
 # Using {::Class#descendants} in {Patterned.realizations}
 require 'active_support/core_ext/class/subclasses'
 
-# Project / Package
-# -----------------------------------------------------------------------
+### Project / Package ###
 
 # Using {NRSER::Regexps::Composed.join} and {NRSER::Regexps::Composed.or} to
 # compose {Names::Name.pattern} instances.

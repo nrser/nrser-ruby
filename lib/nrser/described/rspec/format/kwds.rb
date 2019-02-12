@@ -30,10 +30,10 @@ class Kwds < ::Hash
     
     map { |key, value|
       if key.is_a? Symbol
-        "#{ key }: #{ NRSER::RSpec.short_s value, max }"
+        "#{ key }: #{ Format.short_s value, max }"
       else
-        [ NRSER::RSpec.short_s( key, max ),
-          NRSER::RSpec.short_s( value, max ),
+        [ Format.short_s( key, max ),
+          Format.short_s( value, max ),
         ].join ' => '
       end
     }.join( ", " )

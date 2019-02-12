@@ -5,8 +5,13 @@
 # Requirements
 # ========================================================================
 
-# Project / Package
-# ------------------------------------------------------------------------
+### Deps ###
+
+# Not sure if I want all of AS's Module stuff, but def want 
+# {::Module#anonymous?}
+require 'active_support/core_ext/module/anonymous'
+
+### Project / Package ###
 
 # Submodules
 require_relative './module/method_objects'
@@ -27,6 +32,11 @@ module  Ext
 # Extensions for {::Module}.
 # 
 module Module
+  
+  refine ::Module do
+    prepend Ext::Module
+  end
+
 end # module Module
 
 

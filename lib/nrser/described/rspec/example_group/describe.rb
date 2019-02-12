@@ -10,6 +10,7 @@
 
 require 'nrser/described/hierarchy/node'
 require 'nrser/described/rspec/example_hierarchy'
+require 'nrser/described/rspec/ext'
 
 # Sub-tree
 require_relative './describe/attribute'
@@ -57,20 +58,6 @@ module  ExampleGroup
 # 
 module Describe
   
-  def self.description_for described
-    type = described.class.name.demodulize.underscore
-    
-    content = if described.resolved? && described.subject?
-      described.subject
-    else
-      described
-    end
-    
-    Described::RSpec::Format.description content, type: type
-  end
-  
-  
-  
   def hierarchy
     metadata[ :hierarchy ]
   rescue ::NameError => error
@@ -80,6 +67,21 @@ module Describe
   end
   
   
+  # The current (latest added) {Described::Base} instance (if any).
+  # 
+  # @note
+  #   This does **not** include "custom" subjects in *any way* ("custom"
+  #   subjects are "normal" RSpec `subject { ... }` definitions in example
+  #   groups, which we *do* cast into {Described::Base} in the 
+  #   {ExampleHierarchy} returned by example's {Example#hierarchy} methods).
+  # 
+  # @return [Described::Base]
+  #   When a description instance has been added to this or a ancestor example
+  #   group.
+  # 
+  # @return [nil]
+  #   When no description instances have been added.
+  # 
   def described
     metadata[ :described ]
   rescue ::NameError => error
@@ -155,7 +157,7 @@ module Describe
     end
     
     describe(
-      Describe.description_for( self_described ),
+      self_described.rspec_description,
       **metadata,
       described: self_described,
       hierarchy: hierarchy,

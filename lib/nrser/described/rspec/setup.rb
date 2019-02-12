@@ -21,10 +21,6 @@ require_relative './top_level_mixin'
   config.extend   NRSER::Described::RSpec::ExampleGroup
   config.include  NRSER::Described::RSpec::Example
   
-  config.add_setting :x_type_prefixes
-  config.x_type_prefixes = \
-    NRSER::Described::RSpec::Format::PREFIXES
-  
   config.add_setting :x_style, default: :esc_seq
 end
 

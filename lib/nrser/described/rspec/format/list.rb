@@ -32,7 +32,7 @@ class List < ::Array
   def to_desc max = nil
     return '' if empty?
     max = [16, 64 / self.length].max if max.nil?
-    map { |entry| NRSER::RSpec.short_s entry, max }.join ", "
+    map { |entry| Format.short_s entry, max }.join ", "
   end
 end
 
