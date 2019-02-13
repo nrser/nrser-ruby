@@ -4,6 +4,8 @@ require 'nrser/ext/string/format'
 # Using {NRSER::Ext::Array#rest}
 require 'nrser/ext/array'
 
+require 'nrser/strings/common_prefix'
+
 module NRSER
 
   # @!group Text Functions  
@@ -21,7 +23,7 @@ module NRSER
   # =====================================================================
   
   def self.find_indent text
-    common_prefix lines( text ).map { |line| line[INDENT_RE] }
+    Strings.common_prefix lines( text ).map { |line| line[INDENT_RE] }
   end
   
   

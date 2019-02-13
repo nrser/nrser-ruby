@@ -21,22 +21,6 @@ module NRSER
   # @!group String Functions
   # ==========================================================================
   
-  def self.common_prefix strings
-    raise ArgumentError.new("argument can't be empty") if strings.empty?
-    
-    sorted = strings.sort
-    
-    i = 0
-    
-    while sorted.first[i] == sorted.last[i] &&
-          i < [sorted.first.length, sorted.last.length].min
-      i = i + 1
-    end
-    
-    sorted.first[0...i]
-  end # .common_prefix
-  
-  
   def self.filter_repeated_blank_lines str, remove_leading: false
     out = []
     lines = str.lines
