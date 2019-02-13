@@ -10,6 +10,13 @@ require 'nrser/errors/argument_error'
 require 'nrser/errors/type_error'
 
 
+# Refinements
+# ============================================================================
+
+require 'nrser/refinements/types'
+using NRSER::Types
+
+
 # Declarations
 # =======================================================================
 
@@ -43,24 +50,21 @@ class NRSER::Sys::Env::Path
   #   @todo Document return value.
   # 
   def self.normalize source
-    paths = if source.nil?
-      []
     
-    elsif source.is_a?( String )
-      source.to_s.split SEPARATOR
+    paths = t.match source,
+      t.Nil, [],
       
-    elsif NRSER.array_like?( source )
-      # Flatten it if supported
-      source = source.flatten if source.respond_to?( :flatten )
+      t.String, ->( string ) {
+        string.split SEPARATOR
+      },
       
-      # Stringify each segment, split them and concat results
-      source.flat_map { |entry| entry.to_s.split SEPARATOR }
-    
-    else
-      raise NRSER::ArgumentError.new \
-        %{Expected a string or an "array-like" `source` param.},
-        source: source
-    end
+      t.array_like, ->( array_like ) {
+        # Flatten it if supported
+        array_like = array_like.flatten if array_like.respond_to?( :flatten )
+        
+        # Stringify each segment, split them and concat results
+        array_like.flat_map { |entry| entry.to_s.split SEPARATOR }
+      }
     
     Hamster::Vector.new paths.
       # Get rid of empty paths
@@ -69,6 +73,7 @@ class NRSER::Sys::Env::Path
       uniq.
       # Freeze all the strings
       map( &:freeze )
+      
   end # .normalize
   
   

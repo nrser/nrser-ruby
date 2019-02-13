@@ -62,28 +62,22 @@ module NRSER
   #   If `&block` is not provided.
   # 
   def self.map_branches tree, &block
+    require 'nrser/types'
+    
     if block.nil?
       raise ArgumentError, "Must provide block"
     end
     
     pairs = each_branch( tree ).map &block
     
-    if hash_like? tree
-      pairs.to_h
-    elsif array_like? tree
-      pairs.each_with_object( [] ) { |(index, value), array|
-        array[index] = value
+    Types.match tree,
+      Types.hash_like, -> { pairs.to_h },
+      
+      Types.array_like, -> {
+        pairs.each_with_object( [] ) { |(index, value), array|
+          array[index] = value
+        }
       }
-    else
-      raise TypeError.new erb binding, <<-END
-        Excepted `tree` arg to be array or hash-like.
-        
-        Received (<%= tree.class %>):
-        
-            <%= tree.pretty_inspect %>
-        
-      END
-    end
     
   end # .map_branches
   

@@ -41,23 +41,23 @@ module  ExampleGroup
 # Definitions
 # ========================================================================
 
-# The core of {RSpec} - example group extension that provides contextual
-# "describe" methods for things like modules, classes, methods, etc.
-# 
-# All methods boil-down to calling {RSpec.describe}, but first process 
-# contextual parameters, create metadata, etc.
-# 
-# "Describe" methods are separated into their own submodule that is mixed in
-# to {RSpec::ExampleGroup} so that they can also be mixed in to the top-level
-# scope to expose the methods globally, allowing you to start a file with 
-# just
-# 
-#     SPEC_FILE( ... ) do
-# 
-# Methods are defined in separate source files for organization's sake.
+# Methods mixed in to {::RSpec::Core::ExampleGroup} to use {Described}.
 # 
 module Describe
   
+  # The group (singleton-level) {Hierarchy}. Only includes {Described::Base}
+  # instances defined with {#DESCRIBE} and friends, no casted "custom" 
+  # subjects like {Example#hierarchy} (because they're not available in the
+  # example group context).
+  # 
+  # @return [Hierarchy::NodeHierarchy]
+  #   When a {Described::Base} has been defined in this or an ancestor example
+  #   group. From `#metadata[ :hierarchy ]`.
+  # 
+  # @return [nil]
+  #   When no {Described::Base} has been defined in this or an ancestor example
+  #   group.
+  # 
   def hierarchy
     metadata[ :hierarchy ]
   rescue ::NameError => error
@@ -67,7 +67,8 @@ module Describe
   end
   
   
-  # The current (latest added) {Described::Base} instance (if any).
+  # The current (latest added) {Described::Base} instance (if any). Gets it
+  # from the `#metadata`.
   # 
   # @note
   #   This does **not** include "custom" subjects in *any way* ("custom"
@@ -91,6 +92,14 @@ module Describe
   end
   
   
+  # The {Described::Base} attached to *this* instance, if any.
+  # 
+  # @return [Described::Base]
+  #   When this example group is a described one.
+  # 
+  # @return [nil]
+  #   When this example group is not a described one.
+  # 
   def self_described
     @self_described
   end

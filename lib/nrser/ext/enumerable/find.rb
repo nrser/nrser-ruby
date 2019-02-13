@@ -11,8 +11,6 @@
 require 'nrser/errors/argument_error'
 require 'nrser/errors/multiple_errors'
 
-require 'nrser/types'
-
 
 # Namespace
 # ========================================================================
@@ -101,10 +99,12 @@ module Enumerable
   #   If the results of `#find_all &block` don't satisfy `bounds`.
   # 
   def find_bounded! bounds, &block
-    NRSER::Types.
+    require 'nrser/types'
+    
+    Types.
       length( bounds ).
       check!( find_all &block ) { |type:, value:|
-        raise NRSER::Types::CheckError.new \
+        raise Types::CheckError.new \
           "Length of found elements", value.length, "FAILED to satisfy",
           "bounds conditions", type,
           value: value,
@@ -124,8 +124,10 @@ module Enumerable
   #   If `bounds` are not met by find results.
   # 
   def find_bounded bound, &block
+    require 'nrser/types'
+    
     n_x.find_bounded! bound, &block
-  rescue NRSER::Types::CheckError => error
+  rescue Types::CheckError => error
     nil
   end # #find_bounded
   
@@ -169,6 +171,8 @@ module Enumerable
   #   When `&block` matches more or less than one entry.
   #   
   def find_only &block
+    require 'nrser/types'
+    
     n_x.find_only! &block
   rescue NRSER::Types::CheckError => error
     nil
@@ -209,7 +213,7 @@ module Enumerable
     count = self.count
     
     unless count == 1
-      raise NRSER::CountError.new value: self,
+      raise CountError.new value: self,
                                   count: count,
                                   expected: 1
     end
@@ -246,7 +250,7 @@ module Enumerable
     each do |*args|
       begin
         result = block.call *args
-      rescue Exception => error
+      rescue ::Exception => error
         errors << error
       else
         return result
@@ -257,7 +261,7 @@ module Enumerable
       raise ArgumentError,
         "Appears that enumerable was empty: #{ inspect }"
     else
-      raise NRSER::MultipleErrors.new errors
+      raise MultipleErrors.new errors
     end
   end # .try_find
   

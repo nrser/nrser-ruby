@@ -79,7 +79,6 @@ module Enumerable
       hash[ block.call entry ] += 1
     end
   end # #count_by
-
   
 end # module Enumerable
 
