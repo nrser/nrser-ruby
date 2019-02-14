@@ -49,6 +49,7 @@
       "request": "launch",
       "program": "${workspaceRoot}/dev/bin/cucumber",
       "args": [
+        "--color",
         "--fail-fast",
         "${file}"
       ],
@@ -63,7 +64,13 @@
       "type": "Ruby",
       "request": "launch",
       "program": "${workspaceRoot}/dev/bin/cucumber",
-      "args": [ "--fail-fast", "${file}", "--tags", "@focus" ],
+      "args": [
+        "--color",
+        "--fail-fast",
+        "${file}",
+        "--tags",
+        "@focus"
+      ],
       "useBundler": true,
       "env": {
         "VSCODE_RUBY_DEBUG": "TRUE",
@@ -75,7 +82,7 @@
       "type": "Ruby",
       "request": "launch",
       "program": "${workspaceRoot}/dev/bin/cucumber",
-      "args": [ "--fail-fast", "--tags", "@focus" ],
+      "args": [ "--color", "--fail-fast", "--tags", "@focus" ],
       "useBundler": true,
       "env": {
         "VSCODE_RUBY_DEBUG": "TRUE",
@@ -87,7 +94,7 @@
       "type": "Ruby",
       "request": "launch",
       "program": "${workspaceRoot}/dev/bin/cucumber",
-      "args": [ "--fail-fast", "--last-failed-file" ],
+      "args": [ "--color", "--fail-fast", "--last-failed-file" ],
       "useBundler": true,
       "env": {
         "VSCODE_RUBY_DEBUG": "TRUE",
@@ -99,7 +106,7 @@
       "type": "Ruby",
       "request": "launch",
       "program": "${workspaceRoot}/dev/bin/cucumber",
-      "args": [ "--fail-fast" ],
+      "args": [ "--color", "--fail-fast" ],
       "useBundler": true,
       "env": {
         "VSCODE_RUBY_DEBUG": "TRUE",
