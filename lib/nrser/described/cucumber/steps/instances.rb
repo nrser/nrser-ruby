@@ -51,6 +51,12 @@ module Instances
   # Steps
   # ==========================================================================
   
+  AN_INSTANCE = \
+    Step "an instance:" do |source|
+      describe :instance, subject: eval( source )
+    end
+  
+  
   CREATE_A_NEW_INSTANCE,
   CONSTRUCT_AN_INSTANCE = \
     [

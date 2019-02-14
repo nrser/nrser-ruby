@@ -47,6 +47,11 @@ class Instance < Object
     params.call class_.method( method_name || :new )
   end
   
+  
+  subject_from object: ::Object do |object:|
+    object
+  end
+  
 end # class Callable
 
 

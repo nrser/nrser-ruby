@@ -72,14 +72,14 @@ class InitValue < Parameter
   # @return [nil]
   #   `object` will not resolve a value for this matcher now or in the future.
   # 
-  def futurize object
-    if type.test? object
-      Resolution::Future.new value: object
-      
-    elsif object.is_a?( Described::Base )
+  def futurize object      
+    if object.is_a?( Described::Base )
       Resolution::Future.new \
         described: object, 
         method_name: :subject
+        
+    elsif type.test? object
+      Resolution::Future.new value: object
       
     else
       nil
@@ -98,7 +98,7 @@ class InitValue < Parameter
   # @return [::String]
   # 
   def to_s
-    "#{ self.class }[ #{ described_class.to_s } ]"
+    "#{ self.class }[ #{ type.to_s } ]"
   end
   
   

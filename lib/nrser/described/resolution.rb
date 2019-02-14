@@ -26,6 +26,8 @@ require 'nrser/log'
 # Mixing in my custom pretty printing
 require 'nrser/support/pp'
 
+require_relative './resolution/failed_error'
+
 
 # Refinements
 # =======================================================================
@@ -255,10 +257,25 @@ class Resolution
           t.match parameter,
             
             SubjectFrom::InitValue, -> {
-              if (future = parameter.futurize( described.init_values[ name ] ))
+              if  described.init_values.key?( name ) &&
+                  (future = parameter.futurize( described.init_values[ name ] ))
                 @resolved_futures[ name ] = future
                 true
               
+              # FIXME This... is not great / right / perfect. `nil` coming from
+              #       a missing init value is problematic for things that accept
+              #       {::Object} because `nil` *is* an {::Object}, causing them
+              #       to use it, breaking shit.
+              #       
+              #       This is a bit of a band-aid: if the type is a 
+              #       {Types::Maybe} then we know it really is optional and we
+              #       try to use `nil`
+              #       
+              elsif parameter.type.is_a?( Types::Maybe ) &&
+                    (future = parameter.futurize( nil ))
+                @resolved_futures[ name ] = future
+                true
+                
               else
                 # We're done - we can never successfully resolve because neither
                 # `described`'s init values for `name` (which may be
@@ -272,7 +289,8 @@ class Resolution
                         name: name,
                         value: described.init_values[ name ],
                         parameter: parameter
-                return
+                # return <- Doesn't return from method! Must raise 'n rescue:
+                raise FailedError.new
               end # begin / rescue
             },
             
@@ -280,7 +298,8 @@ class Resolution
               if described.init_values.key?( name )
                 if (  future =
                         parameter.futurize( described.init_values[ name ] ) )
-                  add_candidate! name, future
+                  # add_candidate! name, future
+                  @resolved_futures[ name ] = future
                   true
                 end
               end
@@ -290,8 +309,10 @@ class Resolution
         any?
         
       # If we updated the state at all, see if we got it already
-      try_to_resolve! if updated
+      try_to_resolve! if updated && resolving?
       
+      nil
+    rescue FailedError => error
       nil
     end # init_update_from_described!
   

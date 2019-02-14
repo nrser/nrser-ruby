@@ -51,7 +51,19 @@ module Methods
       describe :method,
         subject: subject.method( method_name.bare_name )
     end
-
+  
+  
+  BOUND_METHOD = \
+    Step "I bind the instance method to the {described}" do |described|
+      instance = if described.is_a?( Described::Instance )
+        described
+      else
+        # if described.
+        describe :instance, object: described
+      end
+      
+      describe :method, instance: instance
+    end
   
 end # module Methods
 

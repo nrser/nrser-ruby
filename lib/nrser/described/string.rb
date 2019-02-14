@@ -7,8 +7,8 @@
 # Project / Package
 # -----------------------------------------------------------------------
 
-# Extending in {Helpers}
-require_relative './helpers'
+# Extending {Object}
+require_relative './object'
 
 
 # Namespace
@@ -16,40 +16,25 @@ require_relative './helpers'
 
 module  NRSER
 module  Described
-module  Cucumber
-module  Steps
 
 
 # Definitions
 # =======================================================================
 
-module Objects
+# Describes any old object.
+# 
+class String < Object
   
-  # Mixins
-  # ==========================================================================
+  # Config
+  # ========================================================================
   
-  extend Helpers
+  subject_type ::String
   
-  
-  # Steps
-  # ==========================================================================
-  
-  THE_OBJECT = \
-    Step "the object {value}" do |value|
-      describe :object, subject: value
-    end
-  
-  THE_STRING = \
-    Step "a/the string:" do |string|
-      describe :string, subject: string
-    end
-  
-end # module Objects
+end # class Object
+
 
 # /Namespace
 # =======================================================================
 
-end # module Steps
-end # module Cucumber
 end # module Described
 end # module NRSER

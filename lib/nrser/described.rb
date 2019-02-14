@@ -32,6 +32,7 @@ require_relative './described/method'
 require_relative './described/module'
 require_relative './described/object'
 require_relative './described/response'
+require_relative './described/string'
 
 
 require 'nrser/refinements/types'

@@ -41,7 +41,7 @@ class Method < Callable
   subject_type ::Method
   
   
-  subject_from instance: Instance, unbound_method: UnboundMethod \
+  subject_from instance: Instance, unbound_method: InstanceMethod \
   do |instance:, unbound_method:|
     unbound_method.bind instance
   end

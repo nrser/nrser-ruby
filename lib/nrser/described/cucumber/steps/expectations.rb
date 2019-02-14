@@ -91,6 +91,12 @@ module Expectations
     Step "the {described} is equal to:" do |described, string|
       expect( subject ).to eq eval( string )
     end
+    
+    
+  X_IS_EQUAL_TO_STRING = \
+    Step "the {described} is equal to the string:" do |described, string|
+      expect( subject ).to eq string
+    end
 
   
   X_IS_INLINE = \
@@ -98,7 +104,8 @@ module Expectations
     do |described_name, value|
       expect_described( described_name ).to be value
     end
-
+  
+  
   IT_HAS_ATTR_EQUAL_TO = \
     Step "it has a(n) {method_name} attribute equal to {value}" \
     do |method_name, value|
@@ -135,10 +142,12 @@ module Expectations
         method_name.bare_name => be( value )
     end
   
+  
   Step "the {described} has a {value} key with value {value}" \
   do |described, key, value|
     expect_described( described ).to include key => value
   end
+  
   
   Step "it has a {value} key with value {value}" \
   do |key, value|
