@@ -7,6 +7,9 @@
 # Project / Package
 # -----------------------------------------------------------------------
 
+# Using {Ext::String#smart_ellipsis}
+require 'nrser/ext/string/text/smart_ellipsis'
+
 require_relative './combinators'
 require_relative './when'
 require_relative './shape'
@@ -174,7 +177,7 @@ def_type        :Has,
   aliases:      [ :has, :includes ],
 &->( member, **options ) do
   # Provide a some-what useful default name
-  options[:name] ||= "Has<#{ NRSER.smart_ellipsis member.inspect, 64 }>"
+  options[:name] ||= "Has<#{ member.inspect.n_x.smart_ellipsis 64 }>"
   
   member_type = make member
 
@@ -215,7 +218,7 @@ def_type        :HasAny,
   aliases:      [ :intersects ],
 &->( *members, **options ) do
   options[:name] ||= \
-    "HasAny<#{ NRSER.smart_ellipsis members.inspect, 64 }>"
+    "HasAny<#{ members.inspect.n_x.smart_ellipsis 64 }>"
 
   member_types = members.map { |m| make m }
   

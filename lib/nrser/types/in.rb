@@ -9,11 +9,14 @@
 
 require 'nrser/errors/type_error'
 
+require 'nrser/ext/string/text/smart_ellipsis'
+
 # Namespace
 # ========================================================================
 
 module  NRSER
 module  Types
+
 
 
 # Definitions
@@ -40,19 +43,19 @@ module  Types
 #   
 #   @return [Type]
 #   
-#   @raise [NRSER::TypeError]
+#   @raise [TypeError]
 #     If `group` doesn't respond to `#include?`.
 # 
 def_type        :In,
   aliases:      [ :member_of ],
   from_s:       ->( s ) { s },
   default_name: ->( group, **options ) {
-                  "In<#{ NRSER.smart_ellipsis group.inspect, 64 }>"
+                  "In<#{ group.inspect.n_x.smart_ellipsis 64 }>"
                 },
   parameterize: :group,
 &->( group, **options ) do
   unless group.respond_to? :include?
-    raise NRSER::TypeError,
+    raise TypeError,
       "In `group` must respond to `:include?`",
       group: group
   end

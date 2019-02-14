@@ -1,15 +1,16 @@
+require 'nrser/ext/string'
+
 SPEC_FILE(
   description: "Gotchas",
   spec_path: __FILE__,
-  module: NRSER,
-  method: :dedent,
+  instance_method: 'NRSER::Ext::String#dedent',
 ) do
   
   CASE "Newline literals in HEREDOCs" do
   # ========================================================================
     
     subject do
-      super().call input
+      super().bind( input ).call
     end
     
     WHEN "when a HEREDOC has a with literal \\n" do

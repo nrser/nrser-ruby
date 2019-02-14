@@ -34,7 +34,7 @@ module Binding
     require 'erb'
     
     NRSER.filter_repeated_blank_lines(
-      NRSER.with_indent_tagged( NRSER.dedent( source ) ) { |tagged_str|
+      source.n_x.dedent.n_x.with_indent_tagged { |tagged_str|
         ERB.new( tagged_str ).result( self )
       },
       remove_leading: true

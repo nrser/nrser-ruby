@@ -22,7 +22,7 @@ module  Described
 
 class Base
   
-  def rspec_description
+  def rspec_description *additional_description
     type = self.class.name.demodulize.underscore.to_sym
     
     content = if resolved? && subject?
@@ -31,7 +31,10 @@ class Base
       described
     end
     
-    Described::RSpec::Format::Description.new content, type: type
+    Described::RSpec::Format::Description.new \
+      content,
+      *additional_description,
+      type: type
   end
   
 end # class Response

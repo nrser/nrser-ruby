@@ -1,9 +1,10 @@
-require 'spec_helper'
+require 'nrser/ext/string'
+using NRSER::Ext::String
 
-describe "NRSER.indent" do
+INSTANCE_METHOD "NRSER::Ext::String#indent" do
   it "indents a block" do
     expect(
-      NRSER.indent <<-BLOCK
+      <<-BLOCK.indent
 def f x
   x * x
 end
@@ -16,7 +17,7 @@ BLOCK
   end
 
   it "indents a single line string" do
-    expect( NRSER.indent "blah" ).to eq "  blah"
+    expect( "blah".indent ).to eq "  blah"
   end
 
 end # indent

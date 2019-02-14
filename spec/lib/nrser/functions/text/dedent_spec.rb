@@ -1,7 +1,7 @@
-require 'spec_helper'
+require 'nrser/ext/string'
+using NRSER::Ext::String
 
-METHOD "NRSER.dedent" do
-  subject { NRSER.method :dedent }
+INSTANCE_METHOD "NRSER::Ext::String#dedent" do
   
   let( :lines ) {
     [
@@ -17,22 +17,22 @@ METHOD "NRSER.dedent" do
   }
   
   it "removes indents" do
-    expect(
-      NRSER.dedent <<-BLOCK
-        def f x
-          x * x
-        end
-      BLOCK
-    ).to eq joined
+    block =  <<-BLOCK
+      def f x
+        x * x
+      end
+    BLOCK
+      
+    expect( block.dedent ).to eq joined
   end
 
   it "ignores things it that aren't indented" do
-    expect( NRSER.dedent joined ).to eq joined
+    expect( joined.dedent ).to eq joined
   end
 
   it "handles edge cases" do
-    expect( NRSER.dedent ''     ).to eq ''
-    expect( NRSER.dedent 'blah' ).to eq 'blah'
+    expect( ''.dedent ).to eq ''
+    expect( 'blah'.dedent ).to eq 'blah'
   end
   
   
@@ -69,7 +69,7 @@ METHOD "NRSER.dedent" do
     
     
     describe "dedent applied" do
-      subject { NRSER.dedent super() }
+      subject { super().dedent }
       
       it { is_expected.to eq "\n" + joined }
     end # "dedent"

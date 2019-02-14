@@ -10,6 +10,10 @@
 
 require 'nrser/functions/text'
 
+require_relative './text/ellipsis'
+require_relative './text/smart_ellipsis'
+require_relative './text/indentation'
+
 
 # Namespace
 # ========================================================================
@@ -28,35 +32,6 @@ module String
 
   # @!group Text Manipulation Instance Methods
   # --------------------------------------------------------------------------
-  
-  # Calls {NRSER.find_indent} on `self`.
-  def find_indent
-    NRSER.find_indent self
-  end
-  
-  
-  # Calls {NRSER.indented?} on `self`.
-  def self.indented?
-    NRSER.indented? self
-  end
-
-
-  # Calls {NRSER.dedent} on `self`.
-  def dedent *args
-    NRSER.dedent self, *args
-  end
-
-
-  # Calls {NRSER.dedent} on `self`.
-  def deindent *args
-    NRSER.dedent self, *args
-  end
-  
-
-  # Calls {NRSER.indent} on `self`.
-  def indent *args
-    NRSER.indent self, *args
-  end
 
 
   # Calls {NRSER.word_wrap} on `self`.

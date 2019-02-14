@@ -52,13 +52,7 @@ module String
 
   # @!group Format Instance Methods
   # --------------------------------------------------------------------------
-
-  # Calls {NRSER.ellipsis} on `self`.
-  def ellipsis *args
-    NRSER.ellipsis self, *args
-  end
-
-
+  
   # Is this string all whitespace?
   # 
   # Uses {WHITESPACE_RE} to test, which in turn uses the `[[:space:]]` *POSIX

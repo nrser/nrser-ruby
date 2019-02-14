@@ -14,6 +14,10 @@ require 'semantic_logger'
 
 require 'nrser/functions/text/format'
 
+# Using {Ext::Elidable#ellipsis}
+require 'nrser/ext/array/ellipsis'
+
+
 
 # Definitions
 # =======================================================================
@@ -469,10 +473,8 @@ class NRSER::Log::Logger < SemanticLogger::Logger
     kwds[:alternative] = alternative if alternative
 
     if max_stack_lines > 0
-      kwds[:stack] =  NRSER::ellipsis \
-                        caller,
-                        max_stack_lines,
-                        omission: '[ ...omitted... ]'
+      kwds[:stack] = \
+        caller.n_x.ellipsis max_stack_lines, omission: '[ ...omitted... ]'
     end
 
     if message.empty?

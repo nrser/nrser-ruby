@@ -4,16 +4,19 @@
 # Requirements
 # ========================================================================
 
-# Stdlib
-# ------------------------------------------------------------------------
+### Stdlib ###
 
 require 'pathname'
+
+### Deps ###
+
 require 'active_support/core_ext/string/filters'
 
-# Project / Package
-# ------------------------------------------------------------------------
+### Project / Package ###
 
-# Submodules
+require 'nrser/core_ext/module/mix'
+
+#### Submodules ####
 require_relative './string/sys/env'
 require_relative './string/format'
 require_relative './string/inflections'
@@ -90,7 +93,7 @@ module String
   
   
   refine ::String do
-    prepend String
+    prepend Ext::String
   end
   
 end # module String

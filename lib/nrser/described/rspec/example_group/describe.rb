@@ -166,7 +166,7 @@ module Describe
     end
     
     describe(
-      self_described.rspec_description,
+      self_described.rspec_description( *description ),
       **metadata,
       described: self_described,
       hierarchy: hierarchy,

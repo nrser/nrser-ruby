@@ -13,6 +13,7 @@ require 'nrser/functions/string'
 require_relative './tree'
 
 # Sub-modules
+require_relative './array/ellipsis'
 require_relative './array/to_proc'
 
 
