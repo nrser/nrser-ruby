@@ -20,7 +20,7 @@ require_relative './nicer_error'
 require 'nrser/ext/enumerable'
 
 # Using {NRSER::Ext::String#indent}
-require 'nrser/ext/string/text'
+require 'nrser/ext/string/text/indentation'
 
 # Using {NRSER::Ext::Exception#format}
 require 'nrser/ext/exception'

@@ -13,11 +13,6 @@ require 'active_support/core_ext/string/inflections'
 # Using {String#squish}
 require 'active_support/core_ext/string/filters'
 
-# Project / Package
-# ------------------------------------------------------------------------
-
-# Using {NRSER.ellipsis}
-require 'nrser/functions/string'
 
 
 # Namespace

@@ -12,14 +12,12 @@ require 'pp'
 
 ### Deps ###
 
+# Using {String#indent}
 require 'active_support/core_ext/string/indent'
 
 ### Project / Package ###
 
 require 'nrser/core_ext/object/lazy_var'
-
-# Using {NRSER::Ext::Binding#erb}
-require 'nrser/ext/binding'
 
 
 # Namespace
@@ -233,6 +231,7 @@ module NicerError
           nil
         else
           if @binding
+            require 'nrser/ext/binding'
             contents = binding.n_x.erb contents
           end
           

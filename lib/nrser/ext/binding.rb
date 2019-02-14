@@ -8,6 +8,13 @@
 # Project / Package
 # ------------------------------------------------------------------------
 
+# Using {Ext::String#dedent}, {Ext::String#with_indent_tagged}
+require_relative './string/text/indentation'
+
+# Using {Ext::String#compact_blank_lines}
+require_relative './string/text/compact_blank_lines'
+
+# Using {Ext::Enumerable#assoc_to}
 require_relative './enumerable/associate'
 
 
@@ -33,12 +40,12 @@ module Binding
   def erb source
     require 'erb'
     
-    NRSER.filter_repeated_blank_lines(
-      source.n_x.dedent.n_x.with_indent_tagged { |tagged_str|
+    source.
+      n_x.dedent.
+      n_x.with_indent_tagged { |tagged_str|
         ERB.new( tagged_str ).result( self )
-      },
-      remove_leading: true
-    )
+      }.
+      n_x.compact_blank_lines( remove_leading: true )
   end
   
   alias_method :template, :erb

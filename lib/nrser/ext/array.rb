@@ -7,9 +7,6 @@
 # Project / Package
 # ------------------------------------------------------------------------
 
-# Need {NRSER.ellipsis}
-require 'nrser/functions/string'
-
 require_relative './tree'
 
 # Sub-modules
