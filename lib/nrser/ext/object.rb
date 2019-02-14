@@ -28,6 +28,9 @@ module  Ext
 # Extensions for {::Object}.
 # 
 module Object
+  refine ::Object do
+    prepend Ext::Object
+  end
 end # module Module
 
 
