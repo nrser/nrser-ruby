@@ -92,6 +92,19 @@ class Special
   alias_method  :picture, :symbol
   
   
+  # Optional *named* HTML entity string (seems like you can form the hex and
+  # decimal ones from the {#hex}, etc.).
+  # 
+  # @example
+  #   NRSER::Char::ELLIPSIS.html_entity
+  #   #=> '&hellip;'
+  # 
+  # @return [::String?]
+  #   The HTML entity string.
+  #     
+  attr_reader :html
+  
+  
   # Constructor
   # ======================================================================
   
@@ -111,7 +124,12 @@ class Special
   #   Optional printable unicode character replacement, see {#symbol} for
   #   details.
   # 
-  def initialize char:, names: [], caret: nil, symbol: nil
+  def initialize  char:,
+                  names: [],
+                  caret: nil,
+                  symbol: nil,
+                  html: nil,
+                  ascii_alt: nil
     unless char.is_a?( String ) && char.length == 1
       raise ArgumentError,
         "char must be string of length 1"
@@ -121,6 +139,8 @@ class Special
     @names = names.map { |n| n.to_s.freeze }.freeze
     @caret = caret.freeze
     @symbol = symbol.freeze
+    @html = html.freeze
+    @ascii_alt = ascii_alt
   end # #initialize
   
   
@@ -176,6 +196,11 @@ class Special
   #   `true` if the character code-point is in the ASCII range.
   def ascii?
     char.ascii_only?
+  end
+  
+  
+  def ascii_alt
+    @ascii_alt || @caret
   end
   
   
