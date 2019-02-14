@@ -1,3 +1,5 @@
+require 'nrser/ext/array'
+
 require 'nrser/refinements/regexps'
 using NRSER::Regexps
 
