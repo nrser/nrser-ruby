@@ -5,25 +5,24 @@
 # Requirements
 # ========================================================================
 
-# Stdlib
-# ------------------------------------------------------------------------
-
-# Deps
-# ------------------------------------------------------------------------
+### Deps ###
 
 require 'pastel'
 
-# Project / Package
-# ------------------------------------------------------------------------
-
-# Using {Object#thru}
-require 'nrser/ext/object'
+### Project / Package ###
 
 # Submodule
 require_relative './format/args'
 require_relative './format/description'
 require_relative './format/list'
 require_relative './format/kwds'
+
+
+# Refinements
+# ============================================================================
+
+require 'nrser/ext/string'
+using NRSER::Ext::String
 
 
 # Namespace
@@ -50,7 +49,7 @@ end # .format
 module Format
   
   def self.short_s value, max = 64
-    NRSER.smart_ellipsis value.inspect, max
+    value.inspect.smart_ellipsis max
   end # .short_s
   
   
