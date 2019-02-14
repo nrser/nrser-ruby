@@ -243,16 +243,10 @@ module Types
       end
     }
     
-    raise TypeError.new NRSER.dedent <<-END
-      Could not match value
-      
-          #{ value.inspect }
-      
-      to any of types
-      
-          #{ enum.map {|type, expression| "\n    #{ type.inspect }"}.join '' }
-      
-    END
+    raise TypeError.new \
+      "Could not match value", value, "to any of types",
+      value: value,
+      types: enum.map { |type, exp| type }
   end # .match
   
   
