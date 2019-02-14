@@ -68,6 +68,14 @@ module Char
     symbol:       '␀'
   
   
+  ELLIPSIS = Special.new \
+    char:         "\u2026",
+    names:        [ "HORIZONTAL ELLIPSIS", "ELLIPSIS", ],
+    symbol:       '…',
+    ascii_alt:    '...',
+    html:         '&hellip;'
+  
+  
   # Module Methods
   # ============================================================================
   
