@@ -95,12 +95,8 @@ SPEC_FILE(
         './blah',
       ],
       
-      and_is_expected: {
-        to: {
-          have_attributes: {
-            name: 'TildePath',
-          }
-        }
+      block: -> {
+        it { is_expected.to have_attributes name: 'TildePath' }
       }
   end # METHOD .tilde_path Description
 
