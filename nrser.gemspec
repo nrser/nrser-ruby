@@ -80,7 +80,8 @@ Gem::Specification.new do |spec|
   
   # Provider for `commonmarker`, the new GFM lib
   spec.add_development_dependency 'yard-commonmarker', '~> 0.5.0'
-
+  
+  # My gem to link standard lib classes to their online docs
   spec.add_development_dependency 'yard-link_stdlib', '~> 0.1.0'
   
   # Add my `yard clean` command
