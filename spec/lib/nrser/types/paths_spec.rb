@@ -83,8 +83,25 @@ SPEC_FILE(
   end # METHOD .path_seg
 
   
-  METHOD :tilde_path do
-    
+  METHOD :TildePath do
+    include_examples 'make type',
+      accepts: [
+        '~',
+        '~/blah',
+      ],
+      
+      rejects: [
+        'hey/ho',
+        './blah',
+      ],
+      
+      and_is_expected: {
+        to: {
+          have_attributes: {
+            name: 'TildePath',
+          }
+        }
+      }
   end # METHOD .tilde_path Description
 
   
