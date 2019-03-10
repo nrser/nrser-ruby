@@ -167,6 +167,15 @@ def_type        :HomePath,
 end # .HomePath
 
 
+def_type :TildePath,
+&->( **options ) do
+  self.Intersection \
+    self.Path,
+    self.When( TILDE_PATH_RE ),
+    **options
+end # .TildePath
+
+
 # @!method self.AbsPath **options
 #   A relative {.Path}, which is just a {.Path} that's not {.AbsPath} or
 #   {.TildePath}.
