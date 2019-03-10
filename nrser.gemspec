@@ -60,19 +60,23 @@ Gem::Specification.new do |spec|
   
   # Development Dependencies
   # ----------------------------------------------------------------------------
-
+  
+  ### Common Gems ###
+  # 
+  # These (and RSpec) get added when generating a new gem with `bundle gem`.
+  # 
+  
+  # I'm not sure exactly *why* Bundler adds itself, but it does, so I've left 
+  # it. It's been changed to `>=` to accept Bundler 2.0+, which seems to work
+  # just fine coming from `~> 1.16.1`.
   spec.add_development_dependency "bundler", '>= 1.16.1'
+  
+  # We use Rake for releasing new gem versions (through `qb gem/release .`)
   spec.add_development_dependency "rake", '~> 12.3'
   
-  # Testing with `rspec`
-  spec.add_development_dependency "rspec", '~> 3.7'
   
-  # Trying out the cuc'...
-  spec.add_development_dependency "cucumber", '~> 3.1.0'
-  spec.add_development_dependency "aruba", '~> 0.14.6'
-  spec.add_development_dependency 'yard-nrser-cucumber', '> 0.0.0'
+  ### YARD - Documentation generation ###
   
-  # Doc site generation with `yard`
   spec.add_development_dependency 'yard', '~> 0.9.15'
   
   # GitHub-Flavored Markdown (GFM) for use with `yard`
@@ -82,12 +86,47 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'yard-commonmarker', '~> 0.5.0'
   
   # My gem to link standard lib classes to their online docs
-  spec.add_development_dependency 'yard-link_stdlib', '~> 0.1.0'
+  spec.add_development_dependency 'yard-link_stdlib', '~> 0.1.1'
   
   # Add my `yard clean` command
   spec.add_development_dependency 'yard-clean', '~> 0.1.0'
   
-  # Nicer REPL experience
+  # Render Cucumber features in documentation
+  # 
+  # This is my own fork of `yard-cucumber` with additional features and 
+  # improvements.
+  # 
+  spec.add_development_dependency 'yard-nrser-cucumber', '> 0.0.0'
+  
+  
+  ### Testing ###
+  
+  #### RSpec - Legacy unit testing ####
+  # 
+  # I would like to move all testing (except in-source doc-tests) to Cucumber,
+  # but at the moment the vast majority of tests are still in RSpec.
+  # 
+  spec.add_development_dependency "rspec", '~> 3.7'
+  
+  #### Doctest - Exec-n-check YARD @example tags ####
+  # 
+  # Ensures YARD examples actually work, and allows them to be used as quick and
+  # easy tests with low rot exposure.
+  # 
+  spec.add_development_dependency 'yard-doctest', '~> 0.1.16'
+  
+  
+  #### Cucumber - Literate tests that also serve as documentation ####
+  
+  spec.add_development_dependency "cucumber", '~> 3.1.0'
+  
+  # Aruba is a Cucumber plugin from the Cucumber team for testing command 
+  # executions
+  spec.add_development_dependency "aruba", '~> 0.14.6'
+  
+  
+  ### Pry - Nicer REPL experience and CLI debugging ###
+  
   spec.add_development_dependency "pry", '~> 0.12.2'
 
   # Supposed to drop into pry as a debugger on unhandled exceptions, but I 
@@ -97,13 +136,15 @@ Gem::Specification.new do |spec|
   # Move around the stack when you debug with `pry`, really sweet
   spec.add_development_dependency "pry-stack_explorer", '~> 0.4.9'
   
+  
+  ### Etc... ###
+  
   # My system commands lib
   spec.add_development_dependency "cmds", '~> 0.2.11'
 
   # Used to parse docs from the Quip API - at the moment, the {NRSER::Types}
   # display table, which we verify in the specs
   spec.add_development_dependency "nokogiri", '~> 1.8.4'
-
-  spec.add_development_dependency "mongo", '~> 2.6.1'
+  
   
 end
