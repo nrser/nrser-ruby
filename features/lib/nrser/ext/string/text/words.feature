@@ -1,4 +1,4 @@
-Feature: Compact repeated blank lines with {NRSER::Ext::String#compact_blank_lines}
+Feature: Split words with {NRSER::Ext::String#words}
 
   Background:
     Given I require 'nrser/ext/string/text/words'
