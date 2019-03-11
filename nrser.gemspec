@@ -58,6 +58,7 @@ Gem::Specification.new do |spec|
   # Python-like method decorators (one part of Python I really still like!)
   spec.add_dependency 'method_decorators', '~> 0.9.6'
   
+  
   # Development Dependencies
   # ----------------------------------------------------------------------------
   
@@ -96,7 +97,7 @@ Gem::Specification.new do |spec|
   # This is my own fork of `yard-cucumber` with additional features and 
   # improvements.
   # 
-  spec.add_development_dependency 'yard-nrser-cucumber', '> 0.0.0'
+  spec.add_development_dependency 'yard-nrser-cucumber', '>= 0.1.0'
   
   
   ### Testing ###
