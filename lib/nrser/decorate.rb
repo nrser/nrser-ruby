@@ -19,9 +19,24 @@ module  NRSER
 # Definitions
 # =======================================================================
 
-# @todo document Decorate module.
+# Method decoration.
 # 
-# @see requirements::features::lib::nrser::decorate Features
+# Check out the {requirements::features::lib::nrser::decorate Features} for
+# usage details and examples.
+# 
+# ## Background
+# 
+# One part of Python I really liked was method decoration. This is Ruby, so we
+# should be able to cook up something nice for, right?
+# 
+# I searched around online on several occasions, and eventually settled on the
+# [method_decorators][] gem, but ended up far from satisfied with it.
+# 
+# [method_decorators]: https://rubygems.org/gems/method_decorators
+# 
+# For some color on the issues encountered, check the old spec:
+# 
+# <https://github.com/nrser/nrser.rb/blob/5762469edf0ccf9c5178f8f16eb6d05ccac614c5/spec/deps/method_decorators/whoops_wrong_method_spec.rb>
 # 
 module Decorate
   

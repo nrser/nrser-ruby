@@ -7,7 +7,7 @@ SPEC_FILE(
   
   SETUP %{ Decorate a class instance method } do
     my_class = Class.new do
-      extend ::MethodDecorators
+      extend NRSER::Decorate
       
       def self.name
         'MyClass'
@@ -19,7 +19,7 @@ SPEC_FILE(
         @count = 0
       end
       
-      +NRSER::LazyAttr
+      decorate NRSER::LazyAttr,
       def f
         @count += 1
         'eff!'
@@ -62,7 +62,7 @@ SPEC_FILE(
   
   SETUP %{ Decorate a class method } do
     my_class = Class.new do
-      extend ::MethodDecorators
+      extend NRSER::Decorate
       
       def self.name
         'MyClass'
@@ -74,7 +74,7 @@ SPEC_FILE(
         @count
       end
       
-      +NRSER::LazyAttr
+      decorate_singleton NRSER::LazyAttr,
       def self.f
         @count += 1
         'eff!'

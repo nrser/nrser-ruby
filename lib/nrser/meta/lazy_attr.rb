@@ -2,12 +2,11 @@
 # frozen_string_literal: true
 
 # Requirements
-# =======================================================================
+# ============================================================================
 
-# Deps
-# -----------------------------------------------------------------------
+### Project / Package ###
 
-require 'method_decorators'
+require 'nrser/decorate'
 
 
 # Namespace
@@ -22,7 +21,7 @@ module  NRSER
 # Store the result of an attribute method (no args) in an instance variable
 # of the same name and return that value on subsequent calls.
 # 
-class LazyAttr < MethodDecorators::Decorator
+class LazyAttr
   
   # Get the instance variable name for a target method.
   # 
@@ -49,19 +48,11 @@ class LazyAttr < MethodDecorators::Decorator
   
   # Execute the decorator.
   # 
+  # @param [::Object] receiver
+  #   Object that received the call.
+  # 
   # @param [Method] target_method
   #   The decorated method, already bound to the receiver.
-  #   
-  #   The `method_decorators` gem calls this `orig`, but I thought
-  #   `target_method` made more sense.
-  # 
-  # @param [*] receiver
-  #   The object that will receive the call to `target`.
-  #   
-  #   The `method_decorators` gem calls this `this`, but I thought `receiver`
-  #   made more sense.
-  #   
-  #   It's just `target.receiver`, but the API is how it is.
   # 
   # @param [Array] args
   #   Any arguments the decorated method was called with.
@@ -69,10 +60,10 @@ class LazyAttr < MethodDecorators::Decorator
   # @param [Proc?] block
   #   The block the decorated method was called with (if any).
   # 
-  # @return
+  # @return [::Object]
   #   Whatever `target_method` returns.
   # 
-  def call target_method, receiver, *args, &block
+  def call receiver, target_method, *args, &block
     unless target_method.parameters.empty?
       raise NRSER::ArgumentError.new \
         "{NRSER::LazyAttr} can only decorate methods with 0 params",
