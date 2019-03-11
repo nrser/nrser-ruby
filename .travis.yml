@@ -22,3 +22,9 @@ script: bundle exec rspec && bundle exec cucumber && ./dev/bin/doctest
 sudo: false
 
 cache: bundler
+
+addons:
+  homebrew:
+    packages:
+      - ripgrep
+    update: true
