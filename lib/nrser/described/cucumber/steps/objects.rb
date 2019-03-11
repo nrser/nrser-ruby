@@ -39,9 +39,14 @@ module Objects
       describe :object, subject: value
     end
   
-  THE_STRING = \
-    Step "a/the string:" do |string|
-      describe :string, subject: string
+  THE_STRING_BLOCK, THE_STRING_INLINE = \
+    [
+      "a/the string:",
+      "a/the string {string}",
+    ].each do |template|
+      Step template do |string|
+        describe :string, subject: string
+      end
     end
   
 end # module Objects

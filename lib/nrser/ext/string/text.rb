@@ -5,14 +5,16 @@
 # Requirements
 # =======================================================================
 
-# Project / Package
-# -----------------------------------------------------------------------
+### Project / Package ###
 
 require 'nrser/functions/text'
 
+# Sub-tree
 require_relative './text/ellipsis'
-require_relative './text/smart_ellipsis'
 require_relative './text/indentation'
+require_relative './text/smart_ellipsis'
+require_relative './text/word_wrap'
+require_relative './text/words'
 
 
 # Namespace
@@ -26,27 +28,6 @@ module  Ext
 # =======================================================================
 
 module String
-  
-  # Instance Methods
-  # ========================================================================
-
-  # @!group Text Manipulation Instance Methods
-  # --------------------------------------------------------------------------
-
-
-  # Calls {NRSER.word_wrap} on `self`.
-  def word_wrap *args
-    NRSER.word_wrap self, *args
-  end
-
-
-  # Calls {NRSER.words} on `self`
-  def words
-    NRSER.words self
-  end
-
-  # @!endgroup Text Manipulation Instance Methods # **************************
-
 end # module String
 
 

@@ -4,7 +4,7 @@ Feature: Compact repeated blank lines with {NRSER::Ext::String#compact_blank_lin
     Given I require 'nrser/ext/string/text/compact_blank_lines'
     And the instance method {NRSER::Ext::String#compact_blank_lines}
   
-  Scenario: (1) 
+  Scenario: (1) Basic Test
     
     Given the string:
       """
