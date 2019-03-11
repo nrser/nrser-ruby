@@ -8,7 +8,6 @@
 # Project / Package
 # -----------------------------------------------------------------------
 
-require 'nrser/functions/text'
 require 'nrser/strings/common_prefix'
 
 

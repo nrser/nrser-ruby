@@ -7,8 +7,6 @@
 
 ### Project / Package ###
 
-require 'nrser/functions/text'
-
 # Sub-tree
 require_relative './text/ellipsis'
 require_relative './text/indentation'
