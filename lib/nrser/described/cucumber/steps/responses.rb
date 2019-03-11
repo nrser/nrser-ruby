@@ -80,6 +80,16 @@ module Responses
       describe :response, params: params_for_positional_values( values )
     end
   
+  CALL_IT_WITH_ARGUMENTS, CALL_THE_METHOD_WITH_ARGUMENTS = \
+    [
+      "I call it with {values}",
+      "I call the method with {values}",
+    ].map do |template|
+      Step template do |values|
+        describe :response, params: params_for_positional_values( values )
+      end
+    end
+  
 end # module Responses
 
 # /Namespace

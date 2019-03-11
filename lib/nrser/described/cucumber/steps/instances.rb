@@ -100,9 +100,9 @@ module Instances
       "I create a new instance of {class} from {values}",
       "I construct an instance of {class} from {values}",
     ].map do |template|
-      Step template do |described, values|
+      Step template do |class_, values|
         describe_positional_params values
-        describe :instance, class_: described.resolve!( hierarchy ).subject
+        describe :instance, class_: class_
       end
     end
   
