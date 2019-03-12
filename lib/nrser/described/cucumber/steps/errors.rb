@@ -35,7 +35,7 @@ module Errors
   # ==========================================================================
   
   CLASS_IS_RAISED = \
-    Step "a {class} is raised" do |cls|
+    Step "a(n) {class} is raised" do |cls|
       describe :error
       expect_it.to be_a cls
     end

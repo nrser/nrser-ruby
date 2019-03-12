@@ -127,23 +127,26 @@ Feature: Memoize in instance variables with {NRSER::Decorate::LazyAttr}
     Then the response is equal to "eff!"
 
   
-  # Scenario: (3) Raises when it can detect the the target takes arguments
+  Scenario: (3) Raises when it can detect the the target takes arguments
     
-  #   Since {NRSER::Decorate::LazyAttr} is for wrapping attribute methods, which 
-  #   accept no arguments, it raises when attempting to decorate a method that
-  #   has parameters.
+    Since {NRSER::Decorate::LazyAttr} is for wrapping attribute methods, which 
+    accept no arguments, it raises when attempting to decorate a method that
+    has parameters.
     
-  #   Given a class:
-  #     """ruby
-  #     class LazyAttrScenario3
+    Given a class:
+      """ruby
+      class LazyClass
         
-  #       extend NRSER::Decorate
+        extend NRSER::Decorate
         
-  #       def f x
-  #         "f of x"
-  #       end
+        def f x
+          "f of x"
+        end
         
-  #     end
-  #     """
+      end
+      """
       
+    When I call {LazyClass.decorate} with {NRSER::Decorate::LazyAttr}
+    
+    Then an {ArgumentError} is raised
       

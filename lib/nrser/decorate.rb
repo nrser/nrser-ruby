@@ -105,6 +105,8 @@ module Decorate
   end # #resolve_method
   
   
+  # @todo Doc me!
+  # 
   def decorate *decorators, target, default_type: nil
     
     if decorators.empty?
@@ -144,11 +146,27 @@ module Decorate
           # pass, it's already good to go
           
         when ::Class
+          # Classes with a `.call` method themselves are just treated as regular
+          # callables.
+          # 
+          # TODO  Is this really how I want it..?
+          # 
           unless decorator.methods.include? :call
-          #   decorator = if decorator.instance_method( :initialize ).parameters.empty?
-            decorator = decorator.new
-          #   else
-          #     decorator.new receiver, 
+            decorator = \
+              if decorator.instance_method( :initialize ).parameters.empty?
+                # The class constructor does not accept args, so don't give it
+                # anything.
+                # 
+                # TODO  Not sure if I want to keep this now that I've figured 
+                #       out what I can get and want there?
+                # 
+                decorator = decorator.new
+              else
+                # The class constructor accepts args, so give it the method 
+                # reference, which will have `self` available as 
+                # {::Method.receiver} or {::UnboundMethod#owner}
+                decorator.new method_ref 
+              end
           end
           
         else

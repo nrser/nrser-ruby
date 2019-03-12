@@ -47,17 +47,16 @@ class LazyAttr
   end # .instance_var_name
   
   
-  # def initialize receiver, target_method
-  #   unless target_method.parameters.empty?
-  #     raise NRSER::ArgumentError.new \
-  #       "{NRSER::LazyAttr} can only decorate methods with 0 params",
-  #       receiver: receiver,
-  #       target_method: target_method
-  #   end
+  def initialize method_ref
+    unless method_ref.parameters.empty?
+      raise ArgumentError.new \
+        "{NRSER::LazyAttr} can only decorate methods with 0 params",
+        receiver: target.receiver,
+        target: target
+    end
     
-  #   @receiver = receiver
-  #   @target_method = target_method
-  # end
+    @method_ref = method_ref
+  end
   
   
   # Execute the decorator.
@@ -65,41 +64,14 @@ class LazyAttr
   # @param [::Object] receiver
   #   Object that received the call.
   # 
-  # @param [Method] target_method
-  #   The decorated method, already bound to the receiver.
-  # 
-  # @param [Array] args
-  #   Any arguments the decorated method was called with.
-  # 
-  # @param [Proc?] block
-  #   The block the decorated method was called with (if any).
+  # @param [::Method] target
+  #   The method that constructs the attribute value, which is only called the
+  #   first time and cached after that.
   # 
   # @return [::Object]
-  #   Whatever `target_method` returns.
+  #   The attribute value.
   # 
-  def call target, *args, &block
-    unless target.parameters.empty?
-      raise NRSER::ArgumentError.new \
-        "{NRSER::LazyAttr} can only decorate methods with 0 params",
-        receiver: target.receiver,
-        target: target
-    end
-    
-    unless args.empty?
-      raise NRSER::ArgumentError.new \
-        "wrong number of arguments for", target,
-        "(given", args.length, "expected 0)",
-        receiver: target.receiver,
-        target: target
-    end
-    
-    unless block.nil?
-      raise NRSER::ArgumentError.new \
-        "wrong number of arguments (given #{ args.length }, expected 0)",
-        receiver: target.receiver,
-        target: target
-    end
-    
+  def call target
     var_name = self.class.instance_var_name target
     
     unless target.receiver.instance_variable_defined? var_name
