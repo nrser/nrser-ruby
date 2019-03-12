@@ -1,11 +1,13 @@
 Feature: Memoize in instance variables with {NRSER::Decorate::LazyAttr}
-
-  Scenario: (1) Lazy decorate an instance method
   
+  Background:
     Given I require "nrser/decorate/lazy_attr"
-    And a class:
+  
+  Scenario: (1) Lazy decorate an instance method
+    
+    Given a class:
       """ruby
-      class LazyClassA
+      class LazyClass
         
         extend NRSER::Decorate
         
@@ -24,7 +26,7 @@ Feature: Memoize in instance variables with {NRSER::Decorate::LazyAttr}
       end
       """
     
-    When I create a new instance of {LazyClassA} with no arguments
+    When I create a new instance of {LazyClass} with no arguments
     
     # In the beginning, the method body has been called 0 times
     Then the instance has a `count` attribute that is 0
@@ -65,11 +67,10 @@ Feature: Memoize in instance variables with {NRSER::Decorate::LazyAttr}
   
 
   Scenario: (2) Lazy decorate a singleton method
-  
-    Given I require "nrser/decorate/lazy_attr"
-    And a class:
+    
+    Given a class:
       """ruby
-      class LazyClassA
+      class LazyClass
         
         extend NRSER::Decorate
         
@@ -124,3 +125,25 @@ Feature: Memoize in instance variables with {NRSER::Decorate::LazyAttr}
     
     When I call `instance_variable_get` on the class with "@f"
     Then the response is equal to "eff!"
+
+  
+  # Scenario: (3) Raises when it can detect the the target takes arguments
+    
+  #   Since {NRSER::Decorate::LazyAttr} is for wrapping attribute methods, which 
+  #   accept no arguments, it raises when attempting to decorate a method that
+  #   has parameters.
+    
+  #   Given a class:
+  #     """ruby
+  #     class LazyAttrScenario3
+        
+  #       extend NRSER::Decorate
+        
+  #       def f x
+  #         "f of x"
+  #       end
+        
+  #     end
+  #     """
+      
+      

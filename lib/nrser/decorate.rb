@@ -4,11 +4,13 @@
 # Requirements
 # =======================================================================
 
-# Project / Package
-# -----------------------------------------------------------------------
+### Project / Package ###
 
 # Using names when resolving methods
 require 'nrser/meta/names'
+
+# Sub-tree
+require_relative './decorate/decoration'
 
 
 # Namespace
@@ -129,8 +131,8 @@ module Decorate
       end
     end
     
-    decorated = \
-      decorators.reverse_each.reduce method_ref do |decorated, decorator|
+    decoration = \
+      decorators.reverse_each.reduce method_ref do |proto_target, decorator|
         
         # Resolve `decorator` to a `#call`-able if needed
         case decorator
@@ -143,7 +145,10 @@ module Decorate
           
         when ::Class
           unless decorator.methods.include? :call
+          #   decorator = if decorator.instance_method( :initialize ).parameters.empty?
             decorator = decorator.new
+          #   else
+          #     decorator.new receiver, 
           end
           
         else
@@ -161,7 +166,7 @@ module Decorate
           
         end # case decorator
         
-        Decoration.new decorator: decorator, decorated: decorated
+        Decoration.new decorator: decorator, proto_target: proto_target
         
       end # reduce
     
@@ -176,7 +181,7 @@ module Decorate
     end
     
     send definer, method_ref.name do |*args, &block|
-      decorated.call self, *args, &block
+      decoration.call self, *args, &block
     end
     
   end # decorate
@@ -184,39 +189,6 @@ module Decorate
   
   def decorate_singleton *args
     decorate *args, default_type: :singleton
-  end
-  
-  
-  class Decoration
-    attr_reader :decorator
-    attr_reader :decorated
-    
-    def initialize decorator:, decorated:
-      @decorator = decorator
-      @decorated = decorated
-    end
-    
-    def call receiver, *args, &block
-      target = case decorated
-      when Decoration
-        # decorated.method( :call ).curry receiver
-        ->( *a, &b ) { decorated.call receiver, *a, &b }
-      when ::UnboundMethod 
-        decorated.bind receiver
-      when Symbol
-        receiver.method decorated
-      else
-        decorated
-      end
-      
-      decorator = if self.decorator.is_a? ::UnboundMethod
-        self.decorator.bind receiver
-      else
-        self.decorator
-      end
-      
-      decorator.call receiver, target, *args, &block
-    end
   end
   
 end # module Decorate

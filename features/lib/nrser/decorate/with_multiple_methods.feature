@@ -8,11 +8,11 @@ Feature: Decorate a method with multiple others
       class A
         extend NRSER::Decorate
         
-        def self.decorator_1 receiver, target, *args, &block
+        def self.decorator_1 target, *args, &block
           "A.decorator_1, #{ target.call *args, &block }"
         end
         
-        def self.decorator_2 receiver, target, *args, &block
+        def self.decorator_2 target, *args, &block
           "A.decorator_2, #{ target.call *args, &block }"
         end
         
@@ -20,7 +20,7 @@ Feature: Decorate a method with multiple others
                   :'.decorator_2',
         # The target instance method.
         # 
-        # @return [Stirng]
+        # @return [String]
         # 
         def f
           "A#f."

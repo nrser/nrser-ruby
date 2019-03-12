@@ -13,7 +13,7 @@ Feature: Decorate with a {Proc}
       
         extend NRSER::Decorate
         
-        decorate ->( receiver, target, *args, &block ) {
+        decorate ->( target, *args, &block ) {
           ~%{ Proc called #{ target.name } and it said:
               #{ target.call *args, &block } }  
         },
@@ -38,7 +38,7 @@ Feature: Decorate with a {Proc}
       
         extend NRSER::Decorate
         
-        decorate_singleton ->( receiver, target, *args, &block ) {
+        decorate_singleton ->( target, *args, &block ) {
           ~%{ Proc called #{ target.name } and it said:
               #{ target.call *args, &block } }  
         },

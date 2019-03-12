@@ -21,7 +21,7 @@ Feature: Reference decorator and decorated methods by reference object
         
         extend NRSER::Decorate
         
-        def self.singleton_decorator receiver, target, *args, &block
+        def self.singleton_decorator target, *args, &block
           <<~END
             A.singleton_decorator called #{ target.name } and it said:
             #{ target.call( *args, &block ) }
@@ -32,7 +32,7 @@ Feature: Reference decorator and decorated methods by reference object
           "Hi from A.singleton_target"
         end
         
-        def instance_decorator receiver, target, *args, &block
+        def instance_decorator target, *args, &block
           <<~END
             A#instance_decorator called #{ target.name } and it said:
             #{ target.call( *args, &block ) }

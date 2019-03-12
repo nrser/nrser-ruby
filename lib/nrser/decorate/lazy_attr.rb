@@ -33,8 +33,8 @@ class LazyAttr
   #   The name of the instance variable, ready to be provided to
   #   `#instance_variable_set` (has `@` prefix).
   # 
-  def self.instance_var_name target_method
-    name = target_method.name.to_s
+  def self.instance_var_name target
+    name = target.name.to_s
     
     # Allow predicate methods by chopping off the `?` character.
     # 
@@ -45,6 +45,19 @@ class LazyAttr
     
     "@#{ name }"
   end # .instance_var_name
+  
+  
+  # def initialize receiver, target_method
+  #   unless target_method.parameters.empty?
+  #     raise NRSER::ArgumentError.new \
+  #       "{NRSER::LazyAttr} can only decorate methods with 0 params",
+  #       receiver: receiver,
+  #       target_method: target_method
+  #   end
+    
+  #   @receiver = receiver
+  #   @target_method = target_method
+  # end
   
   
   # Execute the decorator.
@@ -64,36 +77,36 @@ class LazyAttr
   # @return [::Object]
   #   Whatever `target_method` returns.
   # 
-  def call receiver, target_method, *args, &block
-    unless target_method.parameters.empty?
+  def call target, *args, &block
+    unless target.parameters.empty?
       raise NRSER::ArgumentError.new \
         "{NRSER::LazyAttr} can only decorate methods with 0 params",
-        receiver: receiver,
-        target_method: target_method
+        receiver: target.receiver,
+        target: target
     end
     
     unless args.empty?
       raise NRSER::ArgumentError.new \
-        "wrong number of arguments for", target_method,
+        "wrong number of arguments for", target,
         "(given", args.length, "expected 0)",
-        receiver: receiver,
-        target_method: target_method
+        receiver: target.receiver,
+        target: target
     end
     
     unless block.nil?
       raise NRSER::ArgumentError.new \
         "wrong number of arguments (given #{ args.length }, expected 0)",
-        receiver: receiver,
-        target_method: target_method
+        receiver: target.receiver,
+        target: target
     end
     
-    var_name = self.class.instance_var_name target_method
+    var_name = self.class.instance_var_name target
     
-    unless receiver.instance_variable_defined? var_name
-      receiver.instance_variable_set var_name, target_method.call
+    unless target.receiver.instance_variable_defined? var_name
+      target.receiver.instance_variable_set var_name, target.call
     end
       
-    receiver.instance_variable_get var_name
+    target.receiver.instance_variable_get var_name
         
   end # #call
   

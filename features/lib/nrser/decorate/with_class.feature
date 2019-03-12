@@ -15,7 +15,7 @@ Feature: Decorate with a {Class}
       """ruby
       
       class Decorator
-        def call receiver, target, *args, &block
+        def call target, *args, &block
           <<~END
             Decorator#call called #{ target.name } and it said:
             #{ target.call *args, &block }
@@ -67,7 +67,7 @@ Feature: Decorate with a {Class}
           @value = value
         end
         
-        def call receiver, target, *args, &block
+        def call target, *args, &block
           <<~END
             Decorator#call with value #{ @value } called #{ target.name } and it said:
             #{ target.call *args, &block }
@@ -110,7 +110,7 @@ Feature: Decorate with a {Class}
     Given a class:
       """ruby
       class Decorator
-        def self.call receiver, target, *args, &block
+        def self.call target, *args, &block
           <<~END
             Decorator.call called #{ target.name } and it said:
             #{ target.call *args, &block }
