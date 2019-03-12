@@ -4,11 +4,7 @@
 # Requirements
 # =======================================================================
 
-# Stdlib
-# -----------------------------------------------------------------------
-
-# Deps
-# -----------------------------------------------------------------------
+### Deps ###
 
 # What NRSER's logging is based off
 require 'semantic_logger'
@@ -16,8 +12,7 @@ require 'semantic_logger'
 # We need a {Concurrent::Map} to hold reference to loggers.
 require "concurrent/map"
 
-# Project / Package
-# -----------------------------------------------------------------------
+### Project / Package ###
 
 # Using {NRSER::Ext::Object::Booly.truthy?} for ENV var values.
 require 'nrser/ext/object/booly'
@@ -26,6 +21,13 @@ require 'nrser/ext/object/booly'
 # Need {String#env_varize}
 require 'nrser/core_ext/string/sys/env'
 
+
+# Namespace
+# ============================================================================
+
+module  NRSER
+
+
 # Definitions
 # =======================================================================
   
@@ -33,7 +35,7 @@ require 'nrser/core_ext/string/sys/env'
 # 
 # @see https://rocketjob.github.io/semantic_logger/index.html
 # 
-module NRSER::Log
+module Log
   
   # Sub-Tree Requirements
   # ========================================================================
@@ -861,7 +863,13 @@ module NRSER::Log
   
   # @!endgroup Setup Helpers
 
-end # module NRSER::Log
+end # module Log
+
+
+# /Namespace
+# ============================================================================
+
+end # module  NRSER
 
 
 # Post-Processing

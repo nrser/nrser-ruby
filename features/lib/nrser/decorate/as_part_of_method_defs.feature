@@ -72,8 +72,8 @@ Feature: Decorate as part of method definitions
       
       """
     
-    When I create a new instance of {A} with no parameters
-    And I call `instance_target` with no parameters
+    When I create a new instance of {A} with no arguments
+    And I call `instance_target` with no arguments
     
     Then the response is equal to:
       """ruby
@@ -103,7 +103,7 @@ Feature: Decorate as part of method definitions
       
       """
     
-    And I call {A.singleton_target} with no parameters
+    And I call {A.singleton_target} with no arguments
     
     Then the response is equal to:
       """ruby
@@ -137,10 +137,10 @@ Feature: Decorate as part of method definitions
       
       """
     
-    When I create a new instance of {A} with no parameters
+    When I create a new instance of {A} with no arguments
     
     Given the instance's method `instance_target_1`
-    When I call it with no parameters
+    When I call it with no arguments
     
     Then the response is equal to:
       """ruby
@@ -151,7 +151,7 @@ Feature: Decorate as part of method definitions
       """
     
     Given the instance's method `instance_target_2`
-    And I call it with no parameters
+    And I call it with no arguments
     
     Then the response is equal to:
       """ruby

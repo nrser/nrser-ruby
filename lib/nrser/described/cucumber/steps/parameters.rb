@@ -35,14 +35,14 @@ module Parameters
   # ==========================================================================
   
   THE_INLINE_PARAMS = \
-    Step "the parameters {values}" \
+    Step "the arguments {values}" \
     do |values|
       describe_positional_params values
     end
 
   
   THE_TABLE_PARAMS = \
-    Step "the parameters:" do |table|
+    Step "the arguments:" do |table|
       case table.column_names.count
       when 1
         # The table is interpreted as a list of positional values, the last of 
@@ -53,7 +53,7 @@ module Parameters
           }
       
       when 2
-        # The table is interpreted as parameter name/value pairs, with the names
+        # The table is interpreted as argument name/value pairs, with the names
         # in {NRSER::Meta::Names} format (`arg`, `kwd:`, `&block`)
         table.rows.each do |(raw_name_string, raw_value_string)|
           name = \
@@ -77,13 +77,13 @@ module Parameters
   
 
   PARAM_NAME_IS = \
-    Step "the {param_name} parameter is {value}" do |param_name, value|
+    Step "the {param_name} argument is {value}" do |param_name, value|
       describe_param param_name, value
     end
 
   
   BLOCK_PARAM_IS = \
-    Step "the block parameter is {value}" do |value|
+    Step "the block argument is {value}" do |value|
       if described.is_a? NRSER::Described::Parameters
         described.block = value
       else

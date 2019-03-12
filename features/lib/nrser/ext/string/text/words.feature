@@ -9,7 +9,7 @@ Feature: Split words with {NRSER::Ext::String#words}
     Given the string <string>
     
     When I bind the instance method to the string 
-    And I call the method with no parameters
+    And I call the method with no arguments
     
     Then the response is equal to `<response>`
     

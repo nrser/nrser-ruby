@@ -55,8 +55,8 @@ Feature: Reference decorator and decorated methods by reference object
                 instance_method( :instance_target )
       """
     
-    When I create a new instance of {A} with no parameters
-    And I call `instance_target` with no parameters
+    When I create a new instance of {A} with no arguments
+    And I call `instance_target` with no arguments
     
     Then the response is equal to:
       """ruby
@@ -75,7 +75,7 @@ Feature: Reference decorator and decorated methods by reference object
                 method( :singleton_target )
       """
     
-    When I call {A.singleton_target} with no parameters
+    When I call {A.singleton_target} with no arguments
     
     Then the response is equal to:
       """ruby
@@ -94,8 +94,8 @@ Feature: Reference decorator and decorated methods by reference object
                 instance_method( :instance_target )
       """
     
-    When I create a new instance of {A} with no parameters
-    And I call `instance_target` with no parameters
+    When I create a new instance of {A} with no arguments
+    And I call `instance_target` with no arguments
     
     Then the response is equal to:
       """ruby

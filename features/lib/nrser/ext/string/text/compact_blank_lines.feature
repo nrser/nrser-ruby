@@ -16,7 +16,7 @@ Feature: Compact repeated blank lines with {NRSER::Ext::String#compact_blank_lin
       """
     
     When I bind the instance method to the string 
-    And I call the method with no parameters
+    And I call the method with no arguments
     
     Then the response is equal to the string:
       """

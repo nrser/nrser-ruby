@@ -141,7 +141,7 @@ module Expectations
       expect_described( described ).to have_attributes \
         method_name.bare_name => be( value )
     end
-  
+    
   
   Step "the {described} has a {value} key with value {value}" \
   do |described, key, value|

@@ -63,8 +63,8 @@ Feature: Reference decorator and decorated methods by name
         decorate :instance_decorator, :instance_target
       """
     
-    When I create a new instance of {A} with no parameters
-    And I call `instance_target` with no parameters
+    When I create a new instance of {A} with no arguments
+    And I call `instance_target` with no arguments
     
     Then the response is equal to:
       """ruby
@@ -87,7 +87,7 @@ Feature: Reference decorator and decorated methods by name
         decorate_singleton :singleton_decorator, :singleton_target
       """
     
-    When I call {A.singleton_target} with no parameters
+    When I call {A.singleton_target} with no arguments
     
     Then the response is equal to:
       """ruby
@@ -111,7 +111,7 @@ Feature: Reference decorator and decorated methods by name
                   default_type: :singleton
       """
     
-    When I call {A.singleton_target} with no parameters
+    When I call {A.singleton_target} with no arguments
     
     Then the response is equal to:
       """ruby
@@ -141,8 +141,8 @@ Feature: Reference decorator and decorated methods by name
         decorate '.singleton_decorator', :instance_target
       """
     
-    When I create a new instance of {A} with no parameters
-    And I call `instance_target` with no parameters
+    When I create a new instance of {A} with no arguments
+    And I call `instance_target` with no arguments
     
     Then the response is equal to:
       """ruby
@@ -164,8 +164,8 @@ Feature: Reference decorator and decorated methods by name
         decorate '.singleton_decorator', '#instance_target'
       """
     
-    When I create a new instance of {A} with no parameters
-    And I call `instance_target` with no parameters
+    When I create a new instance of {A} with no arguments
+    And I call `instance_target` with no arguments
     
     Then the response is equal to:
       """ruby

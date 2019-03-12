@@ -42,7 +42,7 @@ module NRSER::Log::Mixin
       @semantic_logger = logger
     end
     
-  end
+  end # module SingletonMethods
   
   
   module InstanceMethods

@@ -1,8 +1,8 @@
-Feature: Describe parameters by name
+Feature: Describe arguments by name
   
-  Scenario: Describing named positional and keyword parameters in steps
+  Scenario: Describing named positional and keyword arguments in steps
     
-    Positional and keyword parameters may each be described by name in separate
+    Positional and keyword arguments may each be described by name in separate
     "given" steps.
     
     Given a module:
@@ -17,12 +17,12 @@ Feature: Describe parameters by name
     And the module's method {.f}
     
     # NOTE  These steps could be given in any order
-    And the `a_0` parameter is `1`
-    And the `a_1` parameter is `2`
-    And the `k_0:` parameter is "three"
-    And the `k_1:` parameter is "four"
+    And the `a_0` argument is `1`
+    And the `a_1` argument is `2`
+    And the `k_0:` argument is "three"
+    And the `k_1:` argument is "four"
     
-    When I call the method with the parameters
+    When I call the method with the arguments
     
     Then the response is equal to:
       """ruby
@@ -30,9 +30,9 @@ Feature: Describe parameters by name
       """
   
   
-  Scenario: Describing named positional and keyword parameters in a table
+  Scenario: Describing named positional and keyword arguments in a table
     
-    Positional and keyword parameters may also be described by name/value rows
+    Positional and keyword arguments may also be described by name/value rows
     in a two-column table.
     
     Given a module:
@@ -47,14 +47,14 @@ Feature: Describe parameters by name
     And the module's method {.f}
     
     # NOTE  The table headings must be present, but their values don't matter.
-    And the parameters:
+    And the arguments:
       | NAME  | VALUE   |
       | a_0   | `1`     |
       | a_1   | `2`     |
       | k_0:  | "three" |
       | k_1:  | "four"  |
     
-    When I call the method with the parameters
+    When I call the method with the arguments
     
     Then the response is equal to:
       """ruby
@@ -62,7 +62,7 @@ Feature: Describe parameters by name
       """
 
 
-  Scenario: Describing "rest" (splat / variable-length) parameters
+  Scenario: Describing "rest" (splat / variable-length) arguments
     
     Given a module:
       """ruby
@@ -76,14 +76,14 @@ Feature: Describe parameters by name
     And the module's method {.f}
     
     # NOTE  The table headings must be present, but their values don't matter.
-    And the parameters:
+    And the arguments:
       | NAME    | VALUE                 |
       | x       | `1`                   |
       | y       | `2`                   |
       | *rest   | `[ "three", "four" ]` |
       | z:      | "five"                |
     
-    When I call the method with the parameters
+    When I call the method with the arguments
     
     Then the response is equal to:
       """ruby
@@ -91,7 +91,7 @@ Feature: Describe parameters by name
       """
   
 
-  Scenario: Describing "key-rest" (double-splat / keyword hash) parameters
+  Scenario: Describing "key-rest" (double-splat / keyword hash) arguments
     
     Given a module:
       """ruby
@@ -105,13 +105,13 @@ Feature: Describe parameters by name
     And the module's method {.f}
     
     # NOTE  The table headings must be present, but their values don't matter.
-    And the parameters:
+    And the arguments:
       | NAME      | VALUE                 |
       | x         | `1`                   |
       | y:        | `2`                   |
       | **keyrest | `{ z: 3, w: 4}`       |
     
-    When I call the method with the parameters
+    When I call the method with the arguments
     
     Then the response is equal to:
       """ruby

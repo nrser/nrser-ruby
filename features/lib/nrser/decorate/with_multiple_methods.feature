@@ -29,7 +29,7 @@ Feature: Decorate a method with multiple others
       end
       """
     
-    When I create a new instance of {A} with no parameters
-    And I call `f` with no parameters
+    When I create a new instance of {A} with no arguments
+    And I call `f` with no arguments
     
     Then the response is equal to "A.decorator_1, A.decorator_2, A#f."

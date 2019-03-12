@@ -12,9 +12,9 @@ Feature: Do some shit
   Scenario: Describe some params
     
     Given the method {::File.join}
-    And the parameters "/", 'var', "log", 'blah.log'
+    And the arguments "/", 'var', "log", 'blah.log'
     
-    When I call the method with the parameters
+    When I call the method with the arguments
     
     Then the response is equal to "/var/log/blah.log"
     

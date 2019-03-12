@@ -21,7 +21,7 @@ Feature: Resolve methods by *bare* or *implicit* name
   
   
   Scenario: *Implicit* singleton method name
-    Given the `name:` parameter is ".my_singleton_method"
+    Given the `name:` argument is ".my_singleton_method"
 
     Then the response is a {::Method}
     And it has a `name` attribute that is `:my_singleton_method`
@@ -29,7 +29,7 @@ Feature: Resolve methods by *bare* or *implicit* name
   
   
   Scenario: *Implicit* instance method name
-    Given the `name:` parameter is "#my_instance_method"
+    Given the `name:` argument is "#my_instance_method"
     
     Then the response is an {::UnboundMethod}
     And it has a `name` attribute that is `:my_instance_method`
@@ -37,8 +37,8 @@ Feature: Resolve methods by *bare* or *implicit* name
   
   
   Scenario: *Bare* method name and singleton default type
-    Given the `name:` parameter is "my_singleton_method"
-    And the `default_type:` parameter is `:singleton`
+    Given the `name:` argument is "my_singleton_method"
+    And the `default_type:` argument is `:singleton`
     
     Then the response is a {::Method}
     And it has a `name` attribute that is `:my_singleton_method`
@@ -46,8 +46,8 @@ Feature: Resolve methods by *bare* or *implicit* name
   
   
   Scenario: *Bare* method name and class default type
-    Given the `name:` parameter is "my_singleton_method"
-    And the `default_type:` parameter is `:class`
+    Given the `name:` argument is "my_singleton_method"
+    And the `default_type:` argument is `:class`
     
     Then the response is a {::Method}
     And it has a `name` attribute that is `:my_singleton_method`
@@ -55,8 +55,8 @@ Feature: Resolve methods by *bare* or *implicit* name
   
   
   Scenario: *Bare* method name and instance default type
-    Given the `name:` parameter is "my_instance_method"
-    And the `default_type:` parameter is `:instance`
+    Given the `name:` argument is "my_instance_method"
+    And the `default_type:` argument is `:instance`
     
     Then the response is a {::UnboundMethod}
     And it has a `name` attribute that is `:my_instance_method`
@@ -64,8 +64,8 @@ Feature: Resolve methods by *bare* or *implicit* name
   
   
   Scenario: *Bare* method name and no default type
-    Given the `name:` parameter is "my_instance_method"
-    And the `default_type:` parameter is `nil`
+    Given the `name:` argument is "my_instance_method"
+    And the `default_type:` argument is `nil`
     
     Then a {NRSER::ArgumentError} is raised
     And the error has a `context` attribute

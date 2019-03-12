@@ -40,8 +40,8 @@ Feature: Decorate with a {Class}
       
       """
           
-    When I create a new instance of {A} with no parameters
-    And I call `f` with no parameters
+    When I create a new instance of {A} with no arguments
+    And I call `f` with no arguments
     
     Then the response is equal to:
       """ruby
@@ -92,8 +92,8 @@ Feature: Decorate with a {Class}
       
       """
           
-    When I create a new instance of {A} with no parameters
-    And I call `f` with no parameters
+    When I create a new instance of {A} with no arguments
+    And I call `f` with no arguments
     
     Then the response is equal to:
       """ruby
@@ -136,8 +136,8 @@ Feature: Decorate with a {Class}
       end
       """
           
-    When I create a new instance of {A} with no parameters
-    And I call `f` with no parameters
+    When I create a new instance of {A} with no arguments
+    And I call `f` with no arguments
     
     Then the response is equal to:
       """ruby

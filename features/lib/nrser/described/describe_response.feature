@@ -12,7 +12,7 @@ Feature: Describe a method's response
     Given the class {::String}
     And the class' method `name`
     
-    When I call the method with no parameters
+    When I call the method with no arguments
     
     Then the response is equal to "String"
   
@@ -28,7 +28,7 @@ Feature: Describe a method's response
     Given the class {::Array}
     And its method `name`
     
-    When I call it with no parameters
+    When I call it with no arguments
     
     Then it is equal to "Array"
   
@@ -40,7 +40,7 @@ Feature: Describe a method's response
     
     Given the method {::Hash.name}
     
-    When I call it with no parameters
+    When I call it with no arguments
     
     Then it is equal to "Hash"
   

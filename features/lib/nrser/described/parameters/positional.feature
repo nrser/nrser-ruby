@@ -1,6 +1,6 @@
-Feature: Describe positional parameters 
+Feature: Describe positional arguments 
   
-  Purely positional parameters for method calls can be described in-line with
+  Purely positional arguments for method calls can be described in-line with
   comma-separated lists of quoted strings and expressions, or as rows in
   single-column tables.
   
@@ -10,9 +10,9 @@ Feature: Describe positional parameters
     internally like expressions).
     
     Given the method {::File.join}
-    And the parameters "/", 'var', "log", 'blah.log'
+    And the arguments "/", 'var', "log", 'blah.log'
     
-    When I call the method with the parameters
+    When I call the method with the arguments
     
     Then the response is equal to "/var/log/blah.log"
   
@@ -20,7 +20,7 @@ Feature: Describe positional parameters
   Scenario: Using backtick-quoted expressions in-line
     
     Ruby code can be provided between backticks, which will be passed to `eval`
-    to produce the parameter values.
+    to produce the argument values.
     
     NOTE  At the moment you **can not use backticks (`) *inside* expressions**.
     
@@ -28,9 +28,9 @@ Feature: Describe positional parameters
     
     # These should make sense. You can of course put quoted strings *inside* 
     # backtick expressions if you want to for some reason.
-    And the parameters `:a`, `1`, `"hey"`, `[ 2, 3 ].reduce &:+`
+    And the arguments `:a`, `1`, `"hey"`, `[ 2, 3 ].reduce &:+`
     
-    # The "with the parameters" suffix is cosmetic and can be omitted
+    # The "with the arguments" suffix is cosmetic and can be omitted
     When I call the method
     
     Then the response is equal to `[:a, 1, "hey", 5]`
@@ -49,14 +49,14 @@ Feature: Describe positional parameters
     # 
     # NOTE  The column heading must be present, but may be anything.
     # 
-    And the parameters:
+    And the arguments:
       | VALUE                 |
       | `:a`                  |
       | `1`                   |
       | "hey"                 |
       | `[ 2, 3 ].reduce &:+` |
     
-    # The "with the parameters" suffix is cosmetic and can be omitted
+    # The "with the arguments" suffix is cosmetic and can be omitted
     When I call the method
     
     Then the response is equal to `[:a, 1, "hey", 5]`

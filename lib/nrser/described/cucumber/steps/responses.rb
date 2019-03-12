@@ -34,10 +34,11 @@ module Responses
   # Steps
   # ==========================================================================
   
-  CALL_IT_WITH_NO_PARAMETERS, CALL_THE_METHOD_WITH_NO_PARAMETERS = \
+  CALL_IT_WITH_NO_ARGS,
+  CALL_THE_METHOD_WITH_NO_ARGS = \
     [
-      "I call it with no parameters",
-      "I call the method with no parameters"
+      "I call it with no arguments",
+      "I call the method with no arguments"
     ].map do |template|
       Step template do
         describe :response, params: Meta::Params::Simple.new
@@ -46,8 +47,8 @@ module Responses
 
   CALL_IT, CALL_THE_METHOD = \
     [
-      "I call it( with the parameters)",
-      "I call the method( with the parameters)"
+      "I call it( with the arguments)",
+      "I call the method( with the arguments)"
     ].map do |template|
       Step template do
         describe :response
@@ -55,13 +56,13 @@ module Responses
     end
 
   CALL_METHOD_NAME = \
-    Step "I call {method_name}( with the parameters)" do |method_name|
+    Step "I call {method_name}( with the arguments)" do |method_name|
       describe_method method_name
       describe :response
     end
   
-  CALL_METHOD_NAME_WITH_NO_PARAMETERS = \
-    Step "I call {method_name} with no parameters" do |method_name|
+  CALL_METHOD_NAME_WITH_NO_ARGS = \
+    Step "I call {method_name} with no arguments" do |method_name|
       # TODO  This *should* work, but it doesn't yet...
       # describe :response, 
       #   params: Meta::Params::Simple.new,
@@ -72,15 +73,31 @@ module Responses
       describe :response, 
         params: Meta::Params::Simple.new
     end
+    
+  # CALL_METHOD_NAME_ON_X_WITH_NO_ARGS = \
+    Step "I call {method_name} on the {described} with no arguments" \
+    do |method_name, described|
+      describe :response,
+        callable: describe( :method, object: described, name: method_name ),
+        params: Meta::Params::Simple.new
+    end
   
-  CALL_METHOD_NAME_WITH_PARAMETERS = \
+  CALL_METHOD_NAME_WITH_ARGS = \
     Step "I call {method_name} with {values}" do |method_name, values|
       describe_method method_name
       # describe_positional_params values
       describe :response, params: params_for_positional_values( values )
     end
+    
+    Step "I call {method_name} on the {described} with {values}" \
+    do |method_name, described, values|
+      describe :response,
+        callable: describe( :method, object: described, name: method_name ),
+        params: params_for_positional_values( values )
+    end
   
-  CALL_IT_WITH_ARGUMENTS, CALL_THE_METHOD_WITH_ARGUMENTS = \
+  CALL_IT_WITH_ARGUMENTS,
+  CALL_THE_METHOD_WITH_ARGUMENTS = \
     [
       "I call it with {values}",
       "I call the method with {values}",

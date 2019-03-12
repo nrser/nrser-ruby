@@ -107,11 +107,11 @@ module Instances
     end
   
   
-  CREATE_A_NEW_INSTANCE_WITH_NO_PARAMETERS,
-  CONSTRUCT_AN_INSTANCE_WITH_NO_PARAMETERS = \
+  CREATE_A_NEW_INSTANCE_WITH_NO_ARGS,
+  CONSTRUCT_AN_INSTANCE_WITH_NO_ARGS = \
     [
-      "I create a new instance of {class} with no parameters",
-      "I construct an instance of {class} with no parameters",
+      "I create a new instance of {class} with no arguments",
+      "I construct an instance of {class} with no arguments",
     ].map do |template|
       Step template do |class_|
         describe :instance, class_: class_, params: Meta::Params::Simple.new
@@ -119,11 +119,11 @@ module Instances
     end
   
     
-  CREATE_A_NEW_INSTANCE_OF_THE_DESCRIBED_WITH_NO_PARAMETERS,
-  CONSTRUCT_AN_INSTANCE_OF_THE_DESCRIBED_WITH_NO_PARAMETERS = \
+  CREATE_A_NEW_INSTANCE_OF_THE_DESCRIBED_WITH_NO_ARGS,
+  CONSTRUCT_AN_INSTANCE_OF_THE_DESCRIBED_WITH_NO_ARGS = \
     [
-      "I create a new instance of the {described} with no parameters",
-      "I construct an instance of the {described} with no parameters",
+      "I create a new instance of the {described} with no arguments",
+      "I construct an instance of the {described} with no arguments",
     ].map do |template|
       Step template do |described|
         describe :instance,

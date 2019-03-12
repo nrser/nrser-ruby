@@ -13,6 +13,7 @@ require 'nrser/decorate'
 # =======================================================================
 
 module  NRSER
+module  Decorate
 
 
 # Definitions
@@ -102,4 +103,5 @@ end # class LazyAttr
 # /Namespace
 # =======================================================================
 
+end # module  Decorate
 end # module NRSER

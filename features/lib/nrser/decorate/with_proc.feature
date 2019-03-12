@@ -25,8 +25,8 @@ Feature: Decorate with a {Proc}
       
       """
     
-    When I create a new instance of {A} with no parameters
-    And I call `f` with no parameters
+    When I create a new instance of {A} with no arguments
+    And I call `f` with no arguments
     Then the response is equal to "Proc called f and it said: Hi from f :)"
   
   
@@ -50,5 +50,5 @@ Feature: Decorate with a {Proc}
       
       """
     
-    When I call {A.f} with no parameters
+    When I call {A.f} with no arguments
     Then the response is equal to "Proc called f and it said: Hi from f :)"
