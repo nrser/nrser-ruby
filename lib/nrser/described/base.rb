@@ -173,7 +173,7 @@ class Base
   
   # Get or declare the {Types::Type} of {#subject}s for instances of this class.
   # 
-  # @overload self.subject_type
+  # @overload .subject_type
   #   Get the {Types::Type} of {#subject}s for instances this class.
   #   
   #   @return [nil]
@@ -182,7 +182,7 @@ class Base
   #   @return [Types::Type]
   #     This class' subject type.
   #   
-  # @overload self.subject_type type
+  # @overload .subject_type type
   #   Declare the {Types::Type} of {#subject}s for instance of this class.
   #   
   #   This method is indented to be used durning subclass definition. Once

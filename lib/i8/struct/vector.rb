@@ -42,7 +42,7 @@ class Vector < I8::Vector
   # Check out {I8::Struct::Hash} for a general idea of how this method works,
   # I don't want to duplicate the explanation.
   # 
-  # @overload self.new *prop_defs, &class_body
+  # @overload .new *prop_defs, &class_body
   #   Create a new struct class.
   #   
   #   @example Using array-wrapping for prop defs
@@ -72,7 +72,7 @@ class Vector < I8::Vector
   #   @return [Class<I8::Struct::Vector>]
   #     New structure class.
   # 
-  # @overload self.new *args, **kwds, &block
+  # @overload .new *args, **kwds, &block
   #   Create a new instance.
   #   
   #   @return [I8::Struct::Vector]

@@ -48,7 +48,7 @@ class Hash < I8::Hash
   # 2.  Otherwise, we want to defer up to `super` to create a new instance
   #     of `self`.
   # 
-  # @overload self.new **prop_defs, &class_body
+  # @overload .new **prop_defs, &class_body
   #   When `self` **is** {I8::Struct::Hash}, the method builds a new 
   #   subclass, along the lines of how {I8::Struct.new} and `::Struct.new`
   #   work.
@@ -74,7 +74,7 @@ class Hash < I8::Hash
   #   @return [Class<I8::Struct::Hash>]
   #     New structure class.
   # 
-  # @overload self.new *args, **kwds, &block
+  # @overload .new *args, **kwds, &block
   #   When `self` **is not** {I8::Struct::Hash}, this method simply forwards
   #   all parameters up to it's super method, which will create a new 
   #   instance as usual.
