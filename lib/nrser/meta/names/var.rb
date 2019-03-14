@@ -42,7 +42,7 @@ class Var < Name
   #   
   #   Check this shit...
   #   
-  #   ```Ruby
+  #   ```ruby
   #   class BadAttr
   #     attr_accessor :BAD
   #   

@@ -65,7 +65,7 @@ module  Decorate
 # The decoration process that constructed the {Decoration} (see
 # {Decorate.decorate}) will have overwritten `A.f` to the equivalent of:
 #
-# ```Ruby
+# ```ruby
 # def A.f *args, &block
 #   d.call self, *args, &block
 # end

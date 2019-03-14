@@ -58,7 +58,7 @@ It's signature **MUST** be **EXACTLY ONE** of:
     
     Example:
     
-    ```Ruby
+    ```ruby
     class MyToken < NRSER::Described::Cucumber::Tokens::Token
       def to_custom
         # Do something to `self` to produce the value...
@@ -81,7 +81,7 @@ It's signature **MUST** be **EXACTLY ONE** of:
     
     Example:
     
-    ```Ruby
+    ```ruby
     class MyToken < NRSER::Described::Cucumber::Tokens::Token
       def to_custom scenario_obj
         # Do something using `self` and access to `scenario_obj`
@@ -101,7 +101,7 @@ just {::Object}).
 
 Example:
 
-```Ruby
+```ruby
 class Custom
   def self.from_s string
     # Instantiate from a string...

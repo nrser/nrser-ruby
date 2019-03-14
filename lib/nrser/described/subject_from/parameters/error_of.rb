@@ -36,7 +36,7 @@ class   SubjectFrom
 # definitions, you may prefer to look cool and save up to *four* characters 
 # with {Parameter.[]}:
 # 
-# ```Ruby
+# ```ruby
 # class MyErrorDescription < Described::Object
 #   
 #   subject_form \
