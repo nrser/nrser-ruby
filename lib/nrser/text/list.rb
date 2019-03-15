@@ -66,9 +66,10 @@ class List < ::Array
   attr_reader :join_with
   
   
-  # Optional special {::String} to join the next-to-last and last entries in
-  # string representations (available via {#to_s}).
-  # 
+  # Coordinating conjunction - Optional special {::String} to join the
+  # next-to-last and last entries in string representations (available via
+  # {#to_s}).
+  #
   # @return [nil]
   #   Doesn't do anything special for the last join.
   # 
