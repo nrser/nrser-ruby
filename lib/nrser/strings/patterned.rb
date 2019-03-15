@@ -11,6 +11,9 @@ require 'active_support/core_ext/class/subclasses'
 
 ### Project / Package ###
 
+# Using {NRSER::ArgumentError}
+require 'nrser/errors'
+
 # Using {NRSER::Regexps::Composed.join} and {NRSER::Regexps::Composed.or} to
 # compose {Names::Name.pattern} instances.
 require 'nrser/regexps/composed'
