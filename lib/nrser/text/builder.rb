@@ -8,8 +8,11 @@
 
 ### Project / Package ###
 
+require 'nrser/meta/names/param'
+
 require_relative '../text'
 require_relative './list'
+require_relative './code'
 
 
 # Namespace
@@ -27,10 +30,12 @@ module  Text
 # elements.
 # 
 # @example
-#   new {[
-#     "Argument must be a", list( ::String, ::Symbol, or: ::Integer )
+#   ::NRSER::Text::Builder.new {[
+#     kwd( :target ),
+#     "argument must be a",
+#     list( ::String, ::Symbol, or: ::Integer )
 #   ]}.render
-#   #=> "Argument must be a String, Symbol or Integer"
+#   #=> "`target:` argument must be a {String}, {Symbol} or {Integer}"
 # 
 class Builder
   
@@ -72,6 +77,58 @@ class Builder
   # 
   def list *args
     List.new *args
+  end
+  
+  
+  def code source
+    Code.new source
+  end
+  
+  
+  def ruby source
+    Code.ruby source
+  end
+  
+  
+  # Mark a name 
+  # 
+  # @param [#to_s] name
+  #   @todo Add name param description.
+  # 
+  # @return [return_type]
+  #   @todo Document return value.
+  # 
+  def kwd name
+    # Turn the `name` into a {::String}, allowing people to pass {::Symbol}s
+    # in particular, though of course anything else that makes sense would make
+    # sense.
+    string = name.to_s
+    
+    # Add the ':' to the end, unless it's already there, so that 
+    # {Meta::Names::Param::Keyword.new} will accept it.
+    unless string[ -1 ] == ':'
+      string = string + ':'
+    end
+    
+    ruby Meta::Names::Param::Keyword.new( string )
+  end # #kwd
+  
+  
+  # Mark a {::String} as being an actual code {::String}, as opposed to being
+  # regular prose.
+  # 
+  # @return [Code]
+  # 
+  def str string
+    Code.ruby string
+  end
+  
+  
+  # 
+  # @return [Code]
+  # 
+  def const name
+    Code.ruby Meta::Names::Const.new( name )
   end
   
   

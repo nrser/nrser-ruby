@@ -1,6 +1,19 @@
 # encoding: UTF-8
 # frozen_string_literal: true
 
+# Requirements
+# ============================================================================
+
+### Stdlib ###
+
+### Deps ###
+
+### Project / Package ###
+
+require 'nrser/ext/object/booly'
+
+require_relative './strung'
+
 
 # Namespace
 # =======================================================================
@@ -35,9 +48,56 @@ class Renderer
   # Constants
   # ==========================================================================
   
+  # Instance Defaults
+  # ----------------------------------------------------------------------------
+  
+  # Default character to use for {#space}. Just the regular ASCII space 
+  # character.
+  # 
+  # @return [String]
+  # 
   DEFAULT_SPACE = ' '
   
+  
+  # Default characters to use for {#no_preceding_space_chars}, which is used to
+  # form {#no_preceding_space_regexp}.
+  # 
+  # @return [::Array<::String>]
+  # 
   DEFAULT_NO_PRECEDING_SPACE_CHARS = %w(, ; : . ? !).freeze
+  
+  
+  # Default for {#yard_style_class_names?}.
+  # 
+  # @return [Boolean]
+  # 
+  DEFAULT_YARD_STYLE_CLASS_NAMES = true
+  
+  
+  # Singleton Methods
+  # ==========================================================================
+  
+  # 
+  # 
+  # @param [type] arg_name
+  #   @todo Add name param description.
+  # 
+  # @return [return_type]
+  #   @todo Document return value.
+  # 
+  def self.default_color?
+    if ENV.key? 'NRSER_TEXT_USE_COLOR'
+      return Ext::Object::truthy? ENV[ 'NRSER_TEXT_USE_COLOR' ]
+    end
+    
+    # Detect based on environment
+    # 
+    # Borrowed from Thor (MIT license)
+    # 
+    # https://github.com/erikhuda/thor/blob/0887bc8fb257fadf656fb4c4f081a9067b373e7b/lib/thor/shell.rb#L14
+    # 
+    !( RbConfig::CONFIG["host_os"] =~ /mswin|mingw/ && !ENV["ANSICON"] )
+  end # .default_color?
   
   
   # Attributes
@@ -83,7 +143,9 @@ class Renderer
   #   If all entries in `no_preceding_space_chars` are not {::String}s.
   # 
   def initialize  space: DEFAULT_SPACE,
-                  no_preceding_space_chars: DEFAULT_NO_PRECEDING_SPACE_CHARS
+                  no_preceding_space_chars: DEFAULT_NO_PRECEDING_SPACE_CHARS,
+                  yard_style_class_names: DEFAULT_YARD_STYLE_CLASS_NAMES,
+                  color: self.class.default_color?
     
     unless space.is_a? ::String
       # NOTE  Can't use {NRSER::TypeError}
@@ -107,11 +169,41 @@ class Renderer
         entry.freeze
       }.freeze
     
+    @yard_style_class_names = !!yard_style_class_names
+    
+    @color = !!color
+    
+    @syntax_highlighter_cache = {}
+    
   end # #initialize
   
   
   # Instance Methods
   # ==========================================================================
+  
+  # When true renders {::Class} fragments in YARD link style like
+  # 
+  #     "{String}"
+  # 
+  # @return [Boolean]
+  # 
+  def yard_style_class_names?
+    @yard_style_class_names
+  end # #yard_style_class_names?
+  
+  
+  # @todo Document color? method.
+  # 
+  # @param [type] arg_name
+  #   @todo Add name param description.
+  # 
+  # @return [return_type]
+  #   @todo Document return value.
+  # 
+  def color?
+    @color
+  end # #color?
+  
   
   # Regular expression to test against the right-hand side (RHS) {::String} of
   # a {.join} to see if we should omit the separating space character.
@@ -125,6 +217,41 @@ class Renderer
   #   
   def no_preceding_space_regexp
     /\A[#{ Regexp.escape no_preceding_space_chars.join }](?:[[:space:]]|$)/
+  end
+  
+  
+  def syntax_highlighter_for syntax
+    return nil if syntax.nil?
+    
+    syntax = syntax.to_sym unless syntax.is_a?( ::Symbol )
+    
+    unless @syntax_highlighter_cache.key? syntax
+      @syntax_highlighter_cache[ syntax ] = find_syntax_highlighter_for syntax
+    end
+        
+    @syntax_highlighter_cache[ syntax ]
+  end
+  
+  
+  def find_syntax_highlighter_for syntax
+    method_name = "#{ syntax }_syntax_highlighter"
+    
+    if respond_to?( method_name )
+      send method_name
+    else
+      nil
+    end
+  end
+  
+  
+  def ruby_syntax_highlighter
+    require 'rspec'
+    highlighter = \
+      ::RSpec::Core::Formatters::SyntaxHighlighter.new ::RSpec.configuration
+    
+    ->( string ) { highlighter.highlight( string.lines ).join }
+  rescue
+    nil
   end
   
   
@@ -145,8 +272,8 @@ class Renderer
   # @param [::Array] fragments
   #   Fragments to be joined. Turned into {::String}s first with {.string_for}.
   # 
-  # @param [::String] space
-  #   Space string used between adjacent strings when needed.
+  # @param [::String] with
+  #   String to join with.
   # 
   # @return [::String]
   #   Joined string.
@@ -154,7 +281,7 @@ class Renderer
   def join *fragments, with: self.space
     no_space_rhs_regexp = self.no_preceding_space_regexp
     
-    fragments.reduce { |lhs_fragment, rhs_fragment|
+    string = fragments.reduce { |lhs_fragment, rhs_fragment|
       lhs_string = string_for lhs_fragment
       rhs_string = string_for rhs_fragment
       
@@ -164,26 +291,75 @@ class Renderer
         lhs_string + with + rhs_string
       end
     }
+    
+    Strung.new string, source: fragments
   end # .join
   
   
-  # Convert a fragment into a {::String} so it can be {.join}ed.
+  # Get the display string for an individual `fragment`.
+  #
+  # A {::String} instance is always returned. 
+  #
+  # In most cases, what is returned is actually a {Strung} - a {::String}
+  # extension that saves the object it was created from as an instance variable,
+  # allowing better decision making later if you want to truncate or ellipsis
+  # it.
+  #
+  # The only case in which a {::String} is returned that is *not* a {::Strung} 
+  # is when a {::String} that is not a {::Strung} and that does not match any
+  # if the other formatting tests is given as the `fragment`. In such case,
+  # there's not anything useful that can be done with it.
   # 
   # @param [::Object] fragment
+  #   Fragment object you want the string for. Should handle anything;
+  #   behavior depends on the object's class and this instance's configuration.
+  # 
   # @return [::String]
+  #   String representation of the `fragment` ready for display.
   # 
   def string_for fragment
     if fragment.is_a? Text
       return fragment.render self
     end
-  
-    return fragment.to_summary.to_s if fragment.respond_to?( :to_summary )
     
-    return fragment if fragment.is_a?( ::String )
+    if fragment.respond_to? :to_strung
+      return fragment.to_strung
+    end
+    
+    # TODO  This is old shit brought over from 
+    #       `//lib/nrser/functions/text/format.rb` that probably should be 
+    #       superceded by the stuff being laid out in the {NRSER::Text} module.
+    #       
+    #       I think very little ended up implementing it anyways, only seeing 
+    #       10 hits in 6 files with a quick search (2019.03.15)
+    #       
+    if fragment.respond_to? :to_summary
+      summary = fragment.to_summary
+      
+      case summary
+      when Strung
+        return summary
+      when ::String
+        return Strung.new summary, source: fragment
+      else
+        return Strung.new summary.to_s, source: fragment
+      end
+    end # if #to_summary
+    
+    if fragment.is_a?( ::Class ) && yard_style_class_names?
+      return Strung.new "{#{ fragment.to_s }}", source: fragment
+    end
+    
+    # We have nothing to do with {::String}s - *including* {Strung}s - so just
+    # return them.
+    if fragment.is_a?( ::String )
+      return fragment
+    end
     
     # TODO  Do better!
-    fragment.inspect
-  end
+    Strung.new fragment.inspect, source: fragment
+  end # #string_for
+  
   
 end # class Renderer
 

@@ -153,7 +153,7 @@ class List < ::Array
     else
       renderer.join *fragments, with: join_with
     end
-  end
+  end # #render
   
   
   # Language Integration Instance Methods

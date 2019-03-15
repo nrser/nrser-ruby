@@ -2,6 +2,8 @@ require 'pry'
 require 'pathname'
 require 'set'
 
+ENV[ 'NRSER_TEXT_USE_COLOR' ] = 'false'
+
 ROOT = Pathname.new File.expand_path( '..', __dir__ )
 LIB_PATH = ROOT.join 'lib'
 
