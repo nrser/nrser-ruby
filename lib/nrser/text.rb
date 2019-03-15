@@ -189,6 +189,21 @@ module Text
     default_renderer.string_for fragment
   end
   
+  
+  # @todo Document build method.
+  # 
+  # @param [type] arg_name
+  #   @todo Add name param description.
+  # 
+  # @return [return_type]
+  #   @todo Document return value.
+  # 
+  def self.build *args, &block
+    require_relative './text/builder'
+    
+    Builder.new *args, &block
+  end # .build
+  
 end # module Text
 
 

@@ -279,10 +279,18 @@ class Renderer
   #   Joined string.
   # 
   def join *fragments, with: self.space
+    case fragments.length
+    when 0
+      return ''
+    when 1
+      return string_for fragments[ 0 ]
+    else
+      first, *rest = fragments
+    end
+  
     no_space_rhs_regexp = self.no_preceding_space_regexp
     
-    string = fragments.reduce { |lhs_fragment, rhs_fragment|
-      lhs_string = string_for lhs_fragment
+    string = rest.reduce( string_for first ) { |lhs_string, rhs_fragment|
       rhs_string = string_for rhs_fragment
       
       if no_space_rhs_regexp =~ rhs_string

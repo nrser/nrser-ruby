@@ -111,6 +111,7 @@ class Code
   #   {Renderer} to use.
   # 
   # @return [Strung]
+  #   Rendered string with {#source} attached as it's {Strung#source}.
   # 
   def render renderer = Text.default_renderer
     string = renderer.string_for source

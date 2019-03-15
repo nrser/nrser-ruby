@@ -4,8 +4,11 @@
 # Requirements
 # =======================================================================
 
-# Project / Package
-# -----------------------------------------------------------------------
+### Deps ###
+
+require "active_support/core_ext/hash/indifferent_access"
+
+### Project / Package ###
 
 # We set scope modules as constants on
 # {NRSER::Described::Cucumber::ScenarioScopes}
@@ -56,6 +59,80 @@ module Scope
   def scope
     @scope ||= ScenarioScopes.const_set scope_const_name, ::Module.new
   end # #scope
+  
+  
+  # Get a {::Binding} from the {#scope}, with the {#let_bindings} added as 
+  # local variables.
+  # 
+  # This allows evaluating code in the binding that naturally closes around the 
+  # let values.
+  # 
+  # @return [::Binding]
+  # 
+  def scope_binding
+    scope.module_eval( 'binding' ).tap do |binding|
+      let_bindings.each do |name, value|
+        binding.local_variable_set name, value
+      end
+    end
+  end
+  
+  
+  # Evaluate a string of Ruby code in the {#scope_binding}, which is where you
+  # want to do all your evaluations, because it has the {#let_bindings} added
+  # as local variables.
+  # 
+  # @param [::String] string
+  #   Ruby code.
+  # 
+  # @return [::Object]
+  #   Result of the evaluation.
+  # 
+  def scope_eval string
+    scope_binding.eval string
+  end
+  
+  
+  # Map of names to values bound by {#let}.
+  # 
+  # Uses a {::HashWithIndifferentAccess} so values can be retrieved by 
+  # {::String} or {::Symbol} names.
+  # 
+  # @return [::HashWithIndifferentAccess]
+  # 
+  def let_bindings
+    @let_bindings ||= ::HashWithIndifferentAccess.new
+  end
+  
+  
+  def resolve_let name
+    name = name.to_s unless name.is_a?( ::String )
+    
+    if let_bindings.key? name
+      let_bindings[ name ]
+    else
+      raise ::NoMethodError,
+        "No let value bound to '#{ name }'"
+    end
+  end
+  
+  
+  # Add a local variable binding that will be present in {#scope_binding}, 
+  # which is the {::Binding} used in {#scope_eval}.
+  # 
+  # @param [#to_s] name
+  #   Name of the local variable. No checks are done here, but an error will be
+  #   raised when {#scope_binding} tries to use it if it's not valid.
+  # 
+  # @param [::Object] value
+  #   Value to bind to the `name`.
+  # 
+  # @return [::Object]
+  #   The `value`.
+  # 
+  def let name, value
+    let_bindings[ name.to_s ] = value
+  end
   
   
   # Resolve a constant from the {#scope} or globally.

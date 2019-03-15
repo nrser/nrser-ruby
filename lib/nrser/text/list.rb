@@ -146,7 +146,7 @@ class List < ::Array
         renderer.join *self[ 0..-2 ], last_join, self[ -1 ], with: join_with
       else
         renderer.join \
-          renderer.join( *self[ 0..-2 ], with: join_with),
+          renderer.join( *self[ 0..-2 ], with: join_with ),
           last_join,
           self[ -1 ]
       end

@@ -30,11 +30,14 @@ module  Text
 # elements.
 # 
 # @example
+#   name = :target
+#   
 #   ::NRSER::Text::Builder.new {[
-#     kwd( :target ),
+#     kwd( name ),
 #     "argument must be a",
 #     list( ::String, ::Symbol, or: ::Integer )
 #   ]}.render
+#   
 #   #=> "`target:` argument must be a {String}, {Symbol} or {Integer}"
 # 
 class Builder

@@ -48,11 +48,17 @@ module Vars
   extend World::Quote
   
   
-  def_parameter_type    \
+  def_parameter_type \
     name:           :var_name,
     patterns:    [  Tokens::Var::Local,
                     Tokens::Var::Instance,
                     Tokens::Var::Global, ],
+    transformer:    :unquote
+  
+  
+  def_parameter_type \
+    name:           :local_var_name,
+    patterns:     [ Tokens::Var::Local ],
     transformer:    :unquote
     
       

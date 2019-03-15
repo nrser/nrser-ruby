@@ -153,6 +153,16 @@ module Expectations
   do |key, value|
     expect_it.to include key => value
   end
+  
+  
+  Step "{local_var_name} is equal to {value}" do |local_var_name, value|
+    expect( resolve_let local_var_name ).to eq value
+  end
+  
+  
+  Step "{local_var_name} is equal to the string:" do |local_var_name, string|
+    expect( resolve_let local_var_name ).to eq string
+  end
 
 end # module Expectations
 
