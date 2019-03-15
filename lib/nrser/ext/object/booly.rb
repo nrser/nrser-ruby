@@ -62,11 +62,11 @@ module Object
   # @return [Boolean]
   #   `true` if the object is "truthy".
   # 
-  # @raise [ArgumentError]
-  #   When a string is received that is not in {NRSER::TRUTHY_STRINGS} or
-  #   {NRSER::FALSY_STRINGS} (case insensitive).
+  # @raise [::ArgumentError]
+  #   When a string is received that is not in {TRUTHY_STRINGS} or
+  #   {FALSY_STRINGS} (case insensitive).
   # 
-  # @raise [TypeError]
+  # @raise [::TypeError]
   #   When `object` is not the right type.
   # 
   def self.truthy? object
@@ -82,15 +82,15 @@ module Object
       elsif FALSY_STRINGS.include? downcased
         false
       else
-        raise ArgumentError,
+        raise ::ArgumentError,
               "String #{ object.inspect } not recognized as true or false."
       end
       
-    when TrueClass, FalseClass
+    when ::TrueClass, ::FalseClass
       object
       
     else
-      raise TypeError,
+      raise ::TypeError,
             "Can't evaluate truthiness of #{ object.inspect }"
     end
   end # .truthy?
