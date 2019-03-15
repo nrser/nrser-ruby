@@ -23,10 +23,14 @@ module  Steps
 # Definitions
 # =======================================================================
 
-# New, unorganized and experimental shit. To enable, require this in your
-# `features/support/env.rb` file or equivalent.
+# Declare local variable bindings that will be made available when evaluating
+# with {World::Scope#scope_eval}.
 # 
-module Labs
+# @note
+#   At the moment, these declarations do **not** create description instances,
+#   and I'm not sure if they will... I'm still working it out.
+# 
+module Lets
   
   # Mixins
   # ==========================================================================
@@ -37,8 +41,16 @@ module Labs
   # Steps
   # ==========================================================================
   
+  Step "I let {local_var_name} be {value}" do |local_var_name, value|
+    let local_var_name, value
+  end
   
-end # module Labs
+  
+  Step "I let {local_var_name} be:" do |local_var_name, string|
+    let local_var_name, scope_eval( string )
+  end
+  
+end # module Lets
 
 
 # /Namespace
