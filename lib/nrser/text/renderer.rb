@@ -220,6 +220,19 @@ class Renderer
   end
   
   
+  # 
+  # @return [nil]
+  #   We don't have a highlight `#call`-able available for `syntax`, either 
+  #   because:
+  #   
+  #   1.  `syntax` is `nil`, which *never* has a highlight `#call`-able, or...
+  #       
+  #   2.  {#find_syntax_highlighter_for} returned `nil` for `syntax` (see 
+  #       details there).
+  #   
+  # @return [#call<(::String) → ::String>]
+  #   A `#call`-able that 
+  # 
   def syntax_highlighter_for syntax
     return nil if syntax.nil?
     
@@ -326,6 +339,10 @@ class Renderer
   #   String representation of the `fragment` ready for display.
   # 
   def string_for fragment
+    if fragment.is_a? Code
+      return string_for_code fragment
+    end
+    
     if fragment.is_a? Text
       return fragment.render self
     end
@@ -354,9 +371,14 @@ class Renderer
       end
     end # if #to_summary
     
-    if fragment.is_a?( ::Class ) && yard_style_class_names?
-      return Strung.new "{#{ fragment.to_s }}", source: fragment
+    # if fragment.is_a?( ::Class ) && yard_style_class_names?
+    #   return Strung.new "{#{ fragment.to_s }}", source: fragment
+    # end
+    
+    if fragment.is_a?( ::Class )
+      return string_for_code( Code.ruby fragment )
     end
+    
     
     # We have nothing to do with {::String}s - *including* {Strung}s - so just
     # return them.
@@ -365,8 +387,65 @@ class Renderer
     end
     
     # TODO  Do better!
-    Strung.new fragment.inspect, source: fragment
+    string_for_code \
+      Code.ruby( Strung.new( fragment.inspect, source: fragment ) )
   end # #string_for
+  
+  
+  # Render a {Code} instance to a {::String} (actually a {::Strung}) for
+  # display.
+  # 
+  # Special care has to be taken since {Code} are created and passed here by
+  # {#string_for}, while {#string_for} also passes any {Code} it receiver here.
+  # 
+  # In the former case, we need to be careful *not* to pass the {Code#source}
+  # back to {#string_for} because it would cause an infinite loop, while in the
+  # latter case we want to pass the {Code#source} to {#string_for} to get a 
+  # {::String} for it.
+  # 
+  # @param [Code] code
+  #   The code.
+  # 
+  # @return [Strung]
+  #   A string strung from the `code`
+  # 
+  def string_for_code code
+    source_string = case code.source
+    when ::Class
+      # {::Class} needs special handling to prevent an infinite loop
+      code.source.to_s
+    when ::String # including {::Strung}!
+      # Just use the {Code#source}, no need to pass it back through 
+      # {#string_for}. This saves us time and possible problems with {Code}
+      # instances created from calling `#inspect` on Ruby objects (last lines
+      # of {#string_for})
+      code.source
+    else
+      # The rest should be ok to go back through {#string_for} since they
+      # weren't created there
+      string_for code.source
+    end
+    
+    
+    rendered_string = \
+      if  color? &&
+          (highlighter = syntax_highlighter_for code.syntax)
+        highlighter.call source_string
+    
+      elsif code.source.is_a?( ::Class ) &&
+            code.source.name &&
+            yard_style_class_names?
+        # {Code#source} is a named (non-anonymous) {::Class}, which we "curly
+        # quote" (like YAML doc-strings)
+        Code.curly_quote( code.source.name )
+      
+      else
+        Code.backtick_quote( source_string )
+      
+      end
+    
+    Strung.new rendered_string, source: code
+  end # #string_for_code
   
   
 end # class Renderer

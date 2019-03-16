@@ -27,6 +27,9 @@ require 'nrser/ext/object/booly'
 # Config
 # =======================================================================
 
+# Don't use color in {NRSER::Text} by default
+ENV[ 'NRSER_TEXT_USE_COLOR' ] = 'false'
+
 # Don't load pryrc - we went the env exactly how it is, and there's a huge mess
 # of shit in there
 Pry.config.should_load_rc = false

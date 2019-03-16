@@ -4,13 +4,9 @@
 # Requirements
 # =======================================================================
 
-### Stdlib ###
-
-### Deps ###
-
 ### Project / Package ###
 
-require 'nrser/text'
+# require 'nrser/text'
 
 
 # Refinements
@@ -27,14 +23,14 @@ module  Text
 # Definitions
 # =======================================================================
 
-# @todo document Code class.
+# Wraps objects that should be rendered as source code.
 # 
 class Code
   
   # Mixins
   # ==========================================================================
   
-  include Text
+  # include Text
   
   
   # Singleton Methods
@@ -60,10 +56,15 @@ class Code
   # @return [return_type]
   #   @todo Document return value.
   # 
-  def self.quote string
+  def self.backtick_quote string
     quote = '`' * ((string.scan( /`+/ ).map( &:length ).max || 0) + 1)
     "#{ quote }#{ string }#{ quote }"
   end # .quote
+  
+  
+  def self.curly_quote string
+    "{#{ string }}"
+  end
   
   
   # Attributes
@@ -113,16 +114,16 @@ class Code
   # @return [Strung]
   #   Rendered string with {#source} attached as it's {Strung#source}.
   # 
-  def render renderer = Text.default_renderer
-    string = renderer.string_for source
+  # def render renderer = Text.default_renderer
+  #   string = renderer.string_for source
     
-    if  renderer.color? &&
-        (highlighter = renderer.syntax_highlighter_for syntax)
-      Strung.new highlighter.call( string ), source: source
-    else
-      Strung.new self.class.quote( string ), source: source
-    end
-  end # #render
+  #   if  renderer.color? &&
+  #       (highlighter = renderer.syntax_highlighter_for syntax)
+  #     Strung.new highlighter.call( string ), source: source
+  #   else
+  #     Strung.new self.class.quote( string ), source: source
+  #   end
+  # end # #render
   
 end # class Code
 
