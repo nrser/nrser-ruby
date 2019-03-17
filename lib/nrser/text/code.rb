@@ -115,7 +115,7 @@ class Code
   #   Rendered string with {#source} attached as it's {Strung#source}.
   # 
   # def render renderer = Text.default_renderer
-  #   string = renderer.string_for source
+  #   string = renderer.render_fragment source
     
   #   if  renderer.color? &&
   #       (highlighter = renderer.syntax_highlighter_for syntax)

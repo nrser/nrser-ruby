@@ -180,13 +180,16 @@ module Text
   end # .join
   
   
-  # Convert a fragment into a {::String} so it can be {.join}ed.
+  # Render a fragment into a {::String} using the {.default_renderer}.
+  # 
+  # @see Renderer#render_fragment
+  # @see .default_renderer
   # 
   # @param [::Object] fragment
   # @return [::String]
   # 
-  def self.string_for fragment
-    default_renderer.string_for fragment
+  def self.render_fragment fragment
+    default_renderer.render_fragment fragment
   end
   
   

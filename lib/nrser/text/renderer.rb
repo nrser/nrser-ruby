@@ -8,7 +8,12 @@
 
 ### Deps ###
 
+# Use {Concurrent::Map} for the syntax highlighter cache
+require "concurrent/map"
+
 ### Project / Package ###
+
+require 'nrser/support/critical_code'
 
 require 'nrser/ext/object/booly'
 
@@ -72,6 +77,12 @@ class Renderer
   # @return [Boolean]
   # 
   DEFAULT_YARD_STYLE_CLASS_NAMES = true
+  
+  
+  # Mixins
+  # ==========================================================================
+  
+  include Support::CriticalCode
   
   
   # Singleton Methods
@@ -173,7 +184,8 @@ class Renderer
     
     @color = !!color
     
-    @syntax_highlighter_cache = {}
+    # Use a {Concurrent::Map} for some level of thread safety in the cache
+    @syntax_highlighter_cache = Concurrent::Map.new
     
   end # #initialize
   
@@ -220,6 +232,65 @@ class Renderer
   end
   
   
+  # Get a `::String → ::String` syntax highlighting `#call`-able for a
+  # particular `syntax` - if we can find one.
+  #
+  #
+  # `nil` Syntax
+  # --------------------------------------------------------------------------
+  #
+  # Accepts `nil` for `syntax`, in which case the method always returns `nil`.
+  # This is so it can be called like
+  #
+  #     syntax_highlighter_for code.syntax
+  #
+  # without first checking if {Code#syntax} is `nil` (which would mean the code
+  # does not have an associated language syntax).
+  #
+  #
+  # Finding, Caching & Concurrency
+  # --------------------------------------------------------------------------
+  #
+  # Highlight callables are found on-demand by {#find_syntax_highlighter_for},
+  # and results are cached internally in a {Concurrent::Map}.
+  #
+  # **There is no API to clear the cache.** Once a result is there - either
+  # `nil` or a callable - it's there for the lifetime of the {Renderer}
+  # instance.
+  #
+  # This is in keeping with the over-arching concurrency approach: once code has
+  # a reference to a {Renderer}, it should always stay in a consistent state and
+  # behave the same. The only way to achieve different behavior is to use a
+  # different {Renderer} instance (see additional notes in the {Renderer} class
+  # {Text.default_renderer} method docs).
+  #
+  # In pursuit of that goal, **{#find_syntax_highlighter_for} is called inside a
+  # synchronized block** via {Concurrent::Map#compute_if_absent}.
+  #
+  # The block will only end up getting run *once*, but if you were to fire a
+  # bunch of threads up and have them all try to render text using the same
+  # syntax highlighter they will all block until the first to start finishes the
+  # find, and finding may take a bit depending on the syntax and
+  # implementation... likely at least trying to require some libraries (take a
+  # look for a `#<syntax>_syntax_highlighter` method, like
+  # {#ruby_syntax_highlighter} - if there isn't one, then the {Renderer} doesn't
+  # know how to find any highlighters for that `syntax` and will always return
+  # `nil`).
+  #
+  # It doesn't seem to take much more time to find the highlighters like this
+  # (versus with just a single thread), but it definitely takes more
+  # *resources*, and if you expected those threads to be available to do useful
+  # things like handle connections or some shit, they won't be, so that's
+  # something to thing about too.
+  #
+  # You can avoid this by priming the cache via calling
+  # {#syntax_highlighter_for} with each `syntax` you plan to use.
+  # 
+  # @param [nil | #to_sym] syntax
+  #   The syntax name, such as `:ruby`.
+  #   
+  #   When `nil`, `nil` will always be returned. Otherwise must be a {::Symbol} 
+  #   or something that can be cast to one (via `#to_sym`).
   # 
   # @return [nil]
   #   We don't have a highlight `#call`-able available for `syntax`, either 
@@ -238,14 +309,39 @@ class Renderer
     
     syntax = syntax.to_sym unless syntax.is_a?( ::Symbol )
     
-    unless @syntax_highlighter_cache.key? syntax
-      @syntax_highlighter_cache[ syntax ] = find_syntax_highlighter_for syntax
-    end
+    @syntax_highlighter_cache.compute_if_absent( syntax ) {
+      find_syntax_highlighter_for syntax
+    }
         
     @syntax_highlighter_cache[ syntax ]
   end
   
   
+  # Find a highlighter `#call`-able for a `syntax`.
+  # 
+  # This is simply a dispatch method that looks for a instance method named 
+  # `<syntax>_syntax_highlighter`, and calls it if found (with no arguments).
+  # 
+  # An example target is {#ruby_syntax_highlighter}.
+  # 
+  # @note
+  #   Unless you are testing or debugging, you probably want to be using 
+  #   {#syntax_highlighter_for}, which caches results. This method is broken 
+  #   out for ease of development and overriding.
+  # 
+  # @param [#to_s] syntax
+  #   The syntax name, which is used to form the method name to hand off to 
+  #   (see above).
+  # 
+  # @return [nil]
+  #   No highlighter is available (at least at this time).
+  #   
+  #   This happens when `self` does not respond to the computed method name, 
+  #   or that method returned `nil`, indicating no highlighter is available.
+  # 
+  # @return [#call<(::String) → ::String>]
+  #   `#call`-able that transforms source strings into highlighted strings.
+  # 
   def find_syntax_highlighter_for syntax
     method_name = "#{ syntax }_syntax_highlighter"
     
@@ -283,7 +379,7 @@ class Renderer
   #   #=> "Do you like hot dogs? Of course you like hot dogs!"
   # 
   # @param [::Array] fragments
-  #   Fragments to be joined. Turned into {::String}s first with {.string_for}.
+  #   Fragments to be joined. Turned into {::String}s first with {.render_fragment}.
   # 
   # @param [::String] with
   #   String to join with.
@@ -296,15 +392,15 @@ class Renderer
     when 0
       return ''
     when 1
-      return string_for fragments[ 0 ]
+      return render_fragment fragments[ 0 ]
     else
       first, *rest = fragments
     end
   
     no_space_rhs_regexp = self.no_preceding_space_regexp
     
-    string = rest.reduce( string_for first ) { |lhs_string, rhs_fragment|
-      rhs_string = string_for rhs_fragment
+    string = rest.reduce( render_fragment first ) { |lhs_string, rhs_fragment|
+      rhs_string = render_fragment rhs_fragment
       
       if no_space_rhs_regexp =~ rhs_string
         lhs_string + rhs_string
@@ -317,7 +413,7 @@ class Renderer
   end # .join
   
   
-  # Get the display string for an individual `fragment`.
+  # Render a display string for an individual `fragment`.
   #
   # A {::String} instance is always returned. 
   #
@@ -338,9 +434,9 @@ class Renderer
   # @return [::String]
   #   String representation of the `fragment` ready for display.
   # 
-  def string_for fragment
+  def render_fragment fragment
     if fragment.is_a? Code
-      return string_for_code fragment
+      return render_code fragment
     end
     
     if fragment.is_a? Text
@@ -376,9 +472,8 @@ class Renderer
     # end
     
     if fragment.is_a?( ::Class )
-      return string_for_code( Code.ruby fragment )
+      return render_code( Code.ruby fragment )
     end
-    
     
     # We have nothing to do with {::String}s - *including* {Strung}s - so just
     # return them.
@@ -387,52 +482,67 @@ class Renderer
     end
     
     # TODO  Do better!
-    string_for_code \
+    render_code \
       Code.ruby( Strung.new( fragment.inspect, source: fragment ) )
-  end # #string_for
+  end # #render_fragment
   
   
   # Render a {Code} instance to a {::String} (actually a {::Strung}) for
   # display.
-  # 
+  #
   # Special care has to be taken since {Code} are created and passed here by
-  # {#string_for}, while {#string_for} also passes any {Code} it receiver here.
-  # 
+  # {#render_fragment}, while {#render_fragment} also passes any {Code} it
+  # receiver here.
+  #
   # In the former case, we need to be careful *not* to pass the {Code#source}
-  # back to {#string_for} because it would cause an infinite loop, while in the
-  # latter case we want to pass the {Code#source} to {#string_for} to get a 
-  # {::String} for it.
-  # 
+  # back to {#render_fragment} because it would cause an infinite loop, while in
+  # the latter case we want to pass the {Code#source} to {#render_fragment} to
+  # get a {::String} for it.
+  #
   # @param [Code] code
   #   The code.
   # 
   # @return [Strung]
   #   A string strung from the `code`
   # 
-  def string_for_code code
-    source_string = case code.source
-    when ::Class
-      # {::Class} needs special handling to prevent an infinite loop
-      code.source.to_s
-    when ::String # including {::Strung}!
-      # Just use the {Code#source}, no need to pass it back through 
-      # {#string_for}. This saves us time and possible problems with {Code}
-      # instances created from calling `#inspect` on Ruby objects (last lines
-      # of {#string_for})
-      code.source
-    else
-      # The rest should be ok to go back through {#string_for} since they
-      # weren't created there
-      string_for code.source
-    end
+  def render_code code
+    source_string = \
+      case code.source
+      when ::Class
+        # {::Class} needs special handling to prevent an infinite loop
+        code.source.to_s
+      when ::String # including {::Strung}!
+        # Just use the {Code#source}, no need to pass it back through 
+        # {#render_fragment}. This saves us time and possible problems with {Code}
+        # instances created from calling `#inspect` on Ruby objects (last lines
+        # of {#render_fragment})
+        code.source
+      else
+        # The rest should be ok to go back through {#render_fragment} since they
+        # weren't created there
+        render_fragment code.source
+      end
     
-    
-    rendered_string = \
       if  color? &&
           (highlighter = syntax_highlighter_for code.syntax)
-        highlighter.call source_string
+        
+        highlighted_string = try_critical_code(
+          get_message: -> {
+            "{#{ self.class }} failed to highlight syntax #{ code.syntax }"
+          }
+        ) do
+          highlighter.call source_string
+        end
+        
+        unless highlighted_string.nil?
+          return Strung.new highlighted_string, source: code
+        end
+
+        # Fall through...
+      end
     
-      elsif code.source.is_a?( ::Class ) &&
+      rendered_string = \
+        if code.source.is_a?( ::Class ) &&
             code.source.name &&
             yard_style_class_names?
         # {Code#source} is a named (non-anonymous) {::Class}, which we "curly
@@ -445,8 +555,7 @@ class Renderer
       end
     
     Strung.new rendered_string, source: code
-  end # #string_for_code
-  
+  end # #render_code
   
 end # class Renderer
 
