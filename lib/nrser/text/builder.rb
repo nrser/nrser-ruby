@@ -36,7 +36,7 @@ module  Text
 # @example
 #   name = :target
 #   
-#   ::NRSER::Text::Builder.new {[
+#   ::NRSER::Text::Builder.p {[
 #     kwd( name ),
 #     "argument must be a",
 #     list( ::String, ::Symbol, or: ::Integer )

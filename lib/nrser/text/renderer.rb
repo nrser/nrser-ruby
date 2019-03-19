@@ -20,6 +20,7 @@ require 'nrser/support/critical_code'
 require 'nrser/ext/object/booly'
 
 require_relative './strung'
+require_relative './code'
 
 
 # Namespace
@@ -498,7 +499,8 @@ class Renderer
   def render_blocks *tags, **options
     tags.
       map { |tag|
-        render_block tag, **options, newline_terminate: true
+        render_block tag, **options,
+          newline_terminate: (if tags.length > 1 then true else nil end)
       }.
       join "\n"
   end
