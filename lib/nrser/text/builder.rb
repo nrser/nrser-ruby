@@ -14,6 +14,10 @@ require_relative '../text'
 require_relative './list'
 require_relative './code'
 
+require_relative './tag/paragraph'
+require_relative './tag/header'
+require_relative './tag/section'
+
 
 # Namespace
 # =======================================================================
@@ -42,6 +46,27 @@ module  Text
 # 
 class Builder
   
+  # Singleton Methods
+  # ==========================================================================
+  
+  # Build just a paragraph.
+  # 
+  # @param [::Hash<::Symbol, ::Object>] **options
+  #   Passed as the keyword arguments to {#initialize}.
+  # 
+  # @return [Builder]
+  #   Constructed instance.
+  # 
+  def self.paragraph **options, &block
+    new( **options ) do
+      paragraph *instance_exec( &block )
+    end
+  end # .paragraph
+  
+  # Short 'n sweet name (like HTML!)
+  singleton_class.send :alias_method, :p, :paragraph
+  
+  
   # Attributes
   # ==========================================================================
   
@@ -52,24 +77,68 @@ class Builder
   attr_reader :renderer
   
   
-  # Sequence of fragments that make up the text.
+  # Sequence of tags that make up the blocks of text.
   # 
-  # @return [::Array<::Object>]
+  # @return [::Array<Tag>]
   #     
-  attr_reader :fragments
+  attr_reader :blocks
+  
+  
+  # Column to wrap text at, if any. Used to override {Renderer#word_wrap}
+  # when calling {Renderer#join}.
+  # 
+  # @return [false]
+  #   No word wrapping.
+  # 
+  # @return [::Integer]
+  #   Positive integer column number to wrap text at.
+  #     
+  attr_reader :word_wrap
   
   
   # Construction
   # ==========================================================================
   
-  def initialize renderer: Text.default_renderer, &block
+  def initialize  renderer: Text.default_renderer,
+                  word_wrap: nil,
+                  &block
     @renderer = renderer
-    @fragments = Array( instance_exec( &block ) )
+    
+    # TODO  Validate?
+    @word_wrap = word_wrap
+    
+    # Where we store the blocks as we build
+    @blocks = []
+    
+    instance_exec &block
+    
+    # Can't change the blocks now!
+    @blocks.freeze
   end
   
   
   # Instance Methods
   # ==========================================================================
+  
+  def options
+    {
+      renderer: renderer,
+      word_wrap: word_wrap,
+    }
+  end
+  
+  
+  def append tag
+    @blocks << tag
+  end
+  
+  
+  def paragraph *fragments
+    append Tag::Paragraph.new( *fragments )
+  end
+  
+  alias_method :p, :paragraph
+  
   
   # Shortcut to construct a {List}.
   # 
@@ -127,11 +196,31 @@ class Builder
   end
   
   
+  # Mark a name ({::String} or similar) as being a Ruby constant name.
+  # 
+  # @param [#to_s] name
+  #   Constant name.
   # 
   # @return [Code]
   # 
   def const name
     Code.ruby Meta::Names::Const.new( name )
+  end
+  
+  
+  def header *fragments
+    Tag::Header.new *fragments
+  end
+  
+  
+  def section *header_fragments, &block
+    blocks = self.class.new( **options, &block ).blocks
+    
+    unless header_fragments.empty?
+      blocks = [ header( *header_fragments ), *blocks ]
+    end
+    
+    append Tag::Section.new( *blocks )
   end
   
   
@@ -142,7 +231,8 @@ class Builder
   # @return [::String]
   # 
   def render
-    renderer.join *fragments 
+    # renderer.join *fragments, word_wrap: word_wrap
+    renderer.render_blocks *@blocks, word_wrap: word_wrap
   end
   
 end # class Builder

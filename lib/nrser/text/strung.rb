@@ -32,6 +32,12 @@ module  Text
 # 
 class Strung < ::String
   
+  def self.word_wrap string, line_width: 80, break_sequence: "\n"
+    string.split( "\n" ).collect! do |line|
+      line.length > line_width ? line.gsub(/(.{1,#{line_width}})(\s+|$)/, "\\1#{break_sequence}").strip : line
+    end * break_sequence
+  end # .word_wrap
+  
   # Attributes
   # ==========================================================================
   
@@ -46,8 +52,14 @@ class Strung < ::String
   # ==========================================================================
   
   # Instantiate a new `Strung`.
-  def initialize string, source:
+  def initialize string, source:, word_wrap: false
     @source = source
+    @word_wrap = word_wrap
+    
+    if word_wrap
+      string = self.class.word_wrap( string, line_width: word_wrap )
+    end
+    
     super( string )
     freeze
   end # #initialize

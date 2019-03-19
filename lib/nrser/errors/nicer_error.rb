@@ -17,6 +17,8 @@ require 'active_support/core_ext/string/indent'
 
 ### Project / Package ###
 
+require 'nrser/text'
+
 require 'nrser/core_ext/object/lazy_var'
 
 

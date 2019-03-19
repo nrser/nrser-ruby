@@ -8,6 +8,8 @@
 
 ### Deps ###
 
+require 'active_support/core_ext/string/inflections'
+
 # Use {Concurrent::Map} for the syntax highlighter cache
 require "concurrent/map"
 
@@ -111,6 +113,16 @@ class Renderer
   end # .default_color?
   
   
+  # Default positive {::Integer} column to wrap text at, or `false` for no 
+  # wrapping.
+  # 
+  # @return [false]
+  # 
+  def self.default_word_wrap
+    false
+  end # .default_word_wrap
+  
+  
   # Attributes
   # ==========================================================================
   
@@ -131,6 +143,17 @@ class Renderer
   # @return [::Array<::String>]
   #     
   attr_reader :no_preceding_space_chars
+  
+  
+  # Column to wrap text at, if any.
+  # 
+  # @return [false]
+  #   No word wrapping.
+  # 
+  # @return [::Integer]
+  #   Positive integer column number to wrap text at.
+  #     
+  attr_reader :word_wrap
   
   
   # Construction
@@ -156,7 +179,8 @@ class Renderer
   def initialize  space: DEFAULT_SPACE,
                   no_preceding_space_chars: DEFAULT_NO_PRECEDING_SPACE_CHARS,
                   yard_style_class_names: DEFAULT_YARD_STYLE_CLASS_NAMES,
-                  color: self.class.default_color?
+                  color: self.class.default_color?,
+                  word_wrap: self.class.default_word_wrap
     
     unless space.is_a? ::String
       # NOTE  Can't use {NRSER::TypeError}
@@ -183,6 +207,24 @@ class Renderer
     @yard_style_class_names = !!yard_style_class_names
     
     @color = !!color
+    
+    @word_wrap = \
+      case word_wrap
+      when nil
+        self.class.default_word_wrap
+      when false
+        false
+      when ::Integer
+        if word_wrap > 0
+          word_wrap
+        else
+          warn "Bad `word_wrap:` argument: #{ word_wrap }. Using `nil`."
+          self.class.default_word_wrap
+        end
+      else
+        warn "Bad `word_wrap:` argument: #{ word_wrap.inspect }"
+        self.class.default_word_wrap
+      end
     
     # Use a {Concurrent::Map} for some level of thread safety in the cache
     @syntax_highlighter_cache = Concurrent::Map.new
@@ -353,6 +395,18 @@ class Renderer
   end
   
   
+  # `#call`-able to highlight Ruby syntax, if any are available.
+  # 
+  # Tries to require `rspec`, and uses 
+  # {::RSpec::Core::Formatters::SyntaxHighlighter} if available.
+  # 
+  # @return [nil]
+  #   If not Ruby syntax highlighter is available.
+  # 
+  # @return [::Proc<(::String) -> (::String)]
+  #   When a syntax highlighter is available, a {::String} transformer to 
+  #   highlight Ruby code.
+  # 
   def ruby_syntax_highlighter
     require 'rspec'
     highlighter = \
@@ -387,7 +441,10 @@ class Renderer
   # @return [::String]
   #   Joined string.
   # 
-  def join *fragments, with: self.space
+  def render_fragments  *fragments,
+                        with: self.space,
+                        word_wrap: self.word_wrap,
+                        **options
     case fragments.length
     when 0
       return ''
@@ -409,8 +466,84 @@ class Renderer
       end
     }
     
-    Strung.new string, source: fragments
-  end # .join
+    Strung.new string, source: fragments, word_wrap: word_wrap
+  end # .render_fragments
+  
+  alias_method :join, :render_fragments
+  
+  
+  def render_block tag, newline_terminate: nil, **options
+    method_name = "render_#{ tag.class.name.demodulize.downcase }"
+    
+    string = send method_name, tag, **options
+    
+    if newline_terminate.nil?
+      newline_terminate = string.include? "\n"
+    end
+    
+    if newline_terminate && string[ -1 ] != "\n"
+      string = \
+        case string
+        when Strung
+          Strung.new string + "\n", source: string.source
+        else
+          string + "\n"
+        end
+    end
+    
+    string
+  end
+  
+  
+  def render_blocks *tags, **options
+    tags.
+      map { |tag|
+        render_block tag, **options, newline_terminate: true
+      }.
+      join "\n"
+  end
+  
+  
+  def render_paragraph paragraph, **options
+    render_fragments *paragraph.fragments, **options
+  end
+  
+  
+  def render_section section, depth: 0, **options
+    render_blocks *section.blocks, depth: (depth + 1), **options
+  end
+  
+  
+  def render_header header, depth: 0, word_wrap: self.word_wrap, **options
+    text = render_fragments *header.fragments, **options, word_wrap: false
+    
+    string = \
+      case depth
+      when 0, 1
+        if word_wrap && word_wrap < text.length
+          text = text.truncate word_wrap
+        end
+      
+        char = if depth == 0 then '=' else '-' end
+        
+        "#{ text }\n#{ char * (word_wrap || text.length) }"
+      else
+        sides = '#' * depth
+        sides_length = ( sides.length + 2 ) * 2
+        
+        if word_wrap
+          text_max = word_wrap - sides_length
+          
+          if text_max < text.length
+            text = text.truncate text_max
+          end
+          
+          "#{ sides } #{ text } #{ sides }"
+        end
+      end
+    
+    Strung.new string, source: header
+  end
   
   
   # Render a display string for an individual `fragment`.
