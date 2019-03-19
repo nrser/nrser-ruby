@@ -18,7 +18,7 @@ require_relative '../tag'
 
 module  NRSER
 module  Text
-class   Tag
+module  Tag
 
 
 # Definitions
@@ -26,7 +26,13 @@ class   Tag
 
 # A header.
 #
-class Header < Tag
+class Header
+  
+  # Mixins
+  # ==========================================================================
+  
+  include Tag
+  
   
   # Attributes
   # ==========================================================================
@@ -57,6 +63,6 @@ end # class Header
 # /Namespace
 # =======================================================================
 
-end # class   Tag
+end # module  Tag
 end # module  Text
 end # module  NRSER

@@ -18,7 +18,7 @@ require_relative '../tag'
 
 module  NRSER
 module  Text
-class   Tag
+module  Tag
 
 
 # Definitions
@@ -26,7 +26,13 @@ class   Tag
 
 # A paragraph of text.
 #
-class Paragraph < Tag
+class Paragraph
+  
+  # Mixins
+  # ==========================================================================
+  
+  include Tag
+  
   
   # Attributes
   # ==========================================================================
@@ -57,6 +63,6 @@ end # class Paragraph
 # /Namespace
 # =======================================================================
 
-end # class   Tag
+end # module  Tag
 end # module  Text
 end # module  NRSER

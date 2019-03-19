@@ -10,7 +10,8 @@
 
 ### Project / Package ###
 
-require_relative '../text'
+require 'nrser/text'
+require_relative '../tag'
 
 
 # Refinements
@@ -22,6 +23,7 @@ require_relative '../text'
 
 module  NRSER
 module  Text
+module  Tag
 
 
 # Definitions
@@ -44,9 +46,7 @@ class List < ::Array
   # Mixins
   # ==========================================================================
   
-  # Just used as a flag of sorts to indicate that this is a text object that
-  # can be {#render}ed.
-  include Text
+  include Tag
   
   
   # Constants
@@ -170,5 +170,6 @@ end # List
 # /Namespace
 # =======================================================================
 
+end # module  Tag
 end # module  Text
 end # module  NRSER

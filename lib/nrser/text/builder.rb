@@ -11,9 +11,9 @@
 require 'nrser/meta/names/param'
 
 require_relative '../text'
-require_relative './list'
-require_relative './code'
 
+require_relative './tag/list'
+require_relative './tag/code'
 require_relative './tag/paragraph'
 require_relative './tag/header'
 require_relative './tag/section'
@@ -140,25 +140,25 @@ class Builder
   alias_method :p, :paragraph
   
   
-  # Shortcut to construct a {List}.
+  # Shortcut to construct a {Tag::List}.
   # 
   # @param [::Array] args
-  #   See {List#initialize}.
+  #   See {Tag::List#initialize}.
   # 
-  # @return [List]
+  # @return [Tag::List]
   # 
   def list *args
-    List.new *args
+    Tag::List.new *args
   end
   
   
   def code source
-    Code.new source
+    Tag::Code.new source
   end
   
   
   def ruby source
-    Code.ruby source
+    Tag::Code.ruby source
   end
   
   
@@ -189,10 +189,10 @@ class Builder
   # Mark a {::String} as being an actual code {::String}, as opposed to being
   # regular prose.
   # 
-  # @return [Code]
+  # @return [Tag::Code]
   # 
   def str string
-    Code.ruby string
+    ruby string
   end
   
   
@@ -201,10 +201,10 @@ class Builder
   # @param [#to_s] name
   #   Constant name.
   # 
-  # @return [Code]
+  # @return [Tag::Code]
   # 
   def const name
-    Code.ruby Meta::Names::Const.new( name )
+    ruby Meta::Names::Const.new( name )
   end
   
   

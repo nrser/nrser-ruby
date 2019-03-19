@@ -16,7 +16,7 @@
 
 module  NRSER
 module  Text
-class   Tag
+module  Tag
 
 
 # Definitions
@@ -25,14 +25,12 @@ class   Tag
 # Abstract base class for a very simple, target-agnostic tagging system for
 # structured text.
 #
-class Section < Tag
+class Section
   
-  # Constants
+  # Mixins
   # ==========================================================================
   
-  
-  # Singleton Methods
-  # ==========================================================================
+  include Tag
   
   
   # Attributes
@@ -65,6 +63,6 @@ end # class Section
 # /Namespace
 # =======================================================================
 
-end # class   Tag
+end # module  Tag
 end # module  Text
 end # module  NRSER

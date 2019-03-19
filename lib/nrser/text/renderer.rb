@@ -20,7 +20,7 @@ require 'nrser/support/critical_code'
 require 'nrser/ext/object/booly'
 
 require_relative './strung'
-require_relative './code'
+require_relative './tag/code'
 
 
 # Namespace
@@ -287,8 +287,8 @@ class Renderer
   #
   #     syntax_highlighter_for code.syntax
   #
-  # without first checking if {Code#syntax} is `nil` (which would mean the code
-  # does not have an associated language syntax).
+  # without first checking if {Tag::Code#syntax} is `nil` (which would mean the 
+  # code does not have an associated language syntax).
   #
   #
   # Finding, Caching & Concurrency
@@ -570,11 +570,11 @@ class Renderer
   #   String representation of the `fragment` ready for display.
   # 
   def render_fragment fragment
-    if fragment.is_a? Code
+    if fragment.is_a? Tag::Code
       return render_code fragment
     end
     
-    if fragment.is_a? Text
+    if fragment.is_a?( Tag ) && fragment.respond_to?( :render )
       return fragment.render self
     end
     
@@ -607,7 +607,7 @@ class Renderer
     # end
     
     if fragment.is_a?( ::Class )
-      return render_code( Code.ruby fragment )
+      return render_code( Tag::Code.ruby fragment )
     end
     
     # We have nothing to do with {::String}s - *including* {Strung}s - so just
@@ -618,23 +618,23 @@ class Renderer
     
     # TODO  Do better!
     render_code \
-      Code.ruby( Strung.new( fragment.inspect, source: fragment ) )
+      Tag::Code.ruby( Strung.new( fragment.inspect, source: fragment ) )
   end # #render_fragment
   
   
-  # Render a {Code} instance to a {::String} (actually a {::Strung}) for
+  # Render a {Tag::Code} instance to a {::String} (actually a {::Strung}) for
   # display.
   #
-  # Special care has to be taken since {Code} are created and passed here by
-  # {#render_fragment}, while {#render_fragment} also passes any {Code} it
-  # receiver here.
+  # Special care has to be taken since {Tag::Code} are created and passed here
+  # by {#render_fragment}, while {#render_fragment} also passes any {Tag::Code}
+  # it receiver here.
   #
-  # In the former case, we need to be careful *not* to pass the {Code#source}
-  # back to {#render_fragment} because it would cause an infinite loop, while in
-  # the latter case we want to pass the {Code#source} to {#render_fragment} to
-  # get a {::String} for it.
+  # In the former case, we need to be careful *not* to pass the
+  # {Tag::Code#source} back to {#render_fragment} because it would cause an
+  # infinite loop, while in the latter case we want to pass the
+  # {Tag::Code#source} to {#render_fragment} to get a {::String} for it.
   #
-  # @param [Code] code
+  # @param [Tag::Code] code
   #   The code.
   # 
   # @return [Strung]
@@ -647,10 +647,10 @@ class Renderer
         # {::Class} needs special handling to prevent an infinite loop
         code.source.to_s
       when ::String # including {::Strung}!
-        # Just use the {Code#source}, no need to pass it back through 
-        # {#render_fragment}. This saves us time and possible problems with {Code}
-        # instances created from calling `#inspect` on Ruby objects (last lines
-        # of {#render_fragment})
+        # Just use the {Tag::Code#source}, no need to pass it back through
+        # {#render_fragment}. This saves us time and possible problems with
+        # {Tag::Code} instances created from calling `#inspect` on Ruby objects
+        # (last lines of {#render_fragment})
         code.source
       else
         # The rest should be ok to go back through {#render_fragment} since they
@@ -680,12 +680,12 @@ class Renderer
         if code.source.is_a?( ::Class ) &&
             code.source.name &&
             yard_style_class_names?
-        # {Code#source} is a named (non-anonymous) {::Class}, which we "curly
-        # quote" (like YAML doc-strings)
-        Code.curly_quote( code.source.name )
+        # {Tag::Code#source} is a named (non-anonymous) {::Class}, which we
+        # "curly quote" (like YAML doc-strings)
+        Tag::Code.curly_quote( code.source.name )
       
       else
-        Code.backtick_quote( source_string )
+        Tag::Code.backtick_quote( source_string )
       
       end
     

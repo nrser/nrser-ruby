@@ -6,11 +6,8 @@
 
 ### Project / Package ###
 
-# require 'nrser/text'
+require_relative '../tag'
 
-
-# Refinements
-# =======================================================================
 
 
 # Namespace
@@ -18,6 +15,7 @@
 
 module  NRSER
 module  Text
+module  Tag
 
 
 # Definitions
@@ -30,7 +28,7 @@ class Code
   # Mixins
   # ==========================================================================
   
-  # include Text
+  include Tag
   
   
   # Singleton Methods
@@ -131,5 +129,6 @@ end # class Code
 # /Namespace
 # =======================================================================
 
+end # module  Tag
 end # module  Text
 end # module  NRSER

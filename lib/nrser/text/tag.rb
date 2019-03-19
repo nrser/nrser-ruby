@@ -24,21 +24,9 @@ module  Text
 # Abstract base class for a very simple, target-agnostic tagging system for
 # structured text.
 #
-class Tag
+module Tag
   
-  # Constants
-  # ==========================================================================
-  
-  
-  # Singleton Methods
-  # ==========================================================================
-  
-  
-  # Instance Methods
-  # ==========================================================================
-  
-  
-end # class Tag
+end # module Tag
 
 
 # /Namespace
