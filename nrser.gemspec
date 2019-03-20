@@ -106,7 +106,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'yard-commonmarker', '~> 0.5.0'
   
   # My gem to link standard lib classes to their online docs
-  spec.add_development_dependency 'yard-link_stdlib', '~> 0.1.1'
+  spec.add_development_dependency 'yard-link_stdlib', '~> 0.1.3'
   
   # Add my `yard clean` command
   spec.add_development_dependency 'yard-clean', '~> 0.1.0'
