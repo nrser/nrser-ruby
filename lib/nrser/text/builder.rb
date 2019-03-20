@@ -107,8 +107,10 @@ class Builder
     # TODO  Validate?
     @word_wrap = word_wrap
     
-    # Where we store the blocks as we build
+    # Where we store the top-level blocks as we build
     @blocks = []
+    
+    @stack = [ [ :top, @blocks ] ]
     
     instance_exec &block
     
@@ -118,113 +120,9 @@ class Builder
   
   
   # Instance Methods
-  # ==========================================================================
+  # ==========================================================================  
   
-  def options
-    {
-      renderer: renderer,
-      word_wrap: word_wrap,
-    }
-  end
-  
-  
-  def append tag
-    @blocks << tag
-  end
-  
-  
-  def paragraph *fragments
-    append Tag::Paragraph.new( *fragments )
-  end
-  
-  alias_method :p, :paragraph
-  
-  
-  # Shortcut to construct a {Tag::List}.
-  # 
-  # @param [::Array] args
-  #   See {Tag::List#initialize}.
-  # 
-  # @return [Tag::List]
-  # 
-  def list *args
-    Tag::List.new *args
-  end
-  
-  
-  def code source
-    Tag::Code.new source
-  end
-  
-  
-  def ruby source
-    Tag::Code.ruby source
-  end
-  
-  
-  # Mark a name 
-  # 
-  # @param [#to_s] name
-  #   @todo Add name param description.
-  # 
-  # @return [return_type]
-  #   @todo Document return value.
-  # 
-  def kwd name
-    # Turn the `name` into a {::String}, allowing people to pass {::Symbol}s
-    # in particular, though of course anything else that makes sense would make
-    # sense.
-    string = name.to_s
-    
-    # Add the ':' to the end, unless it's already there, so that 
-    # {Meta::Names::Param::Keyword.new} will accept it.
-    unless string[ -1 ] == ':'
-      string = string + ':'
-    end
-    
-    ruby Meta::Names::Param::Keyword.new( string )
-  end # #kwd
-  
-  
-  # Mark a {::String} as being an actual code {::String}, as opposed to being
-  # regular prose.
-  # 
-  # @return [Tag::Code]
-  # 
-  def str string
-    ruby string
-  end
-  
-  
-  # Mark a name ({::String} or similar) as being a Ruby constant name.
-  # 
-  # @param [#to_s] name
-  #   Constant name.
-  # 
-  # @return [Tag::Code]
-  # 
-  def const name
-    ruby Meta::Names::Const.new( name )
-  end
-  
-  
-  def header *fragments
-    Tag::Header.new *fragments
-  end
-  
-  
-  def section *header_fragments, &block
-    blocks = self.class.new( **options, &block ).blocks
-    
-    unless header_fragments.empty?
-      blocks = [ header( *header_fragments ), *blocks ]
-    end
-    
-    append Tag::Section.new( *blocks )
-  end
-  
-  
-  # Render the {#fragments} to a {::String}.
+  # Render the {#blocks} to a {::String}.
   # 
   # @see Text.join
   # 
@@ -232,8 +130,134 @@ class Builder
   # 
   def render
     # renderer.join *fragments, word_wrap: word_wrap
-    renderer.render_blocks *@blocks, word_wrap: word_wrap
+    renderer.render_blocks *blocks, word_wrap: word_wrap
   end
+  
+  
+  protected
+  # ========================================================================
+    
+    # Append a {Tag} to the {#blocks}.
+    # 
+    # @param [Tag] tag
+    # @return [self]
+    # 
+    def append tag
+      @stack.last[ 1 ] << tag
+      self
+    end
+    
+    
+    def push tag_class, &block
+      @stack << [ tag_class, [] ]
+      block.call
+    ensure
+      popped_tag_class, popped_blocks = @stack.pop
+      append popped_tag_class.new( *popped_blocks )
+    end
+    
+    
+    def paragraph *fragments
+      append Tag::Paragraph.new( *fragments )
+    end
+    
+    alias_method :p, :paragraph
+    
+    
+    def values **values
+      Tag::Values.new **values
+    end
+    
+    
+    # Shortcut to construct a {Tag::List}.
+    # 
+    # @param [::Array] args
+    #   See {Tag::List#initialize}.
+    # 
+    # @return [Tag::List]
+    # 
+    def list *args, &block
+      if block.nil?
+        Tag::List.new *args
+      else
+        push Tag::List, &block
+      end
+    end
+    
+    
+    def code source
+      Tag::Code.new source
+    end
+    
+    
+    def ruby source
+      Tag::Code.ruby source
+    end
+    
+    
+    # Mark a name 
+    # 
+    # @param [#to_s] name
+    #   @todo Add name param description.
+    # 
+    # @return [return_type]
+    #   @todo Document return value.
+    # 
+    def kwd name
+      # Turn the `name` into a {::String}, allowing people to pass {::Symbol}s
+      # in particular, though of course anything else that makes sense would make
+      # sense.
+      string = name.to_s
+      
+      # Add the ':' to the end, unless it's already there, so that 
+      # {Meta::Names::Param::Keyword.new} will accept it.
+      unless string[ -1 ] == ':'
+        string = string + ':'
+      end
+      
+      ruby Meta::Names::Param::Keyword.new( string )
+    end # #kwd
+    
+    
+    # Mark a {::String} as being an actual code {::String}, as opposed to being
+    # regular prose.
+    # 
+    # @return [Tag::Code]
+    # 
+    def str string
+      ruby string
+    end
+    
+    
+    # Mark a name ({::String} or similar) as being a Ruby constant name.
+    # 
+    # @param [#to_s] name
+    #   Constant name.
+    # 
+    # @return [Tag::Code]
+    # 
+    def const name
+      ruby Meta::Names::Const.new( name )
+    end
+    
+    
+    def header *fragments
+      append Tag::Header.new( *fragments )
+    end
+    
+    
+    def section *header_fragments, &block
+      if header_fragments.empty?
+        push Tag::Section, &block
+      else
+        push Tag::Section do
+          header *header_fragments
+          block.call
+        end
+      end
+    end
+  
+  public # end protected ***************************************************
   
 end # class Builder
 

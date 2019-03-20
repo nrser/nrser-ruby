@@ -22,7 +22,7 @@ module  Tag
 # Definitions
 # =======================================================================
 
-class Section
+class Values < ::Hash
   
   # Mixins
   # ==========================================================================
@@ -30,29 +30,23 @@ class Section
   include Tag
   
   
-  # Attributes
-  # ==========================================================================
-  
-  # TODO document `name` attribute.
-  # 
-  # @return [attr_type]
-  #   
-  attr_reader :blocks
-  
-  
   # Construction
   # ==========================================================================
   
   # Instantiate a new {Section}.
-  def initialize *blocks
+  def initialize **values
     super()
-    @blocks = blocks.freeze
+    replace values
+    freeze
   end # #initialize
   
   
   # Instance Methods
   # ==========================================================================
   
+  def expand
+    
+  end
   
 end # class Section
 
