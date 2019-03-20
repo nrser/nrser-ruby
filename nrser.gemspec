@@ -4,25 +4,47 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'nrser/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = "nrser"
-  spec.version       = NRSER::VERSION
-  spec.authors       = ["nrser"]
-  spec.email         = ["neil@neilsouza.com"]
-  spec.summary       = %q{basic ruby utils i use in a lot of stuff.}
-  spec.homepage      = "https://github.com/nrser/nrser.rb"
-  spec.license       = "MIT"
+  spec.name           = "nrser"
+  spec.version        = NRSER::VERSION
+  spec.authors        = [ "nrser" ]
+  spec.email          = [ "neil@neilsouza.com" ]
+  spec.summary        = "My guns."
+  spec.homepage       = "https://github.com/nrser/nrser.rb"
+  spec.license        = "MIT"
   
-  spec.required_ruby_version = '>= 2.3.0'
+  spec.required_ruby_version \
+                      = '>= 2.3.0'
 
-  spec.files         = Dir["lib/**/*.rb"] +
-                        # "In-source" documentation files need to be packaged
-                        # with the gem so that Yard `include` works on 
-                        # rubydoc.org
-                        Dir["lib/**/*.md"] +
-                        %w(LICENSE.txt README.md)
-  spec.executables   = [] # spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
-  spec.test_files    = Dir["spec/**/*.rb"]
-  spec.require_paths = ["lib"]
+  spec.files          = [
+                          # Library Ruby sources and "In-source" documentation 
+                          # files that need to be packaged with the gem so that 
+                          # Yard `include` works on rubydoc.org
+                          # 
+                          Dir[ 'lib/**/*.{rb,md}' ],
+                          
+                          # Additional documentation files, written in Markdown
+                          # and potentially linked to in the doc-strings.
+                          # 
+                          # Basically, we want everything in there *except* 
+                          # `//doc/notes`, since that shouldn't really be
+                          # needed, and right now that's just one directory,
+                          # so just include that guy.
+                          # 
+                          Dir[ 'doc/known_issues_and_gotchas/**/*.md' ],
+                          
+                          # Assorted other files
+                          'LICENSE.txt',
+                          'README.md',
+                        ].flatten
+  
+  spec.executables    = [] # spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
+  
+  spec.test_files     = [
+                          Dir[ 'spec/**/*.rb' ],
+                          Dir[ 'features/**/*.{rb,feature}' ],
+                        ].flatten
+  
+  spec.require_paths  = [ 'lib' ]
 
 
   # Dependencies
