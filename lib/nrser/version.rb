@@ -1,6 +1,7 @@
 require 'pathname'
 
 module NRSER
+  
   # Absolute, expanded path to the gem's root directory.
   # 
   # Here in `//lib/nrser/version` so that it can be used via
@@ -29,6 +30,24 @@ module NRSER
     def self.gem_version
       Gem::Version.new VERSION
     end # .gem_version
+    
+    
+    # Is this a development version of the gem?
+    # 
+    # @note
+    #   I wrote this working on {Support::CriticalCode}, where I'm thinking to
+    #   use it to determine whether or not to suppress (most) all exceptions as
+    #   warnings... basically, let them raise in development versions so you 
+    #   can find and diagnose problems easily, and suppress them otherwise.
+    # 
+    # @return [Boolean]
+    # 
+    def self.dev?
+      # Just take the easy way since we know that `dev` is always in the fourth 
+      # entry for {NRSER}. If generalizing for other gems or if that at some 
+      # point changed this would need to be a bit more complex.
+      gem_version.segments[ 3 ] == 'dev'
+    end
     
     
     # The `Gem::Version` "release" for {NRSER::VERSION} - everything before
