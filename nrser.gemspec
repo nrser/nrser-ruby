@@ -39,10 +39,11 @@ Gem::Specification.new do |spec|
   
   spec.executables    = [] # spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
   
-  spec.test_files     = [
-                          Dir[ 'spec/**/*.rb' ],
-                          Dir[ 'features/**/*.{rb,feature}' ],
-                        ].flatten
+  spec.test_files     = Dir[  # RSpec tests
+                              'spec/**/*.rb',
+                              
+                              # Cucumber tests
+                              'features/**/*.{rb,feature}', ]
   
   spec.require_paths  = [ 'lib' ]
 
