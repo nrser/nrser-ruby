@@ -185,6 +185,11 @@ class Builder
     end
     
     
+    def item &block
+      push Tag::List::Item, &block
+    end
+    
+    
     def code source
       Tag::Code.new source
     end

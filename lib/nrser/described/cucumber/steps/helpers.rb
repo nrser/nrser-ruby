@@ -16,8 +16,8 @@ require 'cucumber/glue/dsl'
 # Project / Package
 # -----------------------------------------------------------------------
 
-# Using {Ext::Object::Booly#truthy?} on {ENV} var for Pry debugging
-require 'nrser/ext/object/booly'
+# Using {Booly#truthy?} on {ENV} var for Pry debugging
+require 'nrser/booly'
 
 # Refinements
 # =======================================================================
@@ -57,7 +57,7 @@ module Helpers
           raise
           
         rescue Exception => error
-          if ENV[ 'NRSER_PRY' ].n_x.truthy?
+          if NRSER::Booly.truthy? ENV[ 'NRSER_PRY' ]
             # Need to grab ref 'cause otherwise `binding` will be different of
             # course inside `values.each_with_index` block, defeating the point
             _binding = binding

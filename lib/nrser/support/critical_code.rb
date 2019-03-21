@@ -9,6 +9,11 @@
 
 require 'set'
 
+### Project / Package ###
+
+# Using {NRSER::Booly.truthy?}
+require 'nrser/booly'
+
 
 # Namespace
 # =======================================================================
@@ -115,81 +120,221 @@ module CriticalCode
   ]
   
   
+  ENABLED_ENV_VAR_NAME = 'NRSER_CRITICAL_CODE_ENABLED'
+  
+  
+  # Singleton Methods
+  # ==========================================================================
+  
+  # Wrapper around {::Kernel#warn} to try to let someone know that something
+  # has gone wrong. Presumably the `error` will not be raised.
+  #
+  # This is useful in logging and it's dependencies that can't count on normal
+  # error reporting being available.
+  # 
+  # @note
+  #   You probably want to use {#try_critical_code} rather than use this 
+  #   method directly. If you screw up your arguments 
+  # 
+  # @param [::Array<#to_s>] messages
+  #   User messages to add to the warning.
+  #   
+  #   Passes them as arguments to {::Kernel#warn}, which seems like it calls
+  #   `#to_s` on anything that is not a {::String}, so unless you have objects
+  #   that raise in their `#to_s` they should be ok ({::Kernel#warn} looks
+  #   like it pretty much just does a `$stderr.puts *args`).
+  #   
+  #   If this is empty, we'll stick a generic message in for ya.
+  #   
+  # @param [::Exception] error
+  #   The error you want to warn about.
+  # 
+  # @return [nil]
+  # 
+  # @raise
+  #   This method does not expect to raise any errors.
+  #   
+  #   If any of {DONT_RAISE} are raised during execution, they will be 
+  #   allowed to bubble up.
+  #   
+  #   The method attempts to briefly report any other errors (which may stem 
+  #   from bad arguments, etc.) using {::Kernel#warn}. If errors are raised 
+  #   in that section, they will bubble up.
+  #
+  def warn_of_error *messages,
+                    error:,
+                    print_backtrace: true
+    args = [
+      "**WARNING** Error raised in critical code",
+      *messages,
+      "ERROR: #{ error } (#{ error.class })"
+    ]
+    
+    if print_backtrace
+      backtrace_string = begin
+        if error.backtrace
+          error.backtrace.join( "\n  " )
+        else
+          "(no backtrace)"
+        end
+      rescue
+        "(failed to format backtrace)"
+      end
+      
+      args << backtrace_string
+    end
+    
+    args << "**END WARNING**"
+    
+    warn *args
+    
+    return nil
+  rescue *DONT_RESCUE
+    raise
+  rescue ::Exception => really_bad
+    warn  "{NRSER::Support::CriticalCode.warn_of_error} ITSELF",
+          "raised an ERROR: #{ really_bad } (#{ really_bad.class })"
+    nil
+  end # .warn_of_error
+  
+  
+  # Is a boolean {ENV} switch set?
+  # 
+  # If the string representation of `var_name` is in the {ENV}, tests if it's 
+  # {Booly.truthy?}.
+  # 
+  # {Booly.truthy?} raises if the {ENV} var value doesn't make sense as 
+  # a boolean (see details over there), but we don't want that to stop the show
+  # in critical code, so any errors raised are downgraded to warnings via 
+  # {.warn_of_error}.
+  # 
+  # If the variable is not in the {ENV} at all, returns the `default`.
+  # 
+  # @param [::String] var_name
+  #   Environnement variable name.
+  #   
+  #   ### IMPORTANT ###
+  #   
+  #   Passing anything other than a {::String} will
+  #   cause {ENV.key?} to raise, resulting in a warning and `default`.
+  #   
+  #   I chose this instead of calling `#to_s` on whatever is passed because I
+  #   figure anything other than a {::String} being passed is more likely to
+  #   be a mistake than not.
+  #   
+  #   Pay attention in critical code!
+  #   
+  # @param [Boolean] default
+  #   What to return if `var_name` is not in the {ENV} *or* if an error is 
+  #   raised.
+  #   
+  #   No checks are performed on this value - it is returned as-is when the
+  #   conditions arise. For that reason, it doesn't *have* to be a boolean,
+  #   but it really seems like you should use booleans for simplicity and 
+  #   consistency's sake.
+  # 
+  # @return [Boolean]
+  #   When `var_name` is in the {ENV}, its bool-y value according to 
+  #   
+  # 
+  def self.env? var_name, default:
+    if ENV.key? var_name
+      Booly.truthy? ENV[ var_name ]
+    else
+      default
+    end
+    
+  rescue *DONT_RESCUE
+    raise
+    
+  rescue ::Exception => error
+    warn_of_error "Failed to test {ENV} var #{ var_name.inspect }",
+      error: error
+    
+    default
+    
+  end # .env?
+  
+  
+  def self.enabled= boolean
+    @enabled = !!boolean
+  end
+  
+  
+  # Is critical code handling turned on?
+  # 
+  # When enabled is `true`,  methods will attempt to downgrade
+  # most raised errors to warnings. Check out the {CriticalCode} for a detailed
+  # explanation.
+  # 
+  # You can turn critical code handling on and off at runtime with {.enabled=}.
+  # 
+  # If the enabled state has *not* been set by the user, first we see if there 
+  # is a 
+  # 
+  # it is enabled unless 
+  # this is a development version of {NRSER}, which is tested with 
+  # {NRSER::Version.dev?}. This allows errors to raise as usual during 
+  # development.
+  # 
+  # @return [Boolean]
+  #   When `true`, {#try_critical_code} will attempt to 
+  # 
+  def self.enabled?
+    unless instance_variable_defined? :@enabled
+      @enabled = env? ENABLED_ENV_VAR_NAME, default: !NRSER::Version.dev?
+    end
+    
+    @enabled
+  end # .enabled?
+  
+  
   # Instance Methods
   # ==========================================================================
 
   protected
   # ========================================================================
     
-    # Wrapper around {::Kernel#warn} to try to let someone know that something
-    # has gone wrong. Presumably the `error` will not be raised.
-    #
-    # This is useful in logging and it's dependencies that can't count on normal
-    # error reporting being available.
+    # Is critical code handling enabled?
+    # 
+    # At the moment, just calls {.enabled?}. In the future, it may allow
+    # selecting on `self` in some way, which would allow the crtical code 
+    # stuff to be used in gems that depend on {NRSER}.
+    # 
+    # @return [Boolean]
+    # 
+    def critical_code_enabled?
+      CriticalCode.enabled?
+    end
+    
+    
+    # Proxies to {.warn_of_error}.
     # 
     # @note
     #   You probably want to use {#try_critical_code} rather than use this 
     #   method directly. If you screw up your arguments 
     # 
-    # @param [::Array<#to_s>] messages
-    #   User messages to add to the warning.
-    #   
-    #   Passes them as arguments to {::Kernel#warn}, which seems like it calls
-    #   `#to_s` on anything that is not a {::String}, so unless you have objects
-    #   that raise in their `#to_s` they should be ok ({::Kernel#warn} looks
-    #   like it pretty much just does a `$stderr.puts *args`).
-    #   
-    #   If this is empty, we'll stick a generic message in for ya.
-    #   
-    # @param [::Exception] error
-    #   The error you want to warn about.
+    # @param [::Array] args
+    #   See {.warn_of_error}.
     # 
     # @return [nil]
     # 
     # @raise
-    #   This method does not expect to raise any errors.
-    #   
-    #   If any of {DONT_RAISE} are raised during execution, they will be 
-    #   allowed to bubble up.
-    #   
-    #   The method attempts to briefly report any other errors (which may stem 
-    #   from bad arguments, etc.) using {::Kernel#warn}. If errors are raised 
-    #   in that section, they will bubble up.
-    #
-    def warn_of_critical_code_error *messages,
-                                    error:,
-                                    print_backtrace: true
-      args = [
-        "**WARNING** Error raised in critical code",
-        *messages,
-        "ERROR: #{ error } (#{ error.class })"
-      ]
-      
-      if print_backtrace
-        backtrace_string = begin
-          if error.backtrace
-            error.backtrace.join( "\n  " )
-          else
-            "(no backtrace)"
-          end
-        rescue
-          "(failed to format backtrace)"
-        end
-        
-        args << backtrace_string
-      end
-      
-      args << "**END WARNING**"
-      
-      warn *args
-      
-      return nil
+    #   When {#critical_code_enabled?}, only bubbles up exceptions that are 
+    #   one of {DONT_RESCUE}, anything else is downgraded into a warning.
+    # 
+    def warn_of_critical_code_error *args
+      CriticalCode.warn_of_error *args
     rescue *DONT_RESCUE
       raise
     rescue ::Exception => really_bad
-      warn  "{NRSER::Support::CriticalCode#warn_of_critical_code_error} ITSELF",
-            "raised an ERROR: #{ really_bad } (#{ really_bad.class })"
-      nil
+      if critical_code_enabled?
+        warn  "{NRSER::Support::CriticalCode#warn_of_critical_code_error} ITSELF",
+              "raised an ERROR: #{ really_bad } (#{ really_bad.class })"
+        nil
+      else
+        raise
+      end
     end # #warn_of_critical_code_error
     
     
@@ -283,7 +428,17 @@ module CriticalCode
     #     Unless something really goes wrong.
     #
     def try_critical_code *args, &block
+      
+      # Short circuit - If critical code is not enabled just call the `&block`
+      # and return that
+      unless critical_code_enabled?
+        return block.call
+      end
+      
       # Check out them args...
+      
+      # The default default ;)
+      default = nil
       
       if block.nil?
         # Can't do nothin'. Raise (which will report and return `nil`).
@@ -313,6 +468,9 @@ module CriticalCode
                   "and `#arity`; given: #{ args[ 0 ][ :get_message ].inspect }"
               end
             end
+            
+            # Overwrite with any `default:` arg, which may be `nil`
+            default = args[ 0 ][ :default ]
           else
             raise ::ArgumentError,
               "Expected options {Hash}, given #{ args[ 0 ].class }: " +
@@ -358,12 +516,13 @@ module CriticalCode
           error: error,
           print_backtrace: print_backtrace
         
-        return nil
+        return default
       end
     rescue *DONT_RESCUE
       raise
     rescue ::Exception => really_bad
       warn_of_critical_code_error error: really_bad
+      default
     end # #try_critical_code
     
   public # end protected ***************************************************

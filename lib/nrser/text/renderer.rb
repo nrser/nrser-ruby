@@ -17,7 +17,8 @@ require "concurrent/map"
 
 require 'nrser/support/critical_code'
 
-require 'nrser/ext/object/booly'
+# Using {NRSER::Booly.truthy?}
+require 'nrser/booly'
 
 require_relative './strung'
 require_relative './tag/code'
@@ -56,9 +57,18 @@ class Renderer
   # Constants
   # ==========================================================================
   
-  # Instance Defaults
-  # ----------------------------------------------------------------------------
+  # {#word_wrap} can not be set below this. I just don't want to deal with all
+  # the weird stuff that can happen if it's too low, and it's got to be a 
+  # mistake at that point... right?
+  # 
+  # @return [::Integer]
+  # 
+  WORD_WRAP_MIN = 24
   
+  
+  # @!group Instance Default Constants
+  # --------------------------------------------------------------------------
+    
   # Default character to use for {#space}. Just the regular ASCII space 
   # character.
   # 
@@ -75,33 +85,101 @@ class Renderer
   DEFAULT_NO_PRECEDING_SPACE_CHARS = %w(, ; : . ? !).freeze
   
   
-  # Default for {#yard_style_class_names?}.
+  # Default {#yard_style_class_names?}.
+  # 
+  # @todo Not in use
   # 
   # @return [Boolean]
   # 
   DEFAULT_YARD_STYLE_CLASS_NAMES = true
   
   
+  # Default {#list_indent}.
+  # 
+  # @return [Integer]
+  # 
+  DEFAULT_LIST_INDENT = 4
+  
+  
+  # Default {#list_header_depth}.
+  # 
+  # @return [Integer]
+  #   Non-negative.
+  # 
+  DEFAULT_LIST_HEADER_DEPTH = 3
+  
+  
+  # Wrap lines by word-splitting at a column?
+  # 
+  # @return [false]
+  #   Disable word-wrapping.
+  # 
+  # @return [::Integer]
+  #   Column number to wrap lines at. Must be larger than {WORD_WRAP_MIN}.
+  # 
+  DEFAULT_WORD_WRAP = false
+  
+  # @!endgroup Instance Default Constants # **********************************
+  
+  
   # Mixins
   # ==========================================================================
   
   include Support::CriticalCode
+  extend  Support::CriticalCode
   
   
   # Singleton Methods
   # ==========================================================================
   
+  # @!group Argument Checking Singleton Methods
+  # --------------------------------------------------------------------------
+  
+  
+  # @todo Document check_header_depth! method.
   # 
+  # @param [#to_s] name
+  #   Name of the argument (for error messages).
   # 
-  # @param [type] arg_name
-  #   @todo Add name param description.
+  # @param [::Integer] value
+  #   The header depth value. Must be an {::Integer} and be 0 or greater to
+  #   pass.
   # 
-  # @return [return_type]
-  #   @todo Document return value.
+  # @param [::Integer] default
+  #   Unless a development version is running, 
+  # 
+  # @return [::Integer]
+  #   The `value` passed in.
+  # 
+  def self.check_header_depth! name:, value:, default:
+    try_critical_code default: default do
+      unless  value.is_a?( ::Integer ) &&
+              value >= 0
+        raise ::ArgumentError,
+          "Expected `#{ name }` to be an {Integer}, 0 or greater; " +
+          "given #{ value.inspect }"
+      end
+      
+      value
+    end
+  end # .check_header_depth!
+  
+  # @!endgroup Argument Checking Singleton Methods # *************************
+  
+  
+  # @!group Dynamic Defaults Singleton Methods
+  # --------------------------------------------------------------------------
+  
+  # Default for {#color?}, looks first for an {ENV} var, then guesses about the
+  # terminal using some code I got from Thor.
+  # 
+  # {ENV} var is `NRSER_TEXT_USE_COLOR`.
+  # 
+  # @return [Boolean]
   # 
   def self.default_color?
     if ENV.key? 'NRSER_TEXT_USE_COLOR'
-      return Ext::Object::truthy? ENV[ 'NRSER_TEXT_USE_COLOR' ]
+      return Booly.truthy? ENV[ 'NRSER_TEXT_USE_COLOR' ]
     end
     
     # Detect based on environment
@@ -113,15 +191,7 @@ class Renderer
     !( RbConfig::CONFIG["host_os"] =~ /mswin|mingw/ && !ENV["ANSICON"] )
   end # .default_color?
   
-  
-  # Default positive {::Integer} column to wrap text at, or `false` for no 
-  # wrapping.
-  # 
-  # @return [false]
-  # 
-  def self.default_word_wrap
-    false
-  end # .default_word_wrap
+  # @!endgroup Dynamic Defaults Singleton Methods # **************************
   
   
   # Attributes
@@ -157,6 +227,23 @@ class Renderer
   attr_reader :word_wrap
   
   
+  # Number of spaces to indent {Tag::List} blocks (markdown-like).
+  # 
+  # @return [Integer]
+  #     
+  attr_reader :list_indent
+  
+  
+  # Header "depth" to start at inside {Tag::List::Item} blocks.
+  #
+  # It's kind-of awkward and weird to have lists use the largest header
+  # settings, so by default they start at {DEFAULT_LIST_HEADER}
+  #
+  # @return [attr_type]
+  #
+  attr_reader :list_header_depth
+  
+  
   # Construction
   # ==========================================================================
   
@@ -181,7 +268,9 @@ class Renderer
                   no_preceding_space_chars: DEFAULT_NO_PRECEDING_SPACE_CHARS,
                   yard_style_class_names: DEFAULT_YARD_STYLE_CLASS_NAMES,
                   color: self.class.default_color?,
-                  word_wrap: self.class.default_word_wrap
+                  word_wrap: DEFAULT_WORD_WRAP,
+                  list_indent: DEFAULT_LIST_INDENT,
+                  list_header_depth: DEFAULT_LIST_HEADER_DEPTH
     
     unless space.is_a? ::String
       # NOTE  Can't use {NRSER::TypeError}
@@ -210,22 +299,52 @@ class Renderer
     @color = !!color
     
     @word_wrap = \
-      case word_wrap
-      when nil
-        self.class.default_word_wrap
-      when false
-        false
-      when ::Integer
-        if word_wrap > 0
+      try_critical_code default: DEFAULT_WORD_WRAP do
+        case word_wrap
+        when nil
+          DEFAULT_WORD_WRAP
+          
+        when false
+          false
+          
+        when ::Integer
+          if word_wrap < WORD_WRAP_MIN
+            raise ::ArgumentError,
+              "`word_wrap:` argument must be #{ WORD_WRAP_MIN } or greater, " +
+              "given #{ word_wrap }"
+          end
+          
           word_wrap
         else
-          warn "Bad `word_wrap:` argument: #{ word_wrap }. Using `nil`."
-          self.class.default_word_wrap
+          raise ::TypeError,
+            "`word_wrap:` must be `nil`, `false` or an {Integer}, " +
+            "given #{ word_wrap.inspect }"
+            
+        end # case word_wrap
+      end # try_critical_code
+    
+    @list_indent = \
+      try_critical_code default: DEFAULT_LIST_INDENT do
+        unless  list_indent.is_a?( ::Integer ) &&
+                list_indent >= 0
+          "Expected `list_indent:` to be an {Integer}, 0 or greater; " +
+          "given #{ list_indent.inspect }"
         end
-      else
-        warn "Bad `word_wrap:` argument: #{ word_wrap.inspect }"
-        self.class.default_word_wrap
-      end
+        
+        list_indent
+      end # try_critical_code
+    
+    @list_header_depth = \
+      try_critical_code default: DEFAULT_LIST_HEADER_DEPTH do
+        unless  list_header_depth.is_a?( ::Integer ) &&
+                list_header_depth >= 0
+          raise ::ArgumentError,
+            "Expected `list_header_depth:` to be an {Integer}, 0 or greater; " +
+            "given #{ list_header_depth.inspect }"
+        end
+        
+        list_header_depth
+      end # try_critical_code
     
     # Use a {Concurrent::Map} for some level of thread safety in the cache
     @syntax_highlighter_cache = Concurrent::Map.new
@@ -506,31 +625,47 @@ class Renderer
   end
   
   
+  def render_list list, word_wrap: self.word_wrap, **options
+    word_wrap = word_wrap && word_wrap - list_indent
+    
+    list.blocks.
+      map { |tag|
+        string = \
+          render_block tag, **options,
+            header_depth: list_header_depth,
+            word_wrap: word_wrap
+      }
+  end
+  
+  
   def render_paragraph paragraph, **options
     render_fragments *paragraph.fragments, **options
   end
   
   
-  def render_section section, depth: 0, **options
-    render_blocks *section.blocks, depth: (depth + 1), **options
+  def render_section section, header_depth: 0, **options
+    render_blocks *section.blocks, header_depth: (header_depth + 1), **options
   end
   
   
-  def render_header header, depth: 0, word_wrap: self.word_wrap, **options
+  def render_header header,
+                    header_depth: 0,
+                    word_wrap: self.word_wrap,
+                    **options
     text = render_fragments *header.fragments, **options, word_wrap: false
     
     string = \
-      case depth
+      case header_depth
       when 0, 1
         if word_wrap && word_wrap < text.length
           text = text.truncate word_wrap
         end
       
-        char = if depth == 0 then '=' else '-' end
+        char = if header_depth == 0 then '=' else '-' end
         
         "#{ text }\n#{ char * (word_wrap || text.length) }"
       else
-        sides = '#' * depth
+        sides = '#' * header_depth
         sides_length = ( sides.length + 2 ) * 2
         
         if word_wrap

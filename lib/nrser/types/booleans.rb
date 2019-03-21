@@ -8,7 +8,7 @@
 # ------------------------------------------------------------------------
 
 # Need truthy and falsy parse values
-require 'nrser/ext/object/booly'
+require 'nrser//booly'
 
 require_relative './type'
 require_relative './is'
@@ -76,7 +76,7 @@ end # class Boolean
 # 
 class TrueType < Boolean
   
-  STRINGS = NRSER::Ext::Object::TRUTHY_STRINGS
+  STRINGS = Booly::TRUTHY_STRINGS
   
   # Instantiate a new `True` type.
   # 
@@ -94,7 +94,7 @@ end # class True
 # 
 class FalseType < Boolean
   
-  STRINGS = NRSER::Ext::Object::FALSY_STRINGS
+  STRINGS = Booly::FALSY_STRINGS
   
   # Instantiate a new `True` type.
   # 

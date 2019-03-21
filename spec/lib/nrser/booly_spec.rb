@@ -1,6 +1,6 @@
 SPEC_FILE(
   spec_path:        __FILE__,
-  module:           NRSER::Ext::Object,
+  module:           NRSER::Booly,
 ) do
   
   TRUTHY_INPUTS = [

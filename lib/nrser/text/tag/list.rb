@@ -43,6 +43,36 @@ module  Tag
 # 
 class List < ::Array
   
+  # @todo document Item class.
+  # 
+  class Item
+    
+    # Mixins
+    # ========================================================================
+    
+    include Tag
+    
+    
+    # Attributes
+    # ==========================================================================
+    
+    # TODO document `blocks` attribute.
+    # 
+    # @return [attr_type]
+    #     
+    attr_reader :blocks
+    
+    
+    # Construction
+    # ========================================================================
+    
+    # Instantiate a new `Item`.
+    def initialize *blocks
+      @blocks = blocks.freeze
+    end # #initialize
+    
+  end # class Item
+  
   # Mixins
   # ==========================================================================
   
