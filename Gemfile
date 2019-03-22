@@ -9,7 +9,7 @@ source 'https://rubygems.org'
 # making any permentant changes, but Git helps to track things)
 gem 'yard', path: './dev/packages/gems/yard'
 
-# gem 'yard-doctest', path: './dev/packages/gems/yard-doctest'
+gem 'yard-doctest', path: './dev/packages/gems/yard-doctest'
 
 # Gems needed to support Ruby debugging in VSCode. Just export this ENV var
 # somewhere to enable installation.
