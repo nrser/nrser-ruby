@@ -52,7 +52,7 @@ class Strung < ::String
   # ==========================================================================
   
   # Instantiate a new `Strung`.
-  def initialize string, source:, word_wrap: false
+  def initialize string = '', source:, word_wrap: false, &build_block
     @source = source
     @word_wrap = word_wrap
     
@@ -61,6 +61,9 @@ class Strung < ::String
     end
     
     super( string )
+    
+    build_block.call( self ) if build_block
+    
     freeze
   end # #initialize
   

@@ -120,6 +120,9 @@ class Renderer
   # 
   DEFAULT_WORD_WRAP = false
   
+  
+  DEFAULT_CODE_INDENT = 4
+  
   # @!endgroup Instance Default Constants # **********************************
   
   
@@ -230,7 +233,7 @@ class Renderer
   
   # Number of spaces to indent {Tag::List} blocks (markdown-like).
   # 
-  # @return [Integer]
+  # @return [::Integer]
   #     
   attr_reader :list_indent
   
@@ -240,9 +243,16 @@ class Renderer
   # It's kind-of awkward and weird to have lists use the largest header
   # settings, so by default they start at {DEFAULT_LIST_HEADER}
   #
-  # @return [attr_type]
+  # @return [::Integer]
   #
   attr_reader :list_header_depth
+  
+  
+  # How far to indent code blocks.
+  # 
+  # @return [::Integer]
+  #     
+  attr_reader :code_indent
   
   
   # Construction
@@ -271,7 +281,8 @@ class Renderer
                   color: self.class.default_color?,
                   word_wrap: DEFAULT_WORD_WRAP,
                   list_indent: DEFAULT_LIST_INDENT,
-                  list_header_depth: DEFAULT_LIST_HEADER_DEPTH
+                  list_header_depth: DEFAULT_LIST_HEADER_DEPTH,
+                  code_indent: DEFAULT_CODE_INDENT
     
     unless space.is_a? ::String
       # NOTE  Can't use {NRSER::TypeError}
@@ -347,6 +358,18 @@ class Renderer
         list_header_depth
       end # try_critical_code
     
+    @code_indent = \
+      try_critical_code default: DEFAULT_CODE_INDENT do
+        unless  code_indent.is_a?( ::Integer ) &&
+                code_indent >= 0
+          raise ::ArgumentError,
+            "Expected `code_indent:` to be an {Integer}, 0 or greater; " +
+            "given #{ code_indent.inspect }"
+        end
+        
+        code_indent
+      end # try_critical_code
+    
     # Use a {Concurrent::Map} for some level of thread safety in the cache
     @syntax_highlighter_cache = Concurrent::Map.new
     
@@ -397,6 +420,45 @@ class Renderer
   
   def indent size, space: self.space, **options
     space * size
+  end
+  
+  
+  # Dump an object to a single-line {Strung}.
+  # 
+  # For now just calls `#inspect`.
+  # 
+  # @param [#inspect] value
+  #   Pretty much anything.
+  # 
+  # @return [Strung]
+  #   {Strung#source} is the `value`.
+  # 
+  def dump_value_inline value
+    # TODO  Do better!
+    Strung.new value.inspect, source: value
+  end
+  
+  
+  # Dump a value pretty-like over multiple lines (if needed).
+  # 
+  # Uses {PP.pp} at the moment.
+  # 
+  # @param [::Object] value
+  #   What to dump. Pretty much anything should be ok.
+  # 
+  # @param [false | ::Integer] word_wrap
+  #   Optional column number to wrap at. If `false`, {PP} will use it's default
+  #   of `79`.
+  # 
+  # @return [Strung]
+  #   {Strung#source} will be the `value`.
+  # 
+  def dump_value_multiline value, word_wrap: self.word_wrap
+    Strung.new source: value do |strung|
+      args = [ value, strung ]
+      args << word_wrap if word_wrap
+      PP.pp *args
+    end
   end
   
   
@@ -602,7 +664,7 @@ class Renderer
   
   
   def render_block tag, newline_terminate: nil, **options
-    method_name = "render_#{ tag.class.name.demodulize.downcase }"
+    method_name = "render_#{ tag.class.name.demodulize.downcase }_block"
     
     string = send method_name, tag, **options
     
@@ -637,7 +699,7 @@ class Renderer
   end
   
   
-  def render_list list, word_wrap: self.word_wrap, **options
+  def render_list_block list, word_wrap: self.word_wrap, **options
     options.merge! \
       word_wrap: word_wrap && word_wrap - list_indent,
       header_depth: list_header_depth
@@ -648,7 +710,10 @@ class Renderer
   end
   
   
-  def render_item item, word_wrap: self.word_wrap, space: self.space, **options
+  def render_item_block item,
+                        word_wrap: self.word_wrap,
+                        space: self.space,
+                        **options
     rendered = render_blocks( *item.blocks, **options, newline_terminate: true )
     indented = rendered.indent list_indent, space, true
     indented[0] = '-'
@@ -657,20 +722,20 @@ class Renderer
   end
   
   
-  def render_paragraph paragraph, **options
+  def render_paragraph_block paragraph, **options
     render_fragments *paragraph.fragments, **options
   end
   
   
-  def render_section section, header_depth: 0, **options
+  def render_section_block section, header_depth: 0, **options
     render_blocks *section.blocks, header_depth: (header_depth + 1), **options
   end
   
   
-  def render_header header,
-                    header_depth: 0,
-                    word_wrap: self.word_wrap,
-                    **options
+  def render_header_block header,
+                          header_depth: 0,
+                          word_wrap: self.word_wrap,
+                          **options
     text = render_fragments *header.fragments, **options, word_wrap: false
     
     string = \
@@ -770,9 +835,7 @@ class Renderer
       return fragment
     end
     
-    # TODO  Do better!
-    render_code \
-      Tag::Code.ruby( Strung.new( fragment.inspect, source: fragment ) )
+    render_code Tag::Code.ruby( dump_value_inline( fragment ) )
   end # #render_fragment
   
   
@@ -845,6 +908,84 @@ class Renderer
     
     Strung.new rendered_string, source: code
   end # #render_code
+  
+  
+  # Render a {Tag::Code} as a block of text.
+  # 
+  # @param [Tag::Code] code
+  #   The code tag.
+  # 
+  # @param [false | ::Integer] word_wrap
+  #   Column to wrap lines at.
+  # 
+  # @param [::Hash<::Symbol, ::Object>] **options
+  #   
+  # @return [Strung]
+  #   Rendered string.
+  # 
+  def render_code_block code, word_wrap: self.word_wrap, **options
+    if word_wrap
+      word_wrap = word_wrap - code_indent
+    end
+    
+    strung = if code.source.is_a? Strung
+      code.source
+    else
+      dump_value_multiline code.source, word_wrap: word_wrap
+    end
+    
+    if  color? &&
+        (highlighter = syntax_highlighter_for code.syntax)
+      
+      highlighted_string = try_critical_code(
+        get_message: -> {
+          "{#{ self.class }} failed to highlight syntax #{ code.syntax }"
+        }
+      ) do
+        highlighter.call strung
+      end
+      
+      unless highlighted_string.nil?
+        strung = Strung.new highlighted_string, source: strung.source
+      end
+    end # Highlighting
+    
+    Strung.new strung.indent( code_indent, space, true ),
+      source: strung.source
+  end # #render_code_block
+  
+  
+  def render_values_block values,
+                          word_wrap: self.word_wrap,
+                          space: self.space,
+                          **options
+    
+    max_name_length = values.keys.map { |k| k.to_s.length }.max
+    
+    separator = "#{ space }=#{ space }"
+    label_col_width = separator.length + max_name_length
+    
+    word_wrap = word_wrap && (word_wrap - label_col_width)
+    
+    code_string = values.
+      map { |name, value|
+        dump = dump_value_multiline value, word_wrap: word_wrap
+        
+        label = name.to_s.ljust( max_name_length ) + separator
+        
+        string = dump.indent label_col_width, space, true
+        
+        string[ 0...label.length ] = label
+        
+        string
+      }.
+      join( "\n" )
+    
+    strung = Strung.new code_string, source: values
+    
+    render_code_block Tag::Code.ruby( strung )
+    
+  end # #render_values_block
   
   # @!endgroup Rendering Instance Methods # **********************************
   

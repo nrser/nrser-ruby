@@ -17,6 +17,7 @@ require_relative './tag/code'
 require_relative './tag/paragraph'
 require_relative './tag/header'
 require_relative './tag/section'
+require_relative './tag/values'
 
 
 # Namespace
@@ -148,12 +149,17 @@ class Builder
     end
     
     
-    def push tag_class, &block
+    def push tag_class, **new_tag_kwds, &block
       @stack << [ tag_class, [] ]
       block.call
     ensure
       popped_tag_class, popped_blocks = @stack.pop
-      append popped_tag_class.new( *popped_blocks )
+      
+      if new_tag_kwds.empty?
+        append tag_class.new( *popped_blocks )
+      else
+        append tag_class.new( *popped_blocks, **new_tag_kwds )
+      end
     end
     
     
@@ -165,7 +171,7 @@ class Builder
     
     
     def values **values
-      Tag::Values.new **values
+      append Tag::Values.new( **values )
     end
     
     
@@ -190,13 +196,21 @@ class Builder
     end
     
     
-    def code source
-      Tag::Code.new source
+    def code *args, &block
+      if block.nil?
+        Tag::Code.new *args
+      else
+        append Tag::Code.new( block.call, *args )
+      end
     end
     
     
-    def ruby source
-      Tag::Code.ruby source
+    def ruby *args, &block
+      if block.nil?
+        Tag::Code.ruby *args
+      else
+        append Tag::Code.ruby( block.call, *args )
+      end
     end
     
     

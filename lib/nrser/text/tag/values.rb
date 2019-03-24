@@ -44,10 +44,6 @@ class Values < ::Hash
   # Instance Methods
   # ==========================================================================
   
-  def expand
-    
-  end
-  
 end # class Section
 
 
