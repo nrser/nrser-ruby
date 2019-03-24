@@ -4,8 +4,8 @@ Feature: Development - render a {NRSER::Text::Tag::List} as a block
     Given I require "set"
     And I require "nrser/text/builder"
   
-  @focus
-  Scenario: (1) Super-simple list
+  
+  Scenario: (1) Super-simple list - all items are single-line paragraphs
     When I let `builder` be:
       """ruby
         NRSER::Text::Builder.new( word_wrap: 74 ) do\
@@ -42,6 +42,62 @@ Feature: Development - render a {NRSER::Text::Tag::List} as a block
       -   Item two.
           
       -   Item three.
+      
+      ...and we outta here!
+      
+      """
+      
+      
+  
+  Scenario: (2) List items are multiple paragraphs
+    When I let `builder` be:
+      """ruby
+        NRSER::Text::Builder.new( word_wrap: 74 ) do\
+          
+          p "A very simple block list..."
+          
+          list do
+            item do
+              p "Item one."
+              
+              p "We have a cat."
+            end # item
+            
+            item do
+              p "Item two."
+              
+              p "She is the best cat."
+            end # item
+            
+            item do
+              p "Item three."
+              
+              p "She usually eat cat food."
+            end # item
+          end # list
+          
+          p "...and we outta here!"
+          
+        end # Builder.new
+      """
+    
+    And I let `strung` be `builder.render`
+    
+    Then `strung` is equal to the string:
+      """
+      A very simple block list...
+      
+      -   Item one.
+          
+          We have a cat.
+          
+      -   Item two.
+          
+          She is the best cat.
+          
+      -   Item three.
+          
+          She usually eat cat food.
       
       ...and we outta here!
       

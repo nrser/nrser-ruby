@@ -1,6 +1,7 @@
 # encoding: UTF-8
 
 require 'nrser/text'
+require 'nrser/text/builder'
 
 def build &block
   puts NRSER::Text.build( &block ).render
@@ -12,42 +13,32 @@ def uni
 end
 
 
-require "concurrent/map"
-
-def resolve_shit
-  puts "Resolving shit in thread #{ Thread.current.name }..."
-  10.times do |i|
-    sleep 1
-    puts "Shit slept #{ i } in thread #{ Thread.current.name }"
-  end
-  # require 'rspec'
+def text_tmp
+  builder = NRSER::Text::Builder.new( word_wrap: 74 ) do    
+    p "A very simple block list..."
+    
+    list do
+      item do
+        p "Item one."
+        
+        p "We have a cat."
+      end # item
+      
+      item do
+        p "Item two."
+        
+        p "She is the best cat!"
+      end # item
+      
+      item do
+        p "Item three."
+        
+        p "She usually eat cat food."
+      end # item
+    end # list
+    
+    p "...and we outta here!"
+  end # Builder.new
   
-  puts "Resolved in thread #{ Thread.current.name }"
-  "shit"
+  puts builder.render
 end
-
-def slam_map pre_fill: false
-  map = Concurrent::Map.new
-  key = :bull
-  
-  start = Time.now
-  
-  if pre_fill
-    map.compute_if_absent( key ) { resolve_shit }
-  end
-  
-  threads = 10.times.map do |i|
-    Thread.new do
-      Thread.current.name = i.to_s
-      value = map.compute_if_absent( key ) { resolve_shit }
-      puts "Thread #{ i } got #{ key } => #{ value }\n"
-    end
-  end
-  
-  threads.each &:join
-  
-  puts "Time: #{ Time.now - start }"
-  
-  nil
-end
-  

@@ -9,6 +9,7 @@
 ### Deps ###
 
 require 'active_support/core_ext/string/inflections'
+require 'active_support/core_ext/string/indent'
 
 # Use {Concurrent::Map} for the syntax highlighter cache
 require "concurrent/map"
@@ -394,6 +395,11 @@ class Renderer
   end
   
   
+  def indent size, space: self.space, **options
+    space * size
+  end
+  
+  
   # Get a `::String → ::String` syntax highlighting `#call`-able for a
   # particular `syntax` - if we can find one.
   #
@@ -538,6 +544,9 @@ class Renderer
   end
   
   
+  # @!group Rendering Instance Methods
+  # --------------------------------------------------------------------------
+  
   # Join assorted `fragments` into a {::String}, attempting to be some-what 
   # smart about it regarding (English) punctuation.
   # 
@@ -615,26 +624,36 @@ class Renderer
   end
   
   
-  def render_blocks *tags, **options
+  def render_blocks *tags, newline_terminate: nil, **options
+    if newline_terminate.nil?
+      newline_terminate = if tags.length > 1 then true else nil end
+    end
+    
     tags.
       map { |tag|
-        render_block tag, **options,
-          newline_terminate: (if tags.length > 1 then true else nil end)
+        render_block tag, **options, newline_terminate: newline_terminate
       }.
       join "\n"
   end
   
   
   def render_list list, word_wrap: self.word_wrap, **options
-    word_wrap = word_wrap && word_wrap - list_indent
+    options.merge! \
+      word_wrap: word_wrap && word_wrap - list_indent,
+      header_depth: list_header_depth
     
-    list.blocks.
-      map { |tag|
-        string = \
-          render_block tag, **options,
-            header_depth: list_header_depth,
-            word_wrap: word_wrap
-      }
+    list.
+      map { |item| render_block item, **options }.
+      join( "#{ indent( list_indent, **options ) }\n" )
+  end
+  
+  
+  def render_item item, word_wrap: self.word_wrap, space: self.space, **options
+    rendered = render_blocks( *item.blocks, **options, newline_terminate: true )
+    indented = rendered.indent list_indent, space, true
+    indented[0] = '-'
+    
+    indented
   end
   
   
@@ -674,13 +693,13 @@ class Renderer
           if text_max < text.length
             text = text.truncate text_max
           end
-          
-          "#{ sides } #{ text } #{ sides }"
         end
+        
+        "#{ sides } #{ text } #{ sides }"
       end
     
     Strung.new string, source: header
-  end
+  end # #render_header
   
   
   # Render a display string for an individual `fragment`.
@@ -826,6 +845,8 @@ class Renderer
     
     Strung.new rendered_string, source: code
   end # #render_code
+  
+  # @!endgroup Rendering Instance Methods # **********************************
   
 end # class Renderer
 
