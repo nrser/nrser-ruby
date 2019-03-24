@@ -1,10 +1,19 @@
-Feature: Print values table/map things
+Feature: Render {NRSER::Text::Tag::Values} table/map things
+  
+  {NRSER::Text::Tag::Values} are name/value maps ({::Hash} instances underneath)
+  that are rendered in {NRSER::Text::Tag::Code} blocks in a sort of table 
+  layout.
+  
+  These are the primarily to support rendering the {NRSER::NicerError#context}
+  in nicer errors, but they seem like they may be useful any time you want to
+  print out some bound values.
   
   Background:
     Given I require "nrser/text/builder"
   
   
-  Scenario:
+  Scenario: (1) The most basic example
+    
     Given I let `builder` be:
       """ruby
         NRSER::Text::Builder.new( word_wrap: 74 ) {
@@ -23,7 +32,8 @@ Feature: Print values table/map things
       """
   
   
-  Scenario:
+  Scenario: (2) Include a {::Hash} with more data to test word wrapping
+    
     Given I let `builder` be:
       """ruby
         NRSER::Text::Builder.new( word_wrap: 74 ) {

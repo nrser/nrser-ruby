@@ -1,4 +1,4 @@
-Feature: Development - render a {NRSER::Text::Tag::List} as a block
+Feature: Render a {NRSER::Text::Tag::List} as a block
 
   Background:
     Given I require "set"
@@ -6,6 +6,7 @@ Feature: Development - render a {NRSER::Text::Tag::List} as a block
   
   
   Scenario: (1) Super-simple list - all items are single-line paragraphs
+    
     When I let `builder` be:
       """ruby
         NRSER::Text::Builder.new( word_wrap: 74 ) do\
@@ -49,6 +50,7 @@ Feature: Development - render a {NRSER::Text::Tag::List} as a block
       
   
   Scenario: (2) List items are multiple paragraphs
+    
     When I let `builder` be:
       """ruby
         NRSER::Text::Builder.new( word_wrap: 74 ) do\
@@ -103,8 +105,16 @@ Feature: Development - render a {NRSER::Text::Tag::List} as a block
       """
 
   
-  Scenario:
-    When I let `builder` be:
+  Scenario: (3) Bit more complex example
+    
+    With headers, sections and code blocks in list items.
+    
+    When I let `my_object` be:
+      """ruby
+      { name: "NRSER", likes: [ :cats, :coffee ] }
+      """
+     
+    And I let `builder` be:
       """ruby
         NRSER::Text::Builder.new( word_wrap: 74 ) do
           p "Here's a block list of some shit:"
@@ -117,7 +127,11 @@ Feature: Development - render a {NRSER::Text::Tag::List} as a block
             item do
               p "Item two:"
               
-              p "Has more to it!"
+              p "Has more to it! Including some Ruby code:"
+              
+              ruby do
+                my_object
+              end
               
               p "Ok, we're done here."
             end # item
@@ -151,7 +165,9 @@ Feature: Development - render a {NRSER::Text::Tag::List} as a block
           
       -   Item two:
           
-          Has more to it!
+          Has more to it! Including some Ruby code:
+          
+              {:name=>"NRSER", :likes=>[:cats, :coffee]}
           
           Ok, we're done here.
           

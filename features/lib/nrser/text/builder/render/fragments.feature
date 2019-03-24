@@ -1,7 +1,13 @@
-Feature: Development - render an array of fragments using {NRSER::Text::Builder}
+Feature: Render an array of fragments using {NRSER::Text::Builder}
   
-  I'm switching the Builder over to use an imperative style with tags, but it
-  might be nice to still be able to just render fragments into a line?
+  I switched the Builder over to use an imperative style with tags, but hacked 
+  in support for the original {::Array} style.
+  
+  All this does is wrap the array in a single {NRSER::Text::Tag::Paragraph}
+  and render as usual.
+  
+  I don't think it's really recommended to use it like this anymore, but, hey,
+  it's there...
   
   Background:
     Given I require "set"
