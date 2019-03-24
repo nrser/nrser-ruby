@@ -101,18 +101,37 @@ module Scope
   # @return [::HashWithIndifferentAccess]
   # 
   def let_bindings
-    @let_bindings ||= ::HashWithIndifferentAccess.new
+    @let_bindings ||= {}
   end
   
   
-  def resolve_let name
+  # Resolve a binding that was created with a "let" step.
+  # 
+  # @param [#to_s] name
+  #   The binding name.
+  # 
+  # @param [Boolean] describe
+  #   When `true`, the bound value will be pushed on to the description stack
+  #   as a {Described::Object}, allowing it to be references using "it" steps
+  #   after this call.
+  # 
+  # @return [::Object]
+  #   The value bound to `name`.
+  # 
+  # @raise [::NoMethodError]
+  #   If `name` is not "let"-bound (does not appear in {#let_bindings}).
+  # 
+  def resolve_let name, describe: false
     name = name.to_s unless name.is_a?( ::String )
     
-    if let_bindings.key? name
-      let_bindings[ name ]
-    else
+    unless let_bindings.key? name
       raise ::NoMethodError,
         "No let value bound to '#{ name }'"
+    end
+    
+    let_bindings[ name ].tap do |bound|
+      # Push the bound object onto the description stack if needed
+      self.describe( :object, subject: bound ) if describe
     end
   end
   
