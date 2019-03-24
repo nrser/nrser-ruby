@@ -225,37 +225,35 @@ module CriticalCode
   #   Pay attention in critical code!
   #   
   # @param [Boolean] default
-  #   What to return if `var_name` is not in the {ENV} *or* if an error is 
-  #   raised.
+  #   What to return if `var_name` is not in the {ENV} *or* if its value doesn't
+  #   make sense as a boolean (see {NRSER::Booly.from_string}).
   #   
-  #   No checks are performed on this value - it is returned as-is when the
-  #   conditions arise. For that reason, it doesn't *have* to be a boolean,
-  #   but it really seems like you should use booleans for simplicity and 
-  #   consistency's sake.
+  #   This value is double-banged into a boolean if it's not one, but try not
+  #   to do anything to wacky despite that.
   # 
   # @return [Boolean]
   #   When `var_name` is in the {ENV}, its bool-y value according to 
-  #   
+  #   {NRSER::Booly}, then the boolean value of it is returned.
   # 
   def self.env? var_name, default:
-    if ENV.key? var_name
-      Booly.truthy? ENV[ var_name ]
-    else
-      default
-    end
+    booly = Booly.from_string ENV[ var_name ]
     
-  rescue *DONT_RESCUE
-    raise
-    
-  rescue ::Exception => error
-    warn_of_error "Failed to test {ENV} var #{ var_name.inspect }",
-      error: error
-    
-    default
-    
+    if booly.nil? then !!default else booly end
   end # .env?
   
   
+  # Manually set {#enabled?}.
+  # 
+  # @param [Boolean] boolean
+  #   `true` to enable, `false` to disable.
+  #   
+  #   This value is double-banged (`!!boolean`) to ensure it's a boolean, but 
+  #   that's really to avoid dealing with bad values... you really should be
+  #   passing a boolean.
+  # 
+  # @return [Boolean]
+  #   Value for {#enabled?} that was set.
+  # 
   def self.enabled= boolean
     @enabled = !!boolean
   end

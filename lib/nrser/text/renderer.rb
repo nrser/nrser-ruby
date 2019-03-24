@@ -178,17 +178,17 @@ class Renderer
   # @return [Boolean]
   # 
   def self.default_color?
-    if ENV.key? 'NRSER_TEXT_USE_COLOR'
-      return Booly.truthy? ENV[ 'NRSER_TEXT_USE_COLOR' ]
-    end
-    
-    # Detect based on environment
-    # 
-    # Borrowed from Thor (MIT license)
-    # 
-    # https://github.com/erikhuda/thor/blob/0887bc8fb257fadf656fb4c4f081a9067b373e7b/lib/thor/shell.rb#L14
-    # 
-    !( RbConfig::CONFIG["host_os"] =~ /mswin|mingw/ && !ENV["ANSICON"] )
+    Support::CriticalCode.env? 'NRSER_TEXT_USE_COLOR',
+      # Detect based on environment
+      # 
+      # Borrowed from Thor (MIT license)
+      # 
+      # https://github.com/erikhuda/thor/blob/0887bc8fb257fadf656fb4c4f081a9067b373e7b/lib/thor/shell.rb#L14
+      # 
+      default: !(
+        RbConfig::CONFIG["host_os"] =~ /mswin|mingw/ &&
+        !ENV["ANSICON"]
+      )
   end # .default_color?
   
   # @!endgroup Dynamic Defaults Singleton Methods # **************************
