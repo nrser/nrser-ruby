@@ -47,7 +47,6 @@ Feature: Development - render a {NRSER::Text::Tag::List} as a block
       
       """
       
-      
   
   Scenario: (2) List items are multiple paragraphs
     When I let `builder` be:
