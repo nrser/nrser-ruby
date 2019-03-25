@@ -100,29 +100,6 @@ class Code
     end
   end # #initialize
   
-  
-  # Instance Methods
-  # ==========================================================================
-  
-  # Render the {Code} into a final display string.
-  # 
-  # @param [Renderer] renderer
-  #   {Renderer} to use.
-  # 
-  # @return [Strung]
-  #   Rendered string with {#source} attached as it's {Strung#source}.
-  # 
-  # def render renderer = Text.default_renderer
-  #   string = renderer.render_fragment source
-    
-  #   if  renderer.color? &&
-  #       (highlighter = renderer.syntax_highlighter_for syntax)
-  #     Strung.new highlighter.call( string ), source: source
-  #   else
-  #     Strung.new self.class.quote( string ), source: source
-  #   end
-  # end # #render
-  
 end # class Code
 
 
