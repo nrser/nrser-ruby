@@ -27,10 +27,19 @@ module  Cucumber
 # Hermann is a very bad marshal. The worst. Ever. In fact, what Hermann does is
 # dump instances by just returning their `#object_id`, and loads by pulling it
 # back out of {ObjectSpace} using {ObjectSpace#_id2ref}.
+# 
+#
+# WTF..?
+# ----------------------------------------------------------------------------
 #
 # It does this because, for some reason - that I have not had the time or heart
 # to look into - Cucumber attempts to duplicate parameter values by first
 # marshaling them, then un-marshaling them.
+# 
+# The relevant method is {Cucumber::StepMatch#deep_clone_args}, which you can 
+# see here:
+# 
+# <https://github.com/cucumber/cucumber-ruby/blob/33632fc4efa6817d36479ea862235bf1bfccfa55/lib/cucumber/step_match.rb#L97>
 #
 # This *greatly* constrains what parameter types can be, because there are many
 # things like {::Proc} and {::IO} and singleton objects that *can't* be
