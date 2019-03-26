@@ -125,7 +125,7 @@ class Const < Name
   
   
   def to_module self_obj
-    self_obj.resolve_module upquote
+    self_obj.resolve_module unquote
   end
   
   # @!endgroup Additional Transformation Instance Methods # ******************
