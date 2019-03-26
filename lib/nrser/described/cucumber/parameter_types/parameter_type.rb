@@ -333,13 +333,37 @@ class ParameterType < ::Cucumber::CucumberExpressions::ParameterType
     end # #init_transformer!
     
     
-    # @todo Document init_generate_type method.
+    # Generate the {Cucumber::CucumberExpressions::ParameterType#type} 
+    # attribute (which is a {::Class}) based on the {#token_classes} this
+    # {ParameterType} matches.
     # 
-    # @param [type] arg_name
-    #   @todo Add name param description.
+    # This method is called during initialization when the `type:` keyword 
+    # argument is *not* given to {#initialize}.
     # 
-    # @return [return_type]
-    #   @todo Document return value.
+    # From what I remember, it's not totally clear what the type information
+    # is used by Cucumber for, but it seems pertinent to provide it.
+    # 
+    # There are some additional details here:
+    # {file:lib/nrser/described/cucumber/parameter_types/doc/parameter_type/generated_transformers.md#Optional_Support_for_Automatic_type__Resolution
+    # Optional Support for Automatic type: Resolution}.
+    # 
+    # Restriction: Must use {DEFAULT_TRANSFORMER}
+    # ------------------------------------------------------------------------
+    # 
+    # The {ParameterType} **must** be using the {DEFAULT_TRANSFORMER} as its
+    # {#transformer} - otherwise we can't really have any idea what class of
+    # object it will return.
+    # 
+    # This is fact the only reason we need the `transformer` parameter - to 
+    # check that it is {DEFAULT_TRANSFORMER}. An {ArgumentError} will be raised
+    # if it's not.
+    # 
+    # @param [::Proc] transformer
+    #   The user-level transformer this {ParameterType} will use. Only here to
+    #   check that it is {DEFAULT_TRANSFORMER}.
+    # 
+    # @return [::Class]
+    #   The type to use.
     # 
     # @raise [NRSER::ArgumentError]
     #   If a {::Proc} was provided for the `transformer:` keyword to 
