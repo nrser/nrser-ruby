@@ -120,6 +120,10 @@ module CriticalCode
   ]
   
   
+  # {ENV} variable name that we look at to set {#enabled?}.
+  # 
+  # @return [::String]
+  # 
   ENABLED_ENV_VAR_NAME = 'NRSER_CRITICAL_CODE_ENABLED'
   
   
