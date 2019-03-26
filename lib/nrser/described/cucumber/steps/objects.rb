@@ -34,21 +34,20 @@ module Objects
   # Steps
   # ==========================================================================
   
-  THE_OBJECT = \
-    Step "the object {value}" do |value|
-      describe :object, subject: value
-    end
+  Step "the object {value}" do |value|
+    describe :object, subject: value
+  end
   
-  THE_STRING_BLOCK, THE_STRING_INLINE = \
-    [
-      "a/the string:",
-      "a/the string {string}",
-    ].each do |template|
-      Step template do |string|
-        describe :string, subject: string
-      end
-    end
   
+  [
+    "a/the string:",
+    "a/the string {string}",
+  ].each do |template|
+    Step template do |string|
+      describe :string, subject: string
+    end
+  end
+
 end # module Objects
 
 # /Namespace

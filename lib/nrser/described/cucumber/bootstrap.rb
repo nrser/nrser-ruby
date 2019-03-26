@@ -15,14 +15,6 @@ require 'nrser/described'
 
 require_relative './parameter_types'
 require_relative './world'
-require_relative './hermann'
-
-[
-  ::Proc,
-  NRSER::Described::Base,
-].each do |cls|
-  cls.send :include, NRSER::Described::Cucumber::Hermann
-end
 
 World NRSER::Described::Cucumber::World::Logger
 World NRSER::Described::Cucumber::World::Describe

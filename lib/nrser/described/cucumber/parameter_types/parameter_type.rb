@@ -4,19 +4,16 @@
 # Requirements
 # =======================================================================
 
-# Stdlib
-# ----------------------------------------------------------------------------
+### Stdlib ###
 
 require 'set'
 
-# Deps
-# ----------------------------------------------------------------------------
+### Deps ###
 
 # Extending {::Cucumber::CucumberExpressions::ParameterType} with our own
 require 'cucumber/cucumber_expressions/parameter_type'
 
-# Project / Package
-# -----------------------------------------------------------------------
+### Project / Package ###
 
 # Need to deal with tokens
 require 'nrser/described/cucumber/tokens'
@@ -24,6 +21,10 @@ require 'nrser/described/cucumber/tokens'
 # Using {Wrappers::String::Match} to flag parameter matches that are *not*
 # tokens (just general regular expressions)
 require 'nrser/described/cucumber/wrappers'
+
+# Need {Pointer} to create marshal-able objects that can be restored to
+# their exact original object
+require_relative './pointer'
 
 
 # Refinements
@@ -421,7 +422,7 @@ class ParameterType < ::Cucumber::CucumberExpressions::ParameterType
   
   # Instance Methods
   # ========================================================================
-  
+    
   def other_patterns
     @other_patterns ||= patterns.flat_map { |pattern|
       if Tokens::Token.subclass? pattern
@@ -435,7 +436,33 @@ class ParameterType < ::Cucumber::CucumberExpressions::ParameterType
   end
   
   
-  def transform self_obj, group_values
+  # Override {::Cucumber::CucumberExpressions::ParameterType#transform} to
+  # tokenize the values and {Pointer}-wrap the result (if needed).
+  # 
+  # @see Pointer
+  # 
+  # @param [::Object] self_obj
+  #   The step content object thing - where to evaluate stuff.
+  # 
+  # @param [::Array] group_values
+  #   The argument values from Cucumber.
+  # 
+  # @param [Boolean] pointer
+  #   Set to `false` to not wrap return values in {Pointer}s, like when calling
+  #   from other transformers.
+  # 
+  # @return [Pointer]
+  #   If `pointer:` is `true` *and* {Pointer.needed?} returns `true` for the 
+  #   actual value, it will be wrapped in a {Pointer} instance to side-step
+  #   the duplication that Cucumber does to parameter values.
+  # 
+  # @return [::Object]
+  #   If `pointer:` is `false` *or* {Pointer.needed?} is `false`, the actual
+  #   value is returned.
+  # 
+  def transform self_obj, group_values, pointer: true
+  
+    # Wrap the values Cucumber provides in token instances
     group_tokens = group_values.map { |group_value|
       token_class = @token_classes.find { |token_class|
         token_class.pattern =~ group_value
@@ -448,8 +475,19 @@ class ParameterType < ::Cucumber::CucumberExpressions::ParameterType
       end
     }
     
-    super( self_obj, group_tokens )
-  end
+    # Get the actual value
+    value = super( self_obj, group_tokens )
+    
+    # If the `pointer:` keyword is `true` and `value` needs to be
+    # {Pointer}-wrapped to safely marshal then wrap it up
+    if pointer && Pointer.needed?( value )
+      Pointer.create value
+    else
+      # Otherwise just return the value
+      value
+    end
+    
+  end # #transform
   
   
   def =~ string

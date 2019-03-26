@@ -102,7 +102,9 @@ module Values
       full_string.
         scan( value_parameter_type.to_re ).
         map { |raw_value_string|
-          value_parameter_type.transform self, [ raw_value_string ]
+          value_parameter_type.transform  self,
+                                          [ raw_value_string ],
+                                          pointer: false
         }
     }
   

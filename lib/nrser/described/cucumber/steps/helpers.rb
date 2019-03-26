@@ -4,23 +4,17 @@
 # Requirements
 # =======================================================================
 
-# Stdlib
-# -----------------------------------------------------------------------
-
-# Deps
-# -----------------------------------------------------------------------
+### Deps ###
 
 # Need {::Cucumber::Glue::DSL.register_rb_step_definition} to register
 require 'cucumber/glue/dsl'
 
-# Project / Package
-# -----------------------------------------------------------------------
+### Project / Package ###
 
 # Using {Booly#truthy?} on {ENV} var for Pry debugging
 require 'nrser/booly'
 
-# Refinements
-# =======================================================================
+require_relative '../parameter_types/pointer'
 
 
 # Namespace
@@ -47,42 +41,46 @@ module Helpers
   #   Newly constructed and registered step.
   #
   def Step pattern, options = {}, &body
-    # If we want be Pryin' then wrap the body to rescue shit
-    proc = if  true # ENV[ 'NRSER_PRY' ].n_x.truthy?
-      ->( *values ) {
-        begin
-          instance_exec *values, &body
-          
-        rescue SystemExit
-          raise
-          
-        rescue Exception => error
-          if NRSER::Booly.truthy? ENV[ 'NRSER_PRY' ]
-            # Need to grab ref 'cause otherwise `binding` will be different of
-            # course inside `values.each_with_index` block, defeating the point
-            _binding = binding
-            
-            # Easy access to values as `v0`, `v1`, ...
-            values.each_with_index { |value, index|
-              _binding.local_variable_set "v#{ index }", value
-            }
-            
-            # 'Cause Cuc' has shadowed regular puts and it's a PITA
-            def puts *args; STDOUT.puts *args; end
-            
-            # Named this way so *hopefully* search for "binding.pry" still
-            # finds it...
-            _binding.pry
-          end
-          
-          raise
-          
-        end # begin ... rescue ...
+    # Wrap the actual body in our own proc
+    proc = ->( *values ) {
+      # Dereference any {Pointer}s to their target values
+      values.map! { |value|
+        if value.is_a? ParameterTypes::Pointer
+          value.target
+        else
+          value
+        end
       }
-    else
-      # Otherwise just use the body as-is
-      body
-    end
+      
+      begin
+        instance_exec *values, &body
+        
+      rescue SystemExit
+        raise
+        
+      rescue Exception => error
+        if NRSER::Booly.truthy? ENV[ 'NRSER_PRY' ]
+          # Need to grab ref 'cause otherwise `binding` will be different of
+          # course inside `values.each_with_index` block, defeating the point
+          _binding = binding
+          
+          # Easy access to values as `v0`, `v1`, ...
+          values.each_with_index { |value, index|
+            _binding.local_variable_set "v#{ index }", value
+          }
+          
+          # 'Cause Cuc' has shadowed regular puts and it's a PITA
+          def puts *args; STDOUT.puts *args; end
+          
+          # Named this way so *hopefully* search for "binding.pry" still
+          # finds it...
+          _binding.pry
+        end
+        
+        raise
+        
+      end # begin ... rescue ...
+    }
     
     ::Cucumber::Glue::Dsl.register_rb_step_definition pattern, proc, options
   end

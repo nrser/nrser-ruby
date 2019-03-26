@@ -49,7 +49,9 @@ module Parameters
         # which *may* be a block.
         describe_positional_params \
           table.rows.map { |row|
-            ParameterTypes::Values::VALUE.transform self, [ row.first ]
+            ParameterTypes::Values::VALUE.transform self,
+                                                    [ row.first ],
+                                                    pointer: false
           }
       
       when 2
@@ -57,10 +59,14 @@ module Parameters
         # in {NRSER::Meta::Names} format (`arg`, `kwd:`, `&block`)
         table.rows.each do |(raw_name_string, raw_value_string)|
           name = \
-            ParameterTypes[ :param_name ].transform self, [ raw_name_string ]
+            ParameterTypes[ :param_name ].transform self,
+                                                    [ raw_name_string ],
+                                                    pointer: false
           
           value = \
-            ParameterTypes[ :value ].transform self, [ raw_value_string ]
+            ParameterTypes[ :value ].transform  self,
+                                                [ raw_value_string ],
+                                                pointer: false
           
           describe_param name, value
         end
