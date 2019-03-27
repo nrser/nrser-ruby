@@ -64,6 +64,11 @@ module Expectations
   end
   
   
+  Step "it is NOT {value}" do |value|
+    expect_it.not_to be value
+  end
+  
+  
   Step "it is equal to {value}" do |value|
     expect_it.to eq value
   end
