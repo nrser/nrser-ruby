@@ -1,4 +1,4 @@
-Feature: Check out option defaults work on {NRSER::Text::Renderer::Options}
+Feature: {NRSER::Text::Renderer::Options} - Checking option defaults
 
   Background:
     Given I require "nrser/text/renderer/options"

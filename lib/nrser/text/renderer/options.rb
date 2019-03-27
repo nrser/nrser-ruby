@@ -30,7 +30,14 @@ class   Renderer
 # Definitions
 # =======================================================================
 
-# @todo document Options class.
+# 
+# You can view all Cucumber features for the module here: 
+# {requirements::features::lib::nrser::text::renderer::options Features}
+# 
+# Both YARD examples and Cucumber features are verified programmatically, with 
+# results on the [Travis CI site][].
+# 
+# [Travis CI site]: https://travis-ci.org/nrser/nrser.rb
 # 
 class Options
   
@@ -344,6 +351,8 @@ class Options
     case object
     when nil, self
       self
+    when Options
+      merge object.to_hash
     when ::Hash      
       dup.tap do |new_options|
         object.each do |name, value|
