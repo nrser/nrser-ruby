@@ -165,7 +165,7 @@ module CriticalCode
   #   from bad arguments, etc.) using {::Kernel#warn}. If errors are raised 
   #   in that section, they will bubble up.
   #
-  def warn_of_error *messages,
+  def self.warn_of_error *messages,
                     error:,
                     print_backtrace: true
     args = [
