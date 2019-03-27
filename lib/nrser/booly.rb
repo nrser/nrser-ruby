@@ -17,7 +17,7 @@ module  NRSER
 # detailed tests or guides available as Cucumber features are linked.
 # 
 # You can view all Cucumber features for the module here: 
-# {requirements::features::lib::nrser::booly NRSER::Booly features}.
+# {requirements::features::lib::nrser::booly NRSER::Booly Features}.
 # 
 # Both YARD examples and Cucumber features are verified programmatically, with 
 # results on the [Travis CI site][].
