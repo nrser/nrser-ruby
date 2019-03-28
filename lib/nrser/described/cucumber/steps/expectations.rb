@@ -99,8 +99,14 @@ module Expectations
   end
   
   
-  Step "the {described_name} is NOT {value}" do |described_name, value|
-    expect_described( described_name ).not_to be value
+  Step "the {described_name} is {value}" do |described_name, value|
+    expect_described( described_name ).to be value
+  end
+  
+  
+  Step "the {described} is the {described}" do |described_a, described_b|
+    expect_described( described_a ).
+      to be described_b.resolve!( hierarchy ).subject
   end
   
   
