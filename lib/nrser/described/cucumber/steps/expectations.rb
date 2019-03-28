@@ -94,9 +94,13 @@ module Expectations
   end
 
   
-  Step "the {described_name} is {value}" \
-  do |described_name, value|
+  Step "the {described_name} is {value}" do |described_name, value|
     expect_described( described_name ).to be value
+  end
+  
+  
+  Step "the {described_name} is NOT {value}" do |described_name, value|
+    expect_described( described_name ).not_to be value
   end
   
   
