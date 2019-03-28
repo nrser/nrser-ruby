@@ -164,3 +164,26 @@ Feature: {NRSER::Text::Renderer::Options} - Passing and Updating
     And it is NOT `A.default_options`
     And it has a `word_wrap` attribute that is `76`
   
+  
+  Scenario: (4) Merging with the same values just returns the instance
+    
+    When I construct an instance of the class from `{ word_wrap: 88 }`
+    And I call {#merge} with `{ word_wrap: 88 }`
+    
+    Then the response is the instance
+  
+  
+  Scenario: (5) Updating with the same values just returns the instance
+    
+    When I construct an instance of the class from `{ word_wrap: 88 }`
+    And I call {#update} with `:word_wrap`, `88`
+    
+    Then the response is the instance
+  
+  
+  Scenario: (6) Updating with the same values just returns the instance
+    
+    When I construct an instance of the class from `{ word_wrap: 88 }`
+    And I call {#apply} with `:word_wrap`, `:*`, `1`
+    
+    Then the response is the instance

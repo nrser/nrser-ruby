@@ -31,6 +31,9 @@ class   Renderer
 # =======================================================================
 
 # 
+# 
+# @immutable Frozen 
+# 
 # You can view all Cucumber features for the module here: 
 # {requirements::features::lib::nrser::text::renderer::options Features}
 # 
@@ -176,6 +179,17 @@ class Options
   end
   
   
+  def self.normalize_name! name
+    normalize_name( name ).tap do |name_sym_or_nil|
+      if name_sym_or_nil.nil?
+        raise ::TypeError,
+          "Expected {Symbol} or {String}, given {#{ name.class }}: " +
+          name.inspect
+      end
+    end
+  end
+  
+  
   def self.option_defs
     # Make sure the hash is initialized
     @option_defs ||= ActiveSupport::OrderedHash.new
@@ -217,7 +231,7 @@ class Options
   
   
   def self.get_option_def name
-    name = name.to_sym if name.is_a?( ::String )
+    name = normalize_name! name
     
     if option_defs.key? name
       option_defs[ name ]
@@ -225,6 +239,15 @@ class Options
       superclass.get_option_def name
     else
       nil
+    end
+  end
+  
+  
+  def self.get_option_def! name
+    get_option_def( name ).tap do |option_def_or_nil|
+      if option_def_or_nil.nil?
+        raise ::KeyError, "Option #{ name } does not exist"
+      end
     end
   end
   
@@ -323,9 +346,11 @@ class Options
   #   If `options` names don't exist or values aren't valid.
   # 
   def initialize **options
-    options.each do |name, value|
-      set_option! name, value
+    delta( options ).each do |name, value|
+      instance_variable_set "@#{ name }", value
     end
+    
+    freeze
   end # #initialize
   
   
@@ -335,53 +360,43 @@ class Options
   protected
   # ========================================================================
     
-    # Mutate the instance by setting an option value.
-    # 
-    # @note
-    #   Calling must be done **CAREFULLY** to preserve external immutability!
-    # 
-    # @param [::Symbol | ::String] name
-    #   Option name.
-    # 
-    # @param [::Object] value
-    #   Value to set.
-    # 
-    # @return [nil]
-    # 
-    # @raise [::KeyError]
-    #   If the named option does not exist *and* 
-    #   {Support::CriticalCode.enabled?} is false (a warning will be issued
-    #   instead if it's true, and no mutation will take place).
-    # 
-    def set_option! name, value
-      option_def = self.class.get_option_def name
-      
-      if option_def.nil?
-        try_critical_code do
-          raise ::KeyError, "Option #{ name } does not exist"
-        end
-        
-        return # If we warned
+    def derive &setup
+      new_options = self.class.allocate
+      instance_variables.each do |ivar_name|
+        new_options.instance_variable_set ivar_name,
+                                          instance_variable_get( ivar_name )
       end
-      
-      default = self[ option_def[ :name ] ]
-      
-      ivar_name = "@#{ option_def[ :name ] }"
-      
-      ivar_value = try_critical_code default: default do
-        option_def[ :block ].call value, default
-      end
-      
-      instance_variable_set ivar_name, ivar_value
-      
-      nil
-    end # #set_option!
+      setup.call new_options
+      new_options.freeze
+    end
     
   public # end protected ***************************************************
   
   
-  # Merge data into this {Options}. If no changes are necessary, attempts to
-  # simply return itself 
+  def delta hash
+    hash.each_with_object( {} ) do |(name, given_value), delta|
+      try_critical_code do
+        
+        name_sym = self.class.normalize_name! name
+        
+        current_value = get! name_sym
+        
+        if given_value != current_value
+          option_def = self.class.get_option_def! name_sym
+          new_value = option_def[ :block ].call given_value, current_value
+          
+          if new_value != current_value
+            delta[ name_sym ] = new_value
+          end
+        end
+        
+      end # try_critical_code
+    end # hash.each_with_object
+  end # #delta
+  
+  
+  # Merge the data in object over that in this instance to create a new one.
+  # 
   # 
   def merge object
     case object
@@ -390,13 +405,13 @@ class Options
     when Options
       merge object.to_hash
     when ::Hash
-      delta = object.reject { |name, value| get( name ) == value }
+      delta = self.delta object
       
       return self if delta.empty?
       
-      try_critical_code default: self do
-        dup.tap do |new_options|
-          delta.each { |name, value| new_options.set_option! name, value }
+      derive do |new_options|
+        delta.each do |name, value|
+          new_options.instance_variable_set "@#{ name }", value
         end
       end
     else
@@ -411,10 +426,8 @@ class Options
   
   def update name, *args, &block
     try_critical_code default: self do
-      if block
-        value = block.call get!( name )
-        
-        dup.tap { |options| options.set_option! name, value }
+      value = if block
+        block.call get!( name )
       else
         unless args.length == 1
           raise ::ArgumentError,
@@ -422,9 +435,11 @@ class Options
             "received #{ args.length + 1 }: #{ [ name, *args ].inspect }"
         end
         
-        dup.tap { |options| options.set_option! name, args[ 0 ] }
-      end
-    end
+        args[ 0 ]
+      end # value = 
+      
+      merge name => value
+    end # try_critical_code
   end # #update
   
   
@@ -459,8 +474,7 @@ class Options
   def apply option_name, method_name, *args, &block
     try_critical_code default: self do
       value = get!( option_name ).public_send method_name, *args, &block
-      
-      dup.tap { |options| options.set_option! option_name, value }
+      merge option_name => value
     end
   end # #apply
   
@@ -529,9 +543,7 @@ class Options
   # --------------------------------------------------------------------------
   
   def == other
-    return false unless other.is_a?( Options )
-    
-    
+    other.is_a?( Options ) && to_h == other.to_h
   end
   
   
@@ -551,6 +563,18 @@ class Options
   # @return [::Hash<::Symbol, ::Object>]
   #  
   def to_h; to_hash; end
+  
+  
+  def dup
+    raise ::NotImplementedError,
+      "{#{ self.class }} are immutable, can't duplicate (and don't need to)"
+  end
+  
+  
+  def clone
+    raise ::NotImplementedError,
+      "{#{ self.class }} are immutable, can't clone (and don't need to)"
+  end
   
   
 end # class Options
