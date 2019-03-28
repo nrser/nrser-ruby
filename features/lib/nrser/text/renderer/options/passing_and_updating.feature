@@ -80,4 +80,87 @@ Feature: {NRSER::Text::Renderer::Options} - Passing and Updating
     And it is NOT `A.default_options`
     And the response has a `word_wrap` attribute that is `88`
     And the response has a `code_indent` attribute that is `8`
+
+
+  Scenario: (2) Using {#update} to create modified versions
     
+    Given a module:
+      """ruby
+      module A
+        
+        def self.default_options
+          @options ||= NRSER::Text::Renderer::Options.new
+        end
+        
+        
+        def self.update_with_value options = nil
+          options = default_options.merge options
+          
+          if options.word_wrap != false
+            options = options.update  :word_wrap,
+                                      options.word_wrap - options.code_indent
+          end
+          
+          options
+        end
+        
+        
+        def self.update_with_block options = nil
+          options = default_options.merge options
+          
+          if options.word_wrap != false
+            options = options.update :word_wrap do |current|
+              current - options.code_indent
+            end
+          end
+          
+          options
+        end
+        
+      end
+      """
+      
+    When I call {A.update_with_value} with `{ word_wrap: 80, code_indent: 4 }`
+    
+    Then the response is a {NRSER::Text::Renderer::Options}
+    And it is NOT `A.default_options`
+    And it has a `word_wrap` attribute that is `76`
+    
+    
+    When I call {A.update_with_block} with `{ word_wrap: 80, code_indent: 8 }`
+    
+    Then the response is a {NRSER::Text::Renderer::Options}
+    And it is NOT `A.default_options`
+    And it has a `word_wrap` attribute that is `72`
+  
+  
+  Scenario: (3) Using {#apply} to create modified versions
+    
+    Given a module:
+      """ruby
+      module A
+        
+        def self.default_options
+          @options ||= NRSER::Text::Renderer::Options.new
+        end
+        
+        
+        def self.f options = nil
+          options = default_options.merge options
+          
+          if options.word_wrap != false
+            options = options.apply :word_wrap, :-, options.code_indent
+          end
+          
+          options
+        end
+        
+      end
+      """
+      
+    When I call {A.f} with `{ word_wrap: 80, code_indent: 4 }`
+    
+    Then the response is a {NRSER::Text::Renderer::Options}
+    And it is NOT `A.default_options`
+    And it has a `word_wrap` attribute that is `76`
+  

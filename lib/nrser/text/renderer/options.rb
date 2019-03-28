@@ -44,9 +44,6 @@ class Options
   # Constants
   # ==========================================================================
   
-  USE_CLASS_DEFAULT = ::BasicObject.new
-  
-  
   # The weird stuff that can happen if it's too low, and it's got to be a 
   # mistake at that point... right?
   # 
@@ -104,6 +101,7 @@ class Options
   # Mixins
   # ==========================================================================
   
+  # Make critical code methods available in both singleton and instances.
   extend  Support::CriticalCode
   include Support::CriticalCode
   
@@ -138,7 +136,6 @@ class Options
   # @!endgroup Dynamic Defaults Singleton Methods # **************************
   
   
-  
   # Get a {::Proc} to use as the `&block` argument to {.def_option}.
   # 
   # @param [#to_s] name
@@ -165,6 +162,18 @@ class Options
       arg
     end
   end # .non_negative_integer_option_block_for
+  
+  
+  def self.normalize_name name
+    case name
+    when ::Symbol
+      name
+    when ::String
+      name.to_sym
+    else
+      nil
+    end
+  end
   
   
   def self.option_defs
@@ -307,6 +316,12 @@ class Options
   
   # Instantiate a new `Options`.
   # 
+  # @param [::Hash<::Symbol, ::Object>] options
+  #   Option names mapped to value.
+  # 
+  # @raise
+  #   If `options` names don't exist or values aren't valid.
+  # 
   def initialize **options
     options.each do |name, value|
       set_option! name, value
@@ -320,12 +335,30 @@ class Options
   protected
   # ========================================================================
     
-    def set_option! name, value, default: USE_CLASS_DEFAULT
+    # Mutate the instance by setting an option value.
+    # 
+    # @note
+    #   Calling must be done **CAREFULLY** to preserve external immutability!
+    # 
+    # @param [::Symbol | ::String] name
+    #   Option name.
+    # 
+    # @param [::Object] value
+    #   Value to set.
+    # 
+    # @return [nil]
+    # 
+    # @raise [::KeyError]
+    #   If the named option does not exist *and* 
+    #   {Support::CriticalCode.enabled?} is false (a warning will be issued
+    #   instead if it's true, and no mutation will take place).
+    # 
+    def set_option! name, value
       option_def = self.class.get_option_def name
       
       if option_def.nil?
         try_critical_code do
-          raise ::ArgumentError, "Option #{ name } does not exist"
+          raise ::KeyError, "Option #{ name } does not exist"
         end
         
         return # If we warned
@@ -347,16 +380,23 @@ class Options
   public # end protected ***************************************************
   
   
+  # Merge data into this {Options}. If no changes are necessary, attempts to
+  # simply return itself 
+  # 
   def merge object
     case object
     when nil, self
       self
     when Options
       merge object.to_hash
-    when ::Hash      
-      dup.tap do |new_options|
-        object.each do |name, value|
-          new_options.set_option! name, value
+    when ::Hash
+      delta = object.reject { |name, value| get( name ) == value }
+      
+      return self if delta.empty?
+      
+      try_critical_code default: self do
+        dup.tap do |new_options|
+          delta.each { |name, value| new_options.set_option! name, value }
         end
       end
     else
@@ -369,18 +409,60 @@ class Options
   end # #merge
   
   
-  def update name, &block
+  def update name, *args, &block
     try_critical_code default: self do
-      dup.tap { |options|
-        options.set_option! name, block.call( self[ name ] )
-      }
+      if block
+        value = block.call get!( name )
+        
+        dup.tap { |options| options.set_option! name, value }
+      else
+        unless args.length == 1
+          raise ::ArgumentError,
+            "Expected 2 arguments (name, value) when no block given, " +
+            "received #{ args.length + 1 }: #{ [ name, *args ].inspect }"
+        end
+        
+        dup.tap { |options| options.set_option! name, args[ 0 ] }
+      end
     end
-  end
+  end # #update
   
   
-  def dup
-    super
-  end
+  # Return a new instance with a single option changed, the value of which is
+  # computed by calling a method on the current value.
+  # 
+  # @example
+  #   options = ::NRSER::Text::Renderer::Options.new  word_wrap: 80,
+  #                                                   code_indent: 4
+  #   
+  #   updated = options.apply :word_wrap, :-, options.code_indent
+  #   
+  #   updated.word_wrap == 76
+  #   #=> true
+  # 
+  # @return [Options]
+  #   If the operation succeeded, the new {Options} instance with updated 
+  #   `option_name` value.
+  #   
+  #   If the operation failed *and* {Support::CriticalCode.enabled?} is true,
+  #   a warning will be written to the standard error stream and *this* instance
+  #   will be returned.
+  #   
+  # @raise [::KeyError]
+  #   If `option_name` is not an option *and* {Support::CriticalCode.enabled?} 
+  #   is false.
+  # 
+  # @raise
+  #   If {Support::CriticalCode.enabled?} is false, any errors that the method
+  #   call in the current value raise will be propagated.
+  # 
+  def apply option_name, method_name, *args, &block
+    try_critical_code default: self do
+      value = get!( option_name ).public_send method_name, *args, &block
+      
+      dup.tap { |options| options.set_option! option_name, value }
+    end
+  end # #apply
   
   
   # Get an option value by name.
@@ -388,13 +470,23 @@ class Options
   # @param [::Symbol | ::String] name
   #   Name of the option.
   # 
+  # @param [Boolean] raise_when_missing
+  #   When true, a {::KeyError} will be raised if `name` is not an option name
+  #   (instead of returning `nil`).
+  #   
+  #   Note that {#get!} is short-hand for calling this method with this option
+  #   true.
+  # 
   # @return [nil]
-  #   There is no `name` option.
+  #   There is no `name` option *and* `raise_when_missing:` is false.
   # 
   # @return [::Object]
   #   The option value (or default).
   # 
-  def [] name
+  # @raise [::KeyError]
+  #   When `name` is not an option name *and* `raise_when_missing:` is true.
+  # 
+  def get name, raise_when_missing: false
     ivar_name = "@#{ name }"
     
     if instance_variable_defined? ivar_name
@@ -403,22 +495,63 @@ class Options
       option_def = self.class.get_option_def name
       
       if option_def.nil?
-        nil
+        if raise_when_missing
+          raise ::KeyError, "Option #{ name } does not exist"
+        else
+          nil
+        end
       else
         option_def[ :default ]
       end
     end
-  end # #[]
+  end # #get
+  
+  alias_method :[], :get
+  
+  
+  # Get an option value, raising if the name does not exist.
+  # 
+  # @param [::Symbol | ::String] name
+  #   Name of the option.
+  # 
+  # @return [::Object]
+  #   The option value (or default).
+  # 
+  # @raise [::KeyError]
+  #   When `name` is not an option name.
+  # 
+  def get! name
+    get name, raise_when_missing: true
+  end
   
   
   # Language Integration Instance Methods
   # --------------------------------------------------------------------------
   
+  def == other
+    return false unless other.is_a?( Options )
+    
+    
+  end
+  
+  
+  # Allow implicit casts to {::Hash}.
+  # 
+  # @return [::Hash<::Symbol, ::Object>]
+  # 
   def to_hash
     self.class.each_option_def.each_with_object( {} ) { |option_def, hash|
       hash[ option_def[ :name ] ] = self[ option_def[ :name ] ]
     }
   end # #to_hash
+  
+  
+  # Get a {::Hash} representation of the options.
+  # 
+  # @return [::Hash<::Symbol, ::Object>]
+  #  
+  def to_h; to_hash; end
+  
   
 end # class Options
 
