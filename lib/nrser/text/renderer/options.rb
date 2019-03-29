@@ -395,8 +395,50 @@ class Options
   end # #delta
   
   
-  # Merge the data in object over that in this instance to create a new one.
+  # Merge the data in an object over that in this instance to create a new one.
+  #
+  # Accepts other {Options} instances, {::Hash}es of option names to values, and
+  # `nil` (which always returns `self`).
+  #
+  # Given the immutability of {Options}, attempts to return `self` if it
+  # determines no changes will be made.
   # 
+  # @overload merge nil
+  #   When `nil` is given, this {Options} is returned.
+  #   
+  #   This allows methods to take an options argument that defaults to `nil` and
+  #   merge that with a default {Options} to get the working map without any
+  #   additional {Options} instances being created.
+  #   
+  #   @param [nil] nil
+  #   @return [self]
+  # 
+  # @overload merge options
+  #   Merge the values from another {Options} over those in this one to create
+  #   a new {Options}.
+  #   
+  #   As an optimization, if the values in the `options` argument are the same
+  #   (`==` comparison) as those in this one simply returns `self`.
+  #   
+  #   @param [Options] options
+  #   @return [Options]
+  #
+  # @overload merge hash
+  #   Merge values from a name/value {::Hash} over those in this {Options} to
+  #   create a new instance.
+  #   
+  #   If the values in the `hash` are all the same as those in this instance
+  #   (`==` comparison) simply returns `self`.
+  #   
+  #   @param [::Hash<( ::Symbol | ::String ), ::Object>] hash
+  #     Map of option names to values.
+  # 
+  # @raise [::TypeError]
+  #   When the argument is not of a suitable type *and* 
+  #   {Support::CriticalCode.enabled?} is false.
+  # 
+  # @see #update
+  # @see #apply
   # 
   def merge object
     case object
