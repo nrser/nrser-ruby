@@ -18,12 +18,14 @@ require 'cucumber/rake/task'
 # ============================================================================
 
 # Add `spec` task to run RSpec
-RSpec::Core::RakeTask.new :spec
+RSpec::Core::RakeTask.new :spec do |task|
+  task.rspec_opts = "--format progress"
+end
 
 
 # Add `features` task to run Cucumber
 Cucumber::Rake::Task.new :features do |t|
-  t.cucumber_opts = "--format pretty"
+  t.cucumber_opts = "--format progress"
 end
 
 
@@ -39,4 +41,8 @@ task :doctest do
 end # task :doctest
 
 
-task :default => [ :spec, :features, :doctest ]
+desc %(Run all tests (RSpec, Cucumber, YARD Doctest))
+task :test => [ :spec, :features, :doctest ]
+
+desc %(Run `test` by default)
+task :default => :test
