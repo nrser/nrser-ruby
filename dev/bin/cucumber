@@ -62,7 +62,9 @@ arg_aliases = {
 
 if ARGV.length == 0
   # Run everything when ARGV is empty
-  ARGV[0] = m.relative_path_for 'features'
+  ARGV[ 0 ] = '--format'
+  ARGV[ 1 ] = 'progress'
+  ARGV[ 2 ] = m.relative_path_for 'features/'
   
 else
   ARGV.each_with_index { |arg, index|
