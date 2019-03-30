@@ -41,6 +41,8 @@ class   Renderer
 # results on the [Travis CI site][].
 # 
 # [Travis CI site]: https://travis-ci.org/nrser/nrser.rb
+#   
+# @typedef [::Symbol | ::String] Name
 # 
 class Options
   
@@ -343,7 +345,8 @@ class Options
   #   Option names mapped to value.
   # 
   # @raise
-  #   If `options` names don't exist or values aren't valid.
+  #   If `options` names don't exist or values aren't valid and 
+  #   {Support::CriticalCode.enabled?} is false.
   # 
   def initialize **options
     delta( options ).each do |name, value|
@@ -357,169 +360,8 @@ class Options
   # Instance Methods
   # ==========================================================================
   
-  protected
-  # ========================================================================
-    
-    def derive &setup
-      new_options = self.class.allocate
-      instance_variables.each do |ivar_name|
-        new_options.instance_variable_set ivar_name,
-                                          instance_variable_get( ivar_name )
-      end
-      setup.call new_options
-      new_options.freeze
-    end
-    
-  public # end protected ***************************************************
-  
-  
-  def delta hash
-    hash.each_with_object( {} ) do |(name, given_value), delta|
-      try_critical_code do
-        
-        name_sym = self.class.normalize_name! name
-        
-        current_value = get! name_sym
-        
-        if given_value != current_value
-          option_def = self.class.get_option_def! name_sym
-          new_value = option_def[ :block ].call given_value, current_value
-          
-          if new_value != current_value
-            delta[ name_sym ] = new_value
-          end
-        end
-        
-      end # try_critical_code
-    end # hash.each_with_object
-  end # #delta
-  
-  
-  # Merge the data in an object over that in this instance to create a new one.
-  #
-  # Accepts other {Options} instances, {::Hash}es of option names to values, and
-  # `nil` (which always returns `self`).
-  #
-  # Given the immutability of {Options}, attempts to return `self` if it
-  # determines no changes will be made.
-  # 
-  # @overload merge nil
-  #   When `nil` is given, this {Options} is returned.
-  #   
-  #   This allows methods to take an options argument that defaults to `nil` and
-  #   merge that with a default {Options} to get the working map without any
-  #   additional {Options} instances being created.
-  #   
-  #   @param [nil] nil
-  #   @return [self]
-  # 
-  # @overload merge options
-  #   Merge the values from another {Options} over those in this one to create
-  #   a new {Options}.
-  #   
-  #   As an optimization, if the values in the `options` argument are the same
-  #   (`==` comparison) as those in this one simply returns `self`.
-  #   
-  #   @param [Options] options
-  #   @return [Options]
-  #
-  # @overload merge hash
-  #   Merge values from a name/value {::Hash} over those in this {Options} to
-  #   create a new instance.
-  #   
-  #   If the values in the `hash` are all the same as those in this instance
-  #   (`==` comparison) simply returns `self`.
-  #   
-  #   @param [::Hash<( ::Symbol | ::String ), ::Object>] hash
-  #     Map of option names to values.
-  # 
-  # @raise [::TypeError]
-  #   When the argument is not of a suitable type *and* 
-  #   {Support::CriticalCode.enabled?} is false.
-  # 
-  # @see #update
-  # @see #apply
-  # 
-  def merge object
-    case object
-    when nil, self
-      self
-    when Options
-      merge object.to_hash
-    when ::Hash
-      delta = self.delta object
-      
-      return self if delta.empty?
-      
-      derive do |new_options|
-        delta.each do |name, value|
-          new_options.instance_variable_set "@#{ name }", value
-        end
-      end
-    else
-      try_critical_code default: self do
-        raise ::TypeError,
-          "Expected `nil`, `self` or {::Hash}, given {#{ object.class }}:" +
-          object.inspect
-      end
-    end
-  end # #merge
-  
-  
-  def update name, *args, &block
-    try_critical_code default: self do
-      value = if block
-        block.call get!( name )
-      else
-        unless args.length == 1
-          raise ::ArgumentError,
-            "Expected 2 arguments (name, value) when no block given, " +
-            "received #{ args.length + 1 }: #{ [ name, *args ].inspect }"
-        end
-        
-        args[ 0 ]
-      end # value = 
-      
-      merge name => value
-    end # try_critical_code
-  end # #update
-  
-  
-  # Return a new instance with a single option changed, the value of which is
-  # computed by calling a method on the current value.
-  # 
-  # @example
-  #   options = ::NRSER::Text::Renderer::Options.new  word_wrap: 80,
-  #                                                   code_indent: 4
-  #   
-  #   updated = options.apply :word_wrap, :-, options.code_indent
-  #   
-  #   updated.word_wrap == 76
-  #   #=> true
-  # 
-  # @return [Options]
-  #   If the operation succeeded, the new {Options} instance with updated 
-  #   `option_name` value.
-  #   
-  #   If the operation failed *and* {Support::CriticalCode.enabled?} is true,
-  #   a warning will be written to the standard error stream and *this* instance
-  #   will be returned.
-  #   
-  # @raise [::KeyError]
-  #   If `option_name` is not an option *and* {Support::CriticalCode.enabled?} 
-  #   is false.
-  # 
-  # @raise
-  #   If {Support::CriticalCode.enabled?} is false, any errors that the method
-  #   call in the current value raise will be propagated.
-  # 
-  def apply option_name, method_name, *args, &block
-    try_critical_code default: self do
-      value = get!( option_name ).public_send method_name, *args, &block
-      merge option_name => value
-    end
-  end # #apply
-  
+  # @!group Read Instance Methods
+  # --------------------------------------------------------------------------
   
   # Get an option value by name.
   # 
@@ -580,8 +422,230 @@ class Options
     get name, raise_when_missing: true
   end
   
+  # @!endgroup Read Instance Methods # ***************************************
   
-  # Language Integration Instance Methods
+  
+  # @!group Merging Instance Methods
+  # --------------------------------------------------------------------------
+  
+  protected
+  # ========================================================================
+    
+    def derive &setup
+      new_options = self.class.allocate
+      instance_variables.each do |ivar_name|
+        new_options.instance_variable_set ivar_name,
+                                          instance_variable_get( ivar_name )
+      end
+      setup.call new_options
+      new_options.freeze
+    end
+    
+  public # end protected ***************************************************
+  
+  # Compute the difference between a {::Hash} of option names and values and
+  # what is defined in the instance.
+  #
+  # This is important for figuring out *if* we need to create a new instance to
+  # realize those options, and is used for such in {#merge}.
+  #
+  # As part of figuring that out, this method normalizes the names (with
+  # {.normalize_name!}) and passes the values through the corresponding option's
+  # processing block.
+  #
+  # The {::Hash} you get back has only valid names and values, and only for
+  # options whose values differ from the ones in this instance.
+  # 
+  # @param [::Hash<(::Symbol | ::String), ::Object>] hash
+  #   {::Hash} of option names ({::Symbol} or {::String} please) to values.
+  # 
+  # @return [::Hash<::Symbol, ::Object>]
+  #   {::Hash} of names to values for options that differ from those in this
+  #   instance.
+  #   
+  #   Names are all normalized, and values are all validated.
+  #
+  # @raise
+  #   Many things can go wrong in here... bad names, bad values. Handling of
+  #   *each* option pair in `hash` is wrapped by 
+  #   {Support::CriticalCode#try_critical_code}.
+  #   
+  #   If {Support::CriticalCode.enabled?} is true, then any errors that could 
+  #   reasonably be caused by argument data should be downgraded to warnings,
+  #   and those options omitted from the returned {::Hash}.
+  #   
+  #   When {Support::CriticalCode.enabled?} is false, errors will be raised as
+  #   usual.
+  #   
+  #   Additional details of how the critical code system works and what it 
+  #   catches are available in the {Support::CriticalCode} documentation.
+  #
+  def delta hash
+    hash.each_with_object( {} ) do |(name, given_value), delta|
+      try_critical_code do
+        
+        name_sym = self.class.normalize_name! name
+        
+        current_value = get! name_sym
+        
+        if given_value != current_value
+          option_def = self.class.get_option_def! name_sym
+          new_value = option_def[ :block ].call given_value, current_value
+          
+          if new_value != current_value
+            delta[ name_sym ] = new_value
+          end
+        end
+        
+      end # try_critical_code
+    end # hash.each_with_object
+  end # #delta
+  
+  
+  # Merge the data in an object over that in this instance to create a new one.
+  #
+  # Accepts other {Options} instances, {::Hash}es of option names to values, and
+  # `nil` (which always returns `self`).
+  #
+  # Given the immutability of {Options}, attempts to return `self` if it
+  # determines no changes will be made.
+  # 
+  # @overload merge nil
+  #   When `nil` is given, this {Options} is returned.
+  #   
+  #   This allows methods to take an options argument that defaults to `nil` and
+  #   merge that with a default {Options} to get the working map without any
+  #   additional {Options} instances being created.
+  #   
+  #   @param [nil] nil
+  #   @return [self]
+  # 
+  # @overload merge options
+  #   Merge the values from another {Options} over those in this one to create
+  #   a new {Options}.
+  #   
+  #   As an optimization, if the values in the `options` argument are the same
+  #   (`==` comparison) as those in this one simply returns `self`.
+  #   
+  #   @param [Options] options
+  #   @return [Options]
+  #
+  # @overload merge hash
+  #   Merge values from a name/value {::Hash} over those in this {Options} to
+  #   create a new instance.
+  #   
+  #   If the values in the `hash` are all the same as those in this instance
+  #   (`==` comparison) simply returns `self`.
+  #   
+  #   @param [::Hash<@type:Name, ::Object>] hash
+  #     Map of option names to values.
+  # 
+  # @raise [::TypeError]
+  #   When the argument is not of a suitable type *and* 
+  #   {Support::CriticalCode.enabled?} is false.
+  # 
+  # @see #update
+  # @see #apply
+  # 
+  def merge object
+    case object
+    when nil, self
+      self
+    when Options
+      merge object.to_hash
+    when ::Hash
+      delta = self.delta object
+      
+      return self if delta.empty?
+      
+      derive do |new_options|
+        delta.each do |name, value|
+          new_options.instance_variable_set "@#{ name }", value
+        end
+      end
+    else
+      try_critical_code default: self do
+        raise ::TypeError,
+          "Expected `nil`, `self` or {::Hash}, given {#{ object.class }}:" +
+          object.inspect
+      end
+    end
+  end # #merge
+  
+  
+  # Merge a single option.
+  # 
+  # @overload merge name, value
+  #   Basically just calls {#merge} with `name => value`.
+  #   
+  #   @param [@type:Name] name
+  #   @return [Options]
+  # 
+  # @overload merge name, &block
+  #   Calls `&block` with the option's current value and uses the response as
+  #   the value in {#merge}.
+  #   
+  #   @param [@type:Name] name
+  #   @return [Options]
+  # 
+  def update name, *args, &block
+    try_critical_code default: self do
+      value = if block
+        block.call get!( name )
+      else
+        unless args.length == 1
+          raise ::ArgumentError,
+            "Expected 2 arguments (name, value) when no block given, " +
+            "received #{ args.length + 1 }: #{ [ name, *args ].inspect }"
+        end
+        
+        args[ 0 ]
+      end # value = 
+      
+      merge name => value
+    end # try_critical_code
+  end # #update
+  
+  
+  # Return a new instance with a single option changed, the value of which is
+  # computed by calling a method on the current value.
+  # 
+  # @example
+  #   options = ::NRSER::Text::Renderer::Options.new  word_wrap: 80,
+  #                                                   code_indent: 4
+  #   
+  #   updated = options.apply :word_wrap, :-, options.code_indent
+  #   
+  #   updated.word_wrap == 76
+  #   #=> true
+  # 
+  # @return [Options]
+  #   If the operation succeeded, the new {Options} instance with updated 
+  #   `option_name` value.
+  #   
+  #   If the operation failed *and* {Support::CriticalCode.enabled?} is true,
+  #   a warning will be written to the standard error stream and *this* instance
+  #   will be returned.
+  #   
+  # @raise [::KeyError]
+  #   If `option_name` is not an option *and* {Support::CriticalCode.enabled?} 
+  #   is false.
+  # 
+  # @raise
+  #   If {Support::CriticalCode.enabled?} is false, any errors that the method
+  #   call in the current value raise will be propagated.
+  # 
+  def apply option_name, method_name, *args, &block
+    try_critical_code default: self do
+      value = get!( option_name ).public_send method_name, *args, &block
+      merge option_name => value
+    end
+  end # #apply
+  
+  # @!endgroup Merging Instance Methods # ************************************
+  
+  
+  # @!group Language Integration Instance Methods
   # --------------------------------------------------------------------------
   
   def == other
@@ -618,6 +682,7 @@ class Options
       "{#{ self.class }} are immutable, can't clone (and don't need to)"
   end
   
+  # @!endgroup Language Integration Instance Methods # ***********************
   
 end # class Options
 
