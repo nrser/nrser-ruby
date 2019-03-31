@@ -11,6 +11,10 @@ gem 'yard', path: './dev/packages/gems/yard'
 
 gem 'yard-doctest', path: './dev/packages/gems/yard-doctest'
 
+# Doesn't work, and not sure exactly what I want with it... going to sideline 
+# it for now
+# gem 'yard-typedef', path: File.join( ENV[ 'MY_GITHUB' ], 'yard-typedef' )
+
 # Gems needed to support Ruby debugging in VSCode. Just export this ENV var
 # somewhere to enable installation.
 if ENV[ "VSCODE_RUBY_DEBUG" ]
