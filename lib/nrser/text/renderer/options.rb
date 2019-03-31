@@ -41,8 +41,6 @@ class   Renderer
 # results on the [Travis CI site][].
 # 
 # [Travis CI site]: https://travis-ci.org/nrser/nrser.rb
-#   
-# @typedef [::Symbol | ::String] Name
 # 
 class Options
   
@@ -537,7 +535,7 @@ class Options
   #   If the values in the `hash` are all the same as those in this instance
   #   (`==` comparison) simply returns `self`.
   #   
-  #   @param [::Hash<@type:Name, ::Object>] hash
+  #   @param [::Hash<(::Symbol | ::String), ::Object>] hash
   #     Map of option names to values.
   # 
   # @raise [::TypeError]
@@ -578,14 +576,14 @@ class Options
   # @overload merge name, value
   #   Basically just calls {#merge} with `name => value`.
   #   
-  #   @param [@type:Name] name
+  #   @param [::Symbol | ::String] name
   #   @return [Options]
   # 
   # @overload merge name, &block
   #   Calls `&block` with the option's current value and uses the response as
   #   the value in {#merge}.
   #   
-  #   @param [@type:Name] name
+  #   @param [::Symbol | ::String] name
   #   @return [Options]
   # 
   def update name, *args, &block
