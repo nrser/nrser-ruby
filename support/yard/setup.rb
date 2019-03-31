@@ -29,6 +29,8 @@ if ENV['NRSER_PRY']
   # of shit in there
   Pry.config.should_load_rc = false
   
+  # Disable progress printing, which screws up using Pry
+  log.show_progress = false
 end
 
 
