@@ -19,7 +19,7 @@ module  Hash
 # `&block` responds true when called with those keys and values, and the 
 # second pairs to which `&block` responds false.
 # 
-# @param [::Proc<(::Object, ::Object) → Boolean>] block
+# @param [::Proc<(::Object, ::Object) ⇒ Boolean>] block
 #   Called with each `(key, value)` pair, and response is used to determine 
 #   which {Hash} to put them in (see above).
 # 
@@ -45,7 +45,7 @@ end # #partition
 # 
 # @note Destructively mutates `self`.
 # 
-# @param [::Proc<(::Object, ::Object) → Boolean>] block
+# @param [::Proc<(::Object, ::Object) ⇒ Boolean>] block
 #   Called with each `(key, value)` pair; those the response true are deleted
 #   from `self` and added to the result hash, those the return false are left
 #   in.

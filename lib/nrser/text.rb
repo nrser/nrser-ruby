@@ -116,7 +116,7 @@ module Text
   #   
   #   **This is the preferred form for usage**; see the note above.
   #   
-  #   @param [Proc<(Renderer) → ::Object>] block
+  #   @param [Proc<(Renderer) ⇒ ::Object>] block
   #   
   #   @return [::Object]
   #     

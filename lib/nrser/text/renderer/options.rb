@@ -144,7 +144,7 @@ class Options
   # @param [#to_s] name
   #   Name of the option to use in any validation error messages.
   # 
-  # @return [::Proc<(::Object, ::Object) → ::Object>]
+  # @return [::Proc<(::Object, ::Object) ⇒ ::Object>]
   #   Accepts `(arg, default)` and returns `arg` if is an {::Integer} and
   #   non-negative (greater or equal to `0`). Otherwise, raises.
   # 

@@ -130,11 +130,11 @@ class Decoration
   # 
   # **Bound** decorators should be callables like:
   # 
-  #     .call( target, *args, &block ) → RESPONSE
+  #     .call( target, *args, &block ) ⇒ RESPONSE
   # 
   # **Unbound** decorators should be callables that work like:
   # 
-  #     .bind( receiver ) → .call( target, *args, &block ) → RESPONSE
+  #     .bind( receiver ) ⇒ .call( target, *args, &block ) ⇒ RESPONSE
   # 
   # @return [::UnboundMethod]
   #   The decorator is an instance method that will need to be bound to the
@@ -148,7 +148,7 @@ class Decoration
   #   Methods are `#call`-able, but I thought it worth breaking out in the 
   #   docs since it's a common decorator type.
   # 
-  # @return [#call<(target, *args, &block) → ::Object]
+  # @return [#call<(target, *args, &block) ⇒ ::Object]
   #   The decorator is any {::Object} with a `#call` method.
   #   
   #   When the decorated method is called, it will be called instead with 
@@ -228,7 +228,7 @@ class Decoration
   # 
   # Otherwise, {#decorator} is already `#call`-able and is simply returned.
   # 
-  # @return [#call<( #call<(*args, &block) → ::Object>, *args, &block ) → ::Object>]
+  # @return [#call<( #call<(*args, &block) ⇒ ::Object>, *args, &block ) ⇒ ::Object>]
   #   Decorator object that will be `#call`ed with `( target, *args, &block )`,
   #   where `target` is the response from {#target_for}.
   # 
@@ -251,7 +251,7 @@ class Decoration
   # @param [::Object] receiver
   #   The `receiver` argument that was passed to {#call}.
   #   
-  # @return [#call<(*args, &block) → ::Object>]
+  # @return [#call<(*args, &block) ⇒ ::Object>]
   #   A `#call`-able object ready to accept the arguments and block. It may be
   #   the original method that was decorated or represent an intermediate 
   #   object in a decoration stack.

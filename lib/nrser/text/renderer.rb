@@ -462,7 +462,7 @@ class Renderer
   end
   
   
-  # Get a `::String → ::String` syntax highlighting `#call`-able for a
+  # Get a `::String ⇒ ::String` syntax highlighting `#call`-able for a
   # particular `syntax` - if we can find one.
   #
   #
@@ -531,7 +531,7 @@ class Renderer
   #   2.  {#find_syntax_highlighter_for} returned `nil` for `syntax` (see 
   #       details there).
   #   
-  # @return [#call<(::String) → ::String>]
+  # @return [#call<(::String) ⇒ ::String>]
   #   A `#call`-able that 
   # 
   def syntax_highlighter_for syntax
@@ -569,7 +569,7 @@ class Renderer
   #   This happens when `self` does not respond to the computed method name, 
   #   or that method returned `nil`, indicating no highlighter is available.
   # 
-  # @return [#call<(::String) → ::String>]
+  # @return [#call<(::String) ⇒ ::String>]
   #   `#call`-able that transforms source strings into highlighted strings.
   # 
   def find_syntax_highlighter_for syntax

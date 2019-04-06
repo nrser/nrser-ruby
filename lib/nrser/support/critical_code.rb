@@ -407,7 +407,7 @@ module CriticalCode
     #     can be a single object or an {::Array} of objects, all of which will
     #     be turned into {::String} via their `#to_s` if they aren't already.
     #   
-    #   @param [::Proc<() → ::Object>] block
+    #   @param [::Proc<() ⇒ ::Object>] block
     #     The block to execute. It is given no arguments.
     #     
     #     If the block is missing, a warning will be issued and `nil` will be
