@@ -117,7 +117,7 @@ Gem::Specification.new do |spec|
   # This is my own fork of `yard-cucumber` with additional features and 
   # improvements.
   # 
-  spec.add_development_dependency 'yard-nrser-cucumber', '>= 0.1.0'
+  spec.add_development_dependency 'yard-nrser-cucumber', '>= 0.1.1'
   
   
   ### Testing ###

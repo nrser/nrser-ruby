@@ -7,9 +7,9 @@ source 'https://rubygems.org'
 
 # Use local checkout of `nrser/yard` so I can play with stuff (not planning on
 # making any permentant changes, but Git helps to track things)
-gem 'yard', path: './dev/packages/gems/yard'
+# gem 'yard', path: './dev/packages/gems/yard'
 
-gem 'yard-doctest', path: './dev/packages/gems/yard-doctest'
+# gem 'yard-doctest', path: './dev/packages/gems/yard-doctest'
 
 # Doesn't work, and not sure exactly what I want with it... going to sideline 
 # it for now
