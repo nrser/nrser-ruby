@@ -23,6 +23,7 @@ require 'nrser/booly'
 
 require_relative './strung'
 require_relative './tag/code'
+require_relative './renderer/options'
 
 
 # Namespace
@@ -58,73 +59,6 @@ class Renderer
   # Constants
   # ==========================================================================
   
-  # {#word_wrap} can not be set below this. I just don't want to deal with all
-  # the weird stuff that can happen if it's too low, and it's got to be a 
-  # mistake at that point... right?
-  # 
-  # @return [::Integer]
-  # 
-  WORD_WRAP_MIN = 24
-  
-  
-  # @!group Instance Default Constants
-  # --------------------------------------------------------------------------
-    
-  # Default character to use for {#space}. Just the regular ASCII space 
-  # character.
-  # 
-  # @return [String]
-  # 
-  DEFAULT_SPACE = ' '
-  
-  
-  # Default characters to use for {#no_preceding_space_chars}, which is used to
-  # form {#no_preceding_space_regexp}.
-  # 
-  # @return [::Array<::String>]
-  # 
-  DEFAULT_NO_PRECEDING_SPACE_CHARS = %w(, ; : . ? !).freeze
-  
-  
-  # Default {#yard_style_class_names?}.
-  # 
-  # @todo Not in use
-  # 
-  # @return [Boolean]
-  # 
-  DEFAULT_YARD_STYLE_CLASS_NAMES = true
-  
-  
-  # Default {#list_indent}.
-  # 
-  # @return [Integer]
-  # 
-  DEFAULT_LIST_INDENT = 4
-  
-  
-  # Default {#list_header_depth}.
-  # 
-  # @return [Integer]
-  #   Non-negative.
-  # 
-  DEFAULT_LIST_HEADER_DEPTH = 3
-  
-  
-  # Wrap lines by word-splitting at a column?
-  # 
-  # @return [false]
-  #   Disable word-wrapping.
-  # 
-  # @return [::Integer]
-  #   Column number to wrap lines at. Must be larger than {WORD_WRAP_MIN}.
-  # 
-  DEFAULT_WORD_WRAP = false
-  
-  
-  DEFAULT_CODE_INDENT = 4
-  
-  # @!endgroup Instance Default Constants # **********************************
-  
   
   # Mixins
   # ==========================================================================
@@ -136,123 +70,15 @@ class Renderer
   # Singleton Methods
   # ==========================================================================
   
-  # @!group Argument Checking Singleton Methods
-  # --------------------------------------------------------------------------
-  
-  
-  # @todo Document check_header_depth! method.
-  # 
-  # @param [#to_s] name
-  #   Name of the argument (for error messages).
-  # 
-  # @param [::Integer] value
-  #   The header depth value. Must be an {::Integer} and be 0 or greater to
-  #   pass.
-  # 
-  # @param [::Integer] default
-  #   Unless a development version is running, 
-  # 
-  # @return [::Integer]
-  #   The `value` passed in.
-  # 
-  def self.check_header_depth! name:, value:, default:
-    try_critical_code default: default do
-      unless  value.is_a?( ::Integer ) &&
-              value >= 0
-        raise ::ArgumentError,
-          "Expected `#{ name }` to be an {Integer}, 0 or greater; " +
-          "given #{ value.inspect }"
-      end
-      
-      value
-    end
-  end # .check_header_depth!
-  
-  # @!endgroup Argument Checking Singleton Methods # *************************
-  
-  
-  # @!group Dynamic Defaults Singleton Methods
-  # --------------------------------------------------------------------------
-  
-  # Default for {#color?}, looks first for an {ENV} var, then guesses about the
-  # terminal using some code I got from Thor.
-  # 
-  # {ENV} var is `NRSER_TEXT_USE_COLOR`.
-  # 
-  # @return [Boolean]
-  # 
-  def self.default_color?
-    Support::CriticalCode.env? 'NRSER_TEXT_USE_COLOR',
-      # Detect based on environment
-      # 
-      # Borrowed from Thor (MIT license)
-      # 
-      # https://github.com/erikhuda/thor/blob/0887bc8fb257fadf656fb4c4f081a9067b373e7b/lib/thor/shell.rb#L14
-      # 
-      default: !(
-        RbConfig::CONFIG["host_os"] =~ /mswin|mingw/ &&
-        !ENV["ANSICON"]
-      )
-  end # .default_color?
-  
-  # @!endgroup Dynamic Defaults Singleton Methods # **************************
-  
   
   # Attributes
   # ==========================================================================
   
-  # Space string to join adjacent fragment strings that look like they need it.
+  # Rendering {Options}.
   # 
-  # @immutable Frozen
-  # 
-  # @return [::String]
+  # @return [Options]
   #     
-  attr_reader :space
-  
-  
-  # Punctuation characters used to build the {#no_preceding_space_regexp}
-  # {::Regexp}.
-  # 
-  # @immutable Deeply frozen.
-  # 
-  # @return [::Array<::String>]
-  #     
-  attr_reader :no_preceding_space_chars
-  
-  
-  # Column to wrap text at, if any.
-  # 
-  # @return [false]
-  #   No word wrapping.
-  # 
-  # @return [::Integer]
-  #   Positive integer column number to wrap text at.
-  #     
-  attr_reader :word_wrap
-  
-  
-  # Number of spaces to indent {Tag::List} blocks (markdown-like).
-  # 
-  # @return [::Integer]
-  #     
-  attr_reader :list_indent
-  
-  
-  # Header "depth" to start at inside {Tag::List::Item} blocks.
-  #
-  # It's kind-of awkward and weird to have lists use the largest header
-  # settings, so by default they start at {DEFAULT_LIST_HEADER}
-  #
-  # @return [::Integer]
-  #
-  attr_reader :list_header_depth
-  
-  
-  # How far to indent code blocks.
-  # 
-  # @return [::Integer]
-  #     
-  attr_reader :code_indent
+  attr_reader :options
   
   
   # Construction
@@ -275,100 +101,8 @@ class Renderer
   # @raise [::TypeError]
   #   If all entries in `no_preceding_space_chars` are not {::String}s.
   # 
-  def initialize  space: DEFAULT_SPACE,
-                  no_preceding_space_chars: DEFAULT_NO_PRECEDING_SPACE_CHARS,
-                  yard_style_class_names: DEFAULT_YARD_STYLE_CLASS_NAMES,
-                  color: self.class.default_color?,
-                  word_wrap: DEFAULT_WORD_WRAP,
-                  list_indent: DEFAULT_LIST_INDENT,
-                  list_header_depth: DEFAULT_LIST_HEADER_DEPTH,
-                  code_indent: DEFAULT_CODE_INDENT
-    
-    unless space.is_a? ::String
-      # NOTE  Can't use {NRSER::TypeError}
-      raise ::TypeError,
-        "`space:` argument must be a {String}, given #{ space.class }: " +
-        space.inspect
-    end
-    
-    @space = space.freeze
-    
-    @no_preceding_space_chars = \
-      no_preceding_space_chars.map { |entry|
-        unless entry.is_a? ::String
-          # NOTE  Can't use {NRSER::TypeError} 'cause it uses text stuff to 
-          #       render! See note in class doc-string.
-          raise ::TypeError,
-            "Entries in `no_preceding_space_chars:` must be {String}s," +
-            "given #{ entry.class }: #{ entry.inspect }"
-        end
-        
-        entry.freeze
-      }.freeze
-    
-    @yard_style_class_names = !!yard_style_class_names
-    
-    @color = !!color
-    
-    @word_wrap = \
-      try_critical_code default: DEFAULT_WORD_WRAP do
-        case word_wrap
-        when nil
-          DEFAULT_WORD_WRAP
-          
-        when false
-          false
-          
-        when ::Integer
-          if word_wrap < WORD_WRAP_MIN
-            raise ::ArgumentError,
-              "`word_wrap:` argument must be #{ WORD_WRAP_MIN } or greater, " +
-              "given #{ word_wrap }"
-          end
-          
-          word_wrap
-        else
-          raise ::TypeError,
-            "`word_wrap:` must be `nil`, `false` or an {Integer}, " +
-            "given #{ word_wrap.inspect }"
-            
-        end # case word_wrap
-      end # try_critical_code
-    
-    @list_indent = \
-      try_critical_code default: DEFAULT_LIST_INDENT do
-        unless  list_indent.is_a?( ::Integer ) &&
-                list_indent >= 0
-          "Expected `list_indent:` to be an {Integer}, 0 or greater; " +
-          "given #{ list_indent.inspect }"
-        end
-        
-        list_indent
-      end # try_critical_code
-    
-    @list_header_depth = \
-      try_critical_code default: DEFAULT_LIST_HEADER_DEPTH do
-        unless  list_header_depth.is_a?( ::Integer ) &&
-                list_header_depth >= 0
-          raise ::ArgumentError,
-            "Expected `list_header_depth:` to be an {Integer}, 0 or greater; " +
-            "given #{ list_header_depth.inspect }"
-        end
-        
-        list_header_depth
-      end # try_critical_code
-    
-    @code_indent = \
-      try_critical_code default: DEFAULT_CODE_INDENT do
-        unless  code_indent.is_a?( ::Integer ) &&
-                code_indent >= 0
-          raise ::ArgumentError,
-            "Expected `code_indent:` to be an {Integer}, 0 or greater; " +
-            "given #{ code_indent.inspect }"
-        end
-        
-        code_indent
-      end # try_critical_code
+  def initialize options = nil
+    @options = Options.from options
     
     # Use a {Concurrent::Map} for some level of thread safety in the cache
     @syntax_highlighter_cache = Concurrent::Map.new
@@ -378,50 +112,6 @@ class Renderer
   
   # Instance Methods
   # ==========================================================================
-  
-  # When true renders {::Class} fragments in YARD link style like
-  # 
-  #     "{String}"
-  # 
-  # @return [Boolean]
-  # 
-  def yard_style_class_names?
-    @yard_style_class_names
-  end # #yard_style_class_names?
-  
-  
-  # @todo Document color? method.
-  # 
-  # @param [type] arg_name
-  #   @todo Add name param description.
-  # 
-  # @return [return_type]
-  #   @todo Document return value.
-  # 
-  def color?
-    @color
-  end # #color?
-  
-  
-  # Regular expression to test against the right-hand side (RHS) {::String} of
-  # a {.join} to see if we should omit the separating space character.
-  # 
-  # Basically, does the RHS start with a punctuation character that should *not*
-  # have a space in front of it?
-  # 
-  # This is all English-only at the moment.
-  # 
-  # @return [Regexp]
-  #   
-  def no_preceding_space_regexp
-    /\A[#{ Regexp.escape no_preceding_space_chars.join }](?:[[:space:]]|$)/
-  end
-  
-  
-  def indent size, space: self.space, **options
-    space * size
-  end
-  
   
   # Dump an object to a single-line {Strung}.
   # 
@@ -624,28 +314,29 @@ class Renderer
   #   #=> "Do you like hot dogs? Of course you like hot dogs!"
   # 
   # @param [::Array] fragments
-  #   Fragments to be joined. Turned into {::String}s first with {.render_fragment}.
+  #   Fragments to be joined. Turned into {::String}s first with 
+  #   {.render_fragment}.
   # 
-  # @param [::String] with
-  #   String to join with.
+  # @param [nil | Options | Hash] options
+  #   Additional rendering options, which will be merged over {#options} for 
+  #   use.
   # 
   # @return [::String]
   #   Joined string.
   # 
-  def render_fragments  *fragments,
-                        with: self.space,
-                        word_wrap: self.word_wrap,
-                        **options
+  def render_fragments fragments, options = nil
+    options = self.options.merge options
+    
     case fragments.length
     when 0
       return ''
     when 1
-      return render_fragment fragments[ 0 ]
+      return render_fragment fragments[ 0 ], options
     else
       first, *rest = fragments
     end
   
-    no_space_rhs_regexp = self.no_preceding_space_regexp
+    no_space_rhs_regexp = options.no_preceding_space_regexp
     
     string = rest.reduce( render_fragment first ) { |lhs_string, rhs_fragment|
       rhs_string = render_fragment rhs_fragment
@@ -653,26 +344,28 @@ class Renderer
       if no_space_rhs_regexp =~ rhs_string
         lhs_string + rhs_string
       else
-        lhs_string + with + rhs_string
+        lhs_string + options.join_with + rhs_string
       end
     }
     
-    Strung.new string, source: fragments, word_wrap: word_wrap
+    Strung.new string, source: fragments, word_wrap: options.word_wrap
   end # .render_fragments
   
   alias_method :join, :render_fragments
   
   
-  def render_block tag, newline_terminate: nil, **options
+  def render_block tag, options = nil
+    options = self.options.merge options
+    
     method_name = "render_#{ tag.class.name.demodulize.downcase }_block"
     
-    string = send method_name, tag, **options
+    string = send method_name, tag, options
     
-    if newline_terminate.nil?
-      newline_terminate = string.include? "\n"
+    if options.newline_terminate == :detect
+      options = options.update :newline_terminate, string.include?( "\n" )
     end
     
-    if newline_terminate && string[ -1 ] != "\n"
+    if options.newline_terminate && string[ -1 ] != "\n"
       string = \
         case string
         when Strung
@@ -686,74 +379,82 @@ class Renderer
   end
   
   
-  def render_blocks *tags, newline_terminate: nil, **options
-    if newline_terminate.nil?
-      newline_terminate = if tags.length > 1 then true else nil end
+  def render_blocks tags, options = nil
+    options = self.options.merge options
+    
+    if options.newline_terminate == :detect && tags.length > 1
+      options = options.update :newline_terminate, true
     end
     
     tags.
-      map { |tag|
-        render_block tag, **options, newline_terminate: newline_terminate
-      }.
+      map { |tag| render_block tag, options }.
       join "\n"
   end
   
   
-  def render_list_block list, word_wrap: self.word_wrap, **options
-    options.merge! \
-      word_wrap: word_wrap && word_wrap - list_indent,
-      header_depth: list_header_depth
+  def render_list_block list, options = nil
+    options = self.options.merge options
+    
+    if options.word_wrap
+      options = options.update  :word_wrap,
+                                options.word_wrap - options.list_indent
+    end
+    
+    options = options.update :header_depth, options.list_header_depth
     
     list.
-      map { |item| render_block item, **options }.
-      join( "#{ indent( list_indent, **options ) }\n" )
+      map { |item| render_block item, options }.
+      join( "\n".indent( options.list_indent, ' ' , true ) ) #.
+      # indent( options.list_indent, ' ', true )
   end
   
   
-  def render_item_block item,
-                        word_wrap: self.word_wrap,
-                        space: self.space,
-                        **options
-    rendered = render_blocks( *item.blocks, **options, newline_terminate: true )
-    indented = rendered.indent list_indent, space, true
+  def render_item_block item, options = nil
+    options = self.options.merge options
+    
+    rendered = render_blocks  item.blocks,
+                              options.update( :newline_terminate, true )
+    
+    indented = rendered.indent options.list_indent, ' ', true
     indented[0] = '-'
     
     indented
   end
   
   
-  def render_paragraph_block paragraph, **options
-    render_fragments *paragraph.fragments, **options
+  def render_paragraph_block paragraph, options = nil
+    render_fragments paragraph.fragments, options
   end
   
   
-  def render_section_block section, header_depth: 0, **options
-    render_blocks *section.blocks, header_depth: (header_depth + 1), **options
+  def render_section_block section, options = nil
+    render_blocks section.blocks,
+                  self.options.merge( options ).apply( :header_depth, :+, 1 )
   end
   
   
-  def render_header_block header,
-                          header_depth: 0,
-                          word_wrap: self.word_wrap,
-                          **options
-    text = render_fragments *header.fragments, **options, word_wrap: false
+  def render_header_block header, options = nil
+    options = self.options.merge options
+    
+    text = render_fragments header.fragments,
+                            options.update( :word_wrap, false )
     
     string = \
-      case header_depth
+      case options.header_depth
       when 0, 1
-        if word_wrap && word_wrap < text.length
-          text = text.truncate word_wrap
+        if options.word_wrap && options.word_wrap < text.length
+          text = text.truncate options.word_wrap
         end
       
-        char = if header_depth == 0 then '=' else '-' end
+        char = if options.header_depth == 0 then '=' else '-' end
         
-        "#{ text }\n#{ char * (word_wrap || text.length) }"
+        "#{ text }\n#{ char * (options.word_wrap || text.length) }"
       else
-        sides = '#' * header_depth
+        sides = '#' * options.header_depth
         sides_length = ( sides.length + 2 ) * 2
         
-        if word_wrap
-          text_max = word_wrap - sides_length
+        if options.word_wrap
+          text_max = options.word_wrap - sides_length
           
           if text_max < text.length
             text = text.truncate text_max
@@ -788,13 +489,15 @@ class Renderer
   # @return [::String]
   #   String representation of the `fragment` ready for display.
   # 
-  def render_fragment fragment
+  def render_fragment fragment, options = nil
+    options = self.options.merge options
+    
     if fragment.is_a? Tag::Code
-      return render_code fragment
+      return render_code fragment, options
     end
     
     if fragment.is_a?( Tag ) && fragment.respond_to?( :render )
-      return fragment.render self
+      return fragment.render self, options
     end
     
     if fragment.respond_to? :to_strung
@@ -826,7 +529,7 @@ class Renderer
     # end
     
     if fragment.is_a?( ::Class )
-      return render_code( Tag::Code.ruby fragment )
+      return render_code( Tag::Code.ruby( fragment ), options )
     end
     
     # We have nothing to do with {::String}s - *including* {Strung}s - so just
@@ -835,7 +538,7 @@ class Renderer
       return fragment
     end
     
-    render_code Tag::Code.ruby( dump_value_inline( fragment ) )
+    render_code Tag::Code.ruby( dump_value_inline( fragment ) ), options
   end # #render_fragment
   
   
@@ -857,7 +560,9 @@ class Renderer
   # @return [Strung]
   #   A string strung from the `code`
   # 
-  def render_code code
+  def render_code code, options = nil
+    options = self.options.merge options
+    
     source_string = \
       case code.source
       when ::Class
@@ -872,10 +577,10 @@ class Renderer
       else
         # The rest should be ok to go back through {#render_fragment} since they
         # weren't created there
-        render_fragment code.source
+        render_fragment code.source, options
       end
     
-      if  color? &&
+      if  options.color? &&
           (highlighter = syntax_highlighter_for code.syntax)
         
         highlighted_string = try_critical_code(
@@ -895,8 +600,8 @@ class Renderer
     
       rendered_string = \
         if code.source.is_a?( ::Class ) &&
-            code.source.name &&
-            yard_style_class_names?
+            code.source.name # &&
+            # yard_style_class_names?
         # {Tag::Code#source} is a named (non-anonymous) {::Class}, which we
         # "curly quote" (like YAML doc-strings)
         Tag::Code.curly_quote( code.source.name )
@@ -923,18 +628,20 @@ class Renderer
   # @return [Strung]
   #   Rendered string.
   # 
-  def render_code_block code, word_wrap: self.word_wrap, **options
-    if word_wrap
-      word_wrap = word_wrap - code_indent
+  def render_code_block code, options = nil
+    options = self.options.merge options
+    
+    if options.word_wrap
+      options = options.apply :word_wrap, :-, options.code_indent
     end
     
     strung = if code.source.is_a? Strung
       code.source
     else
-      dump_value_multiline code.source, word_wrap: word_wrap
+      dump_value_multiline code.source, word_wrap: options.word_wrap
     end
     
-    if  color? &&
+    if  options.color? &&
         (highlighter = syntax_highlighter_for code.syntax)
       
       highlighted_string = try_critical_code(
@@ -950,22 +657,20 @@ class Renderer
       end
     end # Highlighting
     
-    Strung.new strung.indent( code_indent, space, true ),
+    Strung.new strung.indent( options.code_indent, ' ', true ),
       source: strung.source
   end # #render_code_block
   
   
-  def render_values_block values,
-                          word_wrap: self.word_wrap,
-                          space: self.space,
-                          **options
+  def render_values_block values, options = nil
+    options = self.options.merge options
     
     max_name_length = values.keys.map { |k| k.to_s.length }.max
     
-    separator = "#{ space }=#{ space }"
+    separator = ' = '
     label_col_width = separator.length + max_name_length
     
-    word_wrap = word_wrap && (word_wrap - label_col_width)
+    word_wrap = options.word_wrap && (options.word_wrap - label_col_width)
     
     code_string = values.
       map { |name, value|
@@ -973,7 +678,7 @@ class Renderer
         
         label = name.to_s.ljust( max_name_length ) + separator
         
-        string = dump.indent label_col_width, space, true
+        string = dump.indent label_col_width, ' ', true
         
         string[ 0...label.length ] = label
         
@@ -983,7 +688,7 @@ class Renderer
     
     strung = Strung.new code_string, source: values
     
-    render_code_block Tag::Code.ruby( strung )
+    render_code_block Tag::Code.ruby( strung ), options
     
   end # #render_values_block
   

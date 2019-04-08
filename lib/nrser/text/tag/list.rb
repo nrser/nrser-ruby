@@ -171,18 +171,29 @@ class List < ::Array
   # 
   # @return [String]
   # 
-  def render renderer = Text.default_renderer
+  def render renderer = Text.default_renderer, options = nil
+    options = renderer.options.merge options
+    
     if last_join
       if oxford?
-        renderer.join *self[ 0..-2 ], last_join, self[ -1 ], with: join_with
+        renderer.render_fragments \
+          [ *self[ 0..-2 ], last_join, self[ -1 ] ],
+          options.update( :join_with, join_with )
       else
-        renderer.join \
-          renderer.join( *self[ 0..-2 ], with: join_with ),
-          last_join,
-          self[ -1 ]
+        renderer.render_fragments \
+          [
+            renderer.render_fragments(
+              self[ 0..-2 ],
+              options.update( :join_with, join_with )
+            ),
+            last_join,
+            self[ -1 ]
+          ],
+          options
       end
     else
-      renderer.join *fragments, with: join_with
+      renderer.render_fragments fragments,
+                                options.update( :join_with, join_with )
     end
   end # #render
   

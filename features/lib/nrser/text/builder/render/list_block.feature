@@ -9,7 +9,7 @@ Feature: Render a {NRSER::Text::Tag::List} as a block
     
     When I let `builder` be:
       """ruby
-        NRSER::Text::Builder.new( word_wrap: 74 ) do\
+        NRSER::Text::Builder.new( word_wrap: 74 ) do
           
           p "A very simple block list..."
           

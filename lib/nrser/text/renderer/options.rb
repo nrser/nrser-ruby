@@ -66,6 +66,14 @@ class Options
   DEFAULT_NO_PRECEDING_SPACE_CHARS = %w(, ; : . ? !).freeze
   
   
+  # Default {#header_depth}.
+  # 
+  # @return [Integer]
+  #   Non-negative.
+  # 
+  DEFAULT_HEADER_DEPTH = 0
+  
+  
   # Default {#list_indent}.
   # 
   # @return [Integer]
@@ -98,6 +106,13 @@ class Options
   # 
   DEFAULT_CODE_INDENT = 4
   
+  
+  # Default newline termination behavior.
+  # 
+  # @return [::Symbol | Boolean]
+  # 
+  DEFAULT_NEWLINE_TERMINATE = :detect
+  
   # @!endgroup Instance Default Constants # **********************************
   
   
@@ -111,6 +126,22 @@ class Options
   
   # Singleton Methods
   # ==========================================================================
+  
+  def self.from options
+    case options
+    when nil
+      new
+    when Options
+      options
+    when ::Hash
+      new options
+    else
+      raise ::TypeError,
+        "Expected `nil`, #{ self } or {Hash}, found #{ options.class }: " +
+        options.inspect
+    end
+  end
+  
   
   # @!group Dynamic Defaults Singleton Methods
   # --------------------------------------------------------------------------
@@ -322,6 +353,10 @@ class Options
   end
   
   
+  def_option :header_depth, default: DEFAULT_HEADER_DEPTH,
+    &non_negative_integer_option_block_for( :header_depth )
+  
+  
   def_option :list_indent, default: DEFAULT_LIST_INDENT,
     &non_negative_integer_option_block_for( :list_indent )
   
@@ -332,6 +367,30 @@ class Options
   
   def_option :code_indent, default: DEFAULT_CODE_INDENT,
     &non_negative_integer_option_block_for( :list_header_depth )
+  
+  
+  def_option :newline_terminate, default: DEFAULT_NEWLINE_TERMINATE \
+  do |arg, default|
+    case arg
+    # when nil
+    #   default
+    when :detect, true, false
+      arg
+    else
+      raise ::TypeError,
+        "Expected `newline_terminate` to be `:detect`, `true` or `false`, " +
+        "found #{ arg.class }: #{ arg.inspect }"
+    end
+  end
+  
+  
+  def_option :join_with, default: ' ' do |arg, default|
+    unless arg.is_a? ::String
+      raise ::TypeError,
+        "Expected `join_with` to be a {String}, " +
+        "found #{ arg.class }: #{ arg.inspect }"
+    end
+  end
   
   
   # Construction
@@ -346,7 +405,7 @@ class Options
   #   If `options` names don't exist or values aren't valid and 
   #   {Support::CriticalCode.enabled?} is false.
   # 
-  def initialize **options
+  def initialize options = {}
     delta( options ).each do |name, value|
       instance_variable_set "@#{ name }", value
     end
@@ -357,6 +416,21 @@ class Options
   
   # Instance Methods
   # ==========================================================================
+  
+  # Regular expression to test against the right-hand side (RHS) {::String} of
+  # a {.join} to see if we should omit the separating space character.
+  # 
+  # Basically, does the RHS start with a punctuation character that should *not*
+  # have a space in front of it?
+  # 
+  # This is all English-only at the moment.
+  # 
+  # @return [Regexp]
+  #   
+  def no_preceding_space_regexp
+    /\A[#{ Regexp.escape no_preceding_space_chars.join }](?:[[:space:]]|$)/
+  end
+  
   
   # @!group Read Instance Methods
   # --------------------------------------------------------------------------

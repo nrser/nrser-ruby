@@ -131,7 +131,7 @@ class Builder
   # 
   def render
     # renderer.join *fragments, word_wrap: word_wrap
-    renderer.render_blocks *blocks, word_wrap: word_wrap
+    renderer.render_blocks blocks, word_wrap: word_wrap
   end
   
   
