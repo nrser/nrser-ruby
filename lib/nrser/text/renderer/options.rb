@@ -390,6 +390,8 @@ class Options
         "Expected `join_with` to be a {String}, " +
         "found #{ arg.class }: #{ arg.inspect }"
     end
+    
+    arg
   end
   
   
