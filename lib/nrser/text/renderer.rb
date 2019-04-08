@@ -306,11 +306,13 @@ class Renderer
   #   # that should *not* have whitespace preceding it
   #   a = 'aye'
   #   
-  #   Renderer.new.join "I've got an", a, ", a bee and a sea."
+  #   ::NRSER::Text::Renderer.new.
+  #     render_fragments [ "I've got an", a, ", a bee and a sea." ]
   #   #=> "I've got an aye, a bee and a sea."
   #   
   #   x = "hot dogs"
-  #   Rendered.new.join "Do you like", x, "?", "Of course you like", x, "!"
+  #   ::NRSER::Text::Renderer.new.
+  #     render_fragments [ "Do you like", x, "?", "Of course you like", x, "!" ]
   #   #=> "Do you like hot dogs? Of course you like hot dogs!"
   # 
   # @param [::Array] fragments
