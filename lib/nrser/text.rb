@@ -176,7 +176,7 @@ module Text
   #   Joined string.
   # 
   def self.join *fragments, **options
-    default_renderer.join fragments, **options
+    default_renderer.render_fragments fragments, **options
   end # .join
   
   
