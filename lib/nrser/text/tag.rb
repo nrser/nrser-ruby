@@ -25,7 +25,15 @@ module  Text
 # structured text.
 #
 module Tag
-  
+  def render_name
+    name = self.class.name
+    
+    if name.start_with?( Tag.name + '::' )
+      name.sub! Tag.name + '::', ''
+    end
+    
+    name.underscore.gsub '/', '_'
+  end
 end # module Tag
 
 

@@ -55,10 +55,6 @@ module  Text
 #   {Text.default_renderer}.
 # 
 class Renderer
-
-  # Constants
-  # ==========================================================================
-  
   
   # Mixins
   # ==========================================================================
@@ -67,14 +63,10 @@ class Renderer
   extend  Support::CriticalCode
   
   
-  # Singleton Methods
-  # ==========================================================================
-  
-  
   # Attributes
   # ==========================================================================
   
-  # Rendering {Options}.
+  # Base rendering {Options}.
   # 
   # @return [Options]
   #     
@@ -86,27 +78,28 @@ class Renderer
   
   # Construct a new {Renderer}.
   # 
-  # @param [::String] space
-  #   String to use between fragments in {#join} (unless overridden in that call
-  #   itself). Assigned to {#space}.
+  # @param [Options | ::Hash<(::Symbol | ::String), ::Object> | nil] options
+  #   Base options for the renderer. Value is passed to {Options.from} to get 
+  #   an {Options} instance, which becomes {#options}.
+  #   
+  #   When...
+  #   
+  #   -   {Options} - directly assigned to {#options}.
+  #       
+  #   -   {::Hash}  - Option name and value pairs pass to {Options#initialize},
+  #       assigning over the defaults.
+  #       
+  #   -   `nil`     - an {Options} is constructed using only it's defaults.
   # 
-  # @param [::Array<::String>] no_preceding_space_chars
-  #   Characters that usually should not have a space in front of them in 
-  #   English. Assigned to {#no_preceding_space_chars} and used to be a little
-  #   smarter in {#join}.
-  # 
-  # @raise [::TypeError]
-  #   If `space` is not a {::String}.
-  # 
-  # @raise [::TypeError]
-  #   If all entries in `no_preceding_space_chars` are not {::String}s.
+  # @raise
+  #   If {Support::CriticalCode.enabled?} is `false`, bad option values will 
+  #   cause an error to be raised. There should be more details in {Options}.
   # 
   def initialize options = nil
     @options = Options.from options
     
     # Use a {Concurrent::Map} for some level of thread safety in the cache
     @syntax_highlighter_cache = Concurrent::Map.new
-    
   end # #initialize
   
   
@@ -151,6 +144,9 @@ class Renderer
     end
   end
   
+  
+  # @!group Syntax Highlighting Instance Methods
+  # --------------------------------------------------------------------------
   
   # Get a `::String ⇒ ::String` syntax highlighting `#call`-able for a
   # particular `syntax` - if we can find one.
@@ -295,6 +291,8 @@ class Renderer
     nil
   end
   
+  # @!endgroup Syntax Highlighting Instance Methods # ************************
+  
   
   # @!group Rendering Instance Methods
   # --------------------------------------------------------------------------
@@ -353,13 +351,33 @@ class Renderer
     Strung.new string, source: fragments, word_wrap: options.word_wrap
   end # .render_fragments
   
-  alias_method :join, :render_fragments
   
-  
+  # Render a {Tag} as a block of text.
+  # 
+  # Acts as a dynamic method router, forming the method name
+  # 
+  #     "render_#{ tag.render_name }_block"
+  # 
+  # and calling it with the `tag` and options.
+  # 
+  # This allows additional tags and {Renderer} extensions that handle them to 
+  # be created easily.
+  # 
+  # Takes care of newline termination as well. If {Options#newline_terminate}
+  # is `:detect` on the merged options, a trailing newline is ensured if the 
+  # resulting string is more than once line (if it contains `"\n"`).
+  # 
+  # @param [Options | ::Hash<(::Symbol | ::String), ::Object> | nil] options
+  #   Options that will be merged over the base {#options} to use for rendering
+  #   the `tag`.
+  # 
+  # @return [::String]
+  #   Rendered string.
+  # 
   def render_block tag, options = nil
     options = self.options.merge options
     
-    method_name = "render_#{ tag.class.name.demodulize.downcase }_block"
+    method_name = "render_#{ tag.render_name }_block"
     
     string = send method_name, tag, options
     
@@ -378,9 +396,23 @@ class Renderer
     end
     
     string
-  end
+  end # #render_block
   
   
+  # Render a sequence of {Tag}s as blocks, joined by newlines.
+  # 
+  # Handles newline termination: if {Options#newline_terminate} is `:detect`,
+  # then the blocks will be newline-terminated if there is more than one of
+  # them.
+  # 
+  # @param [#map<Tag>] tags
+  #   Tags to render.
+  # 
+  # @param [Options | ::Hash<(::Symbol | ::String), ::Object> | nil] options
+  #   Options that will be merged over the base {#options} to use for rendering.
+  # 
+  # @return [::String]
+  # 
   def render_blocks tags, options = nil
     options = self.options.merge options
     
@@ -391,27 +423,50 @@ class Renderer
     tags.
       map { |tag| render_block tag, options }.
       join "\n"
-  end
+  end # #render_block
   
   
+  # Render a {Tag::List} (or any other tag that's `#render_name` is `list`) as
+  # a block.
+  # 
+  # @param [Tag & #map<Tag>] list
+  #   The list to render.
+  # 
+  # @param [Options | ::Hash<(::Symbol | ::String), ::Object> | nil] options
+  #   Options that will be merged over the base {#options} to use for rendering.
+  # 
+  # @return [::String]
+  # 
   def render_list_block list, options = nil
     options = self.options.merge options
     
+    # If we are word-wrapping, adjust the size by the list indent.
     if options.word_wrap
       options = options.update  :word_wrap,
                                 options.word_wrap - options.list_indent
     end
     
+    # Start headers in the items at the list header depth
     options = options.update :header_depth, options.list_header_depth
     
     list.
       map { |item| render_block item, options }.
-      join( "\n".indent( options.list_indent, ' ' , true ) ) #.
-      # indent( options.list_indent, ' ', true )
+      join( "\n".indent( options.list_indent, ' ' , true ) )
   end
   
   
-  def render_item_block item, options = nil
+  # Render a {Tag::List::Item} (or any other tag that's `#render_name` is 
+  # `list_item`) as as block.
+  # 
+  # @param [Tag & #map<Tag>] list
+  #   The list to render.
+  # 
+  # @param [Options | ::Hash<(::Symbol | ::String), ::Object> | nil] options
+  #   Options that will be merged over the base {#options} to use for rendering.
+  # 
+  # @return [::String]
+  # 
+  def render_list_item_block item, options = nil
     options = self.options.merge options
     
     rendered = render_blocks  item.blocks,
