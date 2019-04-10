@@ -690,11 +690,8 @@ class Options
   # computed by calling a method on the current value.
   # 
   # @example
-  #   options = ::NRSER::Text::Renderer::Options.new  word_wrap: 80,
-  #                                                   code_indent: 4
-  #   
+  #   options = Options.new  word_wrap: 80, code_indent: 4
   #   updated = options.apply :word_wrap, :-, options.code_indent
-  #   
   #   updated.word_wrap == 76
   #   #=> true
   # 

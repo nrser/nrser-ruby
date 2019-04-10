@@ -100,13 +100,13 @@ class Terminal < Base
   #   # that should *not* have whitespace preceding it
   #   a = 'aye'
   #   
-  #   ::NRSER::Text::Renderer::Terminal.new.
-  #     render_fragments [ "I've got an", a, ", a bee and a sea." ]
+  #   Terminal.new.render_fragments [ "I've got an", a, ", a bee and a sea." ]
   #   #=> "I've got an aye, a bee and a sea."
   #   
   #   x = "hot dogs"
-  #   ::NRSER::Text::Renderer::Terminal.new.
-  #     render_fragments [ "Do you like", x, "?", "Of course you like", x, "!" ]
+  #   Terminal.new.render_fragments [
+  #     "Do you like", x, "?", "Of course you like", x, "!"
+  #   ]
   #   #=> "Do you like hot dogs? Of course you like hot dogs!"
   # 
   # @param [::Array] fragments
