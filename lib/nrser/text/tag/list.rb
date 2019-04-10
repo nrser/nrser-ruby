@@ -1,21 +1,14 @@
 # encoding: UTF-8
 # frozen_string_literal: true
+# doctest: true
 
 # Requirements
 # =======================================================================
-
-### Stdlib ###
-
-### Deps ###
 
 ### Project / Package ###
 
 require 'nrser/text'
 require_relative '../tag'
-
-
-# Refinements
-# =======================================================================
 
 
 # Namespace
@@ -30,15 +23,15 @@ module  Tag
 # =======================================================================
 
 # @example
-#   ::NRSER::Text::List.new( 'a', 'b', 'c' ).render_text
+#   List.new( 'a', 'b', 'c' ).render
 #   #=> "a, b, c"
 # 
 # @example
-#   ::NRSER::Text::List.new( 'a', 'b', and: 'c' ).render_text
+#   List.new( 'a', 'b', and: 'c' ).render
 #   #=> "a, b and c"
 #
 # @example Use Oxford-style with a coordinating conjunction
-#   ::NRSER::Text::List.new( 'a', 'b', and: 'c', oxford: true ).render_text
+#   List.new( 'a', 'b', and: 'c', oxford: true ).render
 #   #=> "a, b, and c"
 # 
 class List < ::Array
@@ -173,27 +166,23 @@ class List < ::Array
   # 
   def render renderer = Text.default_renderer, options = nil
     options = renderer.options.merge options
+    join_with_options = options.update :join_with, join_with
     
     if last_join
       if oxford?
-        renderer.render_fragments \
-          [ *self[ 0..-2 ], last_join, self[ -1 ] ],
-          options.update( :join_with, join_with )
+        except_last = \
+          renderer.join *self[ 0..-2 ], last_join, options: join_with_options
+        
+        renderer.join except_last, self[ -1 ], options: options
       else
-        renderer.render_fragments \
-          [
-            renderer.render_fragments(
-              self[ 0..-2 ],
-              options.update( :join_with, join_with )
-            ),
-            last_join,
-            self[ -1 ]
-          ],
-          options
+        renderer.join \
+          renderer.join( *self[ 0..-2 ], options: join_with_options ),
+          last_join,
+          self[ -1 ],
+          options: options
       end
     else
-      renderer.render_fragments fragments,
-                                options.update( :join_with, join_with )
+      renderer.join *self, options: join_with_options
     end
   end # #render
   

@@ -15,7 +15,7 @@ require 'active_support/core_ext/module/attribute_accessors'
 
 ### Project / Package ###
 
-require_relative './text/renderer'
+require_relative './text/renderer/terminal'
 
 
 # Namespace
@@ -42,7 +42,7 @@ module Text
   # and when it assigns `@default_renderer = Renderer.new`, which seems like it
   # would clobber the {Renderer} set by {.default_renderer=}.
   # 
-  @default_renderer = Renderer.new
+  @default_renderer = Renderer::Terminal.new
   
   
   # Singleton Methods

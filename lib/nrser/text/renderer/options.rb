@@ -24,7 +24,7 @@ require 'nrser/support/critical_code'
 
 module  NRSER
 module  Text
-class   Renderer
+module  Renderer
 
 
 # Definitions
@@ -434,6 +434,11 @@ class Options
   end
   
   
+  def bare_join? left_hand_side, right_hand_side
+    no_preceding_space_regexp =~ right_hand_side
+  end
+  
+  
   # @!group Read Instance Methods
   # --------------------------------------------------------------------------
   
@@ -764,6 +769,6 @@ end # class Options
 # /Namespace
 # =======================================================================
 
-end # class   Renderer
+end # module  Renderer
 end # module  Text
 end # module  NRSER
