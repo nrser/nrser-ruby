@@ -4,8 +4,6 @@
 # Requirements
 # ============================================================================
 
-### Stdlib ###
-
 ### Deps ###
 
 require 'active_support/core_ext/string/inflections'
@@ -17,9 +15,6 @@ require "concurrent/map"
 ### Project / Package ###
 
 require 'nrser/support/critical_code'
-
-# Using {NRSER::Booly.truthy?}
-require 'nrser/booly'
 
 require_relative '../strung'
 require_relative '../tag/code'

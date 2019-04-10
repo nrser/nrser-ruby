@@ -12,9 +12,6 @@ require 'active_support/core_ext/string/indent'
 
 ### Project / Package ###
 
-# Using {NRSER::Booly.truthy?}
-require 'nrser/booly'
-
 require_relative '../strung'
 require_relative '../tag/code'
 require_relative './base'
