@@ -90,7 +90,7 @@ class Terminal < Base
   # @!group Rendering Instance Methods
   # --------------------------------------------------------------------------
   
-# Join assorted `fragments` into a {::String}, attempting to be some-what 
+  # Join assorted `fragments` into a {::String}, attempting to be some-what 
   # smart about it regarding (English) punctuation.
   # 
   # @example Handle fragments that start with punctuation
