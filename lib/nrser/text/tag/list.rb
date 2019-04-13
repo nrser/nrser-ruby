@@ -105,8 +105,14 @@ class List < ::Array
   # Construction
   # ==========================================================================
   
-  def initialize *entries, join_with: ', ', oxford: false, **options
+  def initialize *entries,  join_with: ', ',
+                            oxford: false,
+                            ordered: false,
+                            **options
     @join_with = join_with.to_s
+    
+    # Is this an ordered list?
+    @ordered = !!ordered
     
     # Use Oxford comma?
     @oxford = !!oxford
@@ -155,6 +161,15 @@ class List < ::Array
   def oxford?
     @oxford
   end
+  
+  
+  # Is this an ordered list (usually displayed with numbered items)?
+  # 
+  # @return [Boolean]
+  # 
+  def ordered?
+    @ordered
+  end # #ordered?
   
   
   # Render the {List} into a final {::String}.

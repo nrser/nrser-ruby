@@ -89,6 +89,13 @@ class Options
   DEFAULT_LIST_HEADER_DEPTH = 3
   
   
+  # Default {#list_unordered_marker}
+  # 
+  # @return [::String]
+  # 
+  DEFAULT_LIST_UNORDERED_MARKER = '-'
+  
+  
   # Wrap lines by word-splitting at a column?
   # 
   # @return [false]
@@ -357,14 +364,6 @@ class Options
     &non_negative_integer_option_block_for( :header_depth )
   
   
-  def_option :list_indent, default: DEFAULT_LIST_INDENT,
-    &non_negative_integer_option_block_for( :list_indent )
-  
-  
-  def_option :list_header_depth, default: DEFAULT_LIST_HEADER_DEPTH,
-    &non_negative_integer_option_block_for( :list_header_depth )
-  
-  
   def_option :code_indent, default: DEFAULT_CODE_INDENT,
     &non_negative_integer_option_block_for( :list_header_depth )
   
@@ -393,6 +392,34 @@ class Options
     
     arg
   end
+  
+  
+  # @!group List Options
+  # --------------------------------------------------------------------------
+  # 
+  # Have a `list_` prefix.
+  # 
+  
+  def_option :list_indent, default: DEFAULT_LIST_INDENT,
+    &non_negative_integer_option_block_for( :list_indent )
+  
+  
+  def_option :list_header_depth, default: DEFAULT_LIST_HEADER_DEPTH,
+    &non_negative_integer_option_block_for( :list_header_depth )
+  
+  
+  def_option :list_unordered_marker, default: DEFAULT_LIST_UNORDERED_MARKER \
+  do |arg, default|
+    unless arg.is_a? ::String
+      raise ::TypeError,
+        "Expected `list_unordered_marker` to be a {String}, " +
+        "found #{ arg.class }: #{ arg.inspect }"
+    end
+    
+    arg
+  end
+    
+  # @!endgroup List Options # ************************************************
   
   
   # Construction

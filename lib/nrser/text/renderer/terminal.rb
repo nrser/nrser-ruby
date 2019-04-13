@@ -231,17 +231,56 @@ class Terminal < Base
   def render_list_block list, options = nil
     options = self.options.merge options
     
+    # Compute how much indent space we will need for the list marker
+    list_marker_length = if list.ordered?
+      list.length.to_s.length + 1 # 'NNN.', like '1.' (2) or '1234.' (5)
+    else
+      options.list_unordered_marker.length # should be '-' or '*'
+    end
+    
+    # The min indent is that plus 1, to account for a space before content 
+    # starts.
+    min_indent = list_marker_length + 1
+    
+    # Make sure we have enough space in the list indent option, increasing it
+    # and issuing a warning if we don't
+    if options.list_indent < min_indent
+      warn  "{#{ options.class.name }#list_indent} of " +
+            "#{ options.list_indent } is smaller than computed minimum " +
+            "#{ min_indent }, increasing to #{ min_indent }"
+      
+      options = options.update :list_indent, min_indent
+    end
+    
     # If we are word-wrapping, adjust the size by the list indent.
     if options.word_wrap
       options = options.update  :word_wrap,
                                 options.word_wrap - options.list_indent
     end
     
-    # Start headers in the items at the list header depth
-    options = options.update :header_depth, options.list_header_depth
+    # Start headers in the items at the list header depth and newline-terminate
+    options = options.merge header_depth: options.list_header_depth,
+                            newline_terminate: true
     
     list.
-      map { |item| render_block item, options }.
+      each_with_index.
+      map { |item, index|
+        item_string = render_block item, options
+        
+        indented = item_string.indent options.list_indent, ' ', true
+        
+        list_marker = if list.ordered?
+          (index + 1).to_s + '.'
+        else
+          options.list_unordered_marker
+        end
+        
+        if list_marker.length > 0
+          indented[ 0..( list_marker.length - 1 ) ] = list_marker
+        end
+        
+        indented
+      }.
       join( "\n".indent( options.list_indent, ' ' , true ) )
   end
   
@@ -260,13 +299,8 @@ class Terminal < Base
   def render_list_item_block item, options = nil
     options = self.options.merge options
     
-    rendered = render_blocks  item.blocks,
-                              options.update( :newline_terminate, true )
-    
-    indented = rendered.indent options.list_indent, ' ', true
-    indented[0] = '-'
-    
-    indented
+    render_blocks item.blocks,
+                  options.update( :newline_terminate, true )
   end
   
   

@@ -186,7 +186,7 @@ class Builder
       if block.nil?
         Tag::List.new *args
       else
-        push Tag::List, &block
+        push Tag::List, *args, &block
       end
     end
     
@@ -236,6 +236,43 @@ class Builder
       
       ruby Meta::Names::Param::Keyword.new( string )
     end # #kwd
+    
+    
+    def args name = '*args'
+      string = name.to_s
+      
+      unless string[ 0 ] == '*'
+        string = '*' + string
+      end
+      
+      ruby Meta::Names::Param::Rest.new( string )
+    end
+    
+    
+    def rest name = '*rest'
+      args name
+    end
+    
+    
+    def kwds name = '**kwds'
+      string = name.to_s
+      
+      unless string.start_with? '**'
+        string = '**' + string
+      end
+      
+      ruby Meta::Names::Param::KeyRest.new( string )
+    end
+    
+    
+    def kwargs name = '**kwargs'
+      kwds name
+    end
+    
+    
+    def key_rest name = '**key_rest'
+      kwds name
+    end
     
     
     # Mark a {::String} as being an actual code {::String}, as opposed to being
