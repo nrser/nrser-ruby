@@ -36,8 +36,6 @@ module Module
   def safe_name
     name = self.name
     return name if name.is_a? ::String
-
-    puts "self.name: #{ self.name.inspect } (#{ self.name.class })"
     
     # Slice out whatever that hex thingy that anon modules dump in their
     # `#to_s`... `"#<Class:0x00007fa6958c1700>" => "0x00007fa6958c1700"`
