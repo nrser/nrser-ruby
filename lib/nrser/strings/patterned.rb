@@ -11,9 +11,6 @@ require 'active_support/core_ext/class/subclasses'
 
 ### Project / Package ###
 
-# Using {NRSER::ArgumentError}
-require 'nrser/errors'
-
 # Using {NRSER::Regexps::Composed.join} and {NRSER::Regexps::Composed.or} to
 # compose {Names::Name.pattern} instances.
 require 'nrser/regexps/composed'
@@ -60,7 +57,7 @@ class Patterned < ::String
   #   @return [::Regexp]
   #     Regular expression that all instances must match.
   #   
-  #   @raise [NRSER::RuntimeError]
+  #   @raise [::RuntimeError]
   #     If this class does not have a pattern declared. This means the class 
   #     is either:
   #     
@@ -86,14 +83,14 @@ class Patterned < ::String
   #   @return [::Regexp]
   #     The pattern.
   #   
-  #   @raise [NRSER::ConflictError]
+  #   @raise [::RuntimeError]
   #     If a pattern has already been declared for this class.
   # 
   def self.pattern *objects
     unless objects.empty? # (setter)
       if @pattern.is_a? ::Regexp
-        raise NRSER::ConflictError.new \
-          "`#{ name }.pattern` is already set to", @pattern
+        raise ::RuntimeError,
+          "`#{ name }.pattern` is already set to #{ @pattern }"
       end
       
       @pattern = if objects.length == 1 &&
@@ -113,8 +110,8 @@ class Patterned < ::String
     end # if objects.empty? (setter)
     
     unless @pattern.is_a? ::Regexp
-      raise NRSER::RuntimeError.new \
-        self, "has no `.pattern` setup, which means it is abstract or ",
+      raise ::RuntimeError,
+        "#{ self } has no `.pattern` setup, which means it is abstract or " +
         "incorrectly configured."
     end
     
@@ -137,7 +134,7 @@ class Patterned < ::String
   # 
   # @return [Array<::Class<Patterned>>]
   # 
-  # @raise [NoMethodError]
+  # @raise [::NoMethodError]
   #   If the receiver is {Patterned}. As {Pattered} is a generic utility class,
   #   it doesn't make sense to ask about everything that uses it, and doing so
   #   could incur poor performance or unintended consequences (since Ruby is
@@ -145,7 +142,7 @@ class Patterned < ::String
   # 
   def self.realizations
     if self.equal? Patterned
-      raise NoMethodError.new \
+      raise ::NoMethodError,
         "May only be called on subclasses, not {Patterned} itself"
     end
     
@@ -187,7 +184,7 @@ class Patterned < ::String
   # @return [Patterned]
   #   New instance of a {.concrete?} {Patterned} subclass.
   # 
-  # @raise [NRSER::CountError]
+  # @raise [::ArgumentError]
   #   If a unique subclass from {.realizations} can not be identified.
   # 
   def self.from! object
@@ -195,20 +192,16 @@ class Patterned < ::String
     
     case classes.count
     when 0
-      raise NRSER::CountError.new \
-        "Object", object.inspect, "can not be used to construct", self,
-        "or any of it's descendant classes",
-        object: object,
-        count: 0
+      raise ::ArgumentError,
+        "`object` #{ object.inspect } can not be used to construct #{ self } " +
+        "or any of it's descendant classes"
     when 1
       classes.first.new object
     else
-      raise NRSER::CountError.new \
-        "Object", object.inspect, "can be used to construct multiple concrete",
-        "(improper) descendant classes of", self,
-        object: object,
-        classes: classes,
-        count: classes.count
+      raise ::ArgumentError,
+        "`object` #{ object.inspect } can be used to construct multiple " +
+        "concrete (improper) descendant classes of #{ self }: " + 
+        classes.map( &:to_s ).join( ', ' )
     end
   end # .from!
   
@@ -381,7 +374,7 @@ class Patterned < ::String
   # @return
   #   New instance of the name class.
   # 
-  # @raise [NRSER::ArgumentError]
+  # @raise [::ArgumentError]
   #   If the string representation of the `object` parameter does not match
   #   the class' {.pattern}.
   # 
@@ -389,10 +382,9 @@ class Patterned < ::String
     string = object.to_s
     
     unless pattern =~ string
-      raise NRSER::ArgumentError.new \
-        self, "can only be constructed of strings that match", pattern,
-        string: string,
-        pattern: pattern
+      raise ::ArgumentError,
+        "#{ self } can only be constructed of strings that match " +
+        "pattern #{ pattern }, given #{ string.inspect }"
     end
     
     super( string ).freeze
