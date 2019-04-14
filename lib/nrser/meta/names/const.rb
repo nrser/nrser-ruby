@@ -1,5 +1,6 @@
 # encoding: UTF-8
 # frozen_string_literal: true
+# doctest: true
 
 # Requirements
 # =======================================================================
@@ -39,26 +40,31 @@ module  Names
 # old value.
 # 
 # @example
-#   name = NRSER::Meta::Names::Module.new 'NRSER::Ext::Regexp'
+#   name = ::NRSER::Meta::Names::Const.new 'NRSER::Ext::Regexp'
 #   #=> "NRSER::Ext::Regexp"
 #   
 #   name.class
-#   #=> NRSER::Meta::Names::Module
+#   #=> NRSER::Meta::Names::Const
 #   
-#   name.const_names
+#   name.segments
 #   #=> ["NRSER", "Ext", "Regexp"]
 #   
-#   name.top_level?
+#   name.segments.all? { |segment|
+#     segment.is_a? NRSER::Meta::Names::Const::Segment
+#   }
+#   #=> true
+#   
+#   name.absolute?
 #   #=> false
 # 
 # @example Top-level name
-#   name = NRSER::Meta::Names::Module.new '::NRSER::Ext::Regexp'
+#   name = ::NRSER::Meta::Names::Const.new '::NRSER::Ext::Regexp'
 #   #=> "::NRSER::Ext::Regexp"
 #   
-#   name.const_names
+#   name.segments
 #   #=> ["NRSER", "Ext", "Regexp"]
 #   
-#   name.top_level?
+#   name.absolute?
 #   #=> true
 # 
 class Const < Name
@@ -66,7 +72,7 @@ class Const < Name
   # An individual piece of a {Const} name (parts that appear between "::").
   # 
   class Segment < Name
-    pattern /\A[A-Z][A-Za-z_]*\z/
+    pattern /\A[A-Z][A-Za-z0-9_]*\z/
   end
 
   
@@ -83,13 +89,6 @@ class Const < Name
   attr_reader :segments
   
   
-  # Does it start with '::'?
-  # 
-  # @return [Boolean]
-  #     
-  attr_reader :is_absolute
-  
-  
   def initialize string
     strings = string.split '::'
     
@@ -100,22 +99,19 @@ class Const < Name
       false
     end
     
-    @segments = strings.map &Segment.method( :new )
+    @segments = strings.map( &Segment.method( :new ) ).freeze
     
     super( string )
   end # #initialize
   
   
-  # Predicate method for {#is_absolute} (does it start with '::'?).
+  # Does it start with '::'?.
   # 
   # @return [Boolean]
   # 
   def absolute?
-    is_absolute
+    @absolute
   end
-  
-  # Original name for {#absolute?}
-  alias_method :is_top_level?, :absolute?
   
 end # class Const
 
