@@ -2,6 +2,8 @@ require 'pry'
 require 'pathname'
 require 'set'
 
+require 'active_support/core_ext/string/inflections'
+
 ENV[ 'NRSER_TEXT_USE_COLOR' ] = 'false'
 
 ROOT = Pathname.new File.expand_path( '..', __dir__ )
@@ -22,7 +24,9 @@ end
 
 
 class ::YARD::Doctest::Example < ::Minitest::Spec
-  def context(bind)
+  # @param [::Module | nil] bind
+  # 
+  def context bind
     @context ||= begin
       if bind
         # NRSER - This is... funky. If we use a regular `#class_eval`, 
@@ -49,6 +53,10 @@ class ::YARD::Doctest::Example < ::Minitest::Spec
         context = TOPLEVEL_BINDING.
           eval "#{ bind.name }.class_eval('binding', __FILE__, __LINE__)"
         
+        if ENV[ 'YDT_PRY_BIND' ]
+          binding.pry
+        end
+        
         # Oh my god, what is happening here?
         # We need to transplant instance variables from the current binding.
         instance_variables.each do |instance_variable_name|
@@ -56,6 +64,12 @@ class ::YARD::Doctest::Example < ::Minitest::Spec
           context.local_variable_set(local_variable_name, instance_variable_get(instance_variable_name))
           context.eval("#{instance_variable_name} = #{local_variable_name}")
         end
+        
+        # if bind.name
+        #   demod_name = bind.name.demodulize
+        #   context.eval "#{ demod_name } = #{ bind.name }"
+        # end
+        
         context
       else
         binding
