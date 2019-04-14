@@ -60,8 +60,8 @@ class Name < NRSER::Strings::Patterned
   #     return concrete_class.new( string ) if concrete_class.pattern =~ string
   #   end
     
-  #   raise NRSER::ArgumentError.new \
-  #     "Unable to create concrete", self, "subclass instance from",
+  #   raise ::ArgumentError,
+  #     "Unable to create concrete #{ self } subclass instance from " + 
   #     string.inspect
   # end
   

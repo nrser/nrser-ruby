@@ -50,7 +50,8 @@ class Method < Name
   # @return [Bare]
   # 
   def bare_name
-    raise NRSER::AbstractMethodError.new self, __method__
+    raise ::NotImplementedError,
+      "#{ self.class.name }##{ __method__ } is abstract"
   end
   
   
@@ -137,7 +138,8 @@ class Method < Name
     #   classes.
     # 
     def self.separator
-      raise NRSER::AbstractMethodError.new self, __method__
+      raise ::NotImplementedError,
+        "#{ self.class.name }##{ __method__ } is abstract"
     end
     
     
@@ -199,7 +201,8 @@ class Method < Name
     #   Realizing classes **MUST** override with an implementation.
     # 
     def implicit_name
-      raise NRSER::AbstractMethodError.new self, __method__
+      raise ::NotImplementedError,
+        "#{ self.class.name }##{ __method__ } is abstract"
     end
     
   
