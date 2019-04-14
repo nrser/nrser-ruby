@@ -32,11 +32,14 @@ module  Text
 # 
 class Strung < ::String
   
+  # HACK Get this from somewhere else!
+  # 
   def self.word_wrap string, line_width: 80, break_sequence: "\n"
     string.split( "\n" ).collect! do |line|
       line.length > line_width ? line.gsub(/(.{1,#{line_width}})(\s+|$)/, "\\1#{break_sequence}").strip : line
     end * break_sequence
   end # .word_wrap
+  
   
   # Attributes
   # ==========================================================================
@@ -52,6 +55,14 @@ class Strung < ::String
   # ==========================================================================
   
   # Instantiate a new `Strung`.
+  # 
+  # @param [::String] string
+  #   The string that is passed up to {::String#initialize}, which may be 
+  #   mutated in the `&build_block` (if given) before the instance is frozen.
+  #   
+  #   For this reason it defaults to the empty string: the build block will 
+  #   start with that when no argument is provided.
+  # 
   def initialize string = '', source:, word_wrap: false, &build_block
     @source = source
     @word_wrap = word_wrap
