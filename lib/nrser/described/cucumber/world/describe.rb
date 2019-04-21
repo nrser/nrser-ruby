@@ -206,13 +206,13 @@ module Describe
   # with this name and value set.
   # 
   # @example Set the value of a positional parameter
-  #   describe_param 'a', 1
+  #   describe_arg 'a', 1
   # 
   # @example Set the value of a keyword parameter
-  #   describe_param 'k:', 1
+  #   describe_arg 'k:', 1
   # 
   # @example Set the value of the block paramter
-  #   describe_param '&block', -> { 1 }
+  #   describe_arg '&block', -> { 1 }
   # 
   # @see NRSER::Described::Arguments
   # @see NRSER::Meta::Names::Param
@@ -231,7 +231,7 @@ module Describe
   #   If `name` does not match the pattern of one of the concrete subclasses
   #   of {NRSER::Meta::Names::Param}.
   # 
-  def describe_param name, value
+  def describe_arg name, value
     if described.is_a? NRSER::Described::Arguments
       described[ name ] = value
       described
@@ -239,7 +239,7 @@ module Describe
       describe :arguments,
         subject: NRSER::Meta::Args::Named.new( named: { name => value } )
     end
-  end # #describe_param
+  end # #describe_arg
   
   
   # Construct a {Meta::Args} from positional argument values, taking account
@@ -252,7 +252,7 @@ module Describe
   # @return [Meta::Args]
   #   The new parameters object.
   # 
-  def params_for_positional_values values
+  def args_for_positional_values values
     # Handle the last entry being a `&...` expression, which is interpreted as 
     # the block parameter
     if values[ -1 ].is_a? Wrappers::Block
@@ -264,7 +264,7 @@ module Describe
     end
     
     Meta::Args::Simple.new *args, &block
-  end # #params_for_positional_values
+  end # #args_for_positional_values
   
   
   # Describe parameters positionally, like you would using `#send`, accept that
@@ -276,10 +276,10 @@ module Describe
   # @return [NRSER::Described::Arguments]
   #   The parameters description.
   # 
-  def describe_positional_params values
+  def describe_positional_args values
     describe :arguments,
-      subject: params_for_positional_values( values )
-  end # #describe_positional_params
+      subject: args_for_positional_values( values )
+  end # #describe_positional_args
   
   # @!endgroup Describe Helper Instance Methods # ****************************
   

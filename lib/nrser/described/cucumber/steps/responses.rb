@@ -85,15 +85,15 @@ module Responses
   CALL_METHOD_NAME_WITH_ARGS = \
     Step "I call {method_name} with {values}" do |method_name, values|
       describe_method method_name
-      # describe_positional_params values
-      describe :response, params: params_for_positional_values( values )
+      # describe_positional_args values
+      describe :response, params: args_for_positional_values( values )
     end
     
     Step "I call {method_name} on the {described} with {values}" \
     do |method_name, described, values|
       describe :response,
         callable: describe( :method, object: described, name: method_name ),
-        params: params_for_positional_values( values )
+        params: args_for_positional_values( values )
     end
   
   CALL_IT_WITH_ARGUMENTS,
@@ -103,7 +103,7 @@ module Responses
       "I call the method with {values}",
     ].map do |template|
       Step template do |values|
-        describe :response, params: params_for_positional_values( values )
+        describe :response, params: args_for_positional_values( values )
       end
     end
   

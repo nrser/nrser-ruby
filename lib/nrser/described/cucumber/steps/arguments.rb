@@ -37,7 +37,7 @@ module Arguments
   THE_INLINE_PARAMS = \
     Step "the arguments {values}" \
     do |values|
-      describe_positional_params values
+      describe_positional_args values
     end
 
   
@@ -47,7 +47,7 @@ module Arguments
       when 1
         # The table is interpreted as a list of positional values, the last of 
         # which *may* be a block.
-        describe_positional_params \
+        describe_positional_args \
           table.rows.map { |row|
             ParameterTypes::Values::VALUE.transform self,
                                                     [ row.first ],
@@ -68,7 +68,7 @@ module Arguments
                                                 [ raw_value_string ],
                                                 pointer: false
           
-          describe_param name, value
+          describe_arg name, value
         end
         
       else
@@ -84,7 +84,7 @@ module Arguments
 
 
   Step "the {param_name} argument is {value}" do |param_name, value|
-    describe_param param_name, value
+    describe_arg param_name, value
   end
 
   

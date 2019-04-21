@@ -88,7 +88,7 @@ module Instances
       "I construct an instance of the {described} from {values}",
     ].map do |template|
       Step template do |described, values|
-        describe_positional_params values
+        describe_positional_args values
         describe :instance, class_: described.resolve!( hierarchy ).subject
       end
     end
@@ -101,7 +101,7 @@ module Instances
       "I construct an instance of {class} from {values}",
     ].map do |template|
       Step template do |class_, values|
-        describe_positional_params values
+        describe_positional_args values
         describe :instance, class_: class_
       end
     end
