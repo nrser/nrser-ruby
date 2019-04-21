@@ -12,7 +12,6 @@ require_relative './world/describe'
 require_relative './world/expect'
 require_relative './world/logger'
 require_relative './world/scope'
-require_relative './world/value_for'
 
 
 # Namespace
