@@ -16,6 +16,7 @@ require "concurrent/map"
 
 require 'nrser/support/critical_code'
 
+require_relative '../runtime_string'
 require_relative '../strung'
 require_relative '../tag/code'
 require_relative './options'
@@ -133,10 +134,10 @@ class Base
   # @return [Strung]
   #   {Strung#source} will be the `value`.
   # 
-  def dump_value_multiline value, word_wrap: self.word_wrap
+  def dump_value_multiline value, options = nil
     Strung.new source: value do |strung|
       args = [ value, strung ]
-      args << word_wrap if word_wrap
+      args << options.word_wrap if options.word_wrap
       PP.pp *args
     end
   end
@@ -264,12 +265,140 @@ class Base
     end
   end
   
+  
+  def should_highlight? code_tag, source_string, options = nil
+    !code_tag.syntax.nil?
+  end
+  
+  
+  # Highlight a {::String} of source code from a {Tag::Code}, if we can and 
+  # should.
+  # 
+  # @param [Tag::Code] code_tag
+  #   The code tag that the `source_string` came from.
+  # 
+  # @param [::String] source_string
+  #   The string of source code to highlight.
+  # 
+  # @param [nil | Options | ::Hash] options
+  #   Optional option overrides; merged with {#options} for use.
+  # 
+  # @return [nil]
+  #   When any of:
+  #   
+  #   1.  {#should_highlight?} returns false.
+  #   2.  No highlighter available for the {Tag::Code#syntax}.
+  #   3.  The highlighter function returned `nil`, which it is allowed to do as 
+  #       a refusal - means "nah, not gonna highlight this, do something else".
+  # 
+  # @return [Strung]
+  #   When the `source_string` was successfully highlighted.
+  #   
+  #   The strung's {Strung#source} will be the `code_tag`.
+  #   
+  # @raise
+  #   If the syntax highlight function fails. This is suppressed to a warning 
+  #   if {CriticalCode.enabled?} is true.
+  # 
+  def highlight code_tag, source_string, options = nil
+    
+    options = self.options.merge options
+    
+    if  should_highlight?( code_tag, source_string, options ) &&
+        (highlighter = syntax_highlighter_for code.syntax)
+       
+      highlighted_string = try_critical_code(
+        get_message: -> {
+          "{#{ self.class }} failed to highlight syntax #{ code_tag.syntax }"
+        }
+      ) do
+        highlighter.call source_string
+      end
+      
+      if highlighted_string.nil?
+        # Highlight functions can return  `nil`
+        nil
+      else
+        Strung.new highlighted_string, source: code_tag
+      end
+      
+    else
+      # Should not highlight *or* didn't find a highlight function available
+      nil
+    end
+    
+  end # #highlight
+  
   # @!endgroup Syntax Highlighting Instance Methods # ************************
   
   
   def join *fragments, options: nil
     render_fragments fragments, options
   end
+  
+  
+  def render_fragment fragment, options = nil
+    
+  end
+  
+  
+  # Render a {Tag} as a block of text.
+  # 
+  # Acts as a dynamic method router, forming the method name
+  # 
+  #     "render_#{ tag.render_name }_block"
+  # 
+  # and calling it with the `tag` and options.
+  # 
+  # This allows additional tags and {Renderer} extensions that handle them to 
+  # be created easily.
+  # 
+  # Takes care of newline termination as well. If {Options#newline_terminate}
+  # is `:detect` on the merged options, a trailing newline is ensured if the 
+  # resulting string is more than once line (if it contains `"\n"`).
+  # 
+  # @param [Options | ::Hash<(::Symbol | ::String), ::Object> | nil] options
+  #   Options that will be merged over the base {#options} to use for rendering
+  #   the `tag`.
+  # 
+  # @return [::String]
+  #   Rendered string.
+  # 
+  def render_block object, options = nil
+    options = self.options.merge options
+    
+    string = case object
+    when Tag
+      method_name = "render_#{ tag.render_name }_block"
+      send method_name, tag, options
+      
+    when RuntimeString
+      dump_value_multiline object, options
+    
+    when ::String
+      # TODO Deal with word wrapping
+      object
+    
+    else
+      dump_value_multiline object, options
+    end
+    
+    if options.newline_terminate == :detect
+      options = options.update :newline_terminate, string.include?( "\n" )
+    end
+    
+    if options.newline_terminate && string[ -1 ] != "\n"
+      string = \
+        case string
+        when Strung
+          Strung.new string + "\n", source: string.source
+        else
+          string + "\n"
+        end
+    end
+    
+    string
+  end # #render_block
   
 end # class Base
 

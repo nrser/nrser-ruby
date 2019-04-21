@@ -17,9 +17,12 @@ require 'active_support/core_ext/string/indent'
 
 ### Project / Package ###
 
+# Using {NRSER::Text} to format messages
 require 'nrser/text'
 
-require 'nrser/core_ext/object/lazy_var'
+# Using {NRSER::Decorate::LazyAttr} to cache attribute values after first 
+# computation
+require 'nrser/decorate/lazy_attr'
 
 
 # Namespace
@@ -43,7 +46,13 @@ module NicerError
   
   # Default column width
   DEFAULT_COLUMN_WIDTH = 78
-
+  
+  
+  # Mixins
+  # ============================================================================
+  
+  extend NRSER::Decorate
+  
 
   # Modules
   # ============================================================================
@@ -68,6 +77,10 @@ module NicerError
         end
       end
     end
+    
+    def text_renderer
+      NicerError.text_renderer
+    end
   end # module ClassMethods
 
   
@@ -84,6 +97,11 @@ module NicerError
   # 
   def self.column_width
     DEFAULT_COLUMN_WIDTH
+  end
+  
+  
+  def self.text_renderer
+    NRSER::Text.default_renderer
   end
 
 
@@ -131,10 +149,15 @@ module NicerError
   def initialize  *message,
                   binding: nil,
                   details: nil,
+                  text_renderer: nil,
                   **context
     @binding = binding.freeze
     @context = context.freeze
     @details = details.freeze
+    
+    if text_renderer.is_a? NRSER::Text::Renderer
+      @text_renderer = text_renderer
+    end
     
     message = default_message if message.empty?
     super_message = format_message *message
@@ -143,28 +166,13 @@ module NicerError
   end # #initialize
   
   
-  # Format a segment of the error message.
-  # 
-  # Strings are simply returned. Other things are inspected (for now).
-  # 
-  # @param [Object] segment
-  #   The segment.
-  # 
-  # @return [String]
-  #   The formatted string for the segment.
-  # 
-  # @todo
-  #   This should talk to config when that comes about to find out how to
-  #   dump things.
-  # 
-  def format_message_segment segment
-    return segment.to_summary if segment.respond_to?( :to_summary )
-    
-    return segment if String === segment
-    
-    # TODO  Do better!
-    segment.inspect
-  end # #format_message_segment
+  def text_renderer
+    if instance_variable_defined? :@text_renderer
+      @text_renderer
+    else
+      self.class.text_renderer
+    end
+  end
   
   
   # Format the main message by converting args to strings and joining them.
@@ -177,7 +185,7 @@ module NicerError
   #   exception's `#initialize`.
   # 
   def format_message *message
-    message.map( &method( :format_message_segment ) ).join( ' ' )
+    Text.join *message
   end
   
   
@@ -210,63 +218,61 @@ module NicerError
   end
   
   
+  decorate NRSER::Decorate::LazyAttr,
   # Render details (first time only, then cached) and return the string.
   # 
   # @return [String?]
   # 
   def details_section
-    lazy_var :@details_section do
-      # No details if we have nothing to work with
-      if details.nil?
+    # No details if we have nothing to work with
+    if details.nil?
+      nil
+    else
+      contents = case details
+      when Proc
+        details.call.to_s
+      when String
+        details
+      else
+        details.to_s
+      end
+      
+      if contents.empty?
         nil
       else
-        contents = case details
-        when Proc
-          details.call.to_s
-        when String
-          details
-        else
-          details.to_s
+        if @binding
+          require 'nrser/ext/binding'
+          contents = binding.n_x.erb contents
         end
         
-        if contents.empty?
-          nil
-        else
-          if @binding
-            require 'nrser/ext/binding'
-            contents = binding.n_x.erb contents
-          end
-          
-          "# Details\n\n" + contents
-        end
+        "# Details\n\n" + contents
       end
     end
-  end
+  end # #details_section
   
   
+  decorate NRSER::Decorate::LazyAttr,
   # @return [String?]
   # 
   def context_section
-    lazy_var :@context_section do
-      if context.empty?
-        nil
-      else
-        "# Context\n\n" + context.map { |name, value|
-          name_str = name.to_s
-          value_str = PP.pp \
-            value,
-            ''.dup,
-            (NRSER::NicerError.column_width - name_str.length - 2)
-          
-          if value_str.lines.count > 1
-            "#{ name_str }:\n\n#{ value_str.indent 4 }\n"
-          else
-            "#{ name_str }: #{ value_str }\n"
-          end
-        }.join
-      end
+    if context.empty?
+      nil
+    else
+      "# Context\n\n" + context.map { |name, value|
+        name_str = name.to_s
+        value_str = PP.pp \
+          value,
+          ''.dup,
+          (NRSER::NicerError.column_width - name_str.length - 2)
+        
+        if value_str.lines.count > 1
+          "#{ name_str }:\n\n#{ value_str.indent 4 }\n"
+        else
+          "#{ name_str }: #{ value_str }\n"
+        end
+      }.join
     end
-  end
+  end # #context_section
   
   
   # Return the extended message, rendering if necessary (cached after first
@@ -277,6 +283,12 @@ module NicerError
   # 
   def extended_message
     @extended_message ||= begin
+      # builder = NRSER::Text.build renderer: text_renderer do
+      #   section "Details" do
+          
+      #   end
+      # end
+      
       sections = []
       
       sections << details_section unless details_section.nil?
@@ -326,20 +338,19 @@ module NicerError
     # The way to get the superclass' message
     message = super()
     
-    # If `extended` is explicitly `false` then just return that
-    return message if extended == false
-    
-    # Otherwise, see if the extended message was explicitly requested,
-    # of if we're configured to provide it as well.
+    # We want to return just the super message if any of:
     # 
-    # Either way, don't add it it's empty.
+    # 1.  `extended` arg is explicitly `false` (an override of anything else).
+    # 2.  `extended` is `nil` *and* {#add_extended_message?} is false.
+    # 3.  {#extended_message?} is empty.
     # 
-    if  (extended || add_extended_message?) &&
-        !extended_message.empty?
-      message + "\n\n" + extended_message
-    else
-      message
+    if  extended == false ||
+        (extended.nil? && !add_extended_message?) ||
+        extended_message.empty?
+      return message
     end
+    
+    message + "\n\n" + extended_message
   end
   
   

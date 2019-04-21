@@ -745,6 +745,24 @@ class Options
     end
   end # #apply
   
+  
+  def increment option_name, amount = 1
+    return self if amount == 0
+    
+    try_critical_code default: self do
+      apply option_name, :-, amount
+    end
+  end
+  
+  
+  def decrement option_name, amount = 1
+    # Ugh... still need to wrap it here in case the `-1 * amount` fails
+    try_critical_code default: self do
+      increment option_name, -1 * amount
+    end
+  end
+  
+  
   # @!endgroup Merging Instance Methods # ************************************
   
   

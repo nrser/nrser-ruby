@@ -11,7 +11,7 @@ Feature: Render {NRSER::Text::Tag::Code} blocks
           p "Have some code:"
           
           code do
-            { a: 1, b: 2 }
+            "{ a: 1, b: 2 }"
           end
         }
       """
@@ -22,7 +22,7 @@ Feature: Render {NRSER::Text::Tag::Code} blocks
       """
       Have some code:
       
-          {:a=>1, :b=>2}
+          { a: 1, b: 2 }
       
       """
       
@@ -40,7 +40,7 @@ Feature: Render {NRSER::Text::Tag::Code} blocks
           p "Have some Ruby:"
           
           code syntax: :ruby do
-            { a: 1, b: 2 }
+            "{ a: 1, b: 2 }"
           end
         }
       """
@@ -55,7 +55,7 @@ Feature: Render {NRSER::Text::Tag::Code} blocks
       """
       Have some Ruby:
       
-          {:a=>1, :b=>2}
+          { a: 1, b: 2 }
       
       """
   
@@ -71,7 +71,7 @@ Feature: Render {NRSER::Text::Tag::Code} blocks
           p "Have some more Ruby:"
           
           ruby do
-            { a: 1, b: 2 }
+            "{ a: 1, b: 2 }"
           end
         }
       """
@@ -86,7 +86,7 @@ Feature: Render {NRSER::Text::Tag::Code} blocks
       """
       Have some more Ruby:
       
-          {:a=>1, :b=>2}
+          { a: 1, b: 2 }
       
       """
 

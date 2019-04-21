@@ -1,44 +1,14 @@
 # encoding: UTF-8
 
 require 'nrser/text'
-require 'nrser/text/builder'
+require 'nrser/text/writer'
 
-def build &block
-  puts NRSER::Text.build( &block ).render
-end
+$lines = File.read( 'README.md' ).lines.
+  select { |l| l.length > 40 && !l.start_with?( "-" ) && !l.start_with?( "=" ) }
 
-def uni
-  𝑎 = 123
-  puts 𝑎 + 1
-end
+def lines; $lines; end
 
+$writer = NRSER::Text::Writer.new io: $stdout, line_width: 40
 
-def text_tmp
-  builder = NRSER::Text::Builder.new( word_wrap: 74 ) do    
-    p "A very simple block list..."
-    
-    list do
-      item do
-        p "Item one."
-        
-        p "We have a cat."
-      end # item
-      
-      item do
-        p "Item two."
-        
-        p "She is the best cat!"
-      end # item
-      
-      item do
-        p "Item three."
-        
-        p "She usually eat cat food."
-      end # item
-    end # list
-    
-    p "...and we outta here!"
-  end # Builder.new
+def w; $writer; end
   
-  puts builder.render
-end

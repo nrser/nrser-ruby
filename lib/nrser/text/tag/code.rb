@@ -6,7 +6,7 @@
 
 ### Project / Package ###
 
-require_relative '../tag'
+require_relative './scalars'
 
 
 
@@ -23,13 +23,7 @@ module  Tag
 
 # Wraps objects that should be rendered as source code.
 # 
-class Code
-  
-  # Mixins
-  # ==========================================================================
-  
-  include Tag
-  
+class Code < Scalar  
   
   # Singleton Methods
   # ==========================================================================
@@ -66,14 +60,7 @@ class Code
   
   
   # Attributes
-  # ==========================================================================
-  
-  # The code object.
-  # 
-  # @return [::Object]
-  #     
-  attr_reader :source
-  
+  # ==========================================================================  
   
   # Syntax (language) of the code, if any.
   # 
@@ -91,14 +78,16 @@ class Code
   
   # Instantiate a new `Code`.
   def initialize source, syntax: nil
-    @source = source
-    
     @syntax = if syntax.nil?
       syntax
     else
       syntax.to_sym
     end
+    
+    super( source )
   end # #initialize
+  
+  alias_method :source, :child
   
 end # class Code
 

@@ -4,10 +4,6 @@
 # Requirements
 # =======================================================================
 
-### Stdlib ###
-
-### Deps ###
-
 ### Project / Package ###
 
 require_relative '../tag'
@@ -24,9 +20,9 @@ module  Tag
 # Definitions
 # =======================================================================
 
-# A paragraph of text.
-#
-class Paragraph
+# Abstract base class for tags that wrap a *single* object.
+# 
+class Scalar
   
   # Mixins
   # ==========================================================================
@@ -37,19 +33,19 @@ class Paragraph
   # Attributes
   # ==========================================================================
   
-  # TODO document `name` attribute.
+  # The tag's *only* child object.
   # 
-  # @return [attr_type]
-  #   
-  attr_reader :fragments
+  # @return [::Object]
+  #     
+  attr_reader :child
   
   
   # Construction
   # ==========================================================================
   
-  # Instantiate a new {Paragraph}.
-  def initialize *fragments
-    @fragments = fragments.freeze
+  # Instantiate a new `Scalar`.
+  def initialize child
+    @child = child
   end # #initialize
   
   
@@ -57,7 +53,10 @@ class Paragraph
   # ==========================================================================
   
   
-end # class Paragraph
+end # class Scalar
+
+
+class Value < Scalar; end
 
 
 # /Namespace

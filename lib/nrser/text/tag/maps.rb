@@ -4,10 +4,6 @@
 # Requirements
 # =======================================================================
 
-### Stdlib ###
-
-### Deps ###
-
 ### Project / Package ###
 
 require_relative '../tag'
@@ -24,40 +20,29 @@ module  Tag
 # Definitions
 # =======================================================================
 
-# A header.
-#
-class Header
-  
+class Map < ::Hash
+
   # Mixins
   # ==========================================================================
   
   include Tag
   
   
-  # Attributes
-  # ==========================================================================
-  
-  # TODO document `name` attribute.
-  # 
-  # @return [attr_type]
-  #   
-  attr_reader :fragments
-  
-  
   # Construction
   # ==========================================================================
   
-  # Instantiate a new {Paragraph}.
-  def initialize *fragments
-    @fragments = fragments.freeze
+  # Instantiate a new {Map}.
+  # 
+  def initialize **objects
+    super()
+    replace objects
+    # freeze
   end # #initialize
   
-  
-  # Instance Methods
-  # ==========================================================================
-  
-  
-end # class Header
+end
+
+
+class Values < Map; end
 
 
 # /Namespace

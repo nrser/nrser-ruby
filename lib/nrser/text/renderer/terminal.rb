@@ -12,6 +12,10 @@ require 'active_support/core_ext/string/indent'
 
 ### Project / Package ###
 
+# require 'nrser/meta/names'
+
+require 'nrser/meta/names'
+
 require_relative '../strung'
 require_relative '../tag/code'
 require_relative './base'
@@ -61,6 +65,15 @@ class Terminal < Base
   
   # @!group Syntax Highlighting Instance Methods
   # --------------------------------------------------------------------------
+  
+  def should_highlight? code_tag, source_string, options = nil
+    options = self.options.merge options
+    
+    return false unless options.color?
+    
+    super( code_tag, source_string, options )
+  end
+  
   
   # `#call`-able to highlight Ruby syntax, if any are available.
   # 
@@ -143,53 +156,6 @@ class Terminal < Base
   end # .render_fragments
   
   
-  # Render a {Tag} as a block of text.
-  # 
-  # Acts as a dynamic method router, forming the method name
-  # 
-  #     "render_#{ tag.render_name }_block"
-  # 
-  # and calling it with the `tag` and options.
-  # 
-  # This allows additional tags and {Renderer} extensions that handle them to 
-  # be created easily.
-  # 
-  # Takes care of newline termination as well. If {Options#newline_terminate}
-  # is `:detect` on the merged options, a trailing newline is ensured if the 
-  # resulting string is more than once line (if it contains `"\n"`).
-  # 
-  # @param [Options | ::Hash<(::Symbol | ::String), ::Object> | nil] options
-  #   Options that will be merged over the base {#options} to use for rendering
-  #   the `tag`.
-  # 
-  # @return [::String]
-  #   Rendered string.
-  # 
-  def render_block tag, options = nil
-    options = self.options.merge options
-    
-    method_name = "render_#{ tag.render_name }_block"
-    
-    string = send method_name, tag, options
-    
-    if options.newline_terminate == :detect
-      options = options.update :newline_terminate, string.include?( "\n" )
-    end
-    
-    if options.newline_terminate && string[ -1 ] != "\n"
-      string = \
-        case string
-        when Strung
-          Strung.new string + "\n", source: string.source
-        else
-          string + "\n"
-        end
-    end
-    
-    string
-  end # #render_block
-  
-  
   # Render a sequence of {Tag}s as blocks, joined by newlines.
   # 
   # Handles newline termination: if {Options#newline_terminate} is `:detect`,
@@ -204,7 +170,7 @@ class Terminal < Base
   # 
   # @return [::String]
   # 
-  def render_blocks tags, options = nil
+  def render_blocks objects, options = nil
     options = self.options.merge options
     
     if options.newline_terminate == :detect && tags.length > 1
@@ -279,6 +245,12 @@ class Terminal < Base
           indented[ 0..( list_marker.length - 1 ) ] = list_marker
         end
         
+        # out.right_pad list_marker, options.list_indent
+        
+        # out.indent options.list_indent do
+        #   render_block out, item, options
+        # end
+        
         indented
       }.
       join( "\n".indent( options.list_indent, ' ' , true ) )
@@ -332,7 +304,7 @@ class Terminal < Base
         
         "#{ text }\n#{ char * (options.word_wrap || text.length) }"
       else
-        sides = '#' * options.header_depth
+        sides = '#' * (options.header_depth + 1)
         sides_length = ( sides.length + 2 ) * 2
         
         if options.word_wrap
@@ -382,9 +354,9 @@ class Terminal < Base
       return fragment.render self, options
     end
     
-    if fragment.respond_to? :to_strung
-      return fragment.to_strung
-    end
+    # if fragment.respond_to? :to_strung
+    #   return fragment.to_strung
+    # end
     
     # TODO  This is old shit brought over from 
     #       `//lib/nrser/functions/text/format.rb` that probably should be 
@@ -393,24 +365,21 @@ class Terminal < Base
     #       I think very little ended up implementing it anyways, only seeing 
     #       10 hits in 6 files with a quick search (2019.03.15)
     #       
-    if fragment.respond_to? :to_summary
-      summary = fragment.to_summary
+    # if fragment.respond_to? :to_summary
+    #   summary = fragment.to_summary
       
-      case summary
-      when Strung
-        return summary
-      when ::String
-        return Strung.new summary, source: fragment
-      else
-        return Strung.new summary.to_s, source: fragment
-      end
-    end # if #to_summary
+    #   case summary
+    #   when Strung
+    #     return summary
+    #   when ::String
+    #     return Strung.new summary, source: fragment
+    #   else
+    #     return Strung.new summary.to_s, source: fragment
+    #   end
+    # end # if #to_summary
     
-    # if fragment.is_a?( ::Class ) && yard_style_class_names?
-    #   return Strung.new "{#{ fragment.to_s }}", source: fragment
-    # end
-    
-    if fragment.is_a?( ::Class )
+    case fragment
+    when ::Class, ::Method, ::UnboundMethod
       return render_code( Tag::Code.ruby( fragment ), options )
     end
     
@@ -445,53 +414,58 @@ class Terminal < Base
   def render_code code, options = nil
     options = self.options.merge options
     
-    source_string = \
-      case code.source
-      when ::Class
-        # {::Class} needs special handling to prevent an infinite loop
-        code.source.to_s
-      when ::String # including {::Strung}!
-        # Just use the {Tag::Code#source}, no need to pass it back through
-        # {#render_fragment}. This saves us time and possible problems with
-        # {Tag::Code} instances created from calling `#inspect` on Ruby objects
-        # (last lines of {#render_fragment})
-        code.source
+    source_string = code.map { |entry|
+      case entry
+      when RuntimeString
+        dump_value_inline entry, options
+      when ::String
+        entry
       else
-        # The rest should be ok to go back through {#render_fragment} since they
-        # weren't created there
-        render_fragment code.source, options
+        dump_value_inline entry, options
       end
+    }.join ' '
     
-      if  options.color? &&
-          (highlighter = syntax_highlighter_for code.syntax)
+    # source_string = \
+    #   case code.source
+    #   when ::Class
+    #     # {::Class} needs special handling to prevent an infinite loop
+    #     code.source.to_s
+      
+    #   when ::Method, ::UnboundMethod
+    #     NRSER::Meta::Names::Method::Explicit.for code.source
         
-        highlighted_string = try_critical_code(
-          get_message: -> {
-            "{#{ self.class }} failed to highlight syntax #{ code.syntax }"
-          }
-        ) do
-          highlighter.call source_string
-        end
-        
-        unless highlighted_string.nil?
-          return Strung.new highlighted_string, source: code
-        end
-
-        # Fall through...
+    #   when ::String # including {::Strung}!
+    #     # Just use the {Tag::Code#source}, no need to pass it back through
+    #     # {#render_fragment}. This saves us time and possible problems with
+    #     # {Tag::Code} instances created from calling `#inspect` on Ruby objects
+    #     # (last lines of {#render_fragment})
+    #     code.source
+    #   else
+    #     # The rest should be ok to go back through {#render_fragment} since they
+    #     # weren't created there
+    #     render_fragment code.source, options
+    #   end
+    
+      if  (highlighted = highlight( code, source_string, options ))
+        return highlighted
       end
     
       rendered_string = \
-        if code.source.is_a?( ::Class ) &&
+        if  code.source.is_a?( ::Class ) &&
             code.source.name # &&
             # yard_style_class_names?
-        # {Tag::Code#source} is a named (non-anonymous) {::Class}, which we
-        # "curly quote" (like YAML doc-strings)
-        Tag::Code.curly_quote( code.source.name )
-      
-      else
-        Tag::Code.backtick_quote( source_string )
-      
-      end
+          # {Tag::Code#source} is a named (non-anonymous) {::Class}, which we
+          # "curly quote" (like YAML doc-strings)
+          Tag::Code.curly_quote( code.source.name )
+        
+        elsif code.source.is_a?( ::Method ) ||
+              code.source.is_a?( ::UnboundMethod )
+          Tag::Code.curly_quote( source_string )
+          
+        else
+          Tag::Code.backtick_quote( source_string )
+        
+        end
     
     Strung.new rendered_string, source: code
   end # #render_code
@@ -514,9 +488,16 @@ class Terminal < Base
     options = self.options.merge options
     
     if options.word_wrap
-      options = options.apply :word_wrap, :-, options.code_indent
+      options = options.decrement :word_wrap, options.code_indent
     end
     
+    # Get a {Strung} for the {Tag::Code#source}: if it already is one, just use
+    # that, assuming that it's been previously rendered into the code string
+    # to use.
+    # 
+    # Otherwise, use {#dump_value_multiline} to create a multi-line block 
+    # string representation of the object.
+    # 
     strung = if code.source.is_a? Strung
       code.source
     else

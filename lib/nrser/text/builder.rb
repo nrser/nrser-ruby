@@ -12,12 +12,11 @@ require 'nrser/meta/names/param'
 
 require_relative '../text'
 
-require_relative './tag/list'
 require_relative './tag/code'
-require_relative './tag/paragraph'
-require_relative './tag/header'
-require_relative './tag/section'
-require_relative './tag/values'
+require_relative './tag/list'
+require_relative './tag/maps'
+require_relative './tag/scalars'
+require_relative './tag/sequences'
 
 
 # Namespace
@@ -170,8 +169,13 @@ class Builder
     alias_method :p, :paragraph
     
     
-    def values **values
-      append Tag::Values.new( **values )
+    def value object
+      append Tag::Value.new( object )
+    end
+    
+    
+    def values **objects
+      append Tag::Values.new( **objects )
     end
     
     

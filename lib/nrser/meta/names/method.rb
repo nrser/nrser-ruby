@@ -166,6 +166,30 @@ class Method < Name
     end
     
     
+    def self.for method
+      case method
+      when ::Method
+        case method.receiver
+        when ::Module
+          Explicit::Singleton.new \
+            "#{ method.receiver.safe_name }.#{ method.name }"
+        else
+          Explicit::Instance.new \
+            "#{ method.receiver.class.safe_name }##{ method.name }"
+        end
+      
+      when ::UnboundMethod
+        Explicit::Instance.new \
+          "#{ method.owner.safe_name }##{ method.name }"
+        
+      else
+        raise ::TypeError,
+          "Expected {Method} or {UnboundMethod}, given #{ method.class}: " +
+          method.inspect
+      end
+    end
+    
+    
     # Name of the constant receiving the method.
     # 
     # @return [NRSER::Meta::Names::Const]
@@ -205,7 +229,14 @@ class Method < Name
         "#{ self.class.name }##{ __method__ } is abstract"
     end
     
-  
+    
+    # @example
+    #   name = Singleton.new "I8::Struct.new"
+    #   #=> "I8::Struct.new"
+    #   
+    #   name.class
+    #   #=> NRSER::Meta::Names::Method::Explicit::Singleton
+    # 
     class Singleton < Explicit
       
       # resolves_to_a ::Method

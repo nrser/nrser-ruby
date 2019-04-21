@@ -127,11 +127,9 @@ Feature: Render a {NRSER::Text::Tag::List} as a block
             item do
               p "Item two:"
               
-              p "Has more to it! Including some Ruby code:"
+              p "Has more to it! Including a Ruby runtime object:"
               
-              ruby do
-                my_object
-              end
+              value { my_object }
               
               p "Ok, we're done here."
             end # item
@@ -165,7 +163,7 @@ Feature: Render a {NRSER::Text::Tag::List} as a block
           
       -   Item two:
           
-          Has more to it! Including some Ruby code:
+          Has more to it! Including a Ruby runtime object:
           
               {:name=>"NRSER", :likes=>[:cats, :coffee]}
           
