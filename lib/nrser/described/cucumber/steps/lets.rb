@@ -50,6 +50,11 @@ module Lets
     let local_var_name, scope_eval( string )
   end
   
+  
+  Step "I let {local_var_name} be the string:" do |local_var_name, string|
+    let local_var_name, string
+  end
+  
 end # module Lets
 
 
