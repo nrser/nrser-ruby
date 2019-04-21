@@ -79,6 +79,26 @@ module Describe
   end
   
   
+  # Is *lazy resolution* enabled for this scenario?
+  # 
+  # Read about it {file:lib/nrser/described/doc/lazy_resolution.md here}.
+  # 
+  # @return [Boolean]
+  # 
+  def lazy?
+    @lazy
+  end
+  
+  
+  # Turn on *lazy resolution* for this scenario.
+  # 
+  # Read about it {file:lib/nrser/described/doc/lazy_resolution.md here}.
+  # 
+  def lazy!
+    @lazy = true
+  end
+  
+  
   # Construct a new described using the name of the class and keyword 
   # parameters and add it to the {#hierarchy}.
   # 
@@ -105,7 +125,11 @@ module Describe
     NRSER::Described.
       const_get( described_name.to_s.camelize ).
       new( **kwds ).
-      tap &hierarchy.method( :add )
+      tap { |described|
+        hierarchy.add described
+        
+        described.resolve!( hierarchy ) unless lazy?
+      }
   end # #describe
   
   # @!endgroup Accessing Descriptions Instance Methods # *********************

@@ -167,9 +167,9 @@ module Hierarchy
   
   
   def resolve_all!
-    return if @all_resolved
+    # return if @all_resolved
     each { |described| described.resolve! self }
-    @all_resolved = true
+    # @all_resolved = true
     nil
   end
   

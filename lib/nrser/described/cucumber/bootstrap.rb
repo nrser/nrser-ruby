@@ -15,6 +15,7 @@ require 'nrser/described'
 
 require_relative './parameter_types'
 require_relative './world'
+require_relative './hooks'
 
 World NRSER::Described::Cucumber::World::Logger
 World NRSER::Described::Cucumber::World::Describe
@@ -23,5 +24,6 @@ World NRSER::Described::Cucumber::World::Scope
 World NRSER::Described::Cucumber::World::Quote
 
 NRSER::Described::Cucumber::ParameterTypes.register!
+NRSER::Described::Cucumber::Hooks.register!
 
 require_relative './steps'

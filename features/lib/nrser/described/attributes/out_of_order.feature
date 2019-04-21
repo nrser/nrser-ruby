@@ -1,3 +1,4 @@
+@lazy
 Feature: Describe attributes "out of order"
   
   {NRSER::Described} supports *out-of-order* descriptions, allowing you to 

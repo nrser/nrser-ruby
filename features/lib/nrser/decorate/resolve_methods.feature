@@ -1,3 +1,4 @@
+@lazy
 Feature: Resolve methods by *bare* or *implicit* name
   
   {NRSER::Decorate#resolve_method} is used internally to resolve {String} and
