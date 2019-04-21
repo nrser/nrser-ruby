@@ -23,14 +23,14 @@ module  Described
 class Response < Object
   
   def rspec_description *additional_description
-    params = init_values[ :params ]
+    args = init_values[ :args ]
   
-    args = [ Described::RSpec::Format::Args.new( params.args ) ]
+    pos_args = [ Described::RSpec::Format::Args.new( args.args ) ]
     
-    args << params.block if params.block
+    pos_args << args.block if args.block
   
     Described::RSpec::Format::Description.new \
-      *args,
+      *pos_args,
       *additional_description,
       type: :called_with
   end

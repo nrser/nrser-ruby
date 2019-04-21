@@ -46,16 +46,16 @@ class Response < Object
   
   subject_type ::Object
   
-  subject_from callable: Callable, params: Arguments do |callable:, params:|
-    params.call callable
+  subject_from callable: Callable, args: Arguments do |callable:, args:|
+    args.call callable
   end
   
   subject_from \
     instance: Instance,
     instance_method: InstanceMethod,
-    params: Arguments \
-  do |instance:, instance_method:, params:|
-    params.call instance_method.bind( instance )
+    args: Arguments \
+  do |instance:, instance_method:, args:|
+    args.call instance_method.bind( instance )
   end
   
 end # class Response

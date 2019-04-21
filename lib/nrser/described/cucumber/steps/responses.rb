@@ -41,7 +41,7 @@ module Responses
       "I call the method with no arguments"
     ].map do |template|
       Step template do
-        describe :response, params: Meta::Args::Simple.new
+        describe :response, args: Meta::Args::Simple.new
       end
     end
 
@@ -65,13 +65,13 @@ module Responses
     Step "I call {method_name} with no arguments" do |method_name|
       # TODO  This *should* work, but it doesn't yet...
       # describe :response, 
-      #   params: Meta::Args::Simple.new,
+      #   args: Meta::Args::Simple.new,
       #   callable: describe_method( method_name )
       
       # So we do this...
       describe_method method_name
       describe :response, 
-        params: Meta::Args::Simple.new
+        args: Meta::Args::Simple.new
     end
     
   # CALL_METHOD_NAME_ON_X_WITH_NO_ARGS = \
@@ -79,21 +79,21 @@ module Responses
     do |method_name, described|
       describe :response,
         callable: describe( :method, object: described, name: method_name ),
-        params: Meta::Args::Simple.new
+        args: Meta::Args::Simple.new
     end
   
   CALL_METHOD_NAME_WITH_ARGS = \
     Step "I call {method_name} with {values}" do |method_name, values|
       describe_method method_name
       # describe_positional_args values
-      describe :response, params: args_for_positional_values( values )
+      describe :response, args: args_for_positional_values( values )
     end
     
     Step "I call {method_name} on the {described} with {values}" \
     do |method_name, described, values|
       describe :response,
         callable: describe( :method, object: described, name: method_name ),
-        params: args_for_positional_values( values )
+        args: args_for_positional_values( values )
     end
   
   CALL_IT_WITH_ARGUMENTS,
@@ -103,7 +103,7 @@ module Responses
       "I call the method with {values}",
     ].map do |template|
       Step template do |values|
-        describe :response, params: args_for_positional_values( values )
+        describe :response, args: args_for_positional_values( values )
       end
     end
   

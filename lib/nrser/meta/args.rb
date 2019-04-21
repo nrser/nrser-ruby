@@ -147,7 +147,7 @@ class Args::Named < Args
               "is available",
               callable: callable,
               callable_parameters: callable.parameters,
-              params: self
+              args: self
           else
             # Consume the keyword hash as the positional parameter
             args << keyword
@@ -163,7 +163,7 @@ class Args::Named < Args
             "Keyword argument", name, "is required, but no value is available",
             callable: callable,
             callable_parameters: callable.parameters,
-            params: self
+            args: self
         end
       when :rest
         

@@ -31,10 +31,10 @@ def NEW *args, &body
     block = args[ -1 ]
     args = args[ 0..-2 ]
   end
-
-  params = Meta::Args::Simple.new *args, &block
+  
   DESCRIBE :instance,
-    params: params, &body
+    args: Meta::Args::Simple.new( *args, &block ),
+    &body
 end
 
 alias_method :NEW_INSTANCE, :NEW
@@ -55,12 +55,11 @@ def INSTANCE_FROM method_name, *args, &body
     block = args[ -1 ]
     args = args[ 0..-2 ]
   end
-
-  params = Meta::Args::Simple.new *args, &block
   
   DESCRIBE :instance,
     method_name: Meta::Names::Method::Bare.new( method_name ),
-    params: params, &body
+    args: Meta::Args::Simple.new( *args, &block ),
+    &body
 end # #INSTANCE_FROM
 
 

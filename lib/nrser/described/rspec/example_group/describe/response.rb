@@ -44,8 +44,9 @@ def RESPONSE_TO *args, &body
     args = args[ 0..-2 ]
   end
   
-  params = Meta::Args::Simple.new *args, &block
-  DESCRIBE :response, params: params, &body
+  DESCRIBE :response,
+    args: Meta::Args::Simple.new( *args, &block ),
+    &body
 end # #RESPONSE_TO
 
 
