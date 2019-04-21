@@ -43,7 +43,8 @@ class Instance < Object
   subject_from \
     class_: Class, 
     method_name: t.maybe( Meta::Names::Method::Bare ),
-    params: Parameters do |class_:, method_name:, params:|
+    params: Arguments \
+  do |class_:, method_name:, params:|
     params.call class_.method( method_name || :new )
   end
   

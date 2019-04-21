@@ -14,12 +14,6 @@ require 'nrser/meta/params'
 require_relative './base'
 
 
-# Refinements
-# =======================================================================
-
-require 'nrser/refinements/types'
-using NRSER::Types
-
 
 # Namespace
 # =======================================================================
@@ -31,22 +25,14 @@ module  Described
 # Definitions
 # =======================================================================
 
-# @todo doc me!
+# Describes arguments to a method call, including {Instance} construction.
 # 
-class Parameters < Base
+class Arguments < Base
   
   # Config
   # ========================================================================
   
   subject_type NRSER::Meta::Params
-
-  
-  # Construction
-  # ========================================================================
-  
-  # def initialize parent: nil, values: {}
-  #   super( parent: parent, subject: NRSER::Meta::Params.new( values ) )
-  # end
   
   
   # Instance Methods
@@ -56,7 +42,7 @@ class Parameters < Base
     subject[ name ] = value
   end
   
-end # class Callable
+end # class Arguments
 
 
 # /Namespace

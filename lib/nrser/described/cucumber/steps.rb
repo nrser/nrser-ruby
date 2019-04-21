@@ -8,6 +8,7 @@
 # -----------------------------------------------------------------------
 
 # Subtree
+require_relative './steps/arguments'
 require_relative './steps/attributes'
 require_relative './steps/classes'
 require_relative './steps/errors'
@@ -18,7 +19,6 @@ require_relative './steps/lets'
 require_relative './steps/methods'
 require_relative './steps/modules'
 require_relative './steps/objects'
-require_relative './steps/parameters'
 require_relative './steps/responses'
 
 

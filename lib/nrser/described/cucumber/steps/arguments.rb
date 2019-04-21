@@ -23,7 +23,7 @@ module  Steps
 # Definitions
 # =======================================================================
 
-module Parameters
+module Arguments
   
   # Mixins
   # ==========================================================================
@@ -82,23 +82,23 @@ module Parameters
     end # Step
   
 
-  PARAM_NAME_IS = \
-    Step "the {param_name} argument is {value}" do |param_name, value|
-      describe_param param_name, value
-    end
+
+  Step "the {param_name} argument is {value}" do |param_name, value|
+    describe_param param_name, value
+  end
 
   
-  BLOCK_PARAM_IS = \
-    Step "the block argument is {value}" do |value|
-      if described.is_a? NRSER::Described::Parameters
-        described.block = value
-      else
-        describe :parameters,
-          subject: NRSER::Meta::Params::Named.new( block: value )
-      end
+
+  Step "the block argument is {value}" do |value|
+    if described.is_a? NRSER::Described::Arguments
+      described.block = value
+    else
+      describe :arguments,
+        subject: NRSER::Meta::Params::Named.new( block: value )
     end
+  end
   
-end # module Parameters
+end # module Arguments
 
 # /Namespace
 # =======================================================================

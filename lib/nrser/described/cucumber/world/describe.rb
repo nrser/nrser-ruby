@@ -202,7 +202,7 @@ module Describe
   # Helper to describe a single parameter's value by name.
   # 
   # If parameters are currently being described, adds this name and value
-  # combination. Otherwise, creates a new {NRSER::Described::Parameters}
+  # combination. Otherwise, creates a new {NRSER::Described::Arguments}
   # with this name and value set.
   # 
   # @example Set the value of a positional parameter
@@ -214,7 +214,7 @@ module Describe
   # @example Set the value of the block paramter
   #   describe_param '&block', -> { 1 }
   # 
-  # @see NRSER::Described::Parameters
+  # @see NRSER::Described::Arguments
   # @see NRSER::Meta::Names::Param
   # 
   # @param [#to_s] name
@@ -224,7 +224,7 @@ module Describe
   # @param [::Object] value
   #   The parameter's value.
   # 
-  # @return [NRSER::Described::Parameters]
+  # @return [NRSER::Described::Arguments]
   #   The parameters description instance the value was set in.
   # 
   # @raise [TypeError]
@@ -232,11 +232,11 @@ module Describe
   #   of {NRSER::Meta::Names::Param}.
   # 
   def describe_param name, value
-    if described.is_a? NRSER::Described::Parameters
+    if described.is_a? NRSER::Described::Arguments
       described[ name ] = value
       described
     else
-      describe :parameters,
+      describe :arguments,
         subject: NRSER::Meta::Params::Named.new( named: { name => value } )
     end
   end # #describe_param
@@ -273,11 +273,11 @@ module Describe
   # @param [::Array<::Object>] values
   #   Parameter values.
   # 
-  # @return [NRSER::Described::Parameters]
+  # @return [NRSER::Described::Arguments]
   #   The parameters description.
   # 
   def describe_positional_params values
-    describe :parameters,
+    describe :arguments,
       subject: params_for_positional_values( values )
   end # #describe_positional_params
   
