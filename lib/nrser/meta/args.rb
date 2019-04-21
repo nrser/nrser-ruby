@@ -36,10 +36,10 @@ module  Meta
 # Definitions
 # =======================================================================
 
-class Params
+class Args
 end
 
-class Params::Simple < Params
+class Args::Simple < Args
   
   # Positional parameter values.
   # 
@@ -67,8 +67,8 @@ class Params::Simple < Params
 end
 
 
-# @todo document Params class.
-class Params::Named < Params
+# @todo document Args class.
+class Args::Named < Args
   
   # Mixins
   # ========================================================================
@@ -93,7 +93,7 @@ class Params::Named < Params
   # Construction
   # ========================================================================
   
-  # Instantiate a new `Params`.
+  # Instantiate a new `Args`.
   def initialize  named: {},
                   args: [],
                   kwds: {},
@@ -249,7 +249,7 @@ class Params::Named < Params
   alias_method :[]=, :set
   
   
-end # class Params
+end # class Args
 
 
 # /Namespace

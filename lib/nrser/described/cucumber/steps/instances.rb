@@ -114,7 +114,7 @@ module Instances
       "I construct an instance of {class} with no arguments",
     ].map do |template|
       Step template do |class_|
-        describe :instance, class_: class_, params: Meta::Params::Simple.new
+        describe :instance, class_: class_, params: Meta::Args::Simple.new
       end
     end
   
@@ -128,7 +128,7 @@ module Instances
       Step template do |described|
         describe :instance,
           class_: described.resolve!( hierarchy ).subject,
-          params: Meta::Params::Simple.new
+          params: Meta::Args::Simple.new
       end
     end
   

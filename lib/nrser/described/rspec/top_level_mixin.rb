@@ -87,7 +87,7 @@ module TopLevelMixin
   
   
   # Create a new {Wrappers::Block} (that will be recognized as the block
-  # parameter in {Meta::Params}) from `&block`.
+  # parameter in {Meta::Args}) from `&block`.
   # 
   # @param [::Proc] block
   #   Proc to wrap.

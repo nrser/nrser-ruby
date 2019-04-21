@@ -41,7 +41,7 @@ module Responses
       "I call the method with no arguments"
     ].map do |template|
       Step template do
-        describe :response, params: Meta::Params::Simple.new
+        describe :response, params: Meta::Args::Simple.new
       end
     end
 
@@ -65,13 +65,13 @@ module Responses
     Step "I call {method_name} with no arguments" do |method_name|
       # TODO  This *should* work, but it doesn't yet...
       # describe :response, 
-      #   params: Meta::Params::Simple.new,
+      #   params: Meta::Args::Simple.new,
       #   callable: describe_method( method_name )
       
       # So we do this...
       describe_method method_name
       describe :response, 
-        params: Meta::Params::Simple.new
+        params: Meta::Args::Simple.new
     end
     
   # CALL_METHOD_NAME_ON_X_WITH_NO_ARGS = \
@@ -79,7 +79,7 @@ module Responses
     do |method_name, described|
       describe :response,
         callable: describe( :method, object: described, name: method_name ),
-        params: Meta::Params::Simple.new
+        params: Meta::Args::Simple.new
     end
   
   CALL_METHOD_NAME_WITH_ARGS = \

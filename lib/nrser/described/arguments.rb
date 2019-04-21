@@ -7,8 +7,8 @@
 # Project / Package
 # -----------------------------------------------------------------------
 
-# Subjects are {NRSER::Meta::Params}
-require 'nrser/meta/params'
+# Subjects are {NRSER::Meta::Args}
+require 'nrser/meta/args'
 
 # Extending {Base}
 require_relative './base'
@@ -32,7 +32,7 @@ class Arguments < Base
   # Config
   # ========================================================================
   
-  subject_type NRSER::Meta::Params
+  subject_type NRSER::Meta::Args
   
   
   # Instance Methods

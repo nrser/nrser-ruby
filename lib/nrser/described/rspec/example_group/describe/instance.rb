@@ -32,7 +32,7 @@ def NEW *args, &body
     args = args[ 0..-2 ]
   end
 
-  params = Meta::Params::Simple.new *args, &block
+  params = Meta::Args::Simple.new *args, &block
   DESCRIBE :instance,
     params: params, &body
 end
@@ -56,7 +56,7 @@ def INSTANCE_FROM method_name, *args, &body
     args = args[ 0..-2 ]
   end
 
-  params = Meta::Params::Simple.new *args, &block
+  params = Meta::Args::Simple.new *args, &block
   
   DESCRIBE :instance,
     method_name: Meta::Names::Method::Bare.new( method_name ),

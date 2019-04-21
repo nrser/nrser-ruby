@@ -94,7 +94,7 @@ module Arguments
       described.block = value
     else
       describe :arguments,
-        subject: NRSER::Meta::Params::Named.new( block: value )
+        subject: NRSER::Meta::Args::Named.new( block: value )
     end
   end
   

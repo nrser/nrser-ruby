@@ -237,19 +237,19 @@ module Describe
       described
     else
       describe :arguments,
-        subject: NRSER::Meta::Params::Named.new( named: { name => value } )
+        subject: NRSER::Meta::Args::Named.new( named: { name => value } )
     end
   end # #describe_param
   
   
-  # Construct a {Meta::Params} from positional argument values, taking account
+  # Construct a {Meta::Args} from positional argument values, taking account
   # of the last value potentially being a {Wrappers::Block} that indicates it
   # is the block parameter.
   # 
   # @param [::Array<::Object>] values
   #   Parameter values.
   # 
-  # @return [Meta::Params]
+  # @return [Meta::Args]
   #   The new parameters object.
   # 
   def params_for_positional_values values
@@ -263,7 +263,7 @@ module Describe
       block = nil
     end
     
-    Meta::Params::Simple.new *args, &block
+    Meta::Args::Simple.new *args, &block
   end # #params_for_positional_values
   
   
