@@ -7,6 +7,8 @@
 # Project / Package
 # -----------------------------------------------------------------------
 
+require 'nrser/meta/args/array'
+
 # Extending in {Helpers}
 require_relative './helpers'
 
@@ -41,7 +43,8 @@ module Responses
       "I call the method with no arguments"
     ].map do |template|
       Step template do
-        describe :response, args: Meta::Args::Simple.new
+        describe :response,
+          args: Meta::Args::Array.new
       end
     end
 
@@ -65,13 +68,13 @@ module Responses
     Step "I call {method_name} with no arguments" do |method_name|
       # TODO  This *should* work, but it doesn't yet...
       # describe :response, 
-      #   args: Meta::Args::Simple.new,
+      #   args: Meta::Args::Array.new,
       #   callable: describe_method( method_name )
       
       # So we do this...
       describe_method method_name
       describe :response, 
-        args: Meta::Args::Simple.new
+        args: Meta::Args::Array.new
     end
     
   # CALL_METHOD_NAME_ON_X_WITH_NO_ARGS = \
@@ -79,14 +82,15 @@ module Responses
     do |method_name, described|
       describe :response,
         callable: describe( :method, object: described, name: method_name ),
-        args: Meta::Args::Simple.new
+        args: Meta::Args::Array.new
     end
   
   CALL_METHOD_NAME_WITH_ARGS = \
     Step "I call {method_name} with {values}" do |method_name, values|
       describe_method method_name
       # describe_positional_args values
-      describe :response, args: args_for_positional_values( values )
+      describe :response,
+        args: args_for_positional_values( values )
     end
     
     Step "I call {method_name} on the {described} with {values}" \

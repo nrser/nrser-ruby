@@ -10,6 +10,8 @@
 # Using {NRSER::Meta::Names::Const.pattern}
 require 'nrser/meta/names'
 
+require 'nrser/meta/args/array'
+
 # Extending in {Helpers}
 require_relative './helpers'
 
@@ -114,7 +116,9 @@ module Instances
       "I construct an instance of {class} with no arguments",
     ].map do |template|
       Step template do |class_|
-        describe :instance, class_: class_, args: Meta::Args::Simple.new
+        describe :instance,
+          class_: class_,
+          args: Meta::Args::Array.new
       end
     end
   
@@ -128,7 +132,7 @@ module Instances
       Step template do |described|
         describe :instance,
           class_: described.resolve!( hierarchy ).subject,
-          args: Meta::Args::Simple.new
+          args: Meta::Args::Array.new
       end
     end
   

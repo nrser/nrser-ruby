@@ -1,6 +1,13 @@
 # encoding: UTF-8
 # frozen_string_literal: true
 
+# Requirements
+# ============================================================================
+
+### Project / Package ###
+
+require 'nrser/meta/args/array'
+
 
 # Namespace
 # =======================================================================
@@ -45,7 +52,7 @@ def RESPONSE_TO *args, &body
   end
   
   DESCRIBE :response,
-    args: Meta::Args::Simple.new( *args, &block ),
+    args: Meta::Args::Array.new( *args, &block ),
     &body
 end # #RESPONSE_TO
 

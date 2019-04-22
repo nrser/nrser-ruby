@@ -7,6 +7,8 @@
 # Project / Package
 # -----------------------------------------------------------------------
 
+require 'nrser/meta/args/named'
+
 # Extending in {Helpers}
 require_relative './helpers'
 

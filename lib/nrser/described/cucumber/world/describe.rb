@@ -16,6 +16,9 @@ require 'active_support/core_ext/string/inflections'
 # Project / Package
 # -----------------------------------------------------------------------
 
+require 'nrser/meta/args/array'
+require 'nrser/meta/args/named'
+
 require 'nrser/described'
 
 require 'nrser/described/hierarchy/array'
@@ -263,7 +266,7 @@ module Describe
       block = nil
     end
     
-    Meta::Args::Simple.new *args, &block
+    Meta::Args::Array.new *args, &block
   end # #args_for_positional_values
   
   

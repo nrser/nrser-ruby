@@ -1,6 +1,14 @@
 # encoding: UTF-8
 # frozen_string_literal: true
 
+# Requirements
+# ============================================================================
+
+### Project / Package ###
+
+require 'nrser/meta/args/array'
+
+
 # Namespace
 # =======================================================================
 
@@ -33,7 +41,7 @@ def NEW *args, &body
   end
   
   DESCRIBE :instance,
-    args: Meta::Args::Simple.new( *args, &block ),
+    args: Meta::Args::Array.new( *args, &block ),
     &body
 end
 
@@ -58,7 +66,7 @@ def INSTANCE_FROM method_name, *args, &body
   
   DESCRIBE :instance,
     method_name: Meta::Names::Method::Bare.new( method_name ),
-    args: Meta::Args::Simple.new( *args, &block ),
+    args: Meta::Args::Array.new( *args, &block ),
     &body
 end # #INSTANCE_FROM
 
@@ -70,4 +78,4 @@ end # module  Describe
 end # module  ExampleGroup
 end # module  RSpec
 end # module  Described
-end # module   NRSER
+end # module  NRSER

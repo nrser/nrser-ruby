@@ -25,12 +25,12 @@ class Response < Object
   def rspec_description *additional_description
     args = init_values[ :args ]
   
-    pos_args = [ Described::RSpec::Format::Args.new( args.args ) ]
+    desc_elements = [ Described::RSpec::Format::Args.new( args.to_a ) ]
     
-    pos_args << args.block if args.block
+    desc_elements << args.block if args.block
   
     Described::RSpec::Format::Description.new \
-      *pos_args,
+      *desc_elements,
       *additional_description,
       type: :called_with
   end
