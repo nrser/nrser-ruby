@@ -32,8 +32,68 @@ module  Support
 # Definitions
 # =======================================================================
 
-# @todo document PP module.
+# Mixin to support easier pretty-printing configuration.
+#
+# Pretty-printing is crucial to my development process: [Pry][] uses it for
+# display, and VSCode's debugging console for Ruby *seems* to use it too, though
+# most recently at least it hasn't seemed to be integrating properly. I
+# *thought* it worked at some point! To look at at some point some time like
+# never.
+#
+# [Pry]: https://rubygems.org/gems/pry
+#
+# Anyways, this module aims to address my greatest pretty-printing-problem:
+# information overload. Deep graphs of objects, like the description hierarchies
+# produced working with {Described} quickly drown the display in noise when
+# using the default {PP} behavior.
+#
+# {Support::PP} combats overload by offering a simple interface for configuring
+# what instance variable values and methods responses to print. This is
+# accomplished by creating class-level {Config} instances with
+# {ClassMethods#pretty_print_config}, which create {Config::IVars} instances
+# when appropriate.
+#
+# Check out {Config::IVars.make} for examples of how instance variable filtering
+# configuration happens on a technical level.
+#
+# More documentation is needed, but for the moment, here's a quick example
+# configuration:
 # 
+# ```ruby
+# class A
+#   
+#   include NRSER::Support::PP
+#   
+#   pretty_print_config \
+#     ivars: {
+#       # Configure to print all instance variables that are defined for 
+#       # instances. This is how Ruby's pretty-printing works out-of-the-box,
+#       # and this mode is the default if none is specified.
+#       # 
+#       # Other options are `:always`, `:never`, and `:present`
+#       mode: :defined,
+#       
+#       # Defines exceptions to the `mode` behavior. You can alternatively use
+#       # and `only:` style, but **not both**.
+#       except: {
+#         # *Never* print `@too_junky`
+#         :@too_junky => :never,
+#         
+#         # *Always* print `@really_important`, even as `nil` if it's not 
+#         # defined.
+#         :@really_important => :always,
+#         
+#         # Print `@sometimes_something` if it's {Object#present?} 
+#         # (using the ActiveSupport core extension method)
+#         :@sometimes_something => :present,
+#       }
+#     }
+#   
+#   # ...
+# 
+# end
+# ```
+#
 module PP
   
   class ErrorString < ::String
