@@ -7,12 +7,14 @@
 # Project / Package
 # -----------------------------------------------------------------------
 
-# Sub-tree
-require_relative './world/arguments'
-require_relative './world/describe'
-require_relative './world/expect'
-require_relative './world/logger'
-require_relative './world/scope'
+require_relative './base'
+
+
+# Refinements
+# ============================================================================
+
+require 'nrser/refinements/types'
+using NRSER::Types
 
 
 # Namespace
@@ -21,21 +23,22 @@ require_relative './world/scope'
 module  NRSER
 module  Described
 module  Cucumber
+module  StepComponent
 
 
 # Definitions
 # =======================================================================
 
-# Contains sub-modules that are mixed in to the "World" in Cucumber
-# (via {Cucumber::Glue::DSL::World}).
+# A Cucumber step component that is composed of other step components.
 # 
-module World
-end # module World
+class Composite < Base
+end # class Composite
 
 
 # /Namespace
 # =======================================================================
 
+end # module StepComponent
 end # module Cucumber
 end # module Described
 end # module NRSER

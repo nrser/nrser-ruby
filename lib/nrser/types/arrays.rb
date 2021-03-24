@@ -9,6 +9,7 @@
 
 require_relative './is_a'
 require_relative './top'
+require_relative './attributes'
 
 
 # Refinements
@@ -220,6 +221,25 @@ def_type        :Array,
     ArrayOfType.new item_type, **options
   end
 end # .Array
+
+
+#@!method self.NonEmptyArray **options
+#   Any array that is **not** {::Array#empty?}.
+#   
+#   @param [Hash] options
+#     Passed to {Type#initialize}.
+#   
+#   @return [Type]
+#   
+def_type        :NonEmptyArray,
+  parameterize: :item_type,
+&->( item_type = self.Top, **options ) do
+  self.Intersection \
+    self.Array( item_type ),
+    self.Attributes( empty?: false ),
+    **options
+end # .NonEmptyArray
+
 
 # @!endgroup Array Type Factories # ******************************************
 

@@ -50,6 +50,35 @@ module Instances
   extend Helpers
   
   
+  # def_step_component :from_arguments,
+  #   "from/with", Arguments.components[ :arguments ]
+  
+  
+  # def_step_component :named_class,
+  #   "{class}" \
+  # do |class_|
+  #   class_
+  # end
+  
+  
+  # def_step_component :described_class,
+  #   "the {described}" \
+  # do |described|
+  #   described.resolve!( hierarchy ).subject
+  # end
+  
+  
+  # def_step_component :class,
+  #   components[ :named_class ] | components[ :described_class ]
+  
+  
+  # def_step_component :construct_from,
+  #   "I construct a(n) (instance of )",
+  #   components[ :class ],
+  #   "from/with",
+  #   Arguments.components[ :arguments ]
+  
+  
   # Steps
   # ==========================================================================
   

@@ -18,6 +18,7 @@ require_relative './world'
 require_relative './hooks'
 
 World NRSER::Described::Cucumber::World::Logger
+World NRSER::Described::Cucumber::World::Arguments
 World NRSER::Described::Cucumber::World::Describe
 World NRSER::Described::Cucumber::World::Expect
 World NRSER::Described::Cucumber::World::Scope

@@ -165,7 +165,7 @@ Gem::Specification.new do |spec|
 
   # Used to parse docs from the Quip API - at the moment, the {NRSER::Types}
   # display table, which we verify in the specs
-  spec.add_development_dependency "nokogiri", '~> 1.8.4'
+  spec.add_development_dependency "nokogiri", '~> 1.10.3'
   
   
 end

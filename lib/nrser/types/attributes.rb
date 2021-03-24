@@ -259,6 +259,72 @@ def_type        :Length,
   self.Attributes({ length: length_type }, options)
 end # .Length
 
+class Attributes
+  extend Factory
+  
+  #@!method self.Predicate **options
+  #   @todo Document Predicate type factory.
+  #   
+  #   @param [Hash] options
+  #     Passed to {Type#initialize}.
+  #   
+  #   @return [Type]
+  #   
+  def_type        :Predicate,
+    parameterize: [ :name, :boolean ],
+  &->( name, boolean, **options ) do
+    Types.Attributes(
+      { name => ( boolean ? Types.True : Types.False ) },
+      **options
+    )
+  end # .Predicate
+  
+  
+  #@!method self.True **options
+  #   {Type} of objects which `name` method responds `true`.
+  #   
+  #   @param [Hash] options
+  #     Passed to {Type#initialize}.
+  #   
+  #   @return [Type]
+  #   
+  def_type        :True,
+    parameterize: [ :name ],
+  &->( name, **options ) do
+    self.Predicate name, true, **options
+  end # .True
+  
+  
+  #@!method self.False **options
+  #   {Type} of objects which `name` method responds `false`.
+  #   
+  #   @param [Hash] options
+  #     Passed to {Type#initialize}.
+  #   
+  #   @return [Type]
+  #   
+  def_type        :False,
+    parameterize: [ :name ],
+  &->( name, **options ) do
+    self.Predicate name, false, **options
+  end # .False
+  
+end # class Attributes (type factories)
+
+
+#@!method self.Empty **options
+#   Type for objects which `#empty?` method responds `true`.
+#   
+#   @param [Hash] options
+#     Passed to {Type#initialize}.
+#   
+#   @return [Type]
+#   
+def_type        :Empty,
+&->( **options ) do
+  Attributes::True :empty?, **options
+end # .Empty
+
 # @!endgroup Attributes Type Factories # *************************************
 
 

@@ -7,6 +7,8 @@
 # Project / Package
 # -----------------------------------------------------------------------
 
+# Using {Meta::Args} realizations
+require 'nrser/meta/args/array'
 require 'nrser/meta/args/named'
 
 # Extending in {Helpers}
@@ -33,56 +35,59 @@ module Arguments
   extend Helpers
   
   
+  # Singleton Methods
+  # ==========================================================================
+  
+  
+  # Step Components
+  # ==========================================================================
+  
+  def_step_component :empty,
+    "empty/no arguments" \
+  do
+    [ Meta::Args::Array.new ]
+  end
+  
+  
+  def_step_component :inline,
+    "(the )arguments {values}" \
+  do |values|
+    [ args_for_positional_values( values ) ]
+  end
+  
+  
+  def_step_component :multiline,
+    "(the )arguments:" \
+  do |multiline|
+    if multiline.is_a? ::Cucumber::MultilineArgument::DataTable
+      [ args_for_data_table( multiline ) ]
+    else
+      [ scope_eval( "::NRSER::Meta::Args::Array.new( #{ multiline } )" ) ]
+    end
+  end
+  
+  
+  def_step_component :single_string,
+    "(the )single string argument:" \
+  do |string|
+    [ Meta::Args::Array.new( string ) ]
+  end
+  
+  
+  def_step_component_variations :arguments,
+    components[ :empty ],
+    components[ :inline ],
+    components[ :multiline ],
+    components[ :single_string ]
+
+  
   # Steps
   # ==========================================================================
   
-  THE_INLINE_PARAMS = \
-    Step "the arguments {values}" \
-    do |values|
-      describe_positional_args values
-    end
-
-  
-  THE_TABLE_PARAMS = \
-    Step "the arguments:" do |table|
-      case table.column_names.count
-      when 1
-        # The table is interpreted as a list of positional values, the last of 
-        # which *may* be a block.
-        describe_positional_args \
-          table.rows.map { |row|
-            ParameterTypes::Values::VALUE.transform self,
-                                                    [ row.first ],
-                                                    pointer: false
-          }
-      
-      when 2
-        # The table is interpreted as argument name/value pairs, with the names
-        # in {NRSER::Meta::Names} format (`arg`, `kwd:`, `&block`)
-        table.rows.each do |(raw_name_string, raw_value_string)|
-          name = \
-            ParameterTypes[ :param_name ].transform self,
-                                                    [ raw_name_string ],
-                                                    pointer: false
-          
-          value = \
-            ParameterTypes[ :value ].transform  self,
-                                                [ raw_value_string ],
-                                                pointer: false
-          
-          describe_arg name, value
-        end
-        
-      else
-        # We don't handle any other dimensions
-        raise NRSER::RuntimeError.new \
-          "Parameter table must be 1 or 2 columns, found ",
-          table.column_names.count,
-          table: table
-        
-      end # case table.column_names.count
-    end # Step
-  
+  def_steps components[ :arguments ] do |args|
+    describe :arguments,
+      subject: args
+  end  
 
 
   Step "the {param_name} argument is {value}" do |param_name, value|

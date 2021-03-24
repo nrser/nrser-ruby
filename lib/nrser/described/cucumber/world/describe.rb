@@ -245,31 +245,6 @@ module Describe
   end # #describe_arg
   
   
-  # Construct a {Meta::Args} from positional argument values, taking account
-  # of the last value potentially being a {Wrappers::Block} that indicates it
-  # is the block parameter.
-  # 
-  # @param [::Array<::Object>] values
-  #   Parameter values.
-  # 
-  # @return [Meta::Args]
-  #   The new parameters object.
-  # 
-  def args_for_positional_values values
-    # Handle the last entry being a `&...` expression, which is interpreted as 
-    # the block parameter
-    if values[ -1 ].is_a? Wrappers::Block
-      args = values[ 0..-2 ]
-      block = values[ -1 ]
-    else
-      args = values
-      block = nil
-    end
-    
-    Meta::Args::Array.new *args, &block
-  end # #args_for_positional_values
-  
-  
   # Describe parameters positionally, like you would using `#send`, accept that
   # the last value is passed as the block if it is a {Wrappers::Block}.
   # 
@@ -286,7 +261,7 @@ module Describe
   
   # @!endgroup Describe Helper Instance Methods # ****************************
   
-end # module DescribeMixins
+end # module Describe
 
 
 # /Namespace

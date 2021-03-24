@@ -85,6 +85,38 @@ module Helpers
     ::Cucumber::Glue::Dsl.register_rb_step_definition pattern, proc, options
   end
   
+  
+  def components
+    @components ||= {}
+  end
+  
+  
+  def def_step_component name, expression, &transformer
+    components[ name.to_sym ] = \
+      StepComponent::Expression.new name, expression, &transformer
+  end
+  
+  
+  def def_step_component_variations name, *components
+    components[ name.to_sym ] = \
+      StepComponent::Variations.new name, *components
+  end
+  
+  
+  def def_steps *components, &block
+    component = case components.length
+    when 0
+      raise ArgumentError.new \
+        "Need to provide components"
+    when 1
+      components[ 0 ]
+    else
+      StepComponent::Sequence.new :anon, *components
+    end
+    
+    component.each do |
+  end
+  
 end # module Helpers
 
 # /Namespace
